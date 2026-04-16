@@ -91,11 +91,19 @@
       document.getElementById('pagination').innerHTML = h;
     }
 
-    fetch('components.json').then(r => r.json()).then(d => {
-      items = d.skills || [];
-      document.getElementById('count').textContent = items.length;
-      render(1);
-    });
+    fetch('components.json')
+      .then(r => r.json())
+      .then(d => {
+        console.log('Loaded keys:', Object.keys(d));
+        console.log('Skills count:', (d.skills || []).length);
+        items = d.skills || [];
+        document.getElementById('count').textContent = items.length;
+        render(1);
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        document.getElementById('grid').innerHTML = '<div class="loading">Error: ' + err.message + '</div>';
+      });
 
     document.getElementById('search').addEventListener('input', e => {
       const q = e.target.value.toLowerCase();

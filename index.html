@@ -160,18 +160,21 @@
     fetch('components.json')
       .then(r => r.json())
       .then(d => {
+        console.log('Loaded keys:', Object.keys(d));
         data = [];
         for (const [type, items] of Object.entries(d)) {
           if (Array.isArray(items)) {
             items.forEach(item => data.push({...item, type}));
             document.getElementById(type + '-num').textContent = items.length;
+            console.log('Added', type, ':', items.length);
           }
         }
         document.getElementById('count').textContent = data.length + ' components';
         render();
       })
       .catch(e => {
-        document.getElementById('grid').innerHTML = '<div class="loading">Error loading data</div>';
+        console.error('Load error:', e);
+        document.getElementById('grid').innerHTML = '<div class="loading">Error: ' + e.message + '</div>';
         console.error(e);
       });
 
