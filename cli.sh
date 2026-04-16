@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # AICCLI - AI Components CLI
-# Usage: curl -sL https://openclacode.netlify.app/cli.sh | bash -s install skills/web-scraping
+# Usage: curl -sL {{SITE_DOMAIN}}/cli.sh | bash -s install skills/web-scraping
 
-SITE_URL="https://openclacode.netlify.app"
+SITE_URL="{{SITE_DOMAIN}}"
 INSTALL_DIR=".aiccli"
 
 # Colors
