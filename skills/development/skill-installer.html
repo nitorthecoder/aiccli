@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>skill-installer - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>skill-installer</h1>
+  <div class="meta">Category: development | Type: skill</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+name: skill-installer
+description: Install Codex skills into $CODEX_HOME/skills from a curated list or a GitHub repo path. Use when a user asks to list installable skills, install a curated skill, or install a skill from another repo (including private repos).
+metadata:
+  short-description: Install curated skills from openai/skills or other repos
+---
+
+# Skill Installer
+
+Helps install skills. By default these are from https://github.com/openai/skills/tree/main/skills/.curated, but users can also provide other locations.
+
+Use the helper scripts based on the task:
+- List curated skills when the user asks what is available, or if the user uses this skill without specifying what to do.
+- Install from the curated list when the user provides a skill name.
+- Install from another repo when the user provides a GitHub repo/path (including private repos).
+
+Install skills with the helper scripts.
+
+## Communication
+
+When listing curated skills, output approximately as follows, depending on the context of the user's request:
+"""
+Skills from {repo}:
+1. skill-1
+2. skill-2 (already installed)
+3. ...
+Which ones would you like installed?
+"""
+
+After installing a skill, tell the user: "Restart Codex to pick up new skills."
+
+## Scripts
+
+All of these scripts use network, so when running in the sandbox, request escalation when running them.
+
+- `scripts/list-curated-skills.py` (prints curated list with installed annotations)
+- `scripts/list-curated-skills.py --format json`
+- `scripts/install-skill-from-github.py --repo &lt;owner&gt;/&lt;repo&gt; --path &lt;path/to/skill&gt; [&lt;path/to/skill&gt; ...]`
+- `scripts/install-skill-from-github.py --url https://github.com/&lt;owner&gt;/&lt;repo&gt;/tree/&lt;ref&gt;/&lt;path&gt;`
+
+## Behavior and Options
+
+- Defaults to direct download for public GitHub repos.
+- If download fails with auth/permission errors, falls back to git sparse checkout.
+- Aborts if the destination skill directory already exists.
+- Installs into `$CODEX_HOME/skills/&lt;skill-name&gt;` (defaults to `~/.codex/skills`).
+- Multiple `--path` values install multiple skills in one run, each named from the path basename unless `--name` is supplied.
+- Options: `--ref &lt;ref&gt;` (default `main`), `--dest &lt;path&gt;`, `--method auto|download|git`.
+
+## Notes
+
+- Curated listing is fetched from `https://github.com/openai/skills/tree/main/skills/.curated` via the GitHub API. If it is unavailable, explain the error and exit.
+- Private GitHub repos can be accessed via existing git credentials or optional `GITHUB_TOKEN`/`GH_TOKEN` for download.
+- Git fallback tries HTTPS first, then SSH.
+- The skills at https://github.com/openai/skills/tree/main/skills/.system are preinstalled, so no need to help users install those. If they ask, just explain this. If they insist, you can download and overwrite.
+- Installed annotations come from `$CODEX_HOME/skills`.
+</pre>
+</body>
+</html>

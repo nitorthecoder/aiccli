@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>create-pr - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>create-pr</h1>
+  <div class="meta">Category: sentry | Type: skill</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+name: create-pr
+description: Create pull requests following Sentry conventions. Use when opening PRs, writing PR descriptions, or preparing changes for review. Follows Sentry's code review guidelines.
+---
+
+# Create Pull Request
+
+Create pull requests following Sentry's engineering practices.
+
+**Requires**: GitHub CLI (`gh`) authenticated and available.
+
+## Process
+
+### Step 1: Verify Branch State
+
+```bash
+# Check current branch and status
+git status
+git log main..HEAD --oneline
+```
+
+Ensure:
+- All changes are committed
+- Branch is up to date with remote
+- Changes are rebased on main if needed
+
+### Step 2: Analyze Changes
+
+Review what will be included in the PR:
+
+```bash
+# See all commits that will be in the PR
+git log main..HEAD
+
+# See the full diff
+git diff main...HEAD
+```
+
+Understand the scope and purpose of all changes before writing the description.
+
+### Step 3: Write the PR Description
+
+Follow this structure:
+
+```markdown
+&lt;brief description of what the PR does&gt;
+
+&lt;why these changes are being made - the motivation&gt;
+
+&lt;alternative approaches considered, if any&gt;
+
+&lt;any additional context reviewers need&gt;
+```
+
+**Do NOT include:**
+- "Test plan" sections
+- Checkbox lists of testing steps
+- Redundant summaries of the diff
+
+**Do include:**
+- Clear explanation of what and why
+- Links to relevant issues or tickets
+- Context that isn't obvious from the code
+- Notes on specific areas that need careful review
+
+### Step 4: Create the PR
+
+```bash
+gh pr create --title "&lt;type&gt;(&lt;scope&gt;): &lt;description&gt;" --body "$(cat &lt;&lt;'EOF'
+&lt;description body here&gt;
+EOF
+)"
+```
+
+**Title format** follows commit conventions:
+- `feat(scope): Add new feature`
+- `fix(scope): Fix the bug`
+- `ref: Refactor something`
+
+### Step 5: Add Reviewers (if known)
+
+```bash
+# Request review from specific people
+gh pr edit --add-reviewer username1,username2
+
+# Or request from a team
+gh pr edit --add-reviewer @getsentry/team-name
+```
+
+Limit to 1-3 reviewers to maintain clear ownership.
+
+## PR Description Examples
+
+### Feature PR
+
+```markdown
+Add Slack thread replies for alert notifications
+
+When an alert is updated or resolved, we now post a reply to the original
+Slack thread instead of creating a new message. This keeps related
+notifications grouped and reduces channel noise.
+
+Previously considered posting edits to the original message, but threading
+better preserves the timeline of events and works when the original message
+is older than Slack's edit window.
+
+Refs SENTRY-1234
+```
+
+### Bug Fix PR
+
+```markdown
+Handle null response in user API endpoint
+
+The user endpoint could return null for soft-deleted accounts, causing
+dashboard crashes when accessing user properties. This adds a null check
+and returns a proper 404 response.
+
+Found while investigating SENTRY-5678.
+
+Fixes SENTRY-5678
+```
+
+### Refactor PR
+
+```markdown
+Extract validation logic to shared module
+
+Moves duplicate validation code from the alerts, issues, and projects
+endpoints into a shared validator class. No behavior change.
+
+This prepares for adding new validation rules in SENTRY-9999 without
+duplicating logic across endpoints.
+```
+
+## Issue References
+
+Reference issues in the PR body:
+
+| Syntax | Effect |
+|--------|--------|
+| `Fixes #1234` | Closes GitHub issue on merge |
+| `Fixes SENTRY-1234` | Closes Sentry issue |
+| `Refs GH-1234` | Links without closing |
+| `Refs LINEAR-ABC-123` | Links Linear issue |
+
+## Guidelines
+
+- **One PR per feature/fix** - Don't bundle unrelated changes
+- **Keep PRs reviewable** - Smaller PRs get faster, better reviews
+- **Explain the why** - Code shows what; description explains why
+- **Mark WIP early** - Use draft PRs for early feedback
+
+## References
+
+- [Sentry Code Review Guidelines](https://develop.sentry.dev/engineering-practices/code-review/)
+- [Sentry Commit Messages](https://develop.sentry.dev/engineering-practices/commit-messages/)
+</pre>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>graph-query - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>graph-query</h1>
+  <div class="meta">Category: ai-maestro | Type: skill</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+name: graph-query
+description: Query the code graph database to understand component relationships, dependencies, and change impact. Use when the user asks to "find callers", "check dependencies", "what uses this", "show relationships", "find serializers", or when reading code and needing to understand what depends on a component before modifications.
+---
+
+# AI Maestro Code Graph Query
+
+Query your codebase's dependency graph to understand component relationships, call chains, and the impact of changes before making modifications. Part of the [AI Maestro](https://github.com/23blocks-OS/ai-maestro) suite.
+
+## Prerequisites
+
+Requires [AI Maestro](https://github.com/23blocks-OS/ai-maestro) running locally with codebase indexed.
+
+```bash
+# Install graph tools
+git clone https://github.com/23blocks-OS/ai-maestro-plugins.git
+cd ai-maestro-plugins && ./install-graph-tools.sh
+```
+
+## Core Behavior
+
+After reading any code file, query the graph to understand dependencies:
+
+```
+Read file -&gt; Query graph -&gt; Then proceed
+```
+
+## Commands
+
+### Query
+| Command | Description |
+|---------|-------------|
+| `graph-describe.sh &lt;name&gt;` | Describe a component or function |
+| `graph-find-callers.sh &lt;fn&gt;` | Find all callers of a function |
+| `graph-find-callees.sh &lt;fn&gt;` | Find all functions called by this function |
+| `graph-find-related.sh &lt;component&gt;` | Find related components |
+| `graph-find-by-type.sh &lt;type&gt;` | Find all components of a type |
+| `graph-find-serializers.sh &lt;model&gt;` | Find serializers for a model |
+| `graph-find-associations.sh &lt;model&gt;` | Find model associations |
+| `graph-find-path.sh &lt;from&gt; &lt;to&gt;` | Find call path between functions |
+
+### Index
+| Command | Description |
+|---------|-------------|
+| `graph-index-delta.sh [path]` | Index or update the code graph |
+
+## Component Types
+
+Use with `graph-find-by-type.sh`: `model`, `serializer`, `controller`, `service`, `job`, `concern`, `component`, `hook`
+
+## Usage Examples
+
+```bash
+# After reading a model file
+graph-describe.sh User
+graph-find-serializers.sh User
+graph-find-associations.sh User
+
+# Before modifying a function
+graph-find-callers.sh process_payment
+graph-find-callees.sh process_payment
+
+# Find call chain between components
+graph-find-path.sh handleRequest sendResponse
+
+# Index your codebase
+graph-index-delta.sh /path/to/project
+```
+
+## Why Query Before Modifying
+
+Without checking the graph, you risk:
+- Breaking callers when changing a function signature
+- Missing serializers that need updating with a model change
+- Overlooking child classes that inherit your modifications
+
+## Full AI Maestro Experience
+
+This skill is part of the [AI Maestro](https://github.com/23blocks-OS/ai-maestro) platform, which provides **6 skills** for AI agent orchestration: messaging, memory, docs, graph, planning, and agent management.
+</pre>
+</body>
+</html>

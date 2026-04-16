@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mui - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>mui</h1>
+  <div class="meta">Category: development | Type: skill</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+name: mui
+description: Material-UI v7 component library patterns including sx prop styling, theme integration, responsive design, and MUI-specific hooks. Use when working with MUI components, styling with sx prop, theme customization, or MUI utilities.
+---
+
+# MUI v7 Patterns
+
+## Purpose
+
+Material-UI v7 (released March 2025) patterns for component usage, styling with sx prop, theme integration, and responsive design.
+
+**Note**: MUI v7 breaking changes from v6:
+- Deep imports no longer work - use package exports field
+- `onBackdropClick` removed from Modal - use `onClose` instead
+- All components now use standardized `slots` and `slotProps` pattern
+- CSS layers support via `enableCssLayer` config (works with Tailwind v4)
+
+## When to Use This Skill
+
+- Styling components with MUI sx prop
+- Using MUI components (Box, Grid, Paper, Typography, etc.)
+- Theme customization and usage
+- Responsive design with MUI breakpoints
+- MUI-specific utilities and hooks
+
+---
+
+## Quick Start
+
+### Basic MUI Component
+
+```typescript
+import { Box, Typography, Button, Paper } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
+
+const styles: Record&lt;string, SxProps&lt;Theme&gt;&gt; = {
+  container: {
+    p: 2,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2,
+  },
+  header: {
+    mb: 3,
+    fontSize: '1.5rem',
+    fontWeight: 600,
+  },
+};
+
+function MyComponent() {
+  return (
+    &lt;Paper sx={styles.container}&gt;
+      &lt;Typography sx={styles.header}&gt;
+        Title
+      &lt;/Typography&gt;
+      &lt;Button variant="contained"&gt;
+        Action
+      &lt;/Button&gt;
+    &lt;/Paper&gt;
+  );
+}
+```
+
+---
+
+## Styling Patterns
+
+### Inline Styles (&lt; 100 lines)
+
+For components with simple styling, define styles at the top:
+
+```typescript
+import type { SxProps, Theme } from '@mui/material';
+
+const componentStyles: Record&lt;string, SxProps&lt;Theme&gt;&gt; = {
+  container: {
+    p: 2,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  header: {
+    mb: 2,
+    color: 'primary.main',
+  },
+  button: {
+    mt: 'auto',
+    alignSelf: 'flex-end',
+  },
+};
+
+function Component() {
+  return (
+    &lt;Box sx={componentStyles.container}&gt;
+      &lt;Typography sx={componentStyles.header}&gt;Header&lt;/Typography&gt;
+      &lt;Button sx={componentStyles.button}&gt;Action&lt;/Button&gt;
+    &lt;/Box&gt;
+  );
+}
+```
+
+### Separate Styles File (&gt;= 100 lines)
+
+For complex components, create separate style file:
+
+```typescript
+// UserProfile.styles.ts
+import type { SxProps, Theme } from '@mui/material';
+
+export const userProfileStyles: Record&lt;string, SxProps&lt;Theme&gt;&gt; = {
+  container: {
+    p: 3,
+    maxWidth: 800,
+    mx: 'auto',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    mb: 3,
+  },
+  // ... many more styles
+};
+
+// UserProfile.tsx
+import { userProfileStyles as styles } from './UserProfile.styles';
+
+function UserProfile() {
+  return &lt;Box sx={styles.container}&gt;...&lt;/Box&gt;;
+}
+```
+
+---
+
+## Common Components
+
+### Layout Components
+
+```typescript
+// Box - Generic container
+&lt;Box sx={{ p: 2, bgcolor: 'background.paper' }}&gt;
+  Content
+&lt;/Box&gt;
+
+// Paper - Elevated surface
+&lt;Paper elevation={2} sx={{ p: 3 }}&gt;
+  Content
+&lt;/Paper&gt;
+
+// Container - Centered content with max-width
+&lt;Container maxWidth="lg"&gt;
+  Content
+&lt;/Container&gt;
+
+// Stack - Flex container with spacing
+&lt;Stack spacing={2} direction="row"&gt;
+  &lt;Item /&gt;
+  &lt;Item /&gt;
+&lt;/Stack&gt;
+```
+
+### Grid System
+
+```typescript
+import { Grid } from '@mui/material';
+
+// 12-column grid
+&lt;Grid container spacing={2}&gt;
+  &lt;Grid item xs={12} md={6}&gt;
+    Left half
+  &lt;/Grid&gt;
+  &lt;Grid item xs={12} md={6}&gt;
+    Right half
+  &lt;/Grid&gt;
+&lt;/Grid&gt;
+
+// Responsive grid
+&lt;Grid container spacing={3}&gt;
+  &lt;Grid item xs={12} sm={6} md={4} lg={3}&gt;
+    Card
+  &lt;/Grid&gt;
+  {/* Repeat for more cards */}
+&lt;/Grid&gt;
+```
+
+### Typography
+
+```typescript
+&lt;Typography variant="h1"&gt;Heading 1&lt;/Typography&gt;
+&lt;Typography variant="h2"&gt;Heading 2&lt;/Typography&gt;
+&lt;Typography variant="body1"&gt;Body text&lt;/Typography&gt;
+&lt;Typography variant="caption"&gt;Small text&lt;/Typography&gt;
+
+// With custom styling
+&lt;Typography
+  variant="h4"
+  sx={{
+    color: 'primary.main',
+    fontWeight: 600,
+    mb: 2,
+  }}
+&gt;
+  Custom Heading
+&lt;/Typography&gt;
+```
+
+### Buttons
+
+```typescript
+// Variants
+&lt;Button variant="contained"&gt;Contained&lt;/Button&gt;
+&lt;Button variant="outlined"&gt;Outlined&lt;/Button&gt;
+&lt;Button variant="text"&gt;Text&lt;/Button&gt;
+
+// Colors
+&lt;Button variant="contained" color="primary"&gt;Primary&lt;/Button&gt;
+&lt;Button variant="contained" color="secondary"&gt;Secondary&lt;/Button&gt;
+&lt;Button variant="contained" color="error"&gt;Error&lt;/Button&gt;
+
+// With icons
+import { Add as AddIcon } from '@mui/icons-material';
+
+&lt;Button startIcon={&lt;AddIcon /&gt;}&gt;Add Item&lt;/Button&gt;
+```
+
+---
+
+## Theme Integration
+
+### Using Theme Values
+
+```typescript
+import { useTheme } from '@mui/material';
+
+function Component() {
+  const theme = useTheme();
+
+  return (
+    &lt;Box
+      sx={{
+        p: 2,
+        bgcolor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        borderRadius: theme.shape.borderRadius,
+      }}
+    &gt;
+      Themed box
+    &lt;/Box&gt;
+  );
+}
+```
+
+### Theme in sx Prop
+
+```typescript
+&lt;Box
+  sx={{
+    // Access theme in sx
+    color: 'primary.main',          // theme.palette.primary.main
+    bgcolor: 'background.paper',     // theme.palette.background.paper
+    p: 2,                            // theme.spacing(2)
+    borderRadius: 1,                 // theme.shape.borderRadius
+  }}
+&gt;
+  Content
+&lt;/Box&gt;
+
+// Callback for advanced usage
+&lt;Box
+  sx={(theme) =&gt; ({
+    color: theme.palette.primary.main,
+    '&:hover': {
+      color: theme.palette.primary.dark,
+    },
+  })}
+&gt;
+  Hover me
+&lt;/Box&gt;
+```
+
+---
+
+## Responsive Design
+
+### Breakpoints
+
+```typescript
+// Mobile-first responsive values
+&lt;Box
+  sx={{
+    width: {
+      xs: '100%',    // 0-600px
+      sm: '80%',     // 600-900px
+      md: '60%',     // 900-1200px
+      lg: '40%',     // 1200-1536px
+      xl: '30%',     // 1536px+
+    },
+  }}
+&gt;
+  Responsive width
+&lt;/Box&gt;
+
+// Responsive display
+&lt;Box
+  sx={{
+    display: {
+      xs: 'none',    // Hidden on mobile
+      md: 'block',   // Visible on desktop
+    },
+  }}
+&gt;
+  Desktop only
+&lt;/Box&gt;
+```
+
+### Responsive Typography
+
+```typescript
+&lt;Typography
+  sx={{
+    fontSize: {
+      xs: '1rem',
+      md: '1.5rem',
+      lg: '2rem',
+    },
+    lineHeight: {
+      xs: 1.5,
+      md: 1.75,
+    },
+  }}
+&gt;
+  Responsive text
+&lt;/Typography&gt;
+```
+
+---
+
+## Forms
+
+```typescript
+import { TextField, Stack, Button } from '@mui/material';
+
+&lt;Box component="form" onSubmit={handleSubmit}&gt;
+  &lt;Stack spacing={2}&gt;
+    &lt;TextField
+      label="Email"
+      type="email"
+      value={email}
+      onChange={(e) =&gt; setEmail(e.target.value)}
+      fullWidth
+      required
+      error={!!errors.email}
+      helperText={errors.email}
+    /&gt;
+    &lt;Button type="submit" variant="contained"&gt;Submit&lt;/Button&gt;
+  &lt;/Stack&gt;
+&lt;/Box&gt;
+```
+
+---
+
+## Common Patterns
+
+### Card Component
+
+```typescript
+import { Card, CardContent, CardActions, Typography, Button } from '@mui/material';
+
+&lt;Card&gt;
+  &lt;CardContent&gt;
+    &lt;Typography variant="h5" component="div"&gt;
+      Title
+    &lt;/Typography&gt;
+    &lt;Typography variant="body2" color="text.secondary"&gt;
+      Description
+    &lt;/Typography&gt;
+  &lt;/CardContent&gt;
+  &lt;CardActions&gt;
+    &lt;Button size="small"&gt;Learn More&lt;/Button&gt;
+  &lt;/CardActions&gt;
+&lt;/Card&gt;
+```
+
+### Dialog/Modal
+
+```typescript
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+
+&lt;Dialog open={open} onClose={handleClose}&gt;
+  &lt;DialogTitle&gt;Confirm Action&lt;/DialogTitle&gt;
+  &lt;DialogContent&gt;
+    Are you sure you want to proceed?
+  &lt;/DialogContent&gt;
+  &lt;DialogActions&gt;
+    &lt;Button onClick={handleClose}&gt;Cancel&lt;/Button&gt;
+    &lt;Button onClick={handleConfirm} variant="contained"&gt;
+      Confirm
+    &lt;/Button&gt;
+  &lt;/DialogActions&gt;
+&lt;/Dialog&gt;
+```
+
+### Loading States
+
+```typescript
+import { CircularProgress, Skeleton } from '@mui/material';
+
+// Spinner
+&lt;Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}&gt;
+  &lt;CircularProgress /&gt;
+&lt;/Box&gt;
+
+// Skeleton
+&lt;Stack spacing={1}&gt;
+  &lt;Skeleton variant="text" width="60%" /&gt;
+  &lt;Skeleton variant="rectangular" height={200} /&gt;
+  &lt;Skeleton variant="text" width="40%" /&gt;
+&lt;/Stack&gt;
+```
+
+---
+
+## MUI-Specific Hooks
+
+### useMuiSnackbar
+
+```typescript
+import { useMuiSnackbar } from '@/hooks/useMuiSnackbar';
+
+function Component() {
+  const { showSuccess, showError, showInfo } = useMuiSnackbar();
+
+  const handleSave = async () =&gt; {
+    try {
+      await saveData();
+      showSuccess('Saved successfully');
+    } catch (error) {
+      showError('Failed to save');
+    }
+  };
+
+  return &lt;Button onClick={handleSave}&gt;Save&lt;/Button&gt;;
+}
+```
+
+---
+
+## Icons
+
+```typescript
+import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Button, IconButton } from '@mui/material';
+
+&lt;Button startIcon={&lt;AddIcon /&gt;}&gt;Add&lt;/Button&gt;
+&lt;IconButton onClick={handleDelete}&gt;&lt;DeleteIcon /&gt;&lt;/IconButton&gt;
+```
+
+---
+
+## Best Practices
+
+### 1. Type Your sx Props
+
+```typescript
+import type { SxProps, Theme } from '@mui/material';
+
+// ✅ Good
+const styles: Record&lt;string, SxProps&lt;Theme&gt;&gt; = {
+  container: { p: 2 },
+};
+
+// ❌ Avoid
+const styles = {
+  container: { p: 2 }, // No type safety
+};
+```
+
+### 2. Use Theme Tokens
+
+```typescript
+// ✅ Good: Use theme tokens
+&lt;Box sx={{ color: 'primary.main', p: 2 }} /&gt;
+
+// ❌ Avoid: Hardcoded values
+&lt;Box sx={{ color: '#1976d2', padding: '16px' }} /&gt;
+```
+
+### 3. Consistent Spacing
+
+```typescript
+// ✅ Good: Use spacing scale
+&lt;Box sx={{ p: 2, mb: 3, mt: 1 }} /&gt;
+
+// ❌ Avoid: Random pixel values
+&lt;Box sx={{ padding: '17px', marginBottom: '25px' }} /&gt;
+```
+
+---
+
+## Additional Resources
+
+For more detailed patterns, see:
+- [styling-guide.md](resources/styling-guide.md) - Advanced styling patterns
+- [component-library.md](resources/component-library.md) - Component examples
+- [theme-customization.md](resources/theme-customization.md) - Theme setup
+</pre>
+</body>
+</html>

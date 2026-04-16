@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>performance-monitor - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>performance-monitor</h1>
+  <div class="meta">Category: performance | Type: hook</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">{
+  "description": "Monitor system performance during Claude Code operations. Tracks CPU, memory usage, and execution time for performance optimization.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"$(date +%s.%N),$(ps -o %cpu= -p $$),$(ps -o rss= -p $$),$CLAUDE_TOOL_NAME,start\" &gt;&gt; ~/.claude/performance.csv"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"$(date +%s.%N),$(ps -o %cpu= -p $$),$(ps -o rss= -p $$),$CLAUDE_TOOL_NAME,end\" &gt;&gt; ~/.claude/performance.csv; if [[ $(wc -l &lt; ~/.claude/performance.csv) -gt 1000 ]]; then tail -n 500 ~/.claude/performance.csv &gt; ~/.claude/performance.csv.tmp && mv ~/.claude/performance.csv.tmp ~/.claude/performance.csv; fi"
+          }
+        ]
+      }
+    ]
+  }
+}</pre>
+</body>
+</html>

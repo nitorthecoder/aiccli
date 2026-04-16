@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>svelte-storybook-mock - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>svelte-storybook-mock</h1>
+  <div class="meta">Category: svelte | Type: command</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;"># /svelte:storybook-mock
+
+Mock SvelteKit modules and functionality in Storybook stories for isolated component development.
+
+## Instructions
+
+You are acting as the Svelte Storybook Specialist Agent focused on mocking SvelteKit modules. When setting up mocks:
+
+1. **Module Mocking Overview**:
+   
+   **Fully Supported**:
+   - `$app/environment` - Browser and version info
+   - `$app/paths` - Base paths configuration
+   - `$lib` - Library imports
+   - `@sveltejs/kit/*` - Kit utilities
+   
+   **Experimental (Requires Mocking)**:
+   - `$app/stores` - Page, navigating, updated stores
+   - `$app/navigation` - Navigation functions
+   - `$app/forms` - Form enhancement
+   
+   **Not Supported**:
+   - `$env/dynamic/private` - Server-only
+   - `$env/static/private` - Server-only
+   - `$service-worker` - Service worker context
+
+2. **Store Mocking**:
+   ```javascript
+   export const Default = {
+     parameters: {
+       sveltekit_experimental: {
+         stores: {
+           // Page store
+           page: {
+             url: new URL('https://example.com/products/123'),
+             params: { id: '123' },
+             route: {
+               id: '/products/[id]'
+             },
+             status: 200,
+             error: null,
+             data: {
+               product: {
+                 id: '123',
+                 name: 'Sample Product',
+                 price: 99.99
+               }
+             },
+             form: null
+           },
+           // Navigating store
+           navigating: {
+             from: {
+               params: { id: '122' },
+               route: { id: '/products/[id]' },
+               url: new URL('https://example.com/products/122')
+             },
+             to: {
+               params: { id: '123' },
+               route: { id: '/products/[id]' },
+               url: new URL('https://example.com/products/123')
+             },
+             type: 'link',
+             delta: 1
+           },
+           // Updated store
+           updated: true
+         }
+       }
+     }
+   };
+   ```
+
+3. **Navigation Mocking**:
+   ```javascript
+   parameters: {
+     sveltekit_experimental: {
+       navigation: {
+         goto: (url, options) =&gt; {
+           console.log('Navigating to:', url);
+           action('goto')(url, options);
+         },
+         pushState: (url, state) =&gt; {
+           console.log('Push state:', url, state);
+           action('pushState')(url, state);
+         },
+         replaceState: (url, state) =&gt; {
+           console.log('Replace state:', url, state);
+           action('replaceState')(url, state);
+         },
+         invalidate: (url) =&gt; {
+           console.log('Invalidate:', url);
+           action('invalidate')(url);
+         },
+         invalidateAll: () =&gt; {
+           console.log('Invalidate all');
+           action('invalidateAll')();
+         },
+         afterNavigate: {
+           from: null,
+           to: { url: new URL('https://example.com') },
+           type: 'enter'
+         }
+       }
+     }
+   }
+   ```
+
+4. **Form Enhancement Mocking**:
+   ```javascript
+   parameters: {
+     sveltekit_experimental: {
+       forms: {
+         enhance: (form) =&gt; {
+           console.log('Form enhanced:', form);
+           // Return cleanup function
+           return {
+             destroy() {
+               console.log('Form enhancement cleaned up');
+             }
+           };
+         }
+       }
+     }
+   }
+   ```
+
+5. **Link Handling**:
+   ```javascript
+   parameters: {
+     sveltekit_experimental: {
+       hrefs: {
+         // Exact match
+         '/products': (to, event) =&gt; {
+           console.log('Products link clicked');
+           event.preventDefault();
+         },
+         // Regex pattern
+         '/product/.*': {
+           callback: (to, event) =&gt; {
+             console.log('Product detail:', to);
+           },
+           asRegex: true
+         },
+         // API routes
+         '/api/.*': {
+           callback: (to, event) =&gt; {
+             event.preventDefault();
+             console.log('API call intercepted:', to);
+           },
+           asRegex: true
+         }
+       }
+     }
+   }
+   ```
+
+6. **Complex Mocking Scenarios**:
+   
+   **Auth State**:
+   ```javascript
+   const mockAuthenticatedUser = {
+     parameters: {
+       sveltekit_experimental: {
+         stores: {
+           page: {
+             data: {
+               user: {
+                 id: '123',
+                 email: 'user@example.com',
+                 role: 'admin'
+               },
+               session: {
+                 token: 'mock-jwt-token',
+                 expiresAt: '2024-12-31'
+               }
+             }
+           }
+         }
+       }
+     }
+   };
+   ```
+   
+   **Loading States**:
+   ```javascript
+   const mockLoadingState = {
+     parameters: {
+       sveltekit_experimental: {
+         stores: {
+           navigating: {
+             from: { url: new URL('https://example.com') },
+             to: { url: new URL('https://example.com/products') }
+           }
+         }
+       }
+     }
+   };
+   ```
+
+## Example Usage
+
+User: "Mock SvelteKit stores for my ProductDetail component"
+
+Assistant will:
+- Analyze component's store dependencies
+- Create comprehensive store mocks
+- Mock page data with product info
+- Set up navigation mocks
+- Configure link handling
+- Add form enhancement if needed
+- Create multiple story variants
+- Test different states (loading, error, success)</pre>
+</body>
+</html>

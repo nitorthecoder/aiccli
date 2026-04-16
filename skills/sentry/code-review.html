@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>code-review - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>code-review</h1>
+  <div class="meta">Category: sentry | Type: skill</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+name: code-review
+description: Perform code reviews following Sentry engineering practices. Use when reviewing pull requests, examining code changes, or providing feedback on code quality. Covers security, performance, testing, and design review.
+---
+
+# Sentry Code Review
+
+Follow these guidelines when reviewing code for Sentry projects.
+
+## Review Checklist
+
+### Identifying Problems
+
+Look for these issues in code changes:
+
+- **Runtime errors**: Potential exceptions, null pointer issues, out-of-bounds access
+- **Performance**: Unbounded O(n²) operations, N+1 queries, unnecessary allocations
+- **Side effects**: Unintended behavioral changes affecting other components
+- **Backwards compatibility**: Breaking API changes without migration path
+- **ORM queries**: Complex Django ORM with unexpected query performance
+- **Security vulnerabilities**: Injection, XSS, access control gaps, secrets exposure
+
+### Design Assessment
+
+- Do component interactions make logical sense?
+- Does the change align with existing project architecture?
+- Are there conflicts with current requirements or goals?
+
+### Test Coverage
+
+Every PR should have appropriate test coverage:
+
+- Functional tests for business logic
+- Integration tests for component interactions
+- End-to-end tests for critical user paths
+
+Verify tests cover actual requirements and edge cases. Avoid excessive branching or looping in test code.
+
+### Long-Term Impact
+
+Flag for senior engineer review when changes involve:
+
+- Database schema modifications
+- API contract changes
+- New framework or library adoption
+- Performance-critical code paths
+- Security-sensitive functionality
+
+## Feedback Guidelines
+
+### Tone
+
+- Be polite and empathetic
+- Provide actionable suggestions, not vague criticism
+- Phrase as questions when uncertain: "Have you considered...?"
+
+### Approval
+
+- Approve when only minor issues remain
+- Don't block PRs for stylistic preferences
+- Remember: the goal is risk reduction, not perfect code
+
+## Common Patterns to Flag
+
+### Python/Django
+
+```python
+# Bad: N+1 query
+for user in users:
+    print(user.profile.name)  # Separate query per user
+
+# Good: Prefetch related
+users = User.objects.prefetch_related('profile')
+```
+
+### TypeScript/React
+
+```typescript
+// Bad: Missing dependency in useEffect
+useEffect(() =&gt; {
+  fetchData(userId);
+}, []);  // userId not in deps
+
+// Good: Include all dependencies
+useEffect(() =&gt; {
+  fetchData(userId);
+}, [userId]);
+```
+
+### Security
+
+```python
+# Bad: SQL injection risk
+cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
+
+# Good: Parameterized query
+cursor.execute("SELECT * FROM users WHERE id = %s", [user_id])
+```
+
+## References
+
+- [Sentry Code Review Guidelines](https://develop.sentry.dev/engineering-practices/code-review/)
+</pre>
+</body>
+</html>

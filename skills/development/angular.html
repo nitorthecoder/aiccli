@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>angular - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>angular</h1>
+  <div class="meta">Category: development | Type: skill</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+name: angular
+description: Modern Angular (v20+) expert with deep knowledge of Signals, Standalone Components, Zoneless applications, SSR/Hydration, and reactive patterns.
+risk: safe
+source: self
+date_added: '2026-02-27'
+---
+
+# Angular Expert
+
+Master modern Angular development with Signals, Standalone Components, Zoneless applications, SSR/Hydration, and the latest reactive patterns.
+
+## When to Use This Skill
+
+- Building new Angular applications (v20+)
+- Implementing Signals-based reactive patterns
+- Creating Standalone Components and migrating from NgModules
+- Configuring Zoneless Angular applications
+- Implementing SSR, prerendering, and hydration
+- Optimizing Angular performance
+- Adopting modern Angular patterns and best practices
+
+## Do Not Use This Skill When
+
+- Migrating from AngularJS (1.x) → use `angular-migration` skill
+- Working with legacy Angular apps that cannot upgrade
+- General TypeScript issues → use `typescript-expert` skill
+
+## Instructions
+
+1. Assess the Angular version and project structure
+2. Apply modern patterns (Signals, Standalone, Zoneless)
+3. Implement with proper typing and reactivity
+4. Validate with build and tests
+
+## Safety
+
+- Always test changes in development before production
+- Gradual migration for existing apps (don't big-bang refactor)
+- Keep backward compatibility during transitions
+
+---
+
+## Angular Version Timeline
+
+| Version        | Release | Key Features                                           |
+| -------------- | ------- | ------------------------------------------------------ |
+| **Angular 20** | Q2 2025 | Signals stable, Zoneless stable, Incremental hydration |
+| **Angular 21** | Q4 2025 | Signals-first default, Enhanced SSR                    |
+| **Angular 22** | Q2 2026 | Signal Forms, Selectorless components                  |
+
+---
+
+## 1. Signals: The New Reactive Primitive
+
+Signals are Angular's fine-grained reactivity system, replacing zone.js-based change detection.
+
+### Core Concepts
+
+```typescript
+import { signal, computed, effect } from "@angular/core";
+
+// Writable signal
+const count = signal(0);
+
+// Read value
+console.log(count()); // 0
+
+// Update value
+count.set(5); // Direct set
+count.update((v) =&gt; v + 1); // Functional update
+
+// Computed (derived) signal
+const doubled = computed(() =&gt; count() * 2);
+
+// Effect (side effects)
+effect(() =&gt; {
+  console.log(`Count changed to: ${count()}`);
+});
+```
+
+### Signal-Based Inputs and Outputs
+
+```typescript
+import { Component, input, output, model } from "@angular/core";
+
+@Component({
+  selector: "app-user-card",
+  standalone: true,
+  template: `
+    &lt;div class="card"&gt;
+      &lt;h3&gt;{{ name() }}&lt;/h3&gt;
+      &lt;span&gt;{{ role() }}&lt;/span&gt;
+      &lt;button (click)="select.emit(id())"&gt;Select&lt;/button&gt;
+    &lt;/div&gt;
+  `,
+})
+export class UserCardComponent {
+  // Signal inputs (read-only)
+  id = input.required&lt;string&gt;();
+  name = input.required&lt;string&gt;();
+  role = input&lt;string&gt;("User"); // With default
+
+  // Output
+  select = output&lt;string&gt;();
+
+  // Two-way binding (model)
+  isSelected = model(false);
+}
+
+// Usage:
+// &lt;app-user-card [id]="'123'" [name]="'John'" [(isSelected)]="selected" /&gt;
+```
+
+### Signal Queries (ViewChild/ContentChild)
+
+```typescript
+import {
+  Component,
+  viewChild,
+  viewChildren,
+  contentChild,
+} from "@angular/core";
+
+@Component({
+  selector: "app-container",
+  standalone: true,
+  template: `
+    &lt;input #searchInput /&gt;
+    &lt;app-item *ngFor="let item of items()" /&gt;
+  `,
+})
+export class ContainerComponent {
+  // Signal-based queries
+  searchInput = viewChild&lt;ElementRef&gt;("searchInput");
+  items = viewChildren(ItemComponent);
+  projectedContent = contentChild(HeaderDirective);
+
+  focusSearch() {
+    this.searchInput()?.nativeElement.focus();
+  }
+}
+```
+
+### When to Use Signals vs RxJS
+
+| Use Case                | Signals         | RxJS                             |
+| ----------------------- | --------------- | -------------------------------- |
+| Local component state   | ✅ Preferred    | Overkill                         |
+| Derived/computed values | ✅ `computed()` | `combineLatest` works            |
+| Side effects            | ✅ `effect()`   | `tap` operator                   |
+| HTTP requests           | ❌              | ✅ HttpClient returns Observable |
+| Event streams           | ❌              | ✅ `fromEvent`, operators        |
+| Complex async flows     | ❌              | ✅ `switchMap`, `mergeMap`       |
+
+---
+
+## 2. Standalone Components
+
+Standalone components are self-contained and don't require NgModule declarations.
+
+### Creating Standalone Components
+
+```typescript
+import { Component } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { RouterLink } from "@angular/router";
+
+@Component({
+  selector: "app-header",
+  standalone: true,
+  imports: [CommonModule, RouterLink], // Direct imports
+  template: `
+    &lt;header&gt;
+      &lt;a routerLink="/"&gt;Home&lt;/a&gt;
+      &lt;a routerLink="/about"&gt;About&lt;/a&gt;
+    &lt;/header&gt;
+  `,
+})
+export class HeaderComponent {}
+```
+
+### Bootstrapping Without NgModule
+
+```typescript
+// main.ts
+import { bootstrapApplication } from "@angular/platform-browser";
+import { provideRouter } from "@angular/router";
+import { provideHttpClient } from "@angular/common/http";
+import { AppComponent } from "./app/app.component";
+import { routes } from "./app/app.routes";
+
+bootstrapApplication(AppComponent, {
+  providers: [provideRouter(routes), provideHttpClient()],
+});
+```
+
+### Lazy Loading Standalone Components
+
+```typescript
+// app.routes.ts
+import { Routes } from "@angular/router";
+
+export const routes: Routes = [
+  {
+    path: "dashboard",
+    loadComponent: () =&gt;
+      import("./dashboard/dashboard.component").then(
+        (m) =&gt; m.DashboardComponent,
+      ),
+  },
+  {
+    path: "admin",
+    loadChildren: () =&gt;
+      import("./admin/admin.routes").then((m) =&gt; m.ADMIN_ROUTES),
+  },
+];
+```
+
+---
+
+## 3. Zoneless Angular
+
+Zoneless applications don't use zone.js, improving performance and debugging.
+
+### Enabling Zoneless Mode
+
+```typescript
+// main.ts
+import { bootstrapApplication } from "@angular/platform-browser";
+import { provideZonelessChangeDetection } from "@angular/core";
+import { AppComponent } from "./app/app.component";
+
+bootstrapApplication(AppComponent, {
+  providers: [provideZonelessChangeDetection()],
+});
+```
+
+### Zoneless Component Patterns
+
+```typescript
+import { Component, signal, ChangeDetectionStrategy } from "@angular/core";
+
+@Component({
+  selector: "app-counter",
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    &lt;div&gt;Count: {{ count() }}&lt;/div&gt;
+    &lt;button (click)="increment()"&gt;+&lt;/button&gt;
+  `,
+})
+export class CounterComponent {
+  count = signal(0);
+
+  increment() {
+    this.count.update((v) =&gt; v + 1);
+    // No zone.js needed - Signal triggers change detection
+  }
+}
+```
+
+### Key Zoneless Benefits
+
+- **Performance**: No zone.js patches on async APIs
+- **Debugging**: Clean stack traces without zone wrappers
+- **Bundle size**: Smaller without zone.js (~15KB savings)
+- **Interoperability**: Better with Web Components and micro-frontends
+
+---
+
+## 4. Server-Side Rendering & Hydration
+
+### SSR Setup with Angular CLI
+
+```bash
+ng add @angular/ssr
+```
+
+### Hydration Configuration
+
+```typescript
+// app.config.ts
+import { ApplicationConfig } from "@angular/core";
+import {
+  provideClientHydration,
+  withEventReplay,
+} from "@angular/platform-browser";
+
+export const appConfig: ApplicationConfig = {
+  providers: [provideClientHydration(withEventReplay())],
+};
+```
+
+### Incremental Hydration (v20+)
+
+```typescript
+import { Component } from "@angular/core";
+
+@Component({
+  selector: "app-page",
+  standalone: true,
+  template: `
+    &lt;app-hero /&gt;
+
+    @defer (hydrate on viewport) {
+      &lt;app-comments /&gt;
+    }
+
+    @defer (hydrate on interaction) {
+      &lt;app-chat-widget /&gt;
+    }
+  `,
+})
+export class PageComponent {}
+```
+
+### Hydration Triggers
+
+| Trigger          | When to Use                             |
+| ---------------- | --------------------------------------- |
+| `on idle`        | Low-priority, hydrate when browser idle |
+| `on viewport`    | Hydrate when element enters viewport    |
+| `on interaction` | Hydrate on first user interaction       |
+| `on hover`       | Hydrate when user hovers                |
+| `on timer(ms)`   | Hydrate after specified delay           |
+
+---
+
+## 5. Modern Routing Patterns
+
+### Functional Route Guards
+
+```typescript
+// auth.guard.ts
+import { inject } from "@angular/core";
+import { Router, CanActivateFn } from "@angular/router";
+import { AuthService } from "./auth.service";
+
+export const authGuard: CanActivateFn = (route, state) =&gt; {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (auth.isAuthenticated()) {
+    return true;
+  }
+
+  return router.createUrlTree(["/login"], {
+    queryParams: { returnUrl: state.url },
+  });
+};
+
+// Usage in routes
+export const routes: Routes = [
+  {
+    path: "dashboard",
+    loadComponent: () =&gt; import("./dashboard.component"),
+    canActivate: [authGuard],
+  },
+];
+```
+
+### Route-Level Data Resolvers
+
+```typescript
+import { inject } from '@angular/core';
+import { ResolveFn } from '@angular/router';
+import { UserService } from './user.service';
+import { User } from './user.model';
+
+export const userResolver: ResolveFn&lt;User&gt; = (route) =&gt; {
+  const userService = inject(UserService);
+  return userService.getUser(route.paramMap.get('id')!);
+};
+
+// In routes
+{
+  path: 'user/:id',
+  loadComponent: () =&gt; import('./user.component'),
+  resolve: { user: userResolver }
+}
+
+// In component
+export class UserComponent {
+  private route = inject(ActivatedRoute);
+  user = toSignal(this.route.data.pipe(map(d =&gt; d['user'])));
+}
+```
+
+---
+
+## 6. Dependency Injection Patterns
+
+### Modern inject() Function
+
+```typescript
+import { Component, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { UserService } from './user.service';
+
+@Component({...})
+export class UserComponent {
+  // Modern inject() - no constructor needed
+  private http = inject(HttpClient);
+  private userService = inject(UserService);
+
+  // Works in any injection context
+  users = toSignal(this.userService.getUsers());
+}
+```
+
+### Injection Tokens for Configuration
+
+```typescript
+import { InjectionToken, inject } from "@angular/core";
+
+// Define token
+export const API_BASE_URL = new InjectionToken&lt;string&gt;("API_BASE_URL");
+
+// Provide in config
+bootstrapApplication(AppComponent, {
+  providers: [{ provide: API_BASE_URL, useValue: "https://api.example.com" }],
+});
+
+// Inject in service
+@Injectable({ providedIn: "root" })
+export class ApiService {
+  private baseUrl = inject(API_BASE_URL);
+
+  get(endpoint: string) {
+    return this.http.get(`${this.baseUrl}/${endpoint}`);
+  }
+}
+```
+
+---
+
+## 7. Component Composition & Reusability
+
+### Content Projection (Slots)
+
+```typescript
+@Component({
+  selector: 'app-card',
+  template: `
+    &lt;div class="card"&gt;
+      &lt;div class="header"&gt;
+        &lt;!-- Select by attribute --&gt;
+        &lt;ng-content select="[card-header]"&gt;&lt;/ng-content&gt;
+      &lt;/div&gt;
+      &lt;div class="body"&gt;
+        &lt;!-- Default slot --&gt;
+        &lt;ng-content&gt;&lt;/ng-content&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  `
+})
+export class CardComponent {}
+
+// Usage
+&lt;app-card&gt;
+  &lt;h3 card-header&gt;Title&lt;/h3&gt;
+  &lt;p&gt;Body content&lt;/p&gt;
+&lt;/app-card&gt;
+```
+
+### Host Directives (Composition)
+
+```typescript
+// Reusable behaviors without inheritance
+@Directive({
+  standalone: true,
+  selector: '[appTooltip]',
+  inputs: ['tooltip'] // Signal input alias
+})
+export class TooltipDirective { ... }
+
+@Component({
+  selector: 'app-button',
+  standalone: true,
+  hostDirectives: [
+    {
+      directive: TooltipDirective,
+      inputs: ['tooltip: title'] // Map input
+    }
+  ],
+  template: `&lt;ng-content /&gt;`
+})
+export class ButtonComponent {}
+```
+
+---
+
+## 8. State Management Patterns
+
+### Signal-Based State Service
+
+```typescript
+import { Injectable, signal, computed } from "@angular/core";
+
+interface AppState {
+  user: User | null;
+  theme: "light" | "dark";
+  notifications: Notification[];
+}
+
+@Injectable({ providedIn: "root" })
+export class StateService {
+  // Private writable signals
+  private _user = signal&lt;User | null&gt;(null);
+  private _theme = signal&lt;"light" | "dark"&gt;("light");
+  private _notifications = signal&lt;Notification[]&gt;([]);
+
+  // Public read-only computed
+  readonly user = computed(() =&gt; this._user());
+  readonly theme = computed(() =&gt; this._theme());
+  readonly notifications = computed(() =&gt; this._notifications());
+  readonly unreadCount = computed(
+    () =&gt; this._notifications().filter((n) =&gt; !n.read).length,
+  );
+
+  // Actions
+  setUser(user: User | null) {
+    this._user.set(user);
+  }
+
+  toggleTheme() {
+    this._theme.update((t) =&gt; (t === "light" ? "dark" : "light"));
+  }
+
+  addNotification(notification: Notification) {
+    this._notifications.update((n) =&gt; [...n, notification]);
+  }
+}
+```
+
+### Component Store Pattern with Signals
+
+```typescript
+import { Injectable, signal, computed, inject } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { toSignal } from "@angular/core/rxjs-interop";
+
+@Injectable()
+export class ProductStore {
+  private http = inject(HttpClient);
+
+  // State
+  private _products = signal&lt;Product[]&gt;([]);
+  private _loading = signal(false);
+  private _filter = signal("");
+
+  // Selectors
+  readonly products = computed(() =&gt; this._products());
+  readonly loading = computed(() =&gt; this._loading());
+  readonly filteredProducts = computed(() =&gt; {
+    const filter = this._filter().toLowerCase();
+    return this._products().filter((p) =&gt;
+      p.name.toLowerCase().includes(filter),
+    );
+  });
+
+  // Actions
+  loadProducts() {
+    this._loading.set(true);
+    this.http.get&lt;Product[]&gt;("/api/products").subscribe({
+      next: (products) =&gt; {
+        this._products.set(products);
+        this._loading.set(false);
+      },
+      error: () =&gt; this._loading.set(false),
+    });
+  }
+
+  setFilter(filter: string) {
+    this._filter.set(filter);
+  }
+}
+```
+
+---
+
+## 9. Forms with Signals (Coming in v22+)
+
+### Current Reactive Forms
+
+```typescript
+import { Component, inject } from "@angular/core";
+import { FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
+
+@Component({
+  selector: "app-user-form",
+  standalone: true,
+  imports: [ReactiveFormsModule],
+  template: `
+    &lt;form [formGroup]="form" (ngSubmit)="onSubmit()"&gt;
+      &lt;input formControlName="name" placeholder="Name" /&gt;
+      &lt;input formControlName="email" type="email" placeholder="Email" /&gt;
+      &lt;button [disabled]="form.invalid"&gt;Submit&lt;/button&gt;
+    &lt;/form&gt;
+  `,
+})
+export class UserFormComponent {
+  private fb = inject(FormBuilder);
+
+  form = this.fb.group({
+    name: ["", Validators.required],
+    email: ["", [Validators.required, Validators.email]],
+  });
+
+  onSubmit() {
+    if (this.form.valid) {
+      console.log(this.form.value);
+    }
+  }
+}
+```
+
+### Signal-Aware Form Patterns (Preview)
+
+```typescript
+// Future Signal Forms API (experimental)
+import { Component, signal } from '@angular/core';
+
+@Component({...})
+export class SignalFormComponent {
+  name = signal('');
+  email = signal('');
+
+  // Computed validation
+  isValid = computed(() =&gt;
+    this.name().length &gt; 0 &&
+    this.email().includes('@')
+  );
+
+  submit() {
+    if (this.isValid()) {
+      console.log({ name: this.name(), email: this.email() });
+    }
+  }
+}
+```
+
+---
+
+## 10. Performance Optimization
+
+### Change Detection Strategies
+
+```typescript
+@Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  // Only checks when:
+  // 1. Input signal/reference changes
+  // 2. Event handler runs
+  // 3. Async pipe emits
+  // 4. Signal value changes
+})
+```
+
+### Defer Blocks for Lazy Loading
+
+```typescript
+@Component({
+  template: `
+    &lt;!-- Immediate loading --&gt;
+    &lt;app-header /&gt;
+
+    &lt;!-- Lazy load when visible --&gt;
+    @defer (on viewport) {
+      &lt;app-heavy-chart /&gt;
+    } @placeholder {
+      &lt;div class="skeleton" /&gt;
+    } @loading (minimum 200ms) {
+      &lt;app-spinner /&gt;
+    } @error {
+      &lt;p&gt;Failed to load chart&lt;/p&gt;
+    }
+  `
+})
+```
+
+### NgOptimizedImage
+
+```typescript
+import { NgOptimizedImage } from '@angular/common';
+
+@Component({
+  imports: [NgOptimizedImage],
+  template: `
+    &lt;img
+      ngSrc="hero.jpg"
+      width="800"
+      height="600"
+      priority
+    /&gt;
+
+    &lt;img
+      ngSrc="thumbnail.jpg"
+      width="200"
+      height="150"
+      loading="lazy"
+      placeholder="blur"
+    /&gt;
+  `
+})
+```
+
+---
+
+## 11. Testing Modern Angular
+
+### Testing Signal Components
+
+```typescript
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { CounterComponent } from "./counter.component";
+
+describe("CounterComponent", () =&gt; {
+  let component: CounterComponent;
+  let fixture: ComponentFixture&lt;CounterComponent&gt;;
+
+  beforeEach(async () =&gt; {
+    await TestBed.configureTestingModule({
+      imports: [CounterComponent], // Standalone import
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(CounterComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it("should increment count", () =&gt; {
+    expect(component.count()).toBe(0);
+
+    component.increment();
+
+    expect(component.count()).toBe(1);
+  });
+
+  it("should update DOM on signal change", () =&gt; {
+    component.count.set(5);
+    fixture.detectChanges();
+
+    const el = fixture.nativeElement.querySelector(".count");
+    expect(el.textContent).toContain("5");
+  });
+});
+```
+
+### Testing with Signal Inputs
+
+```typescript
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentRef } from "@angular/core";
+import { UserCardComponent } from "./user-card.component";
+
+describe("UserCardComponent", () =&gt; {
+  let fixture: ComponentFixture&lt;UserCardComponent&gt;;
+  let componentRef: ComponentRef&lt;UserCardComponent&gt;;
+
+  beforeEach(async () =&gt; {
+    await TestBed.configureTestingModule({
+      imports: [UserCardComponent],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(UserCardComponent);
+    componentRef = fixture.componentRef;
+
+    // Set signal inputs via setInput
+    componentRef.setInput("id", "123");
+    componentRef.setInput("name", "John Doe");
+
+    fixture.detectChanges();
+  });
+
+  it("should display user name", () =&gt; {
+    const el = fixture.nativeElement.querySelector("h3");
+    expect(el.textContent).toContain("John Doe");
+  });
+});
+```
+
+---
+
+## Best Practices Summary
+
+| Pattern              | ✅ Do                          | ❌ Don't                        |
+| -------------------- | ------------------------------ | ------------------------------- |
+| **State**            | Use Signals for local state    | Overuse RxJS for simple state   |
+| **Components**       | Standalone with direct imports | Bloated SharedModules           |
+| **Change Detection** | OnPush + Signals               | Default CD everywhere           |
+| **Lazy Loading**     | `@defer` and `loadComponent`   | Eager load everything           |
+| **DI**               | `inject()` function            | Constructor injection (verbose) |
+| **Inputs**           | `input()` signal function      | `@Input()` decorator (legacy)   |
+| **Zoneless**         | Enable for new projects        | Force on legacy without testing |
+
+---
+
+## Resources
+
+- [Angular.dev Documentation](https://angular.dev)
+- [Angular Signals Guide](https://angular.dev/guide/signals)
+- [Angular SSR Guide](https://angular.dev/guide/ssr)
+- [Angular Update Guide](https://angular.dev/update-guide)
+- [Angular Blog](https://blog.angular.dev)
+
+---
+
+## Common Troubleshooting
+
+| Issue                          | Solution                                            |
+| ------------------------------ | --------------------------------------------------- |
+| Signal not updating UI         | Ensure `OnPush` + call signal as function `count()` |
+| Hydration mismatch             | Check server/client content consistency             |
+| Circular dependency            | Use `inject()` with `forwardRef`                    |
+| Zoneless not detecting changes | Trigger via signal updates, not mutations           |
+| SSR fetch fails                | Use `TransferState` or `withFetch()`                |
+</pre>
+</body>
+</html>

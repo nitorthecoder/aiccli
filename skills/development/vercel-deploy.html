@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vercel-deploy - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>vercel-deploy</h1>
+  <div class="meta">Category: development | Type: skill</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+name: vercel-deploy
+description: Deploy applications and websites to Vercel. Use when the user requests deployment actions like "deploy my app", "deploy and give me the link", "push this live", or "create a preview deployment".
+author: openai
+---
+
+# Vercel Deploy
+
+Deploy any project to Vercel instantly. **Always deploy as preview** (not production) unless the user explicitly asks for production.
+
+## Prerequisites
+
+- When sandboxing blocks the deployment network calls, rerun with `sandbox_permissions=require_escalated`.
+- The deployment might take a few minutes. Use appropriate timeout values.
+
+## Quick Start
+
+**Just run this (with a 10 minute timeout):**
+```bash
+vercel deploy [path] -y
+```
+
+**Important:** Use a 10 minute (600000ms) timeout for the deploy command since builds can take a while.
+
+If that fails with "No existing credentials found", use the fallback method below.
+
+## Fallback (No Auth)
+
+If CLI fails with auth error, use the deploy script:
+
+```bash
+# Deploy current directory
+bash scripts/deploy.sh
+
+# Deploy specific project
+bash scripts/deploy.sh /path/to/project
+
+# Deploy existing tarball
+bash scripts/deploy.sh /path/to/project.tgz
+```
+
+The script handles framework detection, packaging, and deployment. It waits for the build to complete and returns JSON with `previewUrl` and `claimUrl`.
+
+**Tell the user:** "Your deployment is ready at [previewUrl]. Claim it at [claimUrl] to manage your deployment."
+
+## Production Deploys
+
+Only if user explicitly asks:
+```bash
+vercel deploy [path] --prod -y
+```
+
+## Output
+
+Show the user the deployment URL. For fallback deployments, also show the claim URL.
+
+**Do not** curl or fetch the deployed URL to verify it works. Just return the link.
+
+## Troubleshooting
+
+### Escalated Network Access
+
+If deployment fails due to network issues (timeouts, DNS errors, connection resets), rerun the deploy with escalated permissions (use `sandbox_permissions=require_escalated`). The deploy requires escalated network access when sandbox networking blocks outbound requests.
+
+Example guidance to the user:
+
+```
+The deploy needs escalated network access to deploy to Vercel. I can rerun the command with escalated permissions—want me to proceed?
+```
+</pre>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gh-address-comments - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>gh-address-comments</h1>
+  <div class="meta">Category: development | Type: skill</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+name: gh-address-comments
+description: Help address review/issue comments on the open GitHub PR for the current branch using gh CLI; verify gh auth first and prompt the user to authenticate if not logged in.
+metadata:
+  short-description: Address comments in a GitHub PR review
+hooks:
+  PostToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "echo \"[$(date)] GH Address Comments: Executed gh command to address PR comments\" &gt;&gt; ~/.claude/gh-address-comments.log"
+---
+
+# PR Comment Handler
+
+Guide to find the open PR for the current branch and address its comments with gh CLI. Run all `gh` commands with elevated network access.
+
+Prereq: ensure `gh` is authenticated (for example, run `gh auth login` once), then run `gh auth status` with escalated permissions (include workflow/repo scopes) so `gh` commands succeed. If sandboxing blocks `gh auth status`, rerun it with `sandbox_permissions=require_escalated`.
+
+## 1) Inspect comments needing attention
+- Run scripts/fetch_comments.py which will print out all the comments and review threads on the PR
+
+## 2) Ask the user for clarification
+- Number all the review threads and comments and provide a short summary of what would be required to apply a fix for it
+- Ask the user which numbered comments should be addressed
+
+## 3) If user chooses comments
+- Apply fixes for the selected comments
+
+Notes:
+- If gh hits auth/rate issues mid-run, prompt the user to re-authenticate with `gh auth login`, then retry.
+</pre>
+</body>
+</html>

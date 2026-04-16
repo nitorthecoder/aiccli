@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>feature-pipeline - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>feature-pipeline</h1>
+  <div class="meta">Category: orchestration | Type: command</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+description: Execute implementation tasks from a design document. Tasks are tracked as markdown checkboxes directly in the design file.
+argument-hint: &lt;design-file.md&gt;
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, TodoWrite, Task, AskUserQuestion
+---
+
+# Feature Pipeline
+
+Execute implementation tasks from a design document using markdown checkboxes.
+
+## Input Detection
+
+`$ARGUMENTS` should be a path to a design markdown file (e.g., `docs/designs/xxx.md`)
+
+If empty or unclear, ask user for the design file path.
+
+## Phase 1: Initialize
+
+1. Read the design file
+2. Run `python3 .claude/skills/task-execution-engine/scripts/task_manager.py status --file &lt;design.md&gt;` to show current progress
+3. If all tasks completed, report and exit
+4. Otherwise, proceed to execution
+
+## Phase 2: Execution Loop
+
+**UNATTENDED MODE - No questions, no stopping**
+
+```
+LOOP:
+  1. RUN: task_manager.py next --file &lt;design.md&gt; --json
+  2. IF no task available → EXIT to Phase 3
+  3. READ task details (files, criteria)
+  4. IMPLEMENT the task
+     - Create/modify files as specified
+     - Follow codebase patterns
+     - Run tests if applicable
+  5. VERIFY acceptance criteria
+  6. UPDATE status:
+     - Success: task_manager.py done --file &lt;design.md&gt; --task "Title"
+     - Failure: task_manager.py fail --file &lt;design.md&gt; --task "Title" --reason "..."
+  7. OUTPUT result summary
+  8. CONTINUE (go to step 1)
+```
+
+## Phase 3: Completion
+
+1. Run `task_manager.py status --file &lt;design.md&gt;` to show final summary
+2. Report:
+   - Tasks completed
+   - Tasks failed (with reasons)
+   - Files modified
+3. Ask if user wants to commit changes to git
+
+## Implementation Guidelines
+
+### For Each Task:
+
+1. **Read files** specified in task's `files:` line
+2. **Understand criteria** from the checkbox items
+3. **Implement** following existing codebase patterns
+4. **Verify** each acceptance criterion is met
+5. **Update** the design file with completion status
+
+### Decision Making:
+
+- If unclear about implementation details → use codebase patterns
+- If blocked by missing dependency → mark as failed, continue
+- If needs external resource → mark as failed with reason, continue
+
+### Status Updates:
+
+```bash
+# Mark task completed (updates checkbox to [x] ✅)
+python3 .claude/skills/task-execution-engine/scripts/task_manager.py done \
+  --file &lt;design.md&gt; --task "Task Title"
+
+# Mark task failed (updates checkbox to [x] ❌ with reason)
+python3 .claude/skills/task-execution-engine/scripts/task_manager.py fail \
+  --file &lt;design.md&gt; --task "Task Title" --reason "Error description"
+```
+
+## Output Format
+
+After each task:
+
+```
+---TASK RESULT---
+task: Task Title
+status: completed|failed
+files: [list of modified files]
+notes: Brief description
+---END TASK RESULT---
+```
+
+## Error Handling
+
+| Error | Action |
+|-------|--------|
+| Task implementation fails | Mark failed, continue to next |
+| Script error | Log error, retry once, then fail task |
+| No tasks available | Exit loop, show summary |
+| File not found | Ask user for correct path |
+
+## Key Rules
+
+1. **NEVER stop** in the middle of execution loop
+2. **NEVER ask** questions during execution
+3. **ALWAYS** update task status in design file
+4. **Exit only** when no pending tasks remain
+</pre>
+</body>
+</html>

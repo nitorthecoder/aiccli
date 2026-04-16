@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>status - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>status</h1>
+  <div class="meta">Category: railway | Type: skill</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+name: railway-status
+description: Check current Railway project status for this directory. Use when user asks "railway status", "is it running", "what's deployed", "deployment status", or about uptime. NOT for variables or configuration queries - use railway-environment skill for those.
+version: 1.0.0
+author: Railway
+license: MIT
+tags: [Railway, Status, Project, Environment, Deployment, Infrastructure]
+dependencies: [railway-cli]
+allowed-tools: Bash(railway:*), Bash(which:*), Bash(command:*)
+---
+
+# Railway Status
+
+Check the current Railway project status for this directory.
+
+## When to Use
+
+- User asks about Railway status, project, services, or deployments
+- User mentions deploying or pushing to Railway
+- Before any Railway operation (deploy, update service, add variables)
+- User asks about environments or domains
+
+## When NOT to Use
+
+Use the railway-environment skill instead when user wants:
+- Detailed service configuration (builder type, dockerfile path, build command, root directory)
+- Deploy config (start command, restart policy, healthchecks, predeploy command)
+- Service source (repo, branch, image)
+- Compare service configs
+- Query or change environment variables
+
+## Check Status
+
+Run:
+```bash
+railway status --json
+```
+
+First verify CLI is installed:
+```bash
+command -v railway
+```
+
+## Handling Errors
+
+### CLI Not Installed
+If `command -v railway` fails:
+
+&gt; Railway CLI is not installed. Install with:
+&gt; ```
+&gt; npm install -g @railway/cli
+&gt; ```
+&gt; or
+&gt; ```
+&gt; brew install railway
+&gt; ```
+&gt; Then authenticate: `railway login`
+
+### Not Authenticated
+If `railway whoami` fails:
+
+&gt; Not logged in to Railway. Run:
+&gt; ```
+&gt; railway login
+&gt; ```
+
+### No Project Linked
+If status returns "No linked project":
+
+&gt; No Railway project linked to this directory.
+&gt;
+&gt; To link an existing project: `railway link`
+&gt; To create a new project: `railway init`
+
+## Presenting Status
+
+Parse the JSON and present:
+- **Project**: name and workspace
+- **Environment**: current environment (production, staging, etc.)
+- **Services**: list with deployment status
+- **Active Deployments**: any in-progress deployments (from `activeDeployments` field)
+- **Domains**: any configured domains
+
+Example output format:
+```
+Project: my-app (workspace: my-team)
+Environment: production
+
+Services:
+- web: deployed (https://my-app.up.railway.app)
+- api: deploying (build in progress)
+- postgres: running
+```
+
+The `activeDeployments` array on each service shows currently running deployments
+with their status (building, deploying, etc.).
+</pre>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>worktree-init - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>worktree-init</h1>
+  <div class="meta">Category: git-workflow | Type: command</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+allowed-tools: Bash(git:*), Bash(mkdir:*), Bash(ls:*), Bash(cat:*), Bash(basename:*), Bash(pwd:*), Bash(sed:*)
+argument-hint: task 1 | task 2 | task 3
+description: Create parallel worktrees for multi-task development with Ghostty panels
+---
+
+# Worktree Parallel Init
+
+Create multiple git worktrees for parallel development: $ARGUMENTS
+
+## Instructions
+
+You are setting up parallel worktrees so the user can work on multiple tasks simultaneously in separate Ghostty terminal panels, each running its own Claude instance.
+
+### Step 1: Validate Environment
+
+1. Check this is a git repository: `git rev-parse --is-inside-work-tree`
+2. Get the repo name: `basename $(git rev-parse --show-toplevel)`
+3. Get the main branch name (check for `main` or `master`): `git symbolic-ref refs/remotes/origin/HEAD 2&gt;/dev/null | sed 's@^refs/remotes/origin/@@'` — if that fails, default to `main`
+4. Ensure working tree is clean: `git status --porcelain`. If dirty, warn the user and ask if they want to continue.
+5. Fetch latest: `git fetch origin`
+
+### Step 2: Parse Tasks
+
+Parse tasks from `$ARGUMENTS`. Tasks are separated by `|` (pipe character).
+
+If `$ARGUMENTS` is empty, use AskUserQuestion to ask the user to describe their tasks (they can provide multiple separated by `|`).
+
+For each task description:
+- Trim whitespace
+- Generate a kebab-case branch name: `claude/&lt;kebab-case-task&gt;` (max 50 chars, alphanumeric and hyphens only)
+- Generate a worktree directory path: `../worktrees/&lt;repo-name&gt;/claude-&lt;kebab-case-task&gt;`
+
+### Step 3: Create Worktrees
+
+For each task:
+
+1. Create the parent directory if needed: `mkdir -p ../worktrees/&lt;repo-name&gt;`
+2. Create the worktree:
+   ```bash
+   git worktree add -b claude/&lt;name&gt; ../worktrees/&lt;repo-name&gt;/claude-&lt;name&gt; origin/&lt;main-branch&gt;
+   ```
+3. Write a `.worktree-task.md` file inside the new worktree with this content:
+   ```markdown
+   # Worktree Task
+
+   **Branch:** claude/&lt;name&gt;
+   **Task:** &lt;original task description&gt;
+   **Created:** &lt;ISO date&gt;
+   **Source repo:** &lt;path to main repo&gt;
+   ```
+
+### Step 4: Check for Dependencies
+
+If a `package.json` exists in the repo root, note that each worktree may need `npm install` (or the appropriate package manager).
+
+Check for:
+- `package-lock.json` → npm install
+- `yarn.lock` → yarn install
+- `pnpm-lock.yaml` → pnpm install
+- `bun.lockb` → bun install
+
+### Step 5: Output Summary
+
+Display a clear summary table:
+
+```
+| # | Task | Branch | Path |
+|---|------|--------|------|
+| 1 | ... | claude/... | ../worktrees/repo/claude-... |
+```
+
+Then display ready-to-copy commands for Ghostty panels. For each worktree:
+
+```
+# Panel &lt;N&gt;: &lt;task description&gt;
+cd &lt;absolute-path-to-worktree&gt; && claude
+```
+
+If dependencies were detected, add a note:
+```
+# Note: Run &lt;package-manager&gt; install in each worktree before starting
+```
+
+Finally, remind the user:
+- Open a new Ghostty panel with `Cmd+D` (split right) or `Cmd+Shift+D` (split down)
+- When done with a task, use `/worktree-deliver` to commit, push, and create a PR
+- After merging all PRs, use `/worktree-cleanup --all` from the main repo
+</pre>
+</body>
+</html>

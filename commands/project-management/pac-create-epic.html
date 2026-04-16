@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pac-create-epic - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>pac-create-epic</h1>
+  <div class="meta">Category: project-management | Type: command</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+allowed-tools: Read, Write, Edit, Bash
+argument-hint: [epic-name] | --name | --description | --owner
+description: Create new PAC epic following Product as Code specification
+---
+
+# Create PAC Epic
+
+Create a new epic following the Product as Code specification with guided workflow: **$ARGUMENTS**
+
+## PAC Configuration Check
+
+- PAC directory: !`ls -la .pac/ 2&gt;/dev/null || echo "No .pac directory found"`
+- PAC config: @.pac/pac.config.yaml (if exists)
+- Existing epics: !`ls -la .pac/epics/ 2&gt;/dev/null | head -10`
+
+## Task
+
+Create a new Product as Code epic:
+
+**Arguments**: 
+- Epic name (required if not using --name flag)
+- --name &lt;name&gt;: Epic name
+- --description &lt;desc&gt;: Epic description  
+- --owner &lt;owner&gt;: Epic owner
+- --scope &lt;scope&gt;: Scope definition
+
+**Epic Creation Process**:
+1. Validate PAC configuration exists (suggest `/project:pac-configure` if missing)
+2. Generate epic ID from name (format: epic-[kebab-case-name])
+3. Create epic YAML file following PAC v0.1.0 specification in `.pac/epics/[epic-id].yaml`
+4. Include required metadata: id, name, created timestamp, owner
+5. Add spec with description, scope, success criteria, constraints, dependencies
+6. Create epic directory structure: `.pac/epics/[epic-id]/`
+7. Update PAC index if `.pac/index.yaml` exists
+8. Create git branch `pac/[epic-id]` if in git repository
+
+If information is missing, prompt user interactively for epic details.
+
+**Next Steps**: Use `/project:pac-create-ticket --epic [epic-id]` to add tickets to this epic.</pre>
+</body>
+</html>

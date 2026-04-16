@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>react-component-performance - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>react-component-performance</h1>
+  <div class="meta">Category: web-development | Type: skill</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">---
+name: react-component-performance
+description: Diagnose slow React components and suggest targeted performance fixes.
+risk: safe
+source: "Dimillian/Skills (MIT)"
+date_added: "2026-03-25"
+---
+
+# React Component Performance
+
+## Overview
+
+Identify render hotspots, isolate expensive updates, and apply targeted optimizations without changing UI behavior.
+
+## When to Use
+
+- When the user asks to profile or improve a slow React component.
+- When you need to reduce re-renders, list lag, or expensive render work in React UI.
+
+## Workflow
+
+1. Reproduce or describe the slowdown.
+2. Identify what triggers re-renders (state updates, props churn, effects).
+3. Isolate fast-changing state from heavy subtrees.
+4. Stabilize props and handlers; memoize where it pays off.
+5. Reduce expensive work (computation, DOM size, list length).
+6. **Validate**: open React DevTools Profiler → record the interaction → inspect the Flamegraph for components rendering longer than ~16 ms → compare against a pre-optimization baseline recording.
+
+## Checklist
+
+- Measure: use React DevTools Profiler or log renders; capture baseline.
+- Find churn: identify state updated on a timer, scroll, input, or animation.
+- Split: move ticking state into a child; keep heavy lists static.
+- Memoize: wrap leaf rows with `memo` only when props are stable.
+- Stabilize props: use `useCallback`/`useMemo` for handlers and derived values.
+- Avoid derived work in render: precompute, or compute inside memoized helpers.
+- Control list size: window/virtualize long lists; avoid rendering hidden items.
+- Keys: ensure stable keys; avoid index when order can change.
+- Effects: verify dependency arrays; avoid effects that re-run on every render.
+- Style/layout: watch for expensive layout thrash or large Markdown/diff renders.
+
+## Optimization Patterns
+
+### Isolate ticking state
+
+Move a timer or animation counter into a child so the parent list never re-renders on each tick.
+
+```tsx
+// ❌ Before – entire parent (and list) re-renders every second
+function Dashboard({ items }: { items: Item[] }) {
+  const [tick, setTick] = useState(0);
+  useEffect(() =&gt; {
+    const id = setInterval(() =&gt; setTick(t =&gt; t + 1), 1000);
+    return () =&gt; clearInterval(id);
+  }, []);
+  return (
+    &lt;&gt;
+      &lt;Clock tick={tick} /&gt;
+      &lt;ExpensiveList items={items} /&gt; {/* re-renders every second */}
+    &lt;/&gt;
+  );
+}
+
+// ✅ After – only &lt;Clock&gt; re-renders; list is untouched
+function Clock() {
+  const [tick, setTick] = useState(0);
+  useEffect(() =&gt; {
+    const id = setInterval(() =&gt; setTick(t =&gt; t + 1), 1000);
+    return () =&gt; clearInterval(id);
+  }, []);
+  return &lt;span&gt;{tick}s&lt;/span&gt;;
+}
+
+function Dashboard({ items }: { items: Item[] }) {
+  return (
+    &lt;&gt;
+      &lt;Clock /&gt;
+      &lt;ExpensiveList items={items} /&gt;
+    &lt;/&gt;
+  );
+}
+```
+
+### Stabilize callbacks with `useCallback` + `memo`
+
+```tsx
+// ❌ Before – new handler reference on every render busts Row memo
+function List({ items }: { items: Item[] }) {
+  const handleClick = (id: string) =&gt; console.log(id); // new ref each render
+  return items.map(item =&gt; &lt;Row key={item.id} item={item} onClick={handleClick} /&gt;);
+}
+
+// ✅ After – stable handler; Row only re-renders when its own item changes
+const Row = memo(({ item, onClick }: RowProps) =&gt; (
+  &lt;li onClick={() =&gt; onClick(item.id)}&gt;{item.name}&lt;/li&gt;
+));
+
+function List({ items }: { items: Item[] }) {
+  const handleClick = useCallback((id: string) =&gt; console.log(id), []);
+  return items.map(item =&gt; &lt;Row key={item.id} item={item} onClick={handleClick} /&gt;);
+}
+```
+
+### Prefer derived data outside render
+
+```tsx
+// ❌ Before – recomputes on every render
+function Summary({ orders }: { orders: Order[] }) {
+  const total = orders.reduce((sum, o) =&gt; sum + o.amount, 0); // runs every render
+  return &lt;p&gt;Total: {total}&lt;/p&gt;;
+}
+
+// ✅ After – recomputes only when orders changes
+function Summary({ orders }: { orders: Order[] }) {
+  const total = useMemo(() =&gt; orders.reduce((sum, o) =&gt; sum + o.amount, 0), [orders]);
+  return &lt;p&gt;Total: {total}&lt;/p&gt;;
+}
+```
+
+### Additional patterns
+
+- **Split rows**: extract list rows into memoized components with narrow props.
+- **Defer heavy rendering**: lazy-render or collapse expensive content until expanded.
+
+## Profiling Validation Steps
+
+1. Open **React DevTools → Profiler** tab.
+2. Click **Record**, perform the slow interaction, then **Stop**.
+3. Switch to **Flamegraph** view; any bar labeled with a component and time &gt; ~16 ms is a candidate.
+4. Use **Ranked chart** to sort by self render time and target the top offenders.
+5. Apply one optimization at a time, re-record, and compare render counts and durations against the baseline.
+
+## Example Reference
+
+Load `references/examples.md` when the user wants a concrete refactor example.
+</pre>
+</body>
+</html>

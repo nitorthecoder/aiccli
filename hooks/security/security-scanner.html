@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>security-scanner - Claude Code Templates</title>
+  <link rel="stylesheet" href="/_astro/_type_.GXafhj3t.css">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; background: #0a0a0a; color: #e5e5e5; }
+    .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .logo { width: 40px; height: 40px; }
+    .back { color: #a3e635; text-decoration: none; margin-bottom: 1rem; display: inline-block; }
+    pre { background: #1a1a1a; padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid #333; }
+    .meta { color: #888; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <a href="/" class="back">← Back to Claude Code Templates</a>
+  <h1>security-scanner</h1>
+  <div class="meta">Category: security | Type: hook</div>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">{
+  "description": "Scan code for security vulnerabilities and secrets after modifications. Uses multiple security tools to detect potential issues.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v semgrep &gt;/dev/null 2&gt;&1; then semgrep --config=auto \"$CLAUDE_TOOL_FILE_PATH\" 2&gt;/dev/null || true; fi; if command -v bandit &gt;/dev/null 2&gt;&1 && [[ \"$CLAUDE_TOOL_FILE_PATH\" == *.py ]]; then bandit \"$CLAUDE_TOOL_FILE_PATH\" 2&gt;/dev/null || true; fi; if command -v gitleaks &gt;/dev/null 2&gt;&1; then gitleaks detect --source=\"$CLAUDE_TOOL_FILE_PATH\" --no-git 2&gt;/dev/null || true; fi; if grep -qE '(password|secret|key|token)\\s*=\\s*[\"\\x27][^\"\\x27]{8,}' \"$CLAUDE_TOOL_FILE_PATH\" 2&gt;/dev/null; then echo \"Warning: Potential hardcoded secrets detected in $CLAUDE_TOOL_FILE_PATH\" &gt;&2; fi"
+          }
+        ]
+      }
+    ]
+  }
+}</pre>
+</body>
+</html>
