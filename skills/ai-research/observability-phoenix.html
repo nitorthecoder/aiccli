@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>observability-phoenix - AICCLI</title>
-  <meta name="description" content="observability-phoenix - Claude Code skill for AICCLI">
+  <meta name="description" content="Open-source AI observability platform for LLM tracing, evaluation, and monitoring. Use when debugging LLM applications with detailed traces, running evaluations">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / observability-phoenix</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>observability-phoenix</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / observability-phoenix
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>observability-phoenix</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Open-source AI observability platform for LLM tracing, evaluation, and monitoring. Use when debugging LLM applications with detailed traces, running evaluations on datasets, or monitoring production AI systems with real-time insights.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/observability-phoenix</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/observability-phoenix</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/observability-phoenix</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: phoenix-observability
 description: Open-source AI observability platform for LLM tracing, evaluation, and monitoring. Use when debugging LLM applications with detailed traces, running evaluations on datasets, or monitoring production AI systems with real-time insights.
 version: 1.0.0
@@ -88,7 +138,7 @@ Open-source AI observability and evaluation platform for LLM applications with t
 
 **Use alternatives instead:**
 - **LangSmith**: Managed platform with LangChain-first integration
-- **Weights & Biases**: Deep learning experiment tracking focus
+- **Weights &amp; Biases**: Deep learning experiment tracking focus
 - **Arize Cloud**: Managed Phoenix with enterprise features
 - **MLflow**: General ML lifecycle, model registry focus
 
@@ -126,7 +176,7 @@ print(session.url)  # http://localhost:6006
 phoenix serve
 
 # With PostgreSQL
-export PHOENIX_SQL_DATABASE_URL="postgresql://user:pass@host/db"
+export PHOENIX_SQL_DATABASE_URL=&quot;postgresql://user:pass@host/db&quot;
 phoenix serve --port 6006
 ```
 
@@ -138,8 +188,8 @@ from openinference.instrumentation.openai import OpenAIInstrumentor
 
 # Configure OpenTelemetry with Phoenix
 tracer_provider = register(
-    project_name="my-llm-app",
-    endpoint="http://localhost:6006/v1/traces"
+    project_name=&quot;my-llm-app&quot;,
+    endpoint=&quot;http://localhost:6006/v1/traces&quot;
 )
 
 # Instrument OpenAI SDK
@@ -149,8 +199,8 @@ OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
 from openai import OpenAI
 client = OpenAI()
 response = client.chat.completions.create(
-    model="gpt-4o",
-    messages=[{"role": "user", "content": "Hello!"}]
+    model=&quot;gpt-4o&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}]
 )
 ```
 
@@ -165,21 +215,21 @@ from phoenix.otel import register
 from opentelemetry import trace
 
 # Setup tracing
-tracer_provider = register(project_name="my-app")
+tracer_provider = register(project_name=&quot;my-app&quot;)
 tracer = trace.get_tracer(__name__)
 
 # Create custom spans
-with tracer.start_as_current_span("process_query") as span:
-    span.set_attribute("input.value", query)
+with tracer.start_as_current_span(&quot;process_query&quot;) as span:
+    span.set_attribute(&quot;input.value&quot;, query)
 
     # Child spans are automatically nested
-    with tracer.start_as_current_span("retrieve_context"):
+    with tracer.start_as_current_span(&quot;retrieve_context&quot;):
         context = retriever.search(query)
 
-    with tracer.start_as_current_span("generate_response"):
+    with tracer.start_as_current_span(&quot;generate_response&quot;):
         response = llm.generate(query, context)
 
-    span.set_attribute("output.value", response)
+    span.set_attribute(&quot;output.value&quot;, response)
 ```
 
 ### Projects
@@ -188,11 +238,11 @@ Projects organize related traces:
 
 ```python
 import os
-os.environ["PHOENIX_PROJECT_NAME"] = "production-chatbot"
+os.environ[&quot;PHOENIX_PROJECT_NAME&quot;] = &quot;production-chatbot&quot;
 
 # Or per-trace
 from phoenix.otel import register
-tracer_provider = register(project_name="experiment-v2")
+tracer_provider = register(project_name=&quot;experiment-v2&quot;)
 ```
 
 ## Framework instrumentation
@@ -218,8 +268,8 @@ LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
 
 # All LangChain operations traced
 from langchain_openai import ChatOpenAI
-llm = ChatOpenAI(model="gpt-4o")
-response = llm.invoke("Hello!")
+llm = ChatOpenAI(model=&quot;gpt-4o&quot;)
+response = llm.invoke(&quot;Hello!&quot;)
 ```
 
 ### LlamaIndex
@@ -256,14 +306,14 @@ from phoenix.evals import (
 )
 
 # Setup model for evaluation
-eval_model = OpenAIModel(model="gpt-4o")
+eval_model = OpenAIModel(model=&quot;gpt-4o&quot;)
 
 # Evaluate hallucination
 hallucination_eval = HallucinationEvaluator(eval_model)
 results = hallucination_eval.evaluate(
-    input="What is the capital of France?",
-    output="The capital of France is Paris.",
-    reference="Paris is the capital of France."
+    input=&quot;What is the capital of France?&quot;,
+    output=&quot;The capital of France is Paris.&quot;,
+    reference=&quot;Paris is the capital of France.&quot;
 )
 ```
 
@@ -274,21 +324,21 @@ from phoenix.evals import llm_classify
 
 # Define custom evaluation
 def evaluate_helpfulness(input_text, output_text):
-    template = """
+    template = &quot;&quot;&quot;
     Evaluate if the response is helpful for the given question.
 
     Question: {input}
     Response: {output}
 
-    Is this response helpful? Answer 'helpful' or 'not_helpful'.
-    """
+    Is this response helpful? Answer &#039;helpful&#039; or &#039;not_helpful&#039;.
+    &quot;&quot;&quot;
 
     result = llm_classify(
         model=eval_model,
         template=template,
         input=input_text,
         output=output_text,
-        rails=["helpful", "not_helpful"]
+        rails=[&quot;helpful&quot;, &quot;not_helpful&quot;]
     )
     return result
 ```
@@ -303,8 +353,8 @@ client = Client()
 
 # Get spans to evaluate
 spans_df = client.get_spans_dataframe(
-    project_name="my-app",
-    filter_condition="span_kind == 'LLM'"
+    project_name=&quot;my-app&quot;,
+    filter_condition=&quot;span_kind == &#039;LLM&#039;&quot;
 )
 
 # Run evaluations
@@ -332,21 +382,21 @@ client = Client()
 
 # Create dataset
 dataset = client.create_dataset(
-    name="qa-test-set",
-    description="QA evaluation dataset"
+    name=&quot;qa-test-set&quot;,
+    description=&quot;QA evaluation dataset&quot;
 )
 
 # Add examples
 client.add_examples_to_dataset(
-    dataset_name="qa-test-set",
+    dataset_name=&quot;qa-test-set&quot;,
     examples=[
         {
-            "input": {"question": "What is Python?"},
-            "output": {"answer": "A programming language"}
+            &quot;input&quot;: {&quot;question&quot;: &quot;What is Python?&quot;},
+            &quot;output&quot;: {&quot;answer&quot;: &quot;A programming language&quot;}
         },
         {
-            "input": {"question": "What is ML?"},
-            "output": {"answer": "Machine learning"}
+            &quot;input&quot;: {&quot;question&quot;: &quot;What is ML?&quot;},
+            &quot;output&quot;: {&quot;answer&quot;: &quot;Machine learning&quot;}
         }
     ]
 )
@@ -361,26 +411,26 @@ from phoenix.experiments import run_experiment
 client = Client()
 
 def my_model(input_data):
-    """Your model function."""
-    question = input_data["question"]
-    return {"answer": generate_answer(question)}
+    &quot;&quot;&quot;Your model function.&quot;&quot;&quot;
+    question = input_data[&quot;question&quot;]
+    return {&quot;answer&quot;: generate_answer(question)}
 
 def accuracy_evaluator(input_data, output, expected):
-    """Custom evaluator."""
+    &quot;&quot;&quot;Custom evaluator.&quot;&quot;&quot;
     return {
-        "score": 1.0 if expected["answer"].lower() in output["answer"].lower() else 0.0,
-        "label": "correct" if expected["answer"].lower() in output["answer"].lower() else "incorrect"
+        &quot;score&quot;: 1.0 if expected[&quot;answer&quot;].lower() in output[&quot;answer&quot;].lower() else 0.0,
+        &quot;label&quot;: &quot;correct&quot; if expected[&quot;answer&quot;].lower() in output[&quot;answer&quot;].lower() else &quot;incorrect&quot;
     }
 
 # Run experiment
 results = run_experiment(
-    dataset_name="qa-test-set",
+    dataset_name=&quot;qa-test-set&quot;,
     task=my_model,
     evaluators=[accuracy_evaluator],
-    experiment_name="baseline-v1"
+    experiment_name=&quot;baseline-v1&quot;
 )
 
-print(f"Average accuracy: {results.aggregate_metrics['accuracy']}")
+print(f&quot;Average accuracy: {results.aggregate_metrics[&#039;accuracy&#039;]}&quot;)
 ```
 
 ## Client API
@@ -390,20 +440,20 @@ print(f"Average accuracy: {results.aggregate_metrics['accuracy']}")
 ```python
 from phoenix import Client
 
-client = Client(endpoint="http://localhost:6006")
+client = Client(endpoint=&quot;http://localhost:6006&quot;)
 
 # Get spans as DataFrame
 spans_df = client.get_spans_dataframe(
-    project_name="my-app",
-    filter_condition="span_kind == 'LLM'",
+    project_name=&quot;my-app&quot;,
+    filter_condition=&quot;span_kind == &#039;LLM&#039;&quot;,
     limit=1000
 )
 
 # Get specific span
-span = client.get_span(span_id="abc123")
+span = client.get_span(span_id=&quot;abc123&quot;)
 
 # Get trace
-trace = client.get_trace(trace_id="xyz789")
+trace = client.get_trace(trace_id=&quot;xyz789&quot;)
 ```
 
 ### Log feedback
@@ -415,12 +465,12 @@ client = Client()
 
 # Log user feedback
 client.log_annotation(
-    span_id="abc123",
-    name="user_rating",
-    annotator_kind="HUMAN",
+    span_id=&quot;abc123&quot;,
+    name=&quot;user_rating&quot;,
+    annotator_kind=&quot;HUMAN&quot;,
     score=0.8,
-    label="helpful",
-    metadata={"comment": "Good response"}
+    label=&quot;helpful&quot;,
+    metadata={&quot;comment&quot;: &quot;Good response&quot;}
 )
 ```
 
@@ -428,10 +478,10 @@ client.log_annotation(
 
 ```python
 # Export to pandas
-df = client.get_spans_dataframe(project_name="my-app")
+df = client.get_spans_dataframe(project_name=&quot;my-app&quot;)
 
 # Export traces
-traces = client.list_traces(project_name="my-app")
+traces = client.list_traces(project_name=&quot;my-app&quot;)
 ```
 
 ## Production deployment
@@ -446,7 +496,7 @@ docker run -p 6006:6006 arizephoenix/phoenix:latest
 
 ```bash
 # Set database URL
-export PHOENIX_SQL_DATABASE_URL="postgresql://user:pass@host:5432/phoenix"
+export PHOENIX_SQL_DATABASE_URL=&quot;postgresql://user:pass@host:5432/phoenix&quot;
 
 # Start server
 phoenix serve --host 0.0.0.0 --port 6006
@@ -468,8 +518,8 @@ phoenix serve --host 0.0.0.0 --port 6006
 
 ```bash
 export PHOENIX_ENABLE_AUTH=true
-export PHOENIX_SECRET="your-secret-key-min-32-chars"
-export PHOENIX_ADMIN_SECRET="admin-bootstrap-token"
+export PHOENIX_SECRET=&quot;your-secret-key-min-32-chars&quot;
+export PHOENIX_ADMIN_SECRET=&quot;admin-bootstrap-token&quot;
 
 phoenix serve
 ```
@@ -491,8 +541,8 @@ from phoenix.otel import register
 
 # Verify endpoint
 tracer_provider = register(
-    project_name="my-app",
-    endpoint="http://localhost:6006/v1/traces"  # Correct endpoint
+    project_name=&quot;my-app&quot;,
+    endpoint=&quot;http://localhost:6006/v1/traces&quot;  # Correct endpoint
 )
 
 # Force flush
@@ -512,7 +562,7 @@ px.close_app()
 **Database connection issues:**
 ```bash
 # Verify PostgreSQL connection
-psql $PHOENIX_SQL_DATABASE_URL -c "SELECT 1"
+psql $PHOENIX_SQL_DATABASE_URL -c &quot;SELECT 1&quot;
 
 # Check Phoenix logs
 phoenix serve --log-level debug
@@ -530,8 +580,46 @@ phoenix serve --log-level debug
 - **Docker Hub**: https://hub.docker.com/r/arizephoenix/phoenix
 - **Version**: 12.0.0+
 - **License**: Apache 2.0
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Observability</span><span class="tag">Phoenix</span><span class="tag">Arize</span><span class="tag">Tracing</span><span class="tag">Evaluation</span><span class="tag">Monitoring</span><span class="tag">LLM Ops</span><span class="tag">OpenTelemetry</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>18</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

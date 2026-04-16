@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>post-training-trl-fine-tuning - AICCLI</title>
-  <meta name="description" content="post-training-trl-fine-tuning - Claude Code skill for AICCLI">
+  <meta name="description" content="Fine-tune LLMs using reinforcement learning with TRL - SFT for instruction tuning, DPO for preference alignment, PPO/GRPO for reward optimization, and reward mo">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / post-training-trl-fine-tuning</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>post-training-trl-fine-tuning</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / post-training-trl-fine-tuning
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>post-training-trl-fine-tuning</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Fine-tune LLMs using reinforcement learning with TRL - SFT for instruction tuning, DPO for preference alignment, PPO/GRPO for reward optimization, and reward model training. Use when need RLHF, align model with preferences, or train from human feedback. Works with HuggingFace Transformers.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/post-training-trl-fine-tuning</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/post-training-trl-fine-tuning</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/post-training-trl-fine-tuning</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: fine-tuning-with-trl
 description: Fine-tune LLMs using reinforcement learning with TRL - SFT for instruction tuning, DPO for preference alignment, PPO/GRPO for reward optimization, and reward model training. Use when need RLHF, align model with preferences, or train from human feedback. Works with HuggingFace Transformers.
 version: 1.0.0
@@ -81,7 +131,7 @@ pip install trl transformers datasets peft accelerate
 from trl import SFTTrainer
 
 trainer = SFTTrainer(
-    model="Qwen/Qwen2.5-0.5B",
+    model=&quot;Qwen/Qwen2.5-0.5B&quot;,
     train_dataset=dataset,  # Prompt-completion pairs
 )
 trainer.train()
@@ -91,7 +141,7 @@ trainer.train()
 ```python
 from trl import DPOTrainer, DPOConfig
 
-config = DPOConfig(output_dir="model-dpo", beta=0.1)
+config = DPOConfig(output_dir=&quot;model-dpo&quot;, beta=0.1)
 trainer = DPOTrainer(
     model=model,
     args=config,
@@ -127,20 +177,20 @@ from trl import SFTTrainer, SFTConfig
 from datasets import load_dataset
 
 # Load model
-model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-0.5B")
-tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B")
+model = AutoModelForCausalLM.from_pretrained(&quot;Qwen/Qwen2.5-0.5B&quot;)
+tokenizer = AutoTokenizer.from_pretrained(&quot;Qwen/Qwen2.5-0.5B&quot;)
 
 # Load instruction dataset
-dataset = load_dataset("trl-lib/Capybara", split="train")
+dataset = load_dataset(&quot;trl-lib/Capybara&quot;, split=&quot;train&quot;)
 
 # Configure training
 training_args = SFTConfig(
-    output_dir="Qwen2.5-0.5B-SFT",
+    output_dir=&quot;Qwen2.5-0.5B-SFT&quot;,
     per_device_train_batch_size=4,
     num_train_epochs=1,
     learning_rate=2e-5,
     logging_steps=10,
-    save_strategy="epoch"
+    save_strategy=&quot;epoch&quot;
 )
 
 # Train
@@ -164,17 +214,17 @@ from trl import RewardTrainer, RewardConfig
 
 # Load SFT model as base
 model = AutoModelForSequenceClassification.from_pretrained(
-    "Qwen2.5-0.5B-SFT",
+    &quot;Qwen2.5-0.5B-SFT&quot;,
     num_labels=1  # Single reward score
 )
-tokenizer = AutoTokenizer.from_pretrained("Qwen2.5-0.5B-SFT")
+tokenizer = AutoTokenizer.from_pretrained(&quot;Qwen2.5-0.5B-SFT&quot;)
 
 # Load preference data (chosen/rejected pairs)
-dataset = load_dataset("trl-lib/ultrafeedback_binarized", split="train")
+dataset = load_dataset(&quot;trl-lib/ultrafeedback_binarized&quot;, split=&quot;train&quot;)
 
 # Configure training
 training_args = RewardConfig(
-    output_dir="Qwen2.5-0.5B-Reward",
+    output_dir=&quot;Qwen2.5-0.5B-Reward&quot;,
     per_device_train_batch_size=2,
     num_train_epochs=1,
     learning_rate=1e-5
@@ -212,11 +262,11 @@ python -m trl.scripts.ppo \
 from transformers import pipeline
 
 # Load aligned model
-generator = pipeline("text-generation", model="Qwen2.5-0.5B-PPO")
+generator = pipeline(&quot;text-generation&quot;, model=&quot;Qwen2.5-0.5B-PPO&quot;)
 
 # Test
-prompt = "Explain quantum computing to a 10-year-old"
-output = generator(prompt, max_length=200)[0]["generated_text"]
+prompt = &quot;Explain quantum computing to a 10-year-old&quot;
+output = generator(prompt, max_length=200)[0][&quot;generated_text&quot;]
 print(output)
 ```
 
@@ -239,9 +289,9 @@ DPO Training:
 Dataset format:
 ```json
 {
-  "prompt": "What is the capital of France?",
-  "chosen": "The capital of France is Paris.",
-  "rejected": "I don't know."
+  &quot;prompt&quot;: &quot;What is the capital of France?&quot;,
+  &quot;chosen&quot;: &quot;The capital of France is Paris.&quot;,
+  &quot;rejected&quot;: &quot;I don&#039;t know.&quot;
 }
 ```
 
@@ -249,9 +299,9 @@ Load dataset:
 ```python
 from datasets import load_dataset
 
-dataset = load_dataset("trl-lib/ultrafeedback_binarized", split="train")
+dataset = load_dataset(&quot;trl-lib/ultrafeedback_binarized&quot;, split=&quot;train&quot;)
 # Or load your own
-# dataset = load_dataset("json", data_files="preferences.json")
+# dataset = load_dataset(&quot;json&quot;, data_files=&quot;preferences.json&quot;)
 ```
 
 **Step 2: Configure DPO**
@@ -260,7 +310,7 @@ dataset = load_dataset("trl-lib/ultrafeedback_binarized", split="train")
 from trl import DPOConfig
 
 config = DPOConfig(
-    output_dir="Qwen2.5-0.5B-DPO",
+    output_dir=&quot;Qwen2.5-0.5B-DPO&quot;,
     per_device_train_batch_size=4,
     num_train_epochs=1,
     learning_rate=5e-7,
@@ -277,8 +327,8 @@ config = DPOConfig(
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import DPOTrainer
 
-model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-0.5B-Instruct")
-tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B-Instruct")
+model = AutoModelForCausalLM.from_pretrained(&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;)
+tokenizer = AutoTokenizer.from_pretrained(&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;)
 
 trainer = DPOTrainer(
     model=model,
@@ -319,7 +369,7 @@ GRPO Training:
 
 ```python
 def reward_function(completions, **kwargs):
-    """
+    &quot;&quot;&quot;
     Compute rewards for completions.
 
     Args:
@@ -327,7 +377,7 @@ def reward_function(completions, **kwargs):
 
     Returns:
         List of reward scores (floats)
-    """
+    &quot;&quot;&quot;
     rewards = []
     for completion in completions:
         # Example: reward based on length and unique words
@@ -341,14 +391,14 @@ Or use a reward model:
 ```python
 from transformers import pipeline
 
-reward_model = pipeline("text-classification", model="reward-model-path")
+reward_model = pipeline(&quot;text-classification&quot;, model=&quot;reward-model-path&quot;)
 
 def reward_from_model(completions, prompts, **kwargs):
     # Combine prompt + completion
     full_texts = [p + c for p, c in zip(prompts, completions)]
     # Get reward scores
     results = reward_model(full_texts)
-    return [r["score"] for r in results]
+    return [r[&quot;score&quot;] for r in results]
 ```
 
 **Step 2: Configure GRPO**
@@ -357,7 +407,7 @@ def reward_from_model(completions, prompts, **kwargs):
 from trl import GRPOConfig
 
 config = GRPOConfig(
-    output_dir="Qwen2-GRPO",
+    output_dir=&quot;Qwen2-GRPO&quot;,
     per_device_train_batch_size=4,
     num_train_epochs=1,
     learning_rate=1e-5,
@@ -373,10 +423,10 @@ from datasets import load_dataset
 from trl import GRPOTrainer
 
 # Load prompt-only dataset
-dataset = load_dataset("trl-lib/tldr", split="train")
+dataset = load_dataset(&quot;trl-lib/tldr&quot;, split=&quot;train&quot;)
 
 trainer = GRPOTrainer(
-    model="Qwen/Qwen2-0.5B-Instruct",
+    model=&quot;Qwen/Qwen2-0.5B-Instruct&quot;,
     reward_funcs=reward_function,  # Your reward function
     args=config,
     train_dataset=dataset
@@ -503,15 +553,53 @@ config = PPOConfig(
 - Docs: https://huggingface.co/docs/trl/
 - GitHub: https://github.com/huggingface/trl
 - Papers:
-  - "Training language models to follow instructions with human feedback" (InstructGPT, 2022)
-  - "Direct Preference Optimization: Your Language Model is Secretly a Reward Model" (DPO, 2023)
-  - "Group Relative Policy Optimization" (GRPO, 2024)
+  - &quot;Training language models to follow instructions with human feedback&quot; (InstructGPT, 2022)
+  - &quot;Direct Preference Optimization: Your Language Model is Secretly a Reward Model&quot; (DPO, 2023)
+  - &quot;Group Relative Policy Optimization&quot; (GRPO, 2024)
 - Examples: https://github.com/huggingface/trl/tree/main/examples/scripts
 
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Post-Training</span><span class="tag">TRL</span><span class="tag">Reinforcement Learning</span><span class="tag">Fine-Tuning</span><span class="tag">SFT</span><span class="tag">DPO</span><span class="tag">PPO</span><span class="tag">GRPO</span><span class="tag">RLHF</span><span class="tag">Preference Alignment</span><span class="tag">HuggingFace</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>17</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>rdkit - AICCLI</title>
-  <meta name="description" content="rdkit - Claude Code skill for AICCLI">
+  <meta name="description" content=""Cheminformatics toolkit for fine-grained molecular control. SMILES/SDF parsing, descriptors (MW, LogP, TPSA), fingerprints, substructure search, 2D/3D generati">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / rdkit</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>rdkit</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / rdkit
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>rdkit</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Cheminformatics toolkit for fine-grained molecular control. SMILES/SDF parsing, descriptors (MW, LogP, TPSA), fingerprints, substructure search, 2D/3D generation, similarity, reactions. For standard workflows with simpler interface, use datamol (wrapper around RDKit). Use rdkit for advanced control, custom sanitization, specialized algorithms."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/rdkit</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/rdkit</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/rdkit</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: rdkit
-description: "Cheminformatics toolkit for fine-grained molecular control. SMILES/SDF parsing, descriptors (MW, LogP, TPSA), fingerprints, substructure search, 2D/3D generation, similarity, reactions. For standard workflows with simpler interface, use datamol (wrapper around RDKit). Use rdkit for advanced control, custom sanitization, specialized algorithms."
+description: &quot;Cheminformatics toolkit for fine-grained molecular control. SMILES/SDF parsing, descriptors (MW, LogP, TPSA), fingerprints, substructure search, 2D/3D generation, similarity, reactions. For standard workflows with simpler interface, use datamol (wrapper around RDKit). Use rdkit for advanced control, custom sanitization, specialized algorithms.&quot;
 ---
 
 # RDKit Cheminformatics Toolkit
@@ -78,16 +128,16 @@ Read molecular structures from various formats:
 from rdkit import Chem
 
 # From SMILES strings
-mol = Chem.MolFromSmiles('Cc1ccccc1')  # Returns Mol object or None
+mol = Chem.MolFromSmiles(&#039;Cc1ccccc1&#039;)  # Returns Mol object or None
 
 # From MOL files
-mol = Chem.MolFromMolFile('path/to/file.mol')
+mol = Chem.MolFromMolFile(&#039;path/to/file.mol&#039;)
 
 # From MOL blocks (string data)
 mol = Chem.MolFromMolBlock(mol_block_string)
 
 # From InChI
-mol = Chem.MolFromInchi('InChI=1S/C6H6/c1-2-4-6-5-3-1/h1-6H')
+mol = Chem.MolFromInchi(&#039;InChI=1S/C6H6/c1-2-4-6-5-3-1/h1-6H&#039;)
 ```
 
 **Writing Molecules:**
@@ -111,27 +161,27 @@ For processing multiple molecules, use Supplier/Writer objects:
 
 ```python
 # Read SDF files
-suppl = Chem.SDMolSupplier('molecules.sdf')
+suppl = Chem.SDMolSupplier(&#039;molecules.sdf&#039;)
 for mol in suppl:
     if mol is not None:  # Check for parsing errors
         # Process molecule
         pass
 
 # Read SMILES files
-suppl = Chem.SmilesMolSupplier('molecules.smi', titleLine=False)
+suppl = Chem.SmilesMolSupplier(&#039;molecules.smi&#039;, titleLine=False)
 
 # For large files or compressed data
-with gzip.open('molecules.sdf.gz') as f:
+with gzip.open(&#039;molecules.sdf.gz&#039;) as f:
     suppl = Chem.ForwardSDMolSupplier(f)
     for mol in suppl:
         # Process molecule
         pass
 
 # Multithreaded processing for large datasets
-suppl = Chem.MultithreadedSDMolSupplier('molecules.sdf')
+suppl = Chem.MultithreadedSDMolSupplier(&#039;molecules.sdf&#039;)
 
 # Write molecules to SDF
-writer = Chem.SDWriter('output.sdf')
+writer = Chem.SDWriter(&#039;output.sdf&#039;)
 for mol in molecules:
     writer.write(mol)
 writer.close()
@@ -150,7 +200,7 @@ RDKit automatically sanitizes molecules during parsing, executing 13 steps inclu
 
 ```python
 # Disable automatic sanitization
-mol = Chem.MolFromSmiles('C1=CC=CC=C1', sanitize=False)
+mol = Chem.MolFromSmiles(&#039;C1=CC=CC=C1&#039;, sanitize=False)
 
 # Manual sanitization
 Chem.SanitizeMol(mol)
@@ -262,13 +312,13 @@ aromatic_rings = Descriptors.NumAromaticRings(mol)
 ```python
 # Calculate all descriptors at once
 all_descriptors = Descriptors.CalcMolDescriptors(mol)
-# Returns dictionary: {'MolWt': 180.16, 'MolLogP': 1.23, ...}
+# Returns dictionary: {&#039;MolWt&#039;: 180.16, &#039;MolLogP&#039;: 1.23, ...}
 
 # Get list of available descriptor names
 descriptor_names = [desc[0] for desc in Descriptors._descList]
 ```
 
-**Lipinski's Rule of Five:**
+**Lipinski&#039;s Rule of Five:**
 
 ```python
 # Check drug-likeness
@@ -351,7 +401,7 @@ clusters = Butina.ClusterData(dists, len(fps), distThresh=0.3, isDistData=True)
 
 ```python
 # Define query using SMARTS
-query = Chem.MolFromSmarts('[#6]1:[#6]:[#6]:[#6]:[#6]:[#6]:1')  # Benzene ring
+query = Chem.MolFromSmarts(&#039;[#6]1:[#6]:[#6]:[#6]:[#6]:[#6]:1&#039;)  # Benzene ring
 
 # Check if molecule contains substructure
 has_match = mol.HasSubstructMatch(query)
@@ -367,26 +417,26 @@ match = mol.GetSubstructMatch(query)
 
 ```python
 # Primary alcohols
-primary_alcohol = Chem.MolFromSmarts('[CH2][OH1]')
+primary_alcohol = Chem.MolFromSmarts(&#039;[CH2][OH1]&#039;)
 
 # Carboxylic acids
-carboxylic_acid = Chem.MolFromSmarts('C(=O)[OH]')
+carboxylic_acid = Chem.MolFromSmarts(&#039;C(=O)[OH]&#039;)
 
 # Amides
-amide = Chem.MolFromSmarts('C(=O)N')
+amide = Chem.MolFromSmarts(&#039;C(=O)N&#039;)
 
 # Aromatic heterocycles
-aromatic_n = Chem.MolFromSmarts('[nR]')  # Aromatic nitrogen in ring
+aromatic_n = Chem.MolFromSmarts(&#039;[nR]&#039;)  # Aromatic nitrogen in ring
 
 # Macrocycles (rings &gt; 12 atoms)
-macrocycle = Chem.MolFromSmarts('[r{12-}]')
+macrocycle = Chem.MolFromSmarts(&#039;[r{12-}]&#039;)
 ```
 
 **Matching Rules:**
 - Unspecified properties in query match any value in target
 - Hydrogens are ignored unless explicitly specified
-- Charged query atom won't match uncharged target atom
-- Aromatic query atom won't match aliphatic target atom (unless query is generic)
+- Charged query atom won&#039;t match uncharged target atom
+- Aromatic query atom won&#039;t match aliphatic target atom (unless query is generic)
 
 ### 7. Chemical Reactions
 
@@ -396,7 +446,7 @@ macrocycle = Chem.MolFromSmarts('[r{12-}]')
 from rdkit.Chem import AllChem
 
 # Define reaction using SMARTS: reactants &gt;&gt; products
-rxn = AllChem.ReactionFromSmarts('[C:1]=[O:2]&gt;&gt;[C:1][O:2]')  # Ketone reduction
+rxn = AllChem.ReactionFromSmarts(&#039;[C:1]=[O:2]&gt;&gt;[C:1][O:2]&#039;)  # Ketone reduction
 
 # Apply reaction to molecules
 reactants = (mol1,)
@@ -412,7 +462,7 @@ for product_set in products:
 **Reaction Features:**
 - Atom mapping preserves specific atoms between reactants and products
 - Dummy atoms in products are replaced by corresponding reactant atoms
-- "Any" bonds inherit bond order from reactants
+- &quot;Any&quot; bonds inherit bond order from reactants
 - Chirality preserved unless explicitly changed
 
 **Reaction Similarity:**
@@ -436,7 +486,7 @@ from rdkit.Chem import AllChem
 AllChem.Compute2DCoords(mol)
 
 # Align molecule to template structure
-template = Chem.MolFromSmiles('c1ccccc1')
+template = Chem.MolFromSmiles(&#039;c1ccccc1&#039;)
 AllChem.Compute2DCoords(template)
 AllChem.GenerateDepictionMatching2DStructure(mol, template)
 ```
@@ -482,10 +532,10 @@ from rdkit.Chem import Draw
 
 # Draw single molecule to PIL image
 img = Draw.MolToImage(mol, size=(300, 300))
-img.save('molecule.png')
+img.save(&#039;molecule.png&#039;)
 
 # Draw to file directly
-Draw.MolToFile(mol, 'molecule.png')
+Draw.MolToFile(mol, &#039;molecule.png&#039;)
 
 # Draw multiple molecules in grid
 mols = [mol1, mol2, mol3, mol4]
@@ -496,7 +546,7 @@ img = Draw.MolsToGridImage(mols, molsPerRow=2, subImgSize=(200, 200))
 
 ```python
 # Highlight substructure match
-query = Chem.MolFromSmarts('c1ccccc1')
+query = Chem.MolFromSmarts(&#039;c1ccccc1&#039;)
 match = mol.GetSubstructMatch(query)
 
 img = Draw.MolToImage(mol, highlightAtoms=match)
@@ -526,7 +576,7 @@ drawer.DrawMolecule(mol)
 drawer.FinishDrawing()
 
 # Save to file
-with open('molecule.png', 'wb') as f:
+with open(&#039;molecule.png&#039;, &#039;wb&#039;) as f:
     f.write(drawer.GetDrawingText())
 ```
 
@@ -584,8 +634,8 @@ Chem.SetAromaticity(mol)
 
 ```python
 # Replace substructure with another structure
-query = Chem.MolFromSmarts('c1ccccc1')  # Benzene
-replacement = Chem.MolFromSmiles('C1CCCCC1')  # Cyclohexane
+query = Chem.MolFromSmarts(&#039;c1ccccc1&#039;)  # Benzene
+replacement = Chem.MolFromSmiles(&#039;C1CCCCC1&#039;)  # Cyclohexane
 
 new_mol = Chem.ReplaceSubstructs(mol, query, replacement)[0]
 ```
@@ -637,7 +687,7 @@ from rdkit import RDConfig
 import os
 
 # Load feature factory
-fdef_path = os.path.join(RDConfig.RDDataDir, 'BaseFeatures.fdef')
+fdef_path = os.path.join(RDConfig.RDDataDir, &#039;BaseFeatures.fdef&#039;)
 factory = ChemicalFeatures.BuildFeatureFactory(fdef_path)
 
 # Get pharmacophore features
@@ -662,20 +712,20 @@ def analyze_druglikeness(smiles):
 
     # Calculate Lipinski descriptors
     results = {
-        'MW': Descriptors.MolWt(mol),
-        'LogP': Descriptors.MolLogP(mol),
-        'HBD': Descriptors.NumHDonors(mol),
-        'HBA': Descriptors.NumHAcceptors(mol),
-        'TPSA': Descriptors.TPSA(mol),
-        'RotBonds': Descriptors.NumRotatableBonds(mol)
+        &#039;MW&#039;: Descriptors.MolWt(mol),
+        &#039;LogP&#039;: Descriptors.MolLogP(mol),
+        &#039;HBD&#039;: Descriptors.NumHDonors(mol),
+        &#039;HBA&#039;: Descriptors.NumHAcceptors(mol),
+        &#039;TPSA&#039;: Descriptors.TPSA(mol),
+        &#039;RotBonds&#039;: Descriptors.NumRotatableBonds(mol)
     }
 
-    # Check Lipinski's Rule of Five
-    results['Lipinski'] = (
-        results['MW'] &lt;= 500 and
-        results['LogP'] &lt;= 5 and
-        results['HBD'] &lt;= 5 and
-        results['HBA'] &lt;= 10
+    # Check Lipinski&#039;s Rule of Five
+    results[&#039;Lipinski&#039;] = (
+        results[&#039;MW&#039;] &lt;= 500 and
+        results[&#039;LogP&#039;] &lt;= 5 and
+        results[&#039;HBD&#039;] &lt;= 5 and
+        results[&#039;HBA&#039;] &lt;= 10
     )
 
     return results
@@ -730,7 +780,7 @@ Always check for `None` when parsing molecules:
 ```python
 mol = Chem.MolFromSmiles(smiles)
 if mol is None:
-    print(f"Failed to parse: {smiles}")
+    print(f&quot;Failed to parse: {smiles}&quot;)
     continue
 ```
 
@@ -742,11 +792,11 @@ if mol is None:
 import pickle
 
 # Pickle molecules for fast loading
-with open('molecules.pkl', 'wb') as f:
+with open(&#039;molecules.pkl&#039;, &#039;wb&#039;) as f:
     pickle.dump(mols, f)
 
 # Load pickled molecules (much faster than reparsing)
-with open('molecules.pkl', 'rb') as f:
+with open(&#039;molecules.pkl&#039;, &#039;rb&#039;) as f:
     mols = pickle.load(f)
 ```
 
@@ -778,14 +828,14 @@ For large datasets:
 
 ```python
 # Use ForwardSDMolSupplier to avoid loading entire file
-with open('large.sdf') as f:
+with open(&#039;large.sdf&#039;) as f:
     suppl = Chem.ForwardSDMolSupplier(f)
     for mol in suppl:
         # Process one molecule at a time
         pass
 
 # Use MultithreadedSDMolSupplier for parallel processing
-suppl = Chem.MultithreadedSDMolSupplier('large.sdf', numWriterThreads=4)
+suppl = Chem.MultithreadedSDMolSupplier(&#039;large.sdf&#039;, numWriterThreads=4)
 ```
 
 ## Common Pitfalls
@@ -795,7 +845,7 @@ suppl = Chem.MultithreadedSDMolSupplier('large.sdf', numWriterThreads=4)
 3. **Missing hydrogens:** Use `AddHs()` when calculating properties that depend on hydrogen
 4. **2D vs 3D:** Generate appropriate coordinates before visualization or 3D analysis
 5. **SMARTS matching rules:** Remember that unspecified properties match anything
-6. **Thread safety with MolSuppliers:** Don't share supplier objects across threads
+6. **Thread safety with MolSuppliers:** Don&#039;t share supplier objects across threads
 
 ## Resources
 
@@ -818,8 +868,39 @@ Example scripts for common RDKit workflows:
 - `substructure_filter.py` - Filter molecules by substructure patterns
 
 These scripts can be executed directly or used as templates for custom workflows.
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>10</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

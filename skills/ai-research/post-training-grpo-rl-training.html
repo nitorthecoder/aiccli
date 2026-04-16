@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>post-training-grpo-rl-training - AICCLI</title>
-  <meta name="description" content="post-training-grpo-rl-training - Claude Code skill for AICCLI">
+  <meta name="description" content="Expert guidance for GRPO/RL fine-tuning with TRL for reasoning and task-specific model training">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / post-training-grpo-rl-training</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>post-training-grpo-rl-training</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / post-training-grpo-rl-training
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>post-training-grpo-rl-training</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Expert guidance for GRPO/RL fine-tuning with TRL for reasoning and task-specific model training</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/post-training-grpo-rl-training</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/post-training-grpo-rl-training</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/post-training-grpo-rl-training</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: grpo-rl-training
 description: Expert guidance for GRPO/RL fine-tuning with TRL for reasoning and task-specific model training
 version: 1.0.0
@@ -132,7 +182,7 @@ For each prompt p:
 ### Step 1: Dataset Preparation
 
 **Critical Requirements:**
-- Prompts in chat format (list of dicts with 'role' and 'content')
+- Prompts in chat format (list of dicts with &#039;role&#039; and &#039;content&#039;)
 - Include system prompts to set expectations
 - For verifiable tasks, include ground truth answers as additional columns
 
@@ -140,7 +190,7 @@ For each prompt p:
 ```python
 from datasets import load_dataset, Dataset
 
-SYSTEM_PROMPT = """
+SYSTEM_PROMPT = &quot;&quot;&quot;
 Respond in the following format:
 &lt;reasoning&gt;
 [Your step-by-step thinking]
@@ -148,22 +198,22 @@ Respond in the following format:
 &lt;answer&gt;
 [Final answer]
 &lt;/answer&gt;
-"""
+&quot;&quot;&quot;
 
 def prepare_dataset(raw_data):
-    """
+    &quot;&quot;&quot;
     Transform raw data into GRPO-compatible format.
 
     Returns: Dataset with columns:
-    - 'prompt': List[Dict] with role/content (system + user messages)
-    - 'answer': str (ground truth, optional but recommended)
-    """
+    - &#039;prompt&#039;: List[Dict] with role/content (system + user messages)
+    - &#039;answer&#039;: str (ground truth, optional but recommended)
+    &quot;&quot;&quot;
     return raw_data.map(lambda x: {
-        'prompt': [
-            {'role': 'system', 'content': SYSTEM_PROMPT},
-            {'role': 'user', 'content': x['question']}
+        &#039;prompt&#039;: [
+            {&#039;role&#039;: &#039;system&#039;, &#039;content&#039;: SYSTEM_PROMPT},
+            {&#039;role&#039;: &#039;user&#039;, &#039;content&#039;: x[&#039;question&#039;]}
         ],
-        'answer': extract_answer(x['raw_answer'])
+        &#039;answer&#039;: extract_answer(x[&#039;raw_answer&#039;])
     })
 ```
 
@@ -182,13 +232,13 @@ def reward_function_name(
     answer=None,    # Optional: Ground truth from dataset
     **kwargs        # Additional dataset columns
 ) -&gt; list[float]:
-    """
+    &quot;&quot;&quot;
     Evaluate completions and return rewards.
 
     Returns: List of floats (one per completion)
-    """
+    &quot;&quot;&quot;
     # Extract completion text
-    responses = [comp[0]['content'] for comp in completions]
+    responses = [comp[0][&#039;content&#039;] for comp in completions]
 
     # Compute rewards
     rewards = []
@@ -202,8 +252,8 @@ def reward_function_name(
 **Example 1: Correctness Reward (Math/Coding)**
 ```python
 def correctness_reward(prompts, completions, answer, **kwargs):
-    """Reward correct answers with high score."""
-    responses = [comp[0]['content'] for comp in completions]
+    &quot;&quot;&quot;Reward correct answers with high score.&quot;&quot;&quot;
+    responses = [comp[0][&#039;content&#039;] for comp in completions]
     extracted = [extract_final_answer(r) for r in responses]
     return [2.0 if ans == gt else 0.0
             for ans, gt in zip(extracted, answer)]
@@ -214,9 +264,9 @@ def correctness_reward(prompts, completions, answer, **kwargs):
 import re
 
 def format_reward(completions, **kwargs):
-    """Reward XML-like structured format."""
-    pattern = r'&lt;reasoning&gt;.*?&lt;/reasoning&gt;\s*&lt;answer&gt;.*?&lt;/answer&gt;'
-    responses = [comp[0]['content'] for comp in completions]
+    &quot;&quot;&quot;Reward XML-like structured format.&quot;&quot;&quot;
+    pattern = r&#039;&lt;reasoning&gt;.*?&lt;/reasoning&gt;\s*&lt;answer&gt;.*?&lt;/answer&gt;&#039;
+    responses = [comp[0][&#039;content&#039;] for comp in completions]
     return [1.0 if re.search(pattern, r, re.DOTALL) else 0.0
             for r in responses]
 ```
@@ -224,23 +274,23 @@ def format_reward(completions, **kwargs):
 **Example 3: Incremental Format Reward (Partial Credit)**
 ```python
 def incremental_format_reward(completions, **kwargs):
-    """Award partial credit for format compliance."""
-    responses = [comp[0]['content'] for comp in completions]
+    &quot;&quot;&quot;Award partial credit for format compliance.&quot;&quot;&quot;
+    responses = [comp[0][&#039;content&#039;] for comp in completions]
     rewards = []
 
     for r in responses:
         score = 0.0
-        if '&lt;reasoning&gt;' in r:
+        if &#039;&lt;reasoning&gt;&#039; in r:
             score += 0.25
-        if '&lt;/reasoning&gt;' in r:
+        if &#039;&lt;/reasoning&gt;&#039; in r:
             score += 0.25
-        if '&lt;answer&gt;' in r:
+        if &#039;&lt;answer&gt;&#039; in r:
             score += 0.25
-        if '&lt;/answer&gt;' in r:
+        if &#039;&lt;/answer&gt;&#039; in r:
             score += 0.25
         # Penalize extra text after closing tag
-        if r.count('&lt;/answer&gt;') == 1:
-            extra_text = r.split('&lt;/answer&gt;')[-1].strip()
+        if r.count(&#039;&lt;/answer&gt;&#039;) == 1:
+            extra_text = r.split(&#039;&lt;/answer&gt;&#039;)[-1].strip()
             score -= len(extra_text) * 0.001
         rewards.append(score)
 
@@ -257,7 +307,7 @@ Combine 3-5 reward functions for robust training. Order matters less than divers
 from trl import GRPOConfig
 
 training_args = GRPOConfig(
-    output_dir="outputs/grpo-model",
+    output_dir=&quot;outputs/grpo-model&quot;,
 
     # Learning rate
     learning_rate=5e-6,          # Lower = more stable
@@ -265,7 +315,7 @@ training_args = GRPOConfig(
     adam_beta2=0.99,
     weight_decay=0.1,
     warmup_ratio=0.1,
-    lr_scheduler_type='cosine',
+    lr_scheduler_type=&#039;cosine&#039;,
 
     # Batch settings
     per_device_train_batch_size=1,
@@ -282,20 +332,20 @@ training_args = GRPOConfig(
 
     # Optimization
     bf16=True,                    # Faster on A100/H100
-    optim="adamw_8bit",          # Memory-efficient optimizer
+    optim=&quot;adamw_8bit&quot;,          # Memory-efficient optimizer
     max_grad_norm=0.1,
 
     # Logging
     logging_steps=1,
     save_steps=100,
-    report_to="wandb",            # Or "none" for no logging
+    report_to=&quot;wandb&quot;,            # Or &quot;none&quot; for no logging
 )
 ```
 
 **High-Performance Config (Large GPU)**
 ```python
 training_args = GRPOConfig(
-    output_dir="outputs/grpo-model",
+    output_dir=&quot;outputs/grpo-model&quot;,
     learning_rate=1e-5,
     per_device_train_batch_size=4,
     gradient_accumulation_steps=2,
@@ -328,12 +378,12 @@ from peft import LoraConfig
 from trl import GRPOTrainer
 
 # Load model
-model_name = "Qwen/Qwen2.5-1.5B-Instruct"
+model_name = &quot;Qwen/Qwen2.5-1.5B-Instruct&quot;
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
     torch_dtype=torch.bfloat16,
-    attn_implementation="flash_attention_2",  # 2-3x faster
-    device_map="auto"
+    attn_implementation=&quot;flash_attention_2&quot;,  # 2-3x faster
+    device_map=&quot;auto&quot;
 )
 
 tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -344,10 +394,10 @@ peft_config = LoraConfig(
     r=16,                         # Rank (higher = more capacity)
     lora_alpha=32,               # Scaling factor (typically 2*r)
     target_modules=[
-        "q_proj", "k_proj", "v_proj", "o_proj",
-        "gate_proj", "up_proj", "down_proj"
+        &quot;q_proj&quot;, &quot;k_proj&quot;, &quot;v_proj&quot;, &quot;o_proj&quot;,
+        &quot;gate_proj&quot;, &quot;up_proj&quot;, &quot;down_proj&quot;
     ],
-    task_type="CAUSAL_LM",
+    task_type=&quot;CAUSAL_LM&quot;,
     lora_dropout=0.05,
 )
 
@@ -369,7 +419,7 @@ trainer = GRPOTrainer(
 trainer.train()
 
 # Save
-trainer.save_model("final_model")
+trainer.save_model(&quot;final_model&quot;)
 ```
 
 **Unsloth Setup (2-3x Faster)**
@@ -377,7 +427,7 @@ trainer.save_model("final_model")
 from unsloth import FastLanguageModel
 
 model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name="google/gemma-3-1b-it",
+    model_name=&quot;google/gemma-3-1b-it&quot;,
     max_seq_length=1024,
     load_in_4bit=True,
     fast_inference=True,
@@ -387,10 +437,10 @@ model, tokenizer = FastLanguageModel.from_pretrained(
 model = FastLanguageModel.get_peft_model(
     model,
     r=32,
-    target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
-                    "gate_proj", "up_proj", "down_proj"],
+    target_modules=[&quot;q_proj&quot;, &quot;k_proj&quot;, &quot;v_proj&quot;, &quot;o_proj&quot;,
+                    &quot;gate_proj&quot;, &quot;up_proj&quot;, &quot;down_proj&quot;],
     lora_alpha=32,
-    use_gradient_checkpointing="unsloth",
+    use_gradient_checkpointing=&quot;unsloth&quot;,
 )
 
 # Rest is identical to standard setup
@@ -436,7 +486,7 @@ Step   Reward    Reward_Std   KL
 | **No learning** | Flat rewards | Check reward function logic, increase LR |
 | **OOM errors** | GPU memory exceeded | Reduce `num_generations`, enable gradient checkpointing |
 | **Slow training** | &lt; 1 it/s | Enable `use_vllm=True`, use Unsloth, reduce seq length |
-| **Format ignored** | Model doesn't follow structure | Increase format reward weight, add incremental rewards |
+| **Format ignored** | Model doesn&#039;t follow structure | Increase format reward weight, add incremental rewards |
 
 ---
 
@@ -475,7 +525,7 @@ class AdaptiveReward:
         return [r * self.weight for r in rewards]
 
     def adjust_weight(self, success_rate):
-        """Increase weight if model struggling, decrease if succeeding."""
+        &quot;&quot;&quot;Increase weight if model struggling, decrease if succeeding.&quot;&quot;&quot;
         if success_rate &lt; 0.3:
             self.weight *= 1.2
         elif success_rate &gt; 0.8:
@@ -485,16 +535,16 @@ class AdaptiveReward:
 ### 3. Custom Dataset Integration
 ```python
 def load_custom_knowledge_base(csv_path):
-    """Example: School communication platform docs."""
+    &quot;&quot;&quot;Example: School communication platform docs.&quot;&quot;&quot;
     import pandas as pd
     df = pd.read_csv(csv_path)
 
     dataset = Dataset.from_pandas(df).map(lambda x: {
-        'prompt': [
-            {'role': 'system', 'content': CUSTOM_SYSTEM_PROMPT},
-            {'role': 'user', 'content': x['question']}
+        &#039;prompt&#039;: [
+            {&#039;role&#039;: &#039;system&#039;, &#039;content&#039;: CUSTOM_SYSTEM_PROMPT},
+            {&#039;role&#039;: &#039;user&#039;, &#039;content&#039;: x[&#039;question&#039;]}
         ],
-        'answer': x['expert_answer']
+        &#039;answer&#039;: x[&#039;expert_answer&#039;]
     })
     return dataset
 ```
@@ -506,10 +556,10 @@ def load_custom_knowledge_base(csv_path):
 ### Save and Merge LoRA
 ```python
 # Merge LoRA adapters into base model
-if hasattr(trainer.model, 'merge_and_unload'):
+if hasattr(trainer.model, &#039;merge_and_unload&#039;):
     merged_model = trainer.model.merge_and_unload()
-    merged_model.save_pretrained("production_model")
-    tokenizer.save_pretrained("production_model")
+    merged_model.save_pretrained(&quot;production_model&quot;)
+    tokenizer.save_pretrained(&quot;production_model&quot;)
 ```
 
 ### Inference Example
@@ -517,22 +567,22 @@ if hasattr(trainer.model, 'merge_and_unload'):
 from transformers import pipeline
 
 generator = pipeline(
-    "text-generation",
-    model="production_model",
+    &quot;text-generation&quot;,
+    model=&quot;production_model&quot;,
     tokenizer=tokenizer
 )
 
 result = generator(
     [
-        {'role': 'system', 'content': SYSTEM_PROMPT},
-        {'role': 'user', 'content': "What is 15 + 27?"}
+        {&#039;role&#039;: &#039;system&#039;, &#039;content&#039;: SYSTEM_PROMPT},
+        {&#039;role&#039;: &#039;user&#039;, &#039;content&#039;: &quot;What is 15 + 27?&quot;}
     ],
     max_new_tokens=256,
     do_sample=True,
     temperature=0.7,
     top_p=0.9
 )
-print(result[0]['generated_text'])
+print(result[0][&#039;generated_text&#039;])
 ```
 
 ---
@@ -575,9 +625,9 @@ print(result[0]['generated_text'])
 ```python
 # Debug reward function
 def debug_reward(completions, **kwargs):
-    responses = [comp[0]['content'] for comp in completions]
+    responses = [comp[0][&#039;content&#039;] for comp in completions]
     for i, r in enumerate(responses[:2]):  # Print first 2
-        print(f"Response {i}: {r[:200]}...")
+        print(f&quot;Response {i}: {r[:200]}...&quot;)
     return [1.0] * len(responses)  # Dummy rewards
 
 # Test without training
@@ -613,7 +663,7 @@ When this skill is loaded:
 2. **Start with the simplest reward function** (e.g., length-based) to validate setup
 3. **Use the templates** in `templates/` directory as starting points
 4. **Reference examples** in `examples/` for task-specific implementations
-5. **Follow the workflow** sequentially (don't skip steps)
+5. **Follow the workflow** sequentially (don&#039;t skip steps)
 6. **Debug incrementally** - add one reward function at a time
 
 **Critical Reminders:**
@@ -627,8 +677,46 @@ This skill is designed for **expert-level implementation**. Beginners should sta
 
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Post-Training</span><span class="tag">Reinforcement Learning</span><span class="tag">GRPO</span><span class="tag">TRL</span><span class="tag">RLHF</span><span class="tag">Reward Modeling</span><span class="tag">Reasoning</span><span class="tag">DPO</span><span class="tag">PPO</span><span class="tag">Structured Output</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>12</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

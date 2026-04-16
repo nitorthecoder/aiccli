@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>openalex-database - AICCLI</title>
-  <meta name="description" content="openalex-database - Claude Code skill for AICCLI">
+  <meta name="description" content="Query and analyze scholarly literature using the OpenAlex database. This skill should be used when searching for academic papers, analyzing research trends, fin">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / openalex-database</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>openalex-database</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / openalex-database
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>openalex-database</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Query and analyze scholarly literature using the OpenAlex database. This skill should be used when searching for academic papers, analyzing research trends, finding works by authors or institutions, tracking citations, discovering open access publications, or conducting bibliometric analysis across 240M+ scholarly works. Use for literature searches, research output analysis, citation analysis, and academic database queries.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/openalex-database</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/openalex-database</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/openalex-database</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: openalex-database
 description: Query and analyze scholarly literature using the OpenAlex database. This skill should be used when searching for academic papers, analyzing research trends, finding works by authors or institutions, tracking citations, discovering open access publications, or conducting bibliometric analysis across 240M+ scholarly works. Use for literature searches, research output analysis, citation analysis, and academic database queries.
 ---
@@ -75,7 +125,7 @@ Always initialize the client with an email address to access the polite pool (10
 ```python
 from scripts.openalex_client import OpenAlexClient
 
-client = OpenAlexClient(email="your-email@example.edu")
+client = OpenAlexClient(email=&quot;your-email@example.edu&quot;)
 ```
 
 ### Installation Requirements
@@ -97,18 +147,18 @@ No API key required - OpenAlex is completely open.
 ```python
 # Simple search
 results = client.search_works(
-    search="machine learning",
+    search=&quot;machine learning&quot;,
     per_page=100
 )
 
 # Search with filters
 results = client.search_works(
-    search="CRISPR gene editing",
+    search=&quot;CRISPR gene editing&quot;,
     filter_params={
-        "publication_year": "&gt;2020",
-        "is_oa": "true"
+        &quot;publication_year&quot;: &quot;&gt;2020&quot;,
+        &quot;is_oa&quot;: &quot;true&quot;
     },
-    sort="cited_by_count:desc"
+    sort=&quot;cited_by_count:desc&quot;
 )
 ```
 
@@ -122,7 +172,7 @@ Use the two-step pattern (entity name → ID → works):
 from scripts.query_helpers import find_author_works
 
 works = find_author_works(
-    author_name="Jennifer Doudna",
+    author_name=&quot;Jennifer Doudna&quot;,
     client=client,
     limit=100
 )
@@ -132,14 +182,14 @@ works = find_author_works(
 ```python
 # Step 1: Get author ID
 author_response = client._make_request(
-    '/authors',
-    params={'search': 'Jennifer Doudna', 'per-page': 1}
+    &#039;/authors&#039;,
+    params={&#039;search&#039;: &#039;Jennifer Doudna&#039;, &#039;per-page&#039;: 1}
 )
-author_id = author_response['results'][0]['id'].split('/')[-1]
+author_id = author_response[&#039;results&#039;][0][&#039;id&#039;].split(&#039;/&#039;)[-1]
 
 # Step 2: Get works
 works = client.search_works(
-    filter_params={"authorships.author.id": author_id}
+    filter_params={&quot;authorships.author.id&quot;: author_id}
 )
 ```
 
@@ -151,7 +201,7 @@ works = client.search_works(
 from scripts.query_helpers import find_institution_works
 
 works = find_institution_works(
-    institution_name="Stanford University",
+    institution_name=&quot;Stanford University&quot;,
     client=client,
     limit=200
 )
@@ -165,8 +215,8 @@ works = find_institution_works(
 from scripts.query_helpers import find_highly_cited_recent_papers
 
 papers = find_highly_cited_recent_papers(
-    topic="quantum computing",
-    years="&gt;2020",
+    topic=&quot;quantum computing&quot;,
+    years=&quot;&gt;2020&quot;,
     client=client,
     limit=100
 )
@@ -180,9 +230,9 @@ papers = find_highly_cited_recent_papers(
 from scripts.query_helpers import get_open_access_papers
 
 papers = get_open_access_papers(
-    search_term="climate change",
+    search_term=&quot;climate change&quot;,
     client=client,
-    oa_status="any",  # or "gold", "green", "hybrid", "bronze"
+    oa_status=&quot;any&quot;,  # or &quot;gold&quot;, &quot;green&quot;, &quot;hybrid&quot;, &quot;bronze&quot;
     limit=200
 )
 ```
@@ -195,14 +245,14 @@ papers = get_open_access_papers(
 from scripts.query_helpers import get_publication_trends
 
 trends = get_publication_trends(
-    search_term="artificial intelligence",
-    filter_params={"is_oa": "true"},
+    search_term=&quot;artificial intelligence&quot;,
+    filter_params={&quot;is_oa&quot;: &quot;true&quot;},
     client=client
 )
 
 # Sort and display
-for trend in sorted(trends, key=lambda x: x['key'])[-10:]:
-    print(f"{trend['key']}: {trend['count']} publications")
+for trend in sorted(trends, key=lambda x: x[&#039;key&#039;])[-10:]:
+    print(f&quot;{trend[&#039;key&#039;]}: {trend[&#039;count&#039;]} publications&quot;)
 ```
 
 ### 7. Research Output Analysis
@@ -213,15 +263,15 @@ for trend in sorted(trends, key=lambda x: x['key'])[-10:]:
 from scripts.query_helpers import analyze_research_output
 
 analysis = analyze_research_output(
-    entity_type='institution',  # or 'author'
-    entity_name='MIT',
+    entity_type=&#039;institution&#039;,  # or &#039;author&#039;
+    entity_name=&#039;MIT&#039;,
     client=client,
-    years='&gt;2020'
+    years=&#039;&gt;2020&#039;
 )
 
-print(f"Total works: {analysis['total_works']}")
-print(f"Open access: {analysis['open_access_percentage']}%")
-print(f"Top topics: {analysis['top_topics'][:5]}")
+print(f&quot;Total works: {analysis[&#039;total_works&#039;]}&quot;)
+print(f&quot;Open access: {analysis[&#039;open_access_percentage&#039;]}%&quot;)
+print(f&quot;Top topics: {analysis[&#039;top_topics&#039;][:5]}&quot;)
 ```
 
 ### 8. Batch Lookups
@@ -230,15 +280,15 @@ print(f"Top topics: {analysis['top_topics'][:5]}")
 
 ```python
 dois = [
-    "https://doi.org/10.1038/s41586-021-03819-2",
-    "https://doi.org/10.1126/science.abc1234",
+    &quot;https://doi.org/10.1038/s41586-021-03819-2&quot;,
+    &quot;https://doi.org/10.1126/science.abc1234&quot;,
     # ... up to 50 DOIs
 ]
 
 works = client.batch_lookup(
-    entity_type='works',
+    entity_type=&#039;works&#039;,
     ids=dois,
-    id_field='doi'
+    id_field=&#039;doi&#039;
 )
 ```
 
@@ -251,14 +301,14 @@ works = client.batch_lookup(
 works = client.sample_works(
     sample_size=100,
     seed=42,  # For reproducibility
-    filter_params={"publication_year": "2023"}
+    filter_params={&quot;publication_year&quot;: &quot;2023&quot;}
 )
 
 # Large sample (&gt;10k) - automatically handles multiple requests
 works = client.sample_works(
     sample_size=25000,
     seed=42,
-    filter_params={"is_oa": "true"}
+    filter_params={&quot;is_oa&quot;: &quot;true&quot;}
 )
 ```
 
@@ -268,15 +318,15 @@ works = client.sample_works(
 
 ```python
 # Get the work
-work = client.get_entity('works', 'https://doi.org/10.1038/s41586-021-03819-2')
+work = client.get_entity(&#039;works&#039;, &#039;https://doi.org/10.1038/s41586-021-03819-2&#039;)
 
 # Get citing papers using cited_by_api_url
 import requests
 citing_response = requests.get(
-    work['cited_by_api_url'],
-    params={'mailto': client.email, 'per-page': 200}
+    work[&#039;cited_by_api_url&#039;],
+    params={&#039;mailto&#039;: client.email, &#039;per-page&#039;: 200}
 )
-citing_works = citing_response.json()['results']
+citing_works = citing_response.json()[&#039;results&#039;]
 ```
 
 ### 11. Topic and Subject Analysis
@@ -286,16 +336,16 @@ citing_works = citing_response.json()['results']
 ```python
 # Get top topics for an institution
 topics = client.group_by(
-    entity_type='works',
-    group_field='topics.id',
+    entity_type=&#039;works&#039;,
+    group_field=&#039;topics.id&#039;,
     filter_params={
-        "authorships.institutions.id": "I136199984",  # MIT
-        "publication_year": "&gt;2020"
+        &quot;authorships.institutions.id&quot;: &quot;I136199984&quot;,  # MIT
+        &quot;publication_year&quot;: &quot;&gt;2020&quot;
     }
 )
 
 for topic in topics[:10]:
-    print(f"{topic['key_display_name']}: {topic['count']} works")
+    print(f&quot;{topic[&#039;key_display_name&#039;]}: {topic[&#039;count&#039;]} works&quot;)
 ```
 
 ### 12. Large-Scale Data Extraction
@@ -305,27 +355,27 @@ for topic in topics[:10]:
 ```python
 # Paginate through all results
 all_papers = client.paginate_all(
-    endpoint='/works',
+    endpoint=&#039;/works&#039;,
     params={
-        'search': 'synthetic biology',
-        'filter': 'publication_year:2020-2024'
+        &#039;search&#039;: &#039;synthetic biology&#039;,
+        &#039;filter&#039;: &#039;publication_year:2020-2024&#039;
     },
     max_results=10000
 )
 
 # Export to CSV
 import csv
-with open('papers.csv', 'w', newline='', encoding='utf-8') as f:
+with open(&#039;papers.csv&#039;, &#039;w&#039;, newline=&#039;&#039;, encoding=&#039;utf-8&#039;) as f:
     writer = csv.writer(f)
-    writer.writerow(['Title', 'Year', 'Citations', 'DOI', 'OA Status'])
+    writer.writerow([&#039;Title&#039;, &#039;Year&#039;, &#039;Citations&#039;, &#039;DOI&#039;, &#039;OA Status&#039;])
 
     for paper in all_papers:
         writer.writerow([
-            paper.get('title', 'N/A'),
-            paper.get('publication_year', 'N/A'),
-            paper.get('cited_by_count', 0),
-            paper.get('doi', 'N/A'),
-            paper.get('open_access', {}).get('oa_status', 'closed')
+            paper.get(&#039;title&#039;, &#039;N/A&#039;),
+            paper.get(&#039;publication_year&#039;, &#039;N/A&#039;),
+            paper.get(&#039;cited_by_count&#039;, 0),
+            paper.get(&#039;doi&#039;, &#039;N/A&#039;),
+            paper.get(&#039;open_access&#039;, {}).get(&#039;oa_status&#039;, &#039;closed&#039;)
         ])
 ```
 
@@ -334,7 +384,7 @@ with open('papers.csv', 'w', newline='', encoding='utf-8') as f:
 ### Always Use Email for Polite Pool
 Add email to get 10x rate limit (1 req/sec → 10 req/sec):
 ```python
-client = OpenAlexClient(email="your-email@example.edu")
+client = OpenAlexClient(email=&quot;your-email@example.edu&quot;)
 ```
 
 ### Use Two-Step Pattern for Entity Lookups
@@ -345,24 +395,24 @@ Never filter by entity names directly - always get ID first:
 # 2. Filter by ID
 
 # ❌ Wrong
-# filter=author_name:Einstein  # This doesn't work!
+# filter=author_name:Einstein  # This doesn&#039;t work!
 ```
 
 ### Use Maximum Page Size
 Always use `per-page=200` for efficient data retrieval:
 ```python
-results = client.search_works(search="topic", per_page=200)
+results = client.search_works(search=&quot;topic&quot;, per_page=200)
 ```
 
 ### Batch Multiple IDs
 Use batch_lookup() for multiple IDs instead of individual requests:
 ```python
 # ✅ Correct - 1 request for 50 DOIs
-works = client.batch_lookup('works', doi_list, 'doi')
+works = client.batch_lookup(&#039;works&#039;, doi_list, &#039;doi&#039;)
 
 # ❌ Wrong - 50 separate requests
 for doi in doi_list:
-    work = client.get_entity('works', doi)
+    work = client.get_entity(&#039;works&#039;, doi)
 ```
 
 ### Use Sample Parameter for Random Data
@@ -372,15 +422,15 @@ Use `sample_works()` with seed for reproducible random sampling:
 works = client.sample_works(sample_size=100, seed=42)
 
 # ❌ Wrong - random page numbers bias results
-# Using random page numbers doesn't give true random sample
+# Using random page numbers doesn&#039;t give true random sample
 ```
 
 ### Select Only Needed Fields
 Reduce response size by selecting specific fields:
 ```python
 results = client.search_works(
-    search="topic",
-    select=['id', 'title', 'publication_year', 'cited_by_count']
+    search=&quot;topic&quot;,
+    select=[&#039;id&#039;, &#039;title&#039;, &#039;publication_year&#039;, &#039;cited_by_count&#039;]
 )
 ```
 
@@ -389,22 +439,22 @@ results = client.search_works(
 ### Date Ranges
 ```python
 # Single year
-filter_params={"publication_year": "2023"}
+filter_params={&quot;publication_year&quot;: &quot;2023&quot;}
 
 # After year
-filter_params={"publication_year": "&gt;2020"}
+filter_params={&quot;publication_year&quot;: &quot;&gt;2020&quot;}
 
 # Range
-filter_params={"publication_year": "2020-2024"}
+filter_params={&quot;publication_year&quot;: &quot;2020-2024&quot;}
 ```
 
 ### Multiple Filters (AND)
 ```python
 # All conditions must match
 filter_params={
-    "publication_year": "&gt;2020",
-    "is_oa": "true",
-    "cited_by_count": "&gt;100"
+    &quot;publication_year&quot;: &quot;&gt;2020&quot;,
+    &quot;is_oa&quot;: &quot;true&quot;,
+    &quot;cited_by_count&quot;: &quot;&gt;100&quot;
 }
 ```
 
@@ -412,7 +462,7 @@ filter_params={
 ```python
 # Any institution matches
 filter_params={
-    "authorships.institutions.id": "I136199984|I27837315"  # MIT or Harvard
+    &quot;authorships.institutions.id&quot;: &quot;I136199984|I27837315&quot;  # MIT or Harvard
 }
 ```
 
@@ -420,7 +470,7 @@ filter_params={
 ```python
 # Papers with authors from BOTH institutions
 filter_params={
-    "authorships.institutions.id": "I136199984+I27837315"  # MIT AND Harvard
+    &quot;authorships.institutions.id&quot;: &quot;I136199984+I27837315&quot;  # MIT AND Harvard
 }
 ```
 
@@ -428,7 +478,7 @@ filter_params={
 ```python
 # Exclude type
 filter_params={
-    "type": "!paratext"
+    &quot;type&quot;: &quot;!paratext&quot;
 }
 ```
 
@@ -446,8 +496,8 @@ OpenAlex provides these entity types:
 Access any entity type using consistent patterns:
 ```python
 client.search_works(...)
-client.get_entity('authors', author_id)
-client.group_by('works', 'topics.id', filter_params={...})
+client.get_entity(&#039;authors&#039;, author_id)
+client.group_by(&#039;works&#039;, &#039;topics.id&#039;, filter_params={...})
 ```
 
 ## External IDs
@@ -455,16 +505,16 @@ client.group_by('works', 'topics.id', filter_params={...})
 Use external identifiers directly:
 ```python
 # DOI for works
-work = client.get_entity('works', 'https://doi.org/10.7717/peerj.4375')
+work = client.get_entity(&#039;works&#039;, &#039;https://doi.org/10.7717/peerj.4375&#039;)
 
 # ORCID for authors
-author = client.get_entity('authors', 'https://orcid.org/0000-0003-1613-5981')
+author = client.get_entity(&#039;authors&#039;, &#039;https://orcid.org/0000-0003-1613-5981&#039;)
 
 # ROR for institutions
-institution = client.get_entity('institutions', 'https://ror.org/02y3ad647')
+institution = client.get_entity(&#039;institutions&#039;, &#039;https://ror.org/02y3ad647&#039;)
 
 # ISSN for sources
-source = client.get_entity('sources', 'issn:0028-0836')
+source = client.get_entity(&#039;sources&#039;, &#039;issn:0028-0836&#039;)
 ```
 
 ## Reference Documentation
@@ -520,7 +570,7 @@ If encountering 403 errors:
 ### Empty Results
 If searches return no results:
 1. Check filter syntax (see `references/api_guide.md`)
-2. Use two-step pattern for entity lookups (don't filter by names)
+2. Use two-step pattern for entity lookups (don&#039;t filter by names)
 3. Verify entity IDs are correct format
 
 ### Timeout Errors
@@ -541,10 +591,41 @@ Always use polite pool for production workflows by providing email to client.
 - No authentication required
 - All data is open and free
 - Rate limits apply globally, not per IP
-- Use LitLLM with OpenRouter if LLM-based analysis is needed (don't use Perplexity API directly)
+- Use LitLLM with OpenRouter if LLM-based analysis is needed (don&#039;t use Perplexity API directly)
 - Client handles pagination, retries, and rate limiting automatically
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>25</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>blue-green-deployment - AICCLI</title>
-  <meta name="description" content="blue-green-deployment - Claude Code command for AICCLI">
+  <meta name="description" content="Implement blue-green deployment strategy with zero-downtime switching, health validation, and automatic rollback">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../command.html">Command</a> / blue-green-deployment</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>blue-green-deployment</h1>
-      <div class="meta">
-        <span class="meta-item">Command</span>
-        <span class="meta-item">deployment</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">commands</a> / deployment / blue-green-deployment
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⌨️</div>
+      <div class="title">
+        <h1>blue-green-deployment</h1>
+        <div class="meta">
+          <span class="badge type">Command</span>
+          <span class="badge">deployment</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Implement blue-green deployment strategy with zero-downtime switching, health validation, and automatic rollback</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/blue-green-deployment</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install commands/blue-green-deployment</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install commands/blue-green-deployment</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 allowed-tools: Read, Write, Edit, Bash
 argument-hint: [strategy] | setup | deploy | switch | rollback | status
 description: Implement blue-green deployment strategy with zero-downtime switching, health validation, and automatic rollback
@@ -68,9 +118,9 @@ Implement blue-green deployment: $ARGUMENTS
 ## Current Infrastructure State
 
 - Load balancer config: @nginx.conf or @haproxy.cfg or cloud LB configuration
-- Current deployment: !`curl -s https://api.example.com/version 2&gt;/dev/null || echo "Version endpoint needed"`
-- Container orchestration: !`kubectl get deployments 2&gt;/dev/null || docker service ls 2&gt;/dev/null || echo "Container platform detection needed"`
-- Health endpoints: !`curl -s https://api.example.com/health 2&gt;/dev/null | jq -r '.status // "Unknown"' || echo "Health check setup needed"`
+- Current deployment: !`curl -s https://api.example.com/version 2&gt;/dev/null || echo &quot;Version endpoint needed&quot;`
+- Container orchestration: !`kubectl get deployments 2&gt;/dev/null || docker service ls 2&gt;/dev/null || echo &quot;Container platform detection needed&quot;`
+- Health endpoints: !`curl -s https://api.example.com/health 2&gt;/dev/null | jq -r &#039;.status // &quot;Unknown&quot;&#039; || echo &quot;Health check setup needed&quot;`
 - DNS configuration: Check for DNS management capabilities
 
 ## Task
@@ -241,7 +291,7 @@ metadata:
 spec:
   selector:
     app: myapp
-    environment: blue  # Switch this to 'green' during deployment
+    environment: blue  # Switch this to &#039;green&#039; during deployment
   ports:
     - port: 80
       targetPort: 3000
@@ -277,9 +327,9 @@ spec:
         - containerPort: 3000
         env:
         - name: ENVIRONMENT
-          value: "blue"
+          value: &quot;blue&quot;
         - name: VERSION
-          value: "v1.0.0"
+          value: &quot;v1.0.0&quot;
         livenessProbe:
           httpGet:
             path: /health
@@ -294,11 +344,11 @@ spec:
           periodSeconds: 5
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "100m"
+            memory: &quot;128Mi&quot;
+            cpu: &quot;100m&quot;
           limits:
-            memory: "512Mi"
-            cpu: "500m"
+            memory: &quot;512Mi&quot;
+            cpu: &quot;500m&quot;
 
 ---
 # green-deployment.yaml
@@ -328,9 +378,9 @@ spec:
         - containerPort: 3000
         env:
         - name: ENVIRONMENT
-          value: "green"
+          value: &quot;green&quot;
         - name: VERSION
-          value: "v1.1.0"
+          value: &quot;v1.1.0&quot;
         livenessProbe:
           httpGet:
             path: /health
@@ -345,11 +395,11 @@ spec:
           periodSeconds: 5
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "100m"
+            memory: &quot;128Mi&quot;
+            cpu: &quot;100m&quot;
           limits:
-            memory: "512Mi"
-            cpu: "500m"
+            memory: &quot;512Mi&quot;
+            cpu: &quot;500m&quot;
 ```
 
 ### 3. **Deployment Automation Scripts**
@@ -359,52 +409,52 @@ spec:
 #!/bin/bash
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/config.sh"
+SCRIPT_DIR=&quot;$(cd &quot;$(dirname &quot;${BASH_SOURCE[0]}&quot;)&quot; &amp;&amp; pwd)&quot;
+source &quot;$SCRIPT_DIR/config.sh&quot;
 
 # Configuration
-BLUE_ENV="blue"
-GREEN_ENV="green"
-HEALTH_CHECK_URL="${APP_URL}/health"
-READY_CHECK_URL="${APP_URL}/ready"
-VERSION_URL="${APP_URL}/version"
+BLUE_ENV=&quot;blue&quot;
+GREEN_ENV=&quot;green&quot;
+HEALTH_CHECK_URL=&quot;${APP_URL}/health&quot;
+READY_CHECK_URL=&quot;${APP_URL}/ready&quot;
+VERSION_URL=&quot;${APP_URL}/version&quot;
 
 # Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+RED=&#039;\033[0;31m&#039;
+GREEN=&#039;\033[0;32m&#039;
+BLUE=&#039;\033[0;34m&#039;
+YELLOW=&#039;\033[1;33m&#039;
+NC=&#039;\033[0m&#039; # No Color
 
 log() {
-    echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')] $1${NC}"
+    echo -e &quot;${GREEN}[$(date &#039;+%Y-%m-%d %H:%M:%S&#039;)] $1${NC}&quot;
 }
 
 warn() {
-    echo -e "${YELLOW}[WARNING] $1${NC}"
+    echo -e &quot;${YELLOW}[WARNING] $1${NC}&quot;
 }
 
 error() {
-    echo -e "${RED}[ERROR] $1${NC}"
+    echo -e &quot;${RED}[ERROR] $1${NC}&quot;
     exit 1
 }
 
 # Get current active environment
 get_current_env() {
-    if kubectl get service app-service-active &&gt;/dev/null; then
-        kubectl get service app-service-active -o jsonpath='{.spec.selector.environment}'
+    if kubectl get service app-service-active &amp;&gt;/dev/null; then
+        kubectl get service app-service-active -o jsonpath=&#039;{.spec.selector.environment}&#039;
     else
-        echo "blue"  # Default to blue if service doesn't exist
+        echo &quot;blue&quot;  # Default to blue if service doesn&#039;t exist
     fi
 }
 
 # Get inactive environment (opposite of current)
 get_inactive_env() {
     local current_env=$1
-    if [ "$current_env" = "blue" ]; then
-        echo "green"
+    if [ &quot;$current_env&quot; = &quot;blue&quot; ]; then
+        echo &quot;green&quot;
     else
-        echo "blue"
+        echo &quot;blue&quot;
     fi
 }
 
@@ -412,34 +462,34 @@ get_inactive_env() {
 deploy_to_inactive() {
     local version=$1
     local current_env=$(get_current_env)
-    local inactive_env=$(get_inactive_env "$current_env")
+    local inactive_env=$(get_inactive_env &quot;$current_env&quot;)
     
-    log "Current active environment: $current_env"
-    log "Deploying version $version to $inactive_env environment"
+    log &quot;Current active environment: $current_env&quot;
+    log &quot;Deploying version $version to $inactive_env environment&quot;
     
     # Update deployment with new image
     kubectl set image deployment/app-$inactive_env app=myapp:$version
     
     # Wait for rollout to complete
-    log "Waiting for deployment rollout to complete..."
+    log &quot;Waiting for deployment rollout to complete...&quot;
     kubectl rollout status deployment/app-$inactive_env --timeout=600s
     
     # Verify pods are running
-    log "Verifying pods are running..."
+    log &quot;Verifying pods are running...&quot;
     kubectl wait --for=condition=ready pod -l app=myapp,environment=$inactive_env --timeout=300s
     
-    log "Deployment to $inactive_env environment completed successfully"
+    log &quot;Deployment to $inactive_env environment completed successfully&quot;
 }
 
 # Health check function
 health_check() {
     local env=$1
-    local service_url="http://app-service-$env.$NAMESPACE.svc.cluster.local"
+    local service_url=&quot;http://app-service-$env.$NAMESPACE.svc.cluster.local&quot;
     
-    log "Performing health check for $env environment..."
+    log &quot;Performing health check for $env environment...&quot;
     
     # Use kubectl port-forward for internal testing
-    kubectl port-forward service/app-service-$env 8080:80 &
+    kubectl port-forward service/app-service-$env 8080:80 &amp;
     local port_forward_pid=$!
     
     sleep 5  # Wait for port-forward to establish
@@ -455,7 +505,7 @@ health_check() {
         fi
         
         attempts=$((attempts + 1))
-        log "Health check attempt $attempts/$max_attempts failed, retrying..."
+        log &quot;Health check attempt $attempts/$max_attempts failed, retrying...&quot;
         sleep 10
     done
     
@@ -463,67 +513,67 @@ health_check() {
     kill $port_forward_pid 2&gt;/dev/null || true
     
     if [ $health_status -eq 0 ]; then
-        log "Health check passed for $env environment"
+        log &quot;Health check passed for $env environment&quot;
         return 0
     else
-        error "Health check failed for $env environment after $max_attempts attempts"
+        error &quot;Health check failed for $env environment after $max_attempts attempts&quot;
     fi
 }
 
 # Smoke tests
 run_smoke_tests() {
     local env=$1
-    log "Running smoke tests for $env environment..."
+    log &quot;Running smoke tests for $env environment...&quot;
     
     # Port-forward for testing
-    kubectl port-forward service/app-service-$env 8080:80 &
+    kubectl port-forward service/app-service-$env 8080:80 &amp;
     local port_forward_pid=$!
     sleep 5
     
     local test_results=()
     
     # Test 1: Health endpoint
-    if curl -f -s http://localhost:8080/health | jq -e '.status == "healthy"' &gt; /dev/null; then
-        test_results+=("✅ Health endpoint")
+    if curl -f -s http://localhost:8080/health | jq -e &#039;.status == &quot;healthy&quot;&#039; &gt; /dev/null; then
+        test_results+=(&quot;✅ Health endpoint&quot;)
     else
-        test_results+=("❌ Health endpoint")
+        test_results+=(&quot;❌ Health endpoint&quot;)
     fi
     
     # Test 2: Version endpoint
     if curl -f -s http://localhost:8080/version &gt; /dev/null; then
-        test_results+=("✅ Version endpoint")
+        test_results+=(&quot;✅ Version endpoint&quot;)
     else
-        test_results+=("❌ Version endpoint")
+        test_results+=(&quot;❌ Version endpoint&quot;)
     fi
     
     # Test 3: Main application endpoint
     if curl -f -s http://localhost:8080/ &gt; /dev/null; then
-        test_results+=("✅ Main endpoint")
+        test_results+=(&quot;✅ Main endpoint&quot;)
     else
-        test_results+=("❌ Main endpoint")
+        test_results+=(&quot;❌ Main endpoint&quot;)
     fi
     
     # Test 4: Database connectivity (if applicable)
-    if curl -f -s http://localhost:8080/db-health 2&gt;/dev/null | jq -e '.connected == true' &gt; /dev/null; then
-        test_results+=("✅ Database connectivity")
+    if curl -f -s http://localhost:8080/db-health 2&gt;/dev/null | jq -e &#039;.connected == true&#039; &gt; /dev/null; then
+        test_results+=(&quot;✅ Database connectivity&quot;)
     else
-        test_results+=("⚠️  Database connectivity (not tested)")
+        test_results+=(&quot;⚠️  Database connectivity (not tested)&quot;)
     fi
     
     # Clean up port-forward
     kill $port_forward_pid 2&gt;/dev/null || true
     
     # Display results
-    log "Smoke test results for $env:"
-    printf '%s\n' "${test_results[@]}"
+    log &quot;Smoke test results for $env:&quot;
+    printf &#039;%s\n&#039; &quot;${test_results[@]}&quot;
     
     # Check if all critical tests passed
-    local failed_tests=$(printf '%s\n' "${test_results[@]}" | grep -c "❌" || true)
-    if [ "$failed_tests" -gt 0 ]; then
-        error "Smoke tests failed with $failed_tests failures"
+    local failed_tests=$(printf &#039;%s\n&#039; &quot;${test_results[@]}&quot; | grep -c &quot;❌&quot; || true)
+    if [ &quot;$failed_tests&quot; -gt 0 ]; then
+        error &quot;Smoke tests failed with $failed_tests failures&quot;
     fi
     
-    log "All smoke tests passed for $env environment"
+    log &quot;All smoke tests passed for $env environment&quot;
 }
 
 # Switch traffic to new environment
@@ -531,39 +581,39 @@ switch_traffic() {
     local target_env=$1
     local current_env=$(get_current_env)
     
-    if [ "$target_env" = "$current_env" ]; then
-        warn "Target environment ($target_env) is already active"
+    if [ &quot;$target_env&quot; = &quot;$current_env&quot; ]; then
+        warn &quot;Target environment ($target_env) is already active&quot;
         return 0
     fi
     
-    log "Switching traffic from $current_env to $target_env"
+    log &quot;Switching traffic from $current_env to $target_env&quot;
     
     # Create backup of current service configuration
-    kubectl get service app-service-active -o yaml &gt; "/tmp/service-backup-$(date +%Y%m%d-%H%M%S).yaml"
+    kubectl get service app-service-active -o yaml &gt; &quot;/tmp/service-backup-$(date +%Y%m%d-%H%M%S).yaml&quot;
     
     # Update service selector to point to new environment
-    kubectl patch service app-service-active -p '{"spec":{"selector":{"environment":"'$target_env'"}}}'
+    kubectl patch service app-service-active -p &#039;{&quot;spec&quot;:{&quot;selector&quot;:{&quot;environment&quot;:&quot;&#039;$target_env&#039;&quot;}}}&#039;
     
     # Verify the switch
     sleep 10
     local new_active_env=$(get_current_env)
-    if [ "$new_active_env" = "$target_env" ]; then
-        log "Traffic successfully switched to $target_env environment"
+    if [ &quot;$new_active_env&quot; = &quot;$target_env&quot; ]; then
+        log &quot;Traffic successfully switched to $target_env environment&quot;
     else
-        error "Failed to switch traffic to $target_env environment"
+        error &quot;Failed to switch traffic to $target_env environment&quot;
     fi
     
     # Wait for load balancer to propagate changes
-    log "Waiting for load balancer to propagate changes (30 seconds)..."
+    log &quot;Waiting for load balancer to propagate changes (30 seconds)...&quot;
     sleep 30
     
     # Verify external traffic is flowing to new environment
     local attempts=0
     local max_attempts=5
     while [ $attempts -lt $max_attempts ]; do
-        local version=$(curl -s $VERSION_URL | jq -r '.version // "unknown"' 2&gt;/dev/null || echo "unknown")
-        if [ "$version" != "unknown" ]; then
-            log "External traffic verification successful - Version: $version"
+        local version=$(curl -s $VERSION_URL | jq -r &#039;.version // &quot;unknown&quot;&#039; 2&gt;/dev/null || echo &quot;unknown&quot;)
+        if [ &quot;$version&quot; != &quot;unknown&quot; ]; then
+            log &quot;External traffic verification successful - Version: $version&quot;
             break
         fi
         attempts=$((attempts + 1))
@@ -574,17 +624,17 @@ switch_traffic() {
 # Rollback to previous environment
 rollback() {
     local current_env=$(get_current_env)
-    local previous_env=$(get_inactive_env "$current_env")
+    local previous_env=$(get_inactive_env &quot;$current_env&quot;)
     
-    warn "Initiating rollback from $current_env to $previous_env"
+    warn &quot;Initiating rollback from $current_env to $previous_env&quot;
     
     # Verify previous environment is healthy
-    health_check "$previous_env"
+    health_check &quot;$previous_env&quot;
     
     # Switch traffic back
-    switch_traffic "$previous_env"
+    switch_traffic &quot;$previous_env&quot;
     
-    log "Rollback completed successfully"
+    log &quot;Rollback completed successfully&quot;
 }
 
 # Monitor deployment
@@ -593,103 +643,103 @@ monitor_deployment() {
     local start_time=$(date +%s)
     local end_time=$((start_time + duration))
     
-    log "Monitoring deployment for ${duration} seconds..."
+    log &quot;Monitoring deployment for ${duration} seconds...&quot;
     
     while [ $(date +%s) -lt $end_time ]; do
-        local health_status=$(curl -s $HEALTH_CHECK_URL | jq -r '.status // "unknown"' 2&gt;/dev/null || echo "unknown")
-        local version=$(curl -s $VERSION_URL | jq -r '.version // "unknown"' 2&gt;/dev/null || echo "unknown")
+        local health_status=$(curl -s $HEALTH_CHECK_URL | jq -r &#039;.status // &quot;unknown&quot;&#039; 2&gt;/dev/null || echo &quot;unknown&quot;)
+        local version=$(curl -s $VERSION_URL | jq -r &#039;.version // &quot;unknown&quot;&#039; 2&gt;/dev/null || echo &quot;unknown&quot;)
         
-        echo "$(date '+%H:%M:%S') - Health: $health_status, Version: $version"
+        echo &quot;$(date &#039;+%H:%M:%S&#039;) - Health: $health_status, Version: $version&quot;
         
         # Check for critical issues
-        if [ "$health_status" = "unhealthy" ]; then
-            error "Application became unhealthy during monitoring period"
+        if [ &quot;$health_status&quot; = &quot;unhealthy&quot; ]; then
+            error &quot;Application became unhealthy during monitoring period&quot;
         fi
         
         sleep 30
     done
     
-    log "Monitoring completed successfully"
+    log &quot;Monitoring completed successfully&quot;
 }
 
 # Full blue-green deployment process
 deploy() {
     local version=$1
     
-    if [ -z "$version" ]; then
-        error "Version parameter is required"
+    if [ -z &quot;$version&quot; ]; then
+        error &quot;Version parameter is required&quot;
     fi
     
-    log "Starting blue-green deployment for version $version"
+    log &quot;Starting blue-green deployment for version $version&quot;
     
     # Step 1: Deploy to inactive environment
-    deploy_to_inactive "$version"
+    deploy_to_inactive &quot;$version&quot;
     
     # Step 2: Health check inactive environment
     local current_env=$(get_current_env)
-    local inactive_env=$(get_inactive_env "$current_env")
-    health_check "$inactive_env"
+    local inactive_env=$(get_inactive_env &quot;$current_env&quot;)
+    health_check &quot;$inactive_env&quot;
     
     # Step 3: Run smoke tests
-    run_smoke_tests "$inactive_env"
+    run_smoke_tests &quot;$inactive_env&quot;
     
     # Step 4: Switch traffic
-    switch_traffic "$inactive_env"
+    switch_traffic &quot;$inactive_env&quot;
     
     # Step 5: Monitor new deployment
     monitor_deployment 300
     
-    log "Blue-green deployment completed successfully"
-    log "New active environment: $inactive_env"
-    log "Version deployed: $version"
+    log &quot;Blue-green deployment completed successfully&quot;
+    log &quot;New active environment: $inactive_env&quot;
+    log &quot;Version deployed: $version&quot;
 }
 
 # Main script logic
-case "${1:-deploy}" in
-    "setup")
-        log "Setting up blue-green deployment infrastructure..."
+case &quot;${1:-deploy}&quot; in
+    &quot;setup&quot;)
+        log &quot;Setting up blue-green deployment infrastructure...&quot;
         kubectl apply -f k8s/blue-green/
-        log "Blue-green infrastructure setup completed"
+        log &quot;Blue-green infrastructure setup completed&quot;
         ;;
-    "deploy")
-        deploy "${2:-latest}"
+    &quot;deploy&quot;)
+        deploy &quot;${2:-latest}&quot;
         ;;
-    "switch")
-        local target_env="${2:-$(get_inactive_env $(get_current_env))}"
-        switch_traffic "$target_env"
+    &quot;switch&quot;)
+        local target_env=&quot;${2:-$(get_inactive_env $(get_current_env))}&quot;
+        switch_traffic &quot;$target_env&quot;
         ;;
-    "rollback")
+    &quot;rollback&quot;)
         rollback
         ;;
-    "status")
+    &quot;status&quot;)
         local current_env=$(get_current_env)
-        local inactive_env=$(get_inactive_env "$current_env")
+        local inactive_env=$(get_inactive_env &quot;$current_env&quot;)
         
-        echo "=== Blue-Green Deployment Status ==="
-        echo "Current active environment: $current_env"
-        echo "Inactive environment: $inactive_env"
-        echo ""
-        echo "=== Environment Details ==="
+        echo &quot;=== Blue-Green Deployment Status ===&quot;
+        echo &quot;Current active environment: $current_env&quot;
+        echo &quot;Inactive environment: $inactive_env&quot;
+        echo &quot;&quot;
+        echo &quot;=== Environment Details ===&quot;
         kubectl get deployments -l app=myapp
-        echo ""
+        echo &quot;&quot;
         kubectl get services -l app=myapp
-        echo ""
-        echo "=== Health Status ==="
-        curl -s $HEALTH_CHECK_URL 2&gt;/dev/null | jq . || echo "Health check unavailable"
+        echo &quot;&quot;
+        echo &quot;=== Health Status ===&quot;
+        curl -s $HEALTH_CHECK_URL 2&gt;/dev/null | jq . || echo &quot;Health check unavailable&quot;
         ;;
-    "monitor")
-        monitor_deployment "${2:-300}"
+    &quot;monitor&quot;)
+        monitor_deployment &quot;${2:-300}&quot;
         ;;
     *)
-        echo "Usage: $0 {setup|deploy|switch|rollback|status|monitor}"
-        echo ""
-        echo "Commands:"
-        echo "  setup                 - Initialize blue-green infrastructure"
-        echo "  deploy &lt;version&gt;      - Deploy new version using blue-green strategy"
-        echo "  switch [environment]  - Switch traffic between environments"
-        echo "  rollback             - Rollback to previous environment"
-        echo "  status               - Show current deployment status"
-        echo "  monitor [duration]   - Monitor deployment for specified duration"
+        echo &quot;Usage: $0 {setup|deploy|switch|rollback|status|monitor}&quot;
+        echo &quot;&quot;
+        echo &quot;Commands:&quot;
+        echo &quot;  setup                 - Initialize blue-green infrastructure&quot;
+        echo &quot;  deploy &lt;version&gt;      - Deploy new version using blue-green strategy&quot;
+        echo &quot;  switch [environment]  - Switch traffic between environments&quot;
+        echo &quot;  rollback             - Rollback to previous environment&quot;
+        echo &quot;  status               - Show current deployment status&quot;
+        echo &quot;  monitor [duration]   - Monitor deployment for specified duration&quot;
         exit 1
         ;;
 esac
@@ -703,13 +753,13 @@ esac
 #!/bin/bash
 
 # Application configuration
-APP_NAME="myapp"
-APP_URL="https://api.example.com"
-NAMESPACE="default"
+APP_NAME=&quot;myapp&quot;
+APP_URL=&quot;https://api.example.com&quot;
+NAMESPACE=&quot;default&quot;
 
 # Container registry
-REGISTRY="your-registry.com"
-REPOSITORY="myapp"
+REGISTRY=&quot;your-registry.com&quot;
+REPOSITORY=&quot;myapp&quot;
 
 # Health check configuration
 HEALTH_CHECK_TIMEOUT=30
@@ -721,12 +771,12 @@ MONITORING_DURATION=300
 SMOKE_TEST_TIMEOUT=60
 
 # Notification configuration
-SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
-EMAIL_NOTIFICATIONS="${EMAIL_NOTIFICATIONS:-false}"
+SLACK_WEBHOOK_URL=&quot;${SLACK_WEBHOOK_URL:-}&quot;
+EMAIL_NOTIFICATIONS=&quot;${EMAIL_NOTIFICATIONS:-false}&quot;
 
 # Database configuration (if applicable)
-DB_MIGRATION_STRATEGY="${DB_MIGRATION_STRATEGY:-forward-only}"
-DB_BACKUP_BEFORE_DEPLOY="${DB_BACKUP_BEFORE_DEPLOY:-true}"
+DB_MIGRATION_STRATEGY=&quot;${DB_MIGRATION_STRATEGY:-forward-only}&quot;
+DB_BACKUP_BEFORE_DEPLOY=&quot;${DB_BACKUP_BEFORE_DEPLOY:-true}&quot;
 ```
 
 ### 5. **Advanced Features**
@@ -757,10 +807,10 @@ kind: Ingress
 metadata:
   name: app-ingress
   annotations:
-    nginx.ingress.kubernetes.io/canary: "true"
-    nginx.ingress.kubernetes.io/canary-weight: "10"  # 10% to canary
-    nginx.ingress.kubernetes.io/canary-by-header: "X-Canary"
-    nginx.ingress.kubernetes.io/canary-by-header-value: "true"
+    nginx.ingress.kubernetes.io/canary: &quot;true&quot;
+    nginx.ingress.kubernetes.io/canary-weight: &quot;10&quot;  # 10% to canary
+    nginx.ingress.kubernetes.io/canary-by-header: &quot;X-Canary&quot;
+    nginx.ingress.kubernetes.io/canary-by-header-value: &quot;true&quot;
 spec:
   rules:
   - host: api.example.com
@@ -784,29 +834,29 @@ handle_database_migrations() {
     local version=$1
     local target_env=$2
     
-    log "Handling database migrations for version $version"
+    log &quot;Handling database migrations for version $version&quot;
     
-    case "$DB_MIGRATION_STRATEGY" in
-        "forward-only")
+    case &quot;$DB_MIGRATION_STRATEGY&quot; in
+        &quot;forward-only&quot;)
             # Only run forward migrations, safe for blue-green
-            run_forward_migrations "$version"
+            run_forward_migrations &quot;$version&quot;
             ;;
-        "blue-green-safe")
+        &quot;blue-green-safe&quot;)
             # Use database views/aliases for backward compatibility
-            setup_db_compatibility_layer "$version"
-            run_forward_migrations "$version"
+            setup_db_compatibility_layer &quot;$version&quot;
+            run_forward_migrations &quot;$version&quot;
             ;;
-        "separate-db")
+        &quot;separate-db&quot;)
             # Each environment has its own database
-            migrate_environment_database "$target_env" "$version"
+            migrate_environment_database &quot;$target_env&quot; &quot;$version&quot;
             ;;
-        "shared-compatible")
+        &quot;shared-compatible&quot;)
             # Ensure migrations are backward compatible
-            validate_migration_compatibility "$version"
-            run_forward_migrations "$version"
+            validate_migration_compatibility &quot;$version&quot;
+            run_forward_migrations &quot;$version&quot;
             ;;
         *)
-            warn "Unknown database migration strategy: $DB_MIGRATION_STRATEGY"
+            warn &quot;Unknown database migration strategy: $DB_MIGRATION_STRATEGY&quot;
             ;;
     esac
 }
@@ -815,26 +865,26 @@ run_forward_migrations() {
     local version=$1
     
     # Backup database before migrations
-    if [ "$DB_BACKUP_BEFORE_DEPLOY" = "true" ]; then
-        backup_database "pre-migration-$version-$(date +%Y%m%d-%H%M%S)"
+    if [ &quot;$DB_BACKUP_BEFORE_DEPLOY&quot; = &quot;true&quot; ]; then
+        backup_database &quot;pre-migration-$version-$(date +%Y%m%d-%H%M%S)&quot;
     fi
     
     # Run migrations
     kubectl run migration-job-$version \
         --image=myapp:$version \
         --restart=Never \
-        --command -- /bin/sh -c "npm run migrate"
+        --command -- /bin/sh -c &quot;npm run migrate&quot;
     
     # Wait for migration to complete
     kubectl wait --for=condition=complete job/migration-job-$version --timeout=300s
     
     # Verify migration success
-    local exit_code=$(kubectl get job migration-job-$version -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}')
-    if [ "$exit_code" != "True" ]; then
-        error "Database migration failed"
+    local exit_code=$(kubectl get job migration-job-$version -o jsonpath=&#039;{.status.conditions[?(@.type==&quot;Complete&quot;)].status}&#039;)
+    if [ &quot;$exit_code&quot; != &quot;True&quot; ]; then
+        error &quot;Database migration failed&quot;
     fi
     
-    log "Database migrations completed successfully"
+    log &quot;Database migrations completed successfully&quot;
 }
 ```
 
@@ -850,35 +900,66 @@ spec:
   - name: blue-green-deployment
     rules:
     - alert: BlueGreenEnvironmentDown
-      expr: up{job="myapp", environment=~"blue|green"} == 0
+      expr: up{job=&quot;myapp&quot;, environment=~&quot;blue|green&quot;} == 0
       for: 1m
       labels:
         severity: critical
       annotations:
-        summary: "Blue-green environment {{ $labels.environment }} is down"
-        description: "Environment {{ $labels.environment }} has been down for more than 1 minute"
+        summary: &quot;Blue-green environment {{ $labels.environment }} is down&quot;
+        description: &quot;Environment {{ $labels.environment }} has been down for more than 1 minute&quot;
     
     - alert: BlueGreenHighErrorRate
-      expr: rate(http_requests_total{job="myapp", status=~"5.."}[5m]) &gt; 0.1
+      expr: rate(http_requests_total{job=&quot;myapp&quot;, status=~&quot;5..&quot;}[5m]) &gt; 0.1
       for: 2m
       labels:
         severity: warning
       annotations:
-        summary: "High error rate detected during blue-green deployment"
-        description: "Error rate is {{ $value }} errors per second"
+        summary: &quot;High error rate detected during blue-green deployment&quot;
+        description: &quot;Error rate is {{ $value }} errors per second&quot;
     
     - alert: BlueGreenDeploymentStuck
-      expr: time() - kube_deployment_status_observed_generation{deployment=~"app-blue|app-green"} &gt; 600
+      expr: time() - kube_deployment_status_observed_generation{deployment=~&quot;app-blue|app-green&quot;} &gt; 600
       for: 5m
       labels:
         severity: warning
       annotations:
-        summary: "Blue-green deployment appears stuck"
-        description: "Deployment {{ $labels.deployment }} hasn't updated in over 10 minutes"
+        summary: &quot;Blue-green deployment appears stuck&quot;
+        description: &quot;Deployment {{ $labels.deployment }} hasn&#039;t updated in over 10 minutes&quot;
 ```
 
-This blue-green deployment system provides zero-downtime deployments with comprehensive validation, monitoring, and rollback capabilities. The implementation supports multiple platforms (Kubernetes, Docker Swarm, traditional deployments) and includes advanced features like database migration handling and canary releases.</pre></div>
+This blue-green deployment system provides zero-downtime deployments with comprehensive validation, monitoring, and rollback capabilities. The implementation supports multiple platforms (Kubernetes, Docker Swarm, traditional deployments) and includes advanced features like database migration handling and canary releases.</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>115</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

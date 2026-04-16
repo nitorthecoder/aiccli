@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>multimodal-blip-2 - AICCLI</title>
-  <meta name="description" content="multimodal-blip-2 - Claude Code skill for AICCLI">
+  <meta name="description" content="Vision-language pre-training framework bridging frozen image encoders and LLMs. Use when you need image captioning, visual question answering, image-text retrie">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / multimodal-blip-2</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>multimodal-blip-2</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / multimodal-blip-2
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>multimodal-blip-2</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Vision-language pre-training framework bridging frozen image encoders and LLMs. Use when you need image captioning, visual question answering, image-text retrieval, or multimodal chat with state-of-the-art zero-shot performance.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/multimodal-blip-2</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/multimodal-blip-2</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/multimodal-blip-2</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: blip-2-vision-language
 description: Vision-language pre-training framework bridging frozen image encoders and LLMs. Use when you need image captioning, visual question answering, image-text retrieval, or multimodal chat with state-of-the-art zero-shot performance.
 version: 1.0.0
@@ -67,7 +117,7 @@ dependencies: [transformers&gt;=4.30.0, torch&gt;=1.10.0, Pillow]
 
 # BLIP-2: Vision-Language Pre-training
 
-Comprehensive guide to using Salesforce's BLIP-2 for vision-language tasks with frozen image encoders and large language models.
+Comprehensive guide to using Salesforce&#039;s BLIP-2 for vision-language tasks with frozen image encoders and large language models.
 
 ## When to use BLIP-2
 
@@ -114,18 +164,18 @@ from PIL import Image
 from transformers import Blip2Processor, Blip2ForConditionalGeneration
 
 # Load model and processor
-processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
+processor = Blip2Processor.from_pretrained(&quot;Salesforce/blip2-opt-2.7b&quot;)
 model = Blip2ForConditionalGeneration.from_pretrained(
-    "Salesforce/blip2-opt-2.7b",
+    &quot;Salesforce/blip2-opt-2.7b&quot;,
     torch_dtype=torch.float16,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
 
 # Load image
-image = Image.open("photo.jpg").convert("RGB")
+image = Image.open(&quot;photo.jpg&quot;).convert(&quot;RGB&quot;)
 
 # Generate caption
-inputs = processor(images=image, return_tensors="pt").to("cuda", torch.float16)
+inputs = processor(images=image, return_tensors=&quot;pt&quot;).to(&quot;cuda&quot;, torch.float16)
 generated_ids = model.generate(**inputs, max_new_tokens=50)
 caption = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
 print(caption)
@@ -135,9 +185,9 @@ print(caption)
 
 ```python
 # Ask a question about the image
-question = "What color is the car in this image?"
+question = &quot;What color is the car in this image?&quot;
 
-inputs = processor(images=image, text=question, return_tensors="pt").to("cuda", torch.float16)
+inputs = processor(images=image, text=question, return_tensors=&quot;pt&quot;).to(&quot;cuda&quot;, torch.float16)
 generated_ids = model.generate(**inputs, max_new_tokens=50)
 answer = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
 print(answer)
@@ -151,25 +201,25 @@ from lavis.models import load_model_and_preprocess
 from PIL import Image
 
 # Load model
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device(&quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;)
 model, vis_processors, txt_processors = load_model_and_preprocess(
-    name="blip2_opt",
-    model_type="pretrain_opt2.7b",
+    name=&quot;blip2_opt&quot;,
+    model_type=&quot;pretrain_opt2.7b&quot;,
     is_eval=True,
     device=device
 )
 
 # Process image
-image = Image.open("photo.jpg").convert("RGB")
-image = vis_processors["eval"](image).unsqueeze(0).to(device)
+image = Image.open(&quot;photo.jpg&quot;).convert(&quot;RGB&quot;)
+image = vis_processors[&quot;eval&quot;](image).unsqueeze(0).to(device)
 
 # Caption
-caption = model.generate({"image": image})
+caption = model.generate({&quot;image&quot;: image})
 print(caption)
 
 # VQA
-question = txt_processors["eval"]("What is in this image?")
-answer = model.generate({"image": image, "prompt": question})
+question = txt_processors[&quot;eval&quot;](&quot;What is in this image?&quot;)
+answer = model.generate({&quot;image&quot;: image, &quot;prompt&quot;: question})
 print(answer)
 ```
 
@@ -227,28 +277,28 @@ from PIL import Image
 import torch
 
 # Load multiple images
-images = [Image.open(f"image_{i}.jpg").convert("RGB") for i in range(4)]
+images = [Image.open(f&quot;image_{i}.jpg&quot;).convert(&quot;RGB&quot;) for i in range(4)]
 questions = [
-    "What is shown in this image?",
-    "Describe the scene.",
-    "What colors are prominent?",
-    "Is there a person in this image?"
+    &quot;What is shown in this image?&quot;,
+    &quot;Describe the scene.&quot;,
+    &quot;What colors are prominent?&quot;,
+    &quot;Is there a person in this image?&quot;
 ]
 
 # Process batch
 inputs = processor(
     images=images,
     text=questions,
-    return_tensors="pt",
+    return_tensors=&quot;pt&quot;,
     padding=True
-).to("cuda", torch.float16)
+).to(&quot;cuda&quot;, torch.float16)
 
 # Generate
 generated_ids = model.generate(**inputs, max_new_tokens=50)
 answers = processor.batch_decode(generated_ids, skip_special_tokens=True)
 
 for q, a in zip(questions, answers):
-    print(f"Q: {q}\nA: {a}\n")
+    print(f&quot;Q: {q}\nA: {a}\n&quot;)
 ```
 
 ### Controlling generation
@@ -284,9 +334,9 @@ from transformers import BitsAndBytesConfig
 quantization_config = BitsAndBytesConfig(load_in_8bit=True)
 
 model = Blip2ForConditionalGeneration.from_pretrained(
-    "Salesforce/blip2-opt-6.7b",
+    &quot;Salesforce/blip2-opt-6.7b&quot;,
     quantization_config=quantization_config,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
 
 # 4-bit quantization (more aggressive)
@@ -296,9 +346,9 @@ quantization_config = BitsAndBytesConfig(
 )
 
 model = Blip2ForConditionalGeneration.from_pretrained(
-    "Salesforce/blip2-flan-t5-xxl",
+    &quot;Salesforce/blip2-flan-t5-xxl&quot;,
     quantization_config=quantization_config,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
 ```
 
@@ -309,19 +359,19 @@ model = Blip2ForConditionalGeneration.from_pretrained(
 from lavis.models import load_model_and_preprocess
 
 model, vis_processors, txt_processors = load_model_and_preprocess(
-    name="blip2_image_text_matching",
-    model_type="pretrain",
+    name=&quot;blip2_image_text_matching&quot;,
+    model_type=&quot;pretrain&quot;,
     is_eval=True,
     device=device
 )
 
-image = vis_processors["eval"](raw_image).unsqueeze(0).to(device)
-text = txt_processors["eval"]("a dog sitting on grass")
+image = vis_processors[&quot;eval&quot;](raw_image).unsqueeze(0).to(device)
+text = txt_processors[&quot;eval&quot;](&quot;a dog sitting on grass&quot;)
 
 # Get matching score
-itm_output = model({"image": image, "text_input": text}, match_head="itm")
+itm_output = model({&quot;image&quot;: image, &quot;text_input&quot;: text}, match_head=&quot;itm&quot;)
 itm_scores = torch.nn.functional.softmax(itm_output, dim=1)
-print(f"Match probability: {itm_scores[:, 1].item():.3f}")
+print(f&quot;Match probability: {itm_scores[:, 1].item():.3f}&quot;)
 ```
 
 ### Feature extraction
@@ -331,16 +381,16 @@ print(f"Match probability: {itm_scores[:, 1].item():.3f}")
 from lavis.models import load_model_and_preprocess
 
 model, vis_processors, _ = load_model_and_preprocess(
-    name="blip2_feature_extractor",
-    model_type="pretrain",
+    name=&quot;blip2_feature_extractor&quot;,
+    model_type=&quot;pretrain&quot;,
     is_eval=True,
     device=device
 )
 
-image = vis_processors["eval"](raw_image).unsqueeze(0).to(device)
+image = vis_processors[&quot;eval&quot;](raw_image).unsqueeze(0).to(device)
 
 # Get features
-features = model.extract_features({"image": image}, mode="image")
+features = model.extract_features({&quot;image&quot;: image}, mode=&quot;image&quot;)
 image_embeds = features.image_embeds  # Shape: [1, 32, 768]
 image_features = features.image_embeds_proj  # Projected for matching
 ```
@@ -356,23 +406,23 @@ from transformers import Blip2Processor, Blip2ForConditionalGeneration
 from pathlib import Path
 
 class ImageCaptioner:
-    def __init__(self, model_name="Salesforce/blip2-opt-2.7b"):
+    def __init__(self, model_name=&quot;Salesforce/blip2-opt-2.7b&quot;):
         self.processor = Blip2Processor.from_pretrained(model_name)
         self.model = Blip2ForConditionalGeneration.from_pretrained(
             model_name,
             torch_dtype=torch.float16,
-            device_map="auto"
+            device_map=&quot;auto&quot;
         )
 
     def caption(self, image_path: str, prompt: str = None) -&gt; str:
-        image = Image.open(image_path).convert("RGB")
+        image = Image.open(image_path).convert(&quot;RGB&quot;)
 
         if prompt:
-            inputs = self.processor(images=image, text=prompt, return_tensors="pt")
+            inputs = self.processor(images=image, text=prompt, return_tensors=&quot;pt&quot;)
         else:
-            inputs = self.processor(images=image, return_tensors="pt")
+            inputs = self.processor(images=image, return_tensors=&quot;pt&quot;)
 
-        inputs = inputs.to("cuda", torch.float16)
+        inputs = inputs.to(&quot;cuda&quot;, torch.float16)
 
         generated_ids = self.model.generate(
             **inputs,
@@ -383,19 +433,19 @@ class ImageCaptioner:
         return self.processor.decode(generated_ids[0], skip_special_tokens=True)
 
     def caption_batch(self, image_paths: list, prompt: str = None) -&gt; list:
-        images = [Image.open(p).convert("RGB") for p in image_paths]
+        images = [Image.open(p).convert(&quot;RGB&quot;) for p in image_paths]
 
         if prompt:
             inputs = self.processor(
                 images=images,
                 text=[prompt] * len(images),
-                return_tensors="pt",
+                return_tensors=&quot;pt&quot;,
                 padding=True
             )
         else:
-            inputs = self.processor(images=images, return_tensors="pt", padding=True)
+            inputs = self.processor(images=images, return_tensors=&quot;pt&quot;, padding=True)
 
-        inputs = inputs.to("cuda", torch.float16)
+        inputs = inputs.to(&quot;cuda&quot;, torch.float16)
 
         generated_ids = self.model.generate(**inputs, max_new_tokens=50)
         return self.processor.batch_decode(generated_ids, skip_special_tokens=True)
@@ -404,50 +454,50 @@ class ImageCaptioner:
 captioner = ImageCaptioner()
 
 # Single image
-caption = captioner.caption("photo.jpg")
-print(f"Caption: {caption}")
+caption = captioner.caption(&quot;photo.jpg&quot;)
+print(f&quot;Caption: {caption}&quot;)
 
 # With prompt for style
-caption = captioner.caption("photo.jpg", "a detailed description of")
-print(f"Detailed: {caption}")
+caption = captioner.caption(&quot;photo.jpg&quot;, &quot;a detailed description of&quot;)
+print(f&quot;Detailed: {caption}&quot;)
 
 # Batch processing
-captions = captioner.caption_batch(["img1.jpg", "img2.jpg", "img3.jpg"])
+captions = captioner.caption_batch([&quot;img1.jpg&quot;, &quot;img2.jpg&quot;, &quot;img3.jpg&quot;])
 for i, cap in enumerate(captions):
-    print(f"Image {i+1}: {cap}")
+    print(f&quot;Image {i+1}: {cap}&quot;)
 ```
 
-### Workflow 2: Visual Q&A system
+### Workflow 2: Visual Q&amp;A system
 
 ```python
 class VisualQA:
-    def __init__(self, model_name="Salesforce/blip2-flan-t5-xl"):
+    def __init__(self, model_name=&quot;Salesforce/blip2-flan-t5-xl&quot;):
         self.processor = Blip2Processor.from_pretrained(model_name)
         self.model = Blip2ForConditionalGeneration.from_pretrained(
             model_name,
             torch_dtype=torch.float16,
-            device_map="auto"
+            device_map=&quot;auto&quot;
         )
         self.current_image = None
         self.current_inputs = None
 
     def set_image(self, image_path: str):
-        """Load image for multiple questions."""
-        self.current_image = Image.open(image_path).convert("RGB")
+        &quot;&quot;&quot;Load image for multiple questions.&quot;&quot;&quot;
+        self.current_image = Image.open(image_path).convert(&quot;RGB&quot;)
 
     def ask(self, question: str) -&gt; str:
-        """Ask a question about the current image."""
+        &quot;&quot;&quot;Ask a question about the current image.&quot;&quot;&quot;
         if self.current_image is None:
-            raise ValueError("No image set. Call set_image() first.")
+            raise ValueError(&quot;No image set. Call set_image() first.&quot;)
 
         # Format question for FlanT5
-        prompt = f"Question: {question} Answer:"
+        prompt = f&quot;Question: {question} Answer:&quot;
 
         inputs = self.processor(
             images=self.current_image,
             text=prompt,
-            return_tensors="pt"
-        ).to("cuda", torch.float16)
+            return_tensors=&quot;pt&quot;
+        ).to(&quot;cuda&quot;, torch.float16)
 
         generated_ids = self.model.generate(
             **inputs,
@@ -458,23 +508,23 @@ class VisualQA:
         return self.processor.decode(generated_ids[0], skip_special_tokens=True)
 
     def ask_multiple(self, questions: list) -&gt; dict:
-        """Ask multiple questions about current image."""
+        &quot;&quot;&quot;Ask multiple questions about current image.&quot;&quot;&quot;
         return {q: self.ask(q) for q in questions}
 
 # Usage
 vqa = VisualQA()
-vqa.set_image("scene.jpg")
+vqa.set_image(&quot;scene.jpg&quot;)
 
 # Ask questions
-print(vqa.ask("What objects are in this image?"))
-print(vqa.ask("What is the weather like?"))
-print(vqa.ask("How many people are there?"))
+print(vqa.ask(&quot;What objects are in this image?&quot;))
+print(vqa.ask(&quot;What is the weather like?&quot;))
+print(vqa.ask(&quot;How many people are there?&quot;))
 
 # Batch questions
 results = vqa.ask_multiple([
-    "What is the main subject?",
-    "What colors are dominant?",
-    "Is this indoors or outdoors?"
+    &quot;What is the main subject?&quot;,
+    &quot;What colors are dominant?&quot;,
+    &quot;Is this indoors or outdoors?&quot;
 ])
 ```
 
@@ -488,10 +538,10 @@ from lavis.models import load_model_and_preprocess
 
 class ImageSearchEngine:
     def __init__(self):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device(&quot;cuda&quot; if torch.cuda.is_available() else &quot;cpu&quot;)
         self.model, self.vis_processors, self.txt_processors = load_model_and_preprocess(
-            name="blip2_feature_extractor",
-            model_type="pretrain",
+            name=&quot;blip2_feature_extractor&quot;,
+            model_type=&quot;pretrain&quot;,
             is_eval=True,
             device=self.device
         )
@@ -499,15 +549,15 @@ class ImageSearchEngine:
         self.image_paths = []
 
     def index_images(self, image_paths: list):
-        """Build index from images."""
+        &quot;&quot;&quot;Build index from images.&quot;&quot;&quot;
         self.image_paths = image_paths
 
         for path in image_paths:
-            image = Image.open(path).convert("RGB")
-            image = self.vis_processors["eval"](image).unsqueeze(0).to(self.device)
+            image = Image.open(path).convert(&quot;RGB&quot;)
+            image = self.vis_processors[&quot;eval&quot;](image).unsqueeze(0).to(self.device)
 
             with torch.no_grad():
-                features = self.model.extract_features({"image": image}, mode="image")
+                features = self.model.extract_features({&quot;image&quot;: image}, mode=&quot;image&quot;)
                 # Use projected features for matching
                 self.image_features.append(
                     features.image_embeds_proj.mean(dim=1).cpu().numpy()
@@ -516,13 +566,13 @@ class ImageSearchEngine:
         self.image_features = np.vstack(self.image_features)
 
     def search(self, query: str, top_k: int = 5) -&gt; list:
-        """Search images by text query."""
+        &quot;&quot;&quot;Search images by text query.&quot;&quot;&quot;
         # Get text features
-        text = self.txt_processors["eval"](query)
-        text_input = {"text_input": [text]}
+        text = self.txt_processors[&quot;eval&quot;](query)
+        text_input = {&quot;text_input&quot;: [text]}
 
         with torch.no_grad():
-            text_features = self.model.extract_features(text_input, mode="text")
+            text_features = self.model.extract_features(text_input, mode=&quot;text&quot;)
             text_embeds = text_features.text_embeds_proj[:, 0].cpu().numpy()
 
         # Compute similarities
@@ -533,12 +583,12 @@ class ImageSearchEngine:
 
 # Usage
 engine = ImageSearchEngine()
-engine.index_images(["img1.jpg", "img2.jpg", "img3.jpg", ...])
+engine.index_images([&quot;img1.jpg&quot;, &quot;img2.jpg&quot;, &quot;img3.jpg&quot;, ...])
 
 # Search
-results = engine.search("a sunset over the ocean", top_k=5)
+results = engine.search(&quot;a sunset over the ocean&quot;, top_k=5)
 for path, score in results:
-    print(f"{path}: {score:.3f}")
+    print(f&quot;{path}: {score:.3f}&quot;)
 ```
 
 ## Output format
@@ -559,7 +609,7 @@ text = processor.batch_decode(generated_ids, skip_special_tokens=True)
 
 ```python
 # Q-Former outputs
-features = model.extract_features({"image": image}, mode="image")
+features = model.extract_features({&quot;image&quot;: image}, mode=&quot;image&quot;)
 
 features.image_embeds          # [B, 32, 768] - Q-Former outputs
 features.image_embeds_proj     # [B, 32, 256] - Projected for matching
@@ -583,17 +633,17 @@ features.text_embeds_proj     # [B, 256] - Projected text (CLS)
 ```python
 # Use Flash Attention if available
 model = Blip2ForConditionalGeneration.from_pretrained(
-    "Salesforce/blip2-opt-2.7b",
+    &quot;Salesforce/blip2-opt-2.7b&quot;,
     torch_dtype=torch.float16,
-    attn_implementation="flash_attention_2",  # Requires flash-attn
-    device_map="auto"
+    attn_implementation=&quot;flash_attention_2&quot;,  # Requires flash-attn
+    device_map=&quot;auto&quot;
 )
 
 # Compile model (PyTorch 2.0+)
 model = torch.compile(model)
 
 # Use smaller images (if quality allows)
-processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
+processor = Blip2Processor.from_pretrained(&quot;Salesforce/blip2-opt-2.7b&quot;)
 # Default is 224x224, which is optimal
 ```
 
@@ -619,8 +669,46 @@ processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
 - **HuggingFace**: https://huggingface.co/Salesforce/blip2-opt-2.7b
 - **Demo**: https://huggingface.co/spaces/Salesforce/BLIP2
 - **InstructBLIP**: https://arxiv.org/abs/2305.06500 (successor)
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Multimodal</span><span class="tag">Vision-Language</span><span class="tag">Image Captioning</span><span class="tag">VQA</span><span class="tag">Zero-Shot</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>11</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

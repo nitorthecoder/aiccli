@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>kegg-database - AICCLI</title>
-  <meta name="description" content="kegg-database - Claude Code skill for AICCLI">
+  <meta name="description" content=""Direct REST API access to KEGG (academic use only). Pathway analysis, gene-pathway mapping, metabolic pathways, drug interactions, ID conversion. For Python wo">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / kegg-database</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>kegg-database</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / kegg-database
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>kegg-database</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Direct REST API access to KEGG (academic use only). Pathway analysis, gene-pathway mapping, metabolic pathways, drug interactions, ID conversion. For Python workflows with multiple databases, prefer bioservices. Use this for direct HTTP/REST work or KEGG-specific control."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/kegg-database</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/kegg-database</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/kegg-database</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: kegg-database
-description: "Direct REST API access to KEGG (academic use only). Pathway analysis, gene-pathway mapping, metabolic pathways, drug interactions, ID conversion. For Python workflows with multiple databases, prefer bioservices. Use this for direct HTTP/REST work or KEGG-specific control."
+description: &quot;Direct REST API access to KEGG (academic use only). Pathway analysis, gene-pathway mapping, metabolic pathways, drug interactions, ID conversion. For Python workflows with multiple databases, prefer bioservices. Use this for direct HTTP/REST work or KEGG-specific control.&quot;
 ---
 
 # KEGG Database
@@ -70,7 +120,7 @@ KEGG (Kyoto Encyclopedia of Genes and Genomes) is a comprehensive bioinformatics
 
 ## When to Use This Skill
 
-This skill should be used when querying pathways, genes, compounds, enzymes, diseases, and drugs across multiple organisms using KEGG's REST API.
+This skill should be used when querying pathways, genes, compounds, enzymes, diseases, and drugs across multiple organisms using KEGG&#039;s REST API.
 
 ## Quick Start
 
@@ -93,10 +143,10 @@ Retrieve metadata and statistics about KEGG databases.
 from scripts.kegg_api import kegg_info
 
 # Get pathway database info
-info = kegg_info('pathway')
+info = kegg_info(&#039;pathway&#039;)
 
 # Get organism-specific info
-hsa_info = kegg_info('hsa')  # Human genome
+hsa_info = kegg_info(&#039;hsa&#039;)  # Human genome
 ```
 
 **Common databases**: `kegg`, `pathway`, `module`, `brite`, `genes`, `genome`, `compound`, `glycan`, `reaction`, `enzyme`, `disease`, `drug`
@@ -112,13 +162,13 @@ List entry identifiers and names from KEGG databases.
 from scripts.kegg_api import kegg_list
 
 # List all reference pathways
-pathways = kegg_list('pathway')
+pathways = kegg_list(&#039;pathway&#039;)
 
 # List human-specific pathways
-hsa_pathways = kegg_list('pathway', 'hsa')
+hsa_pathways = kegg_list(&#039;pathway&#039;, &#039;hsa&#039;)
 
 # List specific genes (max 10)
-genes = kegg_list('hsa:10458+hsa:10459')
+genes = kegg_list(&#039;hsa:10458+hsa:10459&#039;)
 ```
 
 **Common organism codes**: `hsa` (human), `mmu` (mouse), `dme` (fruit fly), `sce` (yeast), `eco` (E. coli)
@@ -134,14 +184,14 @@ Search KEGG databases by keywords or molecular properties.
 from scripts.kegg_api import kegg_find
 
 # Keyword search
-results = kegg_find('genes', 'p53')
-shiga_toxin = kegg_find('genes', 'shiga toxin')
+results = kegg_find(&#039;genes&#039;, &#039;p53&#039;)
+shiga_toxin = kegg_find(&#039;genes&#039;, &#039;shiga toxin&#039;)
 
 # Chemical formula search (exact match)
-compounds = kegg_find('compound', 'C7H10N4O2', 'formula')
+compounds = kegg_find(&#039;compound&#039;, &#039;C7H10N4O2&#039;, &#039;formula&#039;)
 
 # Molecular weight range search
-drugs = kegg_find('drug', '300-310', 'exact_mass')
+drugs = kegg_find(&#039;drug&#039;, &#039;300-310&#039;, &#039;exact_mass&#039;)
 ```
 
 **Search options**: `formula` (exact match), `exact_mass` (range), `mol_weight` (range)
@@ -157,25 +207,25 @@ Get complete database entries or specific data formats.
 from scripts.kegg_api import kegg_get
 
 # Get pathway entry
-pathway = kegg_get('hsa00010')  # Glycolysis pathway
+pathway = kegg_get(&#039;hsa00010&#039;)  # Glycolysis pathway
 
 # Get multiple entries (max 10)
-genes = kegg_get(['hsa:10458', 'hsa:10459'])
+genes = kegg_get([&#039;hsa:10458&#039;, &#039;hsa:10459&#039;])
 
 # Get protein sequence (FASTA)
-sequence = kegg_get('hsa:10458', 'aaseq')
+sequence = kegg_get(&#039;hsa:10458&#039;, &#039;aaseq&#039;)
 
 # Get nucleotide sequence
-nt_seq = kegg_get('hsa:10458', 'ntseq')
+nt_seq = kegg_get(&#039;hsa:10458&#039;, &#039;ntseq&#039;)
 
 # Get compound structure
-mol_file = kegg_get('cpd:C00002', 'mol')  # ATP in MOL format
+mol_file = kegg_get(&#039;cpd:C00002&#039;, &#039;mol&#039;)  # ATP in MOL format
 
 # Get pathway as JSON (single entry only)
-pathway_json = kegg_get('hsa05130', 'json')
+pathway_json = kegg_get(&#039;hsa05130&#039;, &#039;json&#039;)
 
 # Get pathway image (single entry only)
-pathway_img = kegg_get('hsa05130', 'image')
+pathway_img = kegg_get(&#039;hsa05130&#039;, &#039;image&#039;)
 ```
 
 **Output formats**: `aaseq` (protein FASTA), `ntseq` (nucleotide FASTA), `mol` (MOL format), `kcf` (KCF format), `image` (PNG), `kgml` (XML), `json` (pathway JSON)
@@ -193,19 +243,19 @@ Convert identifiers between KEGG and external databases.
 from scripts.kegg_api import kegg_conv
 
 # Convert all human genes to NCBI Gene IDs
-conversions = kegg_conv('ncbi-geneid', 'hsa')
+conversions = kegg_conv(&#039;ncbi-geneid&#039;, &#039;hsa&#039;)
 
 # Convert specific gene
-gene_id = kegg_conv('ncbi-geneid', 'hsa:10458')
+gene_id = kegg_conv(&#039;ncbi-geneid&#039;, &#039;hsa:10458&#039;)
 
 # Convert to UniProt
-uniprot_id = kegg_conv('uniprot', 'hsa:10458')
+uniprot_id = kegg_conv(&#039;uniprot&#039;, &#039;hsa:10458&#039;)
 
 # Convert compounds to PubChem
-pubchem_ids = kegg_conv('pubchem', 'compound')
+pubchem_ids = kegg_conv(&#039;pubchem&#039;, &#039;compound&#039;)
 
 # Reverse conversion (NCBI Gene ID to KEGG)
-kegg_id = kegg_conv('hsa', 'ncbi-geneid')
+kegg_id = kegg_conv(&#039;hsa&#039;, &#039;ncbi-geneid&#039;)
 ```
 
 **Supported conversions**: `ncbi-geneid`, `ncbi-proteinid`, `uniprot`, `pubchem`, `chebi`
@@ -221,19 +271,19 @@ Find related entries within and between KEGG databases.
 from scripts.kegg_api import kegg_link
 
 # Find pathways linked to human genes
-pathways = kegg_link('pathway', 'hsa')
+pathways = kegg_link(&#039;pathway&#039;, &#039;hsa&#039;)
 
 # Get genes in a specific pathway
-genes = kegg_link('genes', 'hsa00010')  # Glycolysis genes
+genes = kegg_link(&#039;genes&#039;, &#039;hsa00010&#039;)  # Glycolysis genes
 
 # Find pathways containing a specific gene
-gene_pathways = kegg_link('pathway', 'hsa:10458')
+gene_pathways = kegg_link(&#039;pathway&#039;, &#039;hsa:10458&#039;)
 
 # Find compounds in a pathway
-compounds = kegg_link('compound', 'hsa00010')
+compounds = kegg_link(&#039;compound&#039;, &#039;hsa00010&#039;)
 
 # Map genes to KO (orthology) groups
-ko_groups = kegg_link('ko', 'hsa:10458')
+ko_groups = kegg_link(&#039;ko&#039;, &#039;hsa:10458&#039;)
 ```
 
 **Common links**: genes ↔ pathway, pathway ↔ compound, pathway ↔ enzyme, genes ↔ ko (orthology)
@@ -249,10 +299,10 @@ Check for drug-drug interactions.
 from scripts.kegg_api import kegg_ddi
 
 # Check single drug
-interactions = kegg_ddi('D00001')
+interactions = kegg_ddi(&#039;D00001&#039;)
 
 # Check multiple drugs (max 10)
-interactions = kegg_ddi(['D00001', 'D00002', 'D00003'])
+interactions = kegg_ddi([&#039;D00001&#039;, &#039;D00002&#039;, &#039;D00003&#039;])
 ```
 
 ## Common Analysis Workflows
@@ -265,15 +315,15 @@ interactions = kegg_ddi(['D00001', 'D00002', 'D00003'])
 from scripts.kegg_api import kegg_find, kegg_link, kegg_get
 
 # Step 1: Find gene ID by name
-gene_results = kegg_find('genes', 'p53')
+gene_results = kegg_find(&#039;genes&#039;, &#039;p53&#039;)
 
 # Step 2: Link gene to pathways
-pathways = kegg_link('pathway', 'hsa:7157')  # TP53 gene
+pathways = kegg_link(&#039;pathway&#039;, &#039;hsa:7157&#039;)  # TP53 gene
 
 # Step 3: Get detailed pathway information
-for pathway_line in pathways.split('\n'):
+for pathway_line in pathways.split(&#039;\n&#039;):
     if pathway_line:
-        pathway_id = pathway_line.split('\t')[1].replace('path:', '')
+        pathway_id = pathway_line.split(&#039;\t&#039;)[1].replace(&#039;path:&#039;, &#039;&#039;)
         pathway_info = kegg_get(pathway_id)
         # Process pathway information
 ```
@@ -286,13 +336,13 @@ for pathway_line in pathways.split('\n'):
 from scripts.kegg_api import kegg_list, kegg_link
 
 # Step 1: List all human pathways
-pathways = kegg_list('pathway', 'hsa')
+pathways = kegg_list(&#039;pathway&#039;, &#039;hsa&#039;)
 
 # Step 2: For each pathway, get associated genes
-for pathway_line in pathways.split('\n'):
+for pathway_line in pathways.split(&#039;\n&#039;):
     if pathway_line:
-        pathway_id = pathway_line.split('\t')[0]
-        genes = kegg_link('genes', pathway_id)
+        pathway_id = pathway_line.split(&#039;\t&#039;)[0]
+        genes = kegg_link(&#039;genes&#039;, pathway_id)
         # Process genes for enrichment analysis
 ```
 
@@ -304,16 +354,16 @@ for pathway_line in pathways.split('\n'):
 from scripts.kegg_api import kegg_find, kegg_link, kegg_get
 
 # Step 1: Search for compound
-compound_results = kegg_find('compound', 'glucose')
+compound_results = kegg_find(&#039;compound&#039;, &#039;glucose&#039;)
 
 # Step 2: Link compound to reactions
-reactions = kegg_link('reaction', 'cpd:C00031')  # Glucose
+reactions = kegg_link(&#039;reaction&#039;, &#039;cpd:C00031&#039;)  # Glucose
 
 # Step 3: Link reactions to pathways
-pathways = kegg_link('pathway', 'rn:R00299')  # Specific reaction
+pathways = kegg_link(&#039;pathway&#039;, &#039;rn:R00299&#039;)  # Specific reaction
 
 # Step 4: Get pathway details
-pathway_info = kegg_get('map00010')  # Glycolysis
+pathway_info = kegg_get(&#039;map00010&#039;)  # Glycolysis
 ```
 
 ### Workflow 4: Cross-Database Integration
@@ -324,17 +374,17 @@ pathway_info = kegg_get('map00010')  # Glycolysis
 from scripts.kegg_api import kegg_conv, kegg_get
 
 # Step 1: Convert KEGG gene IDs to external database IDs
-uniprot_map = kegg_conv('uniprot', 'hsa')
-ncbi_map = kegg_conv('ncbi-geneid', 'hsa')
+uniprot_map = kegg_conv(&#039;uniprot&#039;, &#039;hsa&#039;)
+ncbi_map = kegg_conv(&#039;ncbi-geneid&#039;, &#039;hsa&#039;)
 
 # Step 2: Parse conversion results
-for line in uniprot_map.split('\n'):
+for line in uniprot_map.split(&#039;\n&#039;):
     if line:
-        kegg_id, uniprot_id = line.split('\t')
+        kegg_id, uniprot_id = line.split(&#039;\t&#039;)
         # Use external IDs for integration
 
 # Step 3: Get sequences using KEGG
-sequence = kegg_get('hsa:10458', 'aaseq')
+sequence = kegg_get(&#039;hsa:10458&#039;, &#039;aaseq&#039;)
 ```
 
 ### Workflow 5: Organism-Specific Pathway Analysis
@@ -345,16 +395,16 @@ sequence = kegg_get('hsa:10458', 'aaseq')
 from scripts.kegg_api import kegg_list, kegg_get
 
 # Step 1: List pathways for multiple organisms
-human_pathways = kegg_list('pathway', 'hsa')
-mouse_pathways = kegg_list('pathway', 'mmu')
-yeast_pathways = kegg_list('pathway', 'sce')
+human_pathways = kegg_list(&#039;pathway&#039;, &#039;hsa&#039;)
+mouse_pathways = kegg_list(&#039;pathway&#039;, &#039;mmu&#039;)
+yeast_pathways = kegg_list(&#039;pathway&#039;, &#039;sce&#039;)
 
 # Step 2: Get reference pathway for comparison
-ref_pathway = kegg_get('map00010')  # Reference glycolysis
+ref_pathway = kegg_get(&#039;map00010&#039;)  # Reference glycolysis
 
 # Step 3: Get organism-specific versions
-hsa_glycolysis = kegg_get('hsa00010')
-mmu_glycolysis = kegg_get('mmu00010')
+hsa_glycolysis = kegg_get(&#039;hsa00010&#039;)
+mmu_glycolysis = kegg_get(&#039;mmu00010&#039;)
 ```
 
 ## Pathway Categories
@@ -415,7 +465,7 @@ For comprehensive API documentation, database specifications, organism codes, an
 
 ## Troubleshooting
 
-**404 Not Found**: Entry or database doesn't exist; verify IDs and organism codes
+**404 Not Found**: Entry or database doesn&#039;t exist; verify IDs and organism codes
 **400 Bad Request**: Syntax error in API call; check parameter formatting
 **Empty results**: Search term may not match entries; try broader keywords
 **Image/KGML errors**: These formats only work with single entries; remove batch processing
@@ -426,8 +476,39 @@ For interactive pathway visualization and annotation:
 - **KEGG Mapper**: https://www.kegg.jp/kegg/mapper/
 - **BlastKOALA**: Automated genome annotation
 - **GhostKOALA**: Metagenome/metatranscriptome annotation
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>17</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

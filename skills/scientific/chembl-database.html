@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>chembl-database - AICCLI</title>
-  <meta name="description" content="chembl-database - Claude Code skill for AICCLI">
+  <meta name="description" content=""Query ChEMBL's bioactive molecules and drug discovery data. Search compounds by structure/properties, retrieve bioactivity data (IC50, Ki), find inhibitors, pe">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / chembl-database</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>chembl-database</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / chembl-database
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>chembl-database</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Query ChEMBL's bioactive molecules and drug discovery data. Search compounds by structure/properties, retrieve bioactivity data (IC50, Ki), find inhibitors, perform SAR studies, for medicinal chemistry."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/chembl-database</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/chembl-database</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/chembl-database</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: chembl-database
-description: "Query ChEMBL's bioactive molecules and drug discovery data. Search compounds by structure/properties, retrieve bioactivity data (IC50, Ki), find inhibitors, perform SAR studies, for medicinal chemistry."
+description: &quot;Query ChEMBL&#039;s bioactive molecules and drug discovery data. Search compounds by structure/properties, retrieve bioactivity data (IC50, Ki), find inhibitors, perform SAR studies, for medicinal chemistry.&quot;
 ---
 
 # ChEMBL Database
@@ -108,12 +158,12 @@ drug = new_client.drug
 **Retrieve by ChEMBL ID:**
 ```python
 molecule = new_client.molecule
-aspirin = molecule.get('CHEMBL25')
+aspirin = molecule.get(&#039;CHEMBL25&#039;)
 ```
 
 **Search by name:**
 ```python
-results = molecule.filter(pref_name__icontains='aspirin')
+results = molecule.filter(pref_name__icontains=&#039;aspirin&#039;)
 ```
 
 **Filter by properties:**
@@ -130,15 +180,15 @@ results = molecule.filter(
 **Retrieve target information:**
 ```python
 target = new_client.target
-egfr = target.get('CHEMBL203')
+egfr = target.get(&#039;CHEMBL203&#039;)
 ```
 
 **Search for specific target types:**
 ```python
 # Find all kinase targets
 kinases = target.filter(
-    target_type='SINGLE PROTEIN',
-    pref_name__icontains='kinase'
+    target_type=&#039;SINGLE PROTEIN&#039;,
+    pref_name__icontains=&#039;kinase&#039;
 )
 ```
 
@@ -149,17 +199,17 @@ kinases = target.filter(
 activity = new_client.activity
 # Find potent EGFR inhibitors
 results = activity.filter(
-    target_chembl_id='CHEMBL203',
-    standard_type='IC50',
+    target_chembl_id=&#039;CHEMBL203&#039;,
+    standard_type=&#039;IC50&#039;,
     standard_value__lte=100,
-    standard_units='nM'
+    standard_units=&#039;nM&#039;
 )
 ```
 
 **Get all activities for a compound:**
 ```python
 compound_activities = activity.filter(
-    molecule_chembl_id='CHEMBL25',
+    molecule_chembl_id=&#039;CHEMBL25&#039;,
     pchembl_value__isnull=False
 )
 ```
@@ -171,7 +221,7 @@ compound_activities = activity.filter(
 similarity = new_client.similarity
 # Find compounds similar to aspirin
 similar = similarity.filter(
-    smiles='CC(=O)Oc1ccccc1C(=O)O',
+    smiles=&#039;CC(=O)Oc1ccccc1C(=O)O&#039;,
     similarity=85  # 85% similarity threshold
 )
 ```
@@ -180,7 +230,7 @@ similar = similarity.filter(
 ```python
 substructure = new_client.substructure
 # Find compounds containing benzene ring
-results = substructure.filter(smiles='c1ccccc1')
+results = substructure.filter(smiles=&#039;c1ccccc1&#039;)
 ```
 
 ### 5. Drug Information
@@ -188,19 +238,19 @@ results = substructure.filter(smiles='c1ccccc1')
 **Retrieve drug data:**
 ```python
 drug = new_client.drug
-drug_info = drug.get('CHEMBL25')
+drug_info = drug.get(&#039;CHEMBL25&#039;)
 ```
 
 **Get mechanisms of action:**
 ```python
 mechanism = new_client.mechanism
-mechanisms = mechanism.filter(molecule_chembl_id='CHEMBL25')
+mechanisms = mechanism.filter(molecule_chembl_id=&#039;CHEMBL25&#039;)
 ```
 
 **Query drug indications:**
 ```python
 drug_indication = new_client.drug_indication
-indications = drug_indication.filter(molecule_chembl_id='CHEMBL25')
+indications = drug_indication.filter(molecule_chembl_id=&#039;CHEMBL25&#039;)
 ```
 
 ## Query Workflow
@@ -209,22 +259,22 @@ indications = drug_indication.filter(molecule_chembl_id='CHEMBL25')
 
 1. **Identify the target** by searching by name:
    ```python
-   targets = new_client.target.filter(pref_name__icontains='EGFR')
-   target_id = targets[0]['target_chembl_id']
+   targets = new_client.target.filter(pref_name__icontains=&#039;EGFR&#039;)
+   target_id = targets[0][&#039;target_chembl_id&#039;]
    ```
 
 2. **Query bioactivity data** for that target:
    ```python
    activities = new_client.activity.filter(
        target_chembl_id=target_id,
-       standard_type='IC50',
+       standard_type=&#039;IC50&#039;,
        standard_value__lte=100
    )
    ```
 
 3. **Extract compound IDs** and retrieve details:
    ```python
-   compound_ids = [act['molecule_chembl_id'] for act in activities]
+   compound_ids = [act[&#039;molecule_chembl_id&#039;] for act in activities]
    compounds = [new_client.molecule.get(cid) for cid in compound_ids]
    ```
 
@@ -232,31 +282,31 @@ indications = drug_indication.filter(molecule_chembl_id='CHEMBL25')
 
 1. **Get drug information**:
    ```python
-   drug_info = new_client.drug.get('CHEMBL1234')
+   drug_info = new_client.drug.get(&#039;CHEMBL1234&#039;)
    ```
 
 2. **Retrieve mechanisms**:
    ```python
-   mechanisms = new_client.mechanism.filter(molecule_chembl_id='CHEMBL1234')
+   mechanisms = new_client.mechanism.filter(molecule_chembl_id=&#039;CHEMBL1234&#039;)
    ```
 
 3. **Find all bioactivities**:
    ```python
-   activities = new_client.activity.filter(molecule_chembl_id='CHEMBL1234')
+   activities = new_client.activity.filter(molecule_chembl_id=&#039;CHEMBL1234&#039;)
    ```
 
 ### Workflow 3: Structure-Activity Relationship (SAR) Study
 
 1. **Find similar compounds**:
    ```python
-   similar = new_client.similarity.filter(smiles='query_smiles', similarity=80)
+   similar = new_client.similarity.filter(smiles=&#039;query_smiles&#039;, similarity=80)
    ```
 
 2. **Get activities for each compound**:
    ```python
    for compound in similar:
        activities = new_client.activity.filter(
-           molecule_chembl_id=compound['molecule_chembl_id']
+           molecule_chembl_id=compound[&#039;molecule_chembl_id&#039;]
        )
    ```
 
@@ -282,12 +332,12 @@ Convert results to pandas DataFrame for analysis:
 ```python
 import pandas as pd
 
-activities = new_client.activity.filter(target_chembl_id='CHEMBL203')
+activities = new_client.activity.filter(target_chembl_id=&#039;CHEMBL203&#039;)
 df = pd.DataFrame(list(activities))
 
 # Analyze results
-print(df['standard_value'].describe())
-print(df.groupby('standard_type').size())
+print(df[&#039;standard_value&#039;].describe())
+print(df.groupby(&#039;standard_type&#039;).size())
 ```
 
 ## Performance Optimization
@@ -312,7 +362,7 @@ Queries execute only when data is accessed. Convert to list to force execution:
 
 ```python
 # Query is not executed yet
-results = molecule.filter(pref_name__icontains='aspirin')
+results = molecule.filter(pref_name__icontains=&#039;aspirin&#039;)
 
 # Force execution
 results_list = list(results)
@@ -323,9 +373,9 @@ results_list = list(results)
 Results are paginated automatically. Iterate through all results:
 
 ```python
-for activity in new_client.activity.filter(target_chembl_id='CHEMBL203'):
+for activity in new_client.activity.filter(target_chembl_id=&#039;CHEMBL203&#039;):
     # Process each activity
-    print(activity['molecule_chembl_id'])
+    print(activity[&#039;molecule_chembl_id&#039;])
 ```
 
 ## Common Use Cases
@@ -335,15 +385,15 @@ for activity in new_client.activity.filter(target_chembl_id='CHEMBL203'):
 ```python
 # Identify kinase targets
 kinases = new_client.target.filter(
-    target_type='SINGLE PROTEIN',
-    pref_name__icontains='kinase'
+    target_type=&#039;SINGLE PROTEIN&#039;,
+    pref_name__icontains=&#039;kinase&#039;
 )
 
 # Get potent inhibitors
 for kinase in kinases[:5]:  # First 5 kinases
     activities = new_client.activity.filter(
-        target_chembl_id=kinase['target_chembl_id'],
-        standard_type='IC50',
+        target_chembl_id=kinase[&#039;target_chembl_id&#039;],
+        standard_type=&#039;IC50&#039;,
         standard_value__lte=50
     )
 ```
@@ -357,7 +407,7 @@ drugs = new_client.drug.filter()
 # For each drug, find all targets
 for drug in drugs[:10]:
     mechanisms = new_client.mechanism.filter(
-        molecule_chembl_id=drug['molecule_chembl_id']
+        molecule_chembl_id=drug[&#039;molecule_chembl_id&#039;]
     )
 ```
 
@@ -420,7 +470,7 @@ Refer to this document when detailed API information is needed or when troublesh
 
 ### Rate Limiting
 
-- Respect ChEMBL's fair usage policies
+- Respect ChEMBL&#039;s fair usage policies
 - Use caching to minimize repeated requests
 - Consider bulk downloads for large datasets
 - Avoid hammering the API with rapid consecutive requests
@@ -438,8 +488,39 @@ Refer to this document when detailed API information is needed or when troublesh
 - Python client GitHub: https://github.com/chembl/chembl_webresource_client
 - Interface documentation: https://chembl.gitbook.io/chembl-interface-documentation/
 - Example notebooks: https://github.com/chembl/notebooks
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>5</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

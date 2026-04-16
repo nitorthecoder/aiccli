@@ -4,63 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>grafana-dashboards - AICCLI</title>
-  <meta name="description" content="grafana-dashboards - Claude Code skill for AICCLI">
+  <meta name="description" content=""Create and manage production-ready Grafana dashboards for comprehensive system observability."">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / grafana-dashboards</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>grafana-dashboards</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / grafana-dashboards
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>grafana-dashboards</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Create and manage production-ready Grafana dashboards for comprehensive system observability."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/grafana-dashboards</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/grafana-dashboards</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/grafana-dashboards</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: grafana-dashboards
-description: "Create and manage production-ready Grafana dashboards for comprehensive system observability."
+description: &quot;Create and manage production-ready Grafana dashboards for comprehensive system observability.&quot;
 risk: unknown
 source: community
-date_added: "2026-02-27"
+date_added: &quot;2026-02-27&quot;
 ---
 
 # Grafana Dashboards
@@ -120,54 +170,54 @@ Design effective Grafana dashboards for monitoring applications, infrastructure,
 
 ```json
 {
-  "dashboard": {
-    "title": "API Monitoring",
-    "tags": ["api", "production"],
-    "timezone": "browser",
-    "refresh": "30s",
-    "panels": [
+  &quot;dashboard&quot;: {
+    &quot;title&quot;: &quot;API Monitoring&quot;,
+    &quot;tags&quot;: [&quot;api&quot;, &quot;production&quot;],
+    &quot;timezone&quot;: &quot;browser&quot;,
+    &quot;refresh&quot;: &quot;30s&quot;,
+    &quot;panels&quot;: [
       {
-        "title": "Request Rate",
-        "type": "graph",
-        "targets": [
+        &quot;title&quot;: &quot;Request Rate&quot;,
+        &quot;type&quot;: &quot;graph&quot;,
+        &quot;targets&quot;: [
           {
-            "expr": "sum(rate(http_requests_total[5m])) by (service)",
-            "legendFormat": "{{service}}"
+            &quot;expr&quot;: &quot;sum(rate(http_requests_total[5m])) by (service)&quot;,
+            &quot;legendFormat&quot;: &quot;{{service}}&quot;
           }
         ],
-        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+        &quot;gridPos&quot;: {&quot;x&quot;: 0, &quot;y&quot;: 0, &quot;w&quot;: 12, &quot;h&quot;: 8}
       },
       {
-        "title": "Error Rate %",
-        "type": "graph",
-        "targets": [
+        &quot;title&quot;: &quot;Error Rate %&quot;,
+        &quot;type&quot;: &quot;graph&quot;,
+        &quot;targets&quot;: [
           {
-            "expr": "(sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))) * 100",
-            "legendFormat": "Error Rate"
+            &quot;expr&quot;: &quot;(sum(rate(http_requests_total{status=~\&quot;5..\&quot;}[5m])) / sum(rate(http_requests_total[5m]))) * 100&quot;,
+            &quot;legendFormat&quot;: &quot;Error Rate&quot;
           }
         ],
-        "alert": {
-          "conditions": [
+        &quot;alert&quot;: {
+          &quot;conditions&quot;: [
             {
-              "evaluator": {"params": [5], "type": "gt"},
-              "operator": {"type": "and"},
-              "query": {"params": ["A", "5m", "now"]},
-              "type": "query"
+              &quot;evaluator&quot;: {&quot;params&quot;: [5], &quot;type&quot;: &quot;gt&quot;},
+              &quot;operator&quot;: {&quot;type&quot;: &quot;and&quot;},
+              &quot;query&quot;: {&quot;params&quot;: [&quot;A&quot;, &quot;5m&quot;, &quot;now&quot;]},
+              &quot;type&quot;: &quot;query&quot;
             }
           ]
         },
-        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}
+        &quot;gridPos&quot;: {&quot;x&quot;: 12, &quot;y&quot;: 0, &quot;w&quot;: 12, &quot;h&quot;: 8}
       },
       {
-        "title": "P95 Latency",
-        "type": "graph",
-        "targets": [
+        &quot;title&quot;: &quot;P95 Latency&quot;,
+        &quot;type&quot;: &quot;graph&quot;,
+        &quot;targets&quot;: [
           {
-            "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service))",
-            "legendFormat": "{{service}}"
+            &quot;expr&quot;: &quot;histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service))&quot;,
+            &quot;legendFormat&quot;: &quot;{{service}}&quot;
           }
         ],
-        "gridPos": {"x": 0, "y": 8, "w": 24, "h": 8}
+        &quot;gridPos&quot;: {&quot;x&quot;: 0, &quot;y&quot;: 8, &quot;w&quot;: 24, &quot;h&quot;: 8}
       }
     ]
   }
@@ -181,28 +231,28 @@ Design effective Grafana dashboards for monitoring applications, infrastructure,
 ### 1. Stat Panel (Single Value)
 ```json
 {
-  "type": "stat",
-  "title": "Total Requests",
-  "targets": [{
-    "expr": "sum(http_requests_total)"
+  &quot;type&quot;: &quot;stat&quot;,
+  &quot;title&quot;: &quot;Total Requests&quot;,
+  &quot;targets&quot;: [{
+    &quot;expr&quot;: &quot;sum(http_requests_total)&quot;
   }],
-  "options": {
-    "reduceOptions": {
-      "values": false,
-      "calcs": ["lastNotNull"]
+  &quot;options&quot;: {
+    &quot;reduceOptions&quot;: {
+      &quot;values&quot;: false,
+      &quot;calcs&quot;: [&quot;lastNotNull&quot;]
     },
-    "orientation": "auto",
-    "textMode": "auto",
-    "colorMode": "value"
+    &quot;orientation&quot;: &quot;auto&quot;,
+    &quot;textMode&quot;: &quot;auto&quot;,
+    &quot;colorMode&quot;: &quot;value&quot;
   },
-  "fieldConfig": {
-    "defaults": {
-      "thresholds": {
-        "mode": "absolute",
-        "steps": [
-          {"value": 0, "color": "green"},
-          {"value": 80, "color": "yellow"},
-          {"value": 90, "color": "red"}
+  &quot;fieldConfig&quot;: {
+    &quot;defaults&quot;: {
+      &quot;thresholds&quot;: {
+        &quot;mode&quot;: &quot;absolute&quot;,
+        &quot;steps&quot;: [
+          {&quot;value&quot;: 0, &quot;color&quot;: &quot;green&quot;},
+          {&quot;value&quot;: 80, &quot;color&quot;: &quot;yellow&quot;},
+          {&quot;value&quot;: 90, &quot;color&quot;: &quot;red&quot;}
         ]
       }
     }
@@ -213,14 +263,14 @@ Design effective Grafana dashboards for monitoring applications, infrastructure,
 ### 2. Time Series Graph
 ```json
 {
-  "type": "graph",
-  "title": "CPU Usage",
-  "targets": [{
-    "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)"
+  &quot;type&quot;: &quot;graph&quot;,
+  &quot;title&quot;: &quot;CPU Usage&quot;,
+  &quot;targets&quot;: [{
+    &quot;expr&quot;: &quot;100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\&quot;idle\&quot;}[5m])) * 100)&quot;
   }],
-  "yaxes": [
-    {"format": "percent", "max": 100, "min": 0},
-    {"format": "short"}
+  &quot;yaxes&quot;: [
+    {&quot;format&quot;: &quot;percent&quot;, &quot;max&quot;: 100, &quot;min&quot;: 0},
+    {&quot;format&quot;: &quot;short&quot;}
   ]
 }
 ```
@@ -228,23 +278,23 @@ Design effective Grafana dashboards for monitoring applications, infrastructure,
 ### 3. Table Panel
 ```json
 {
-  "type": "table",
-  "title": "Service Status",
-  "targets": [{
-    "expr": "up",
-    "format": "table",
-    "instant": true
+  &quot;type&quot;: &quot;table&quot;,
+  &quot;title&quot;: &quot;Service Status&quot;,
+  &quot;targets&quot;: [{
+    &quot;expr&quot;: &quot;up&quot;,
+    &quot;format&quot;: &quot;table&quot;,
+    &quot;instant&quot;: true
   }],
-  "transformations": [
+  &quot;transformations&quot;: [
     {
-      "id": "organize",
-      "options": {
-        "excludeByName": {"Time": true},
-        "indexByName": {},
-        "renameByName": {
-          "instance": "Instance",
-          "job": "Service",
-          "Value": "Status"
+      &quot;id&quot;: &quot;organize&quot;,
+      &quot;options&quot;: {
+        &quot;excludeByName&quot;: {&quot;Time&quot;: true},
+        &quot;indexByName&quot;: {},
+        &quot;renameByName&quot;: {
+          &quot;instance&quot;: &quot;Instance&quot;,
+          &quot;job&quot;: &quot;Service&quot;,
+          &quot;Value&quot;: &quot;Status&quot;
         }
       }
     }
@@ -255,15 +305,15 @@ Design effective Grafana dashboards for monitoring applications, infrastructure,
 ### 4. Heatmap
 ```json
 {
-  "type": "heatmap",
-  "title": "Latency Heatmap",
-  "targets": [{
-    "expr": "sum(rate(http_request_duration_seconds_bucket[5m])) by (le)",
-    "format": "heatmap"
+  &quot;type&quot;: &quot;heatmap&quot;,
+  &quot;title&quot;: &quot;Latency Heatmap&quot;,
+  &quot;targets&quot;: [{
+    &quot;expr&quot;: &quot;sum(rate(http_request_duration_seconds_bucket[5m])) by (le)&quot;,
+    &quot;format&quot;: &quot;heatmap&quot;
   }],
-  "dataFormat": "tsbuckets",
-  "yAxis": {
-    "format": "s"
+  &quot;dataFormat&quot;: &quot;tsbuckets&quot;,
+  &quot;yAxis&quot;: {
+    &quot;format&quot;: &quot;s&quot;
   }
 }
 ```
@@ -273,23 +323,23 @@ Design effective Grafana dashboards for monitoring applications, infrastructure,
 ### Query Variables
 ```json
 {
-  "templating": {
-    "list": [
+  &quot;templating&quot;: {
+    &quot;list&quot;: [
       {
-        "name": "namespace",
-        "type": "query",
-        "datasource": "Prometheus",
-        "query": "label_values(kube_pod_info, namespace)",
-        "refresh": 1,
-        "multi": false
+        &quot;name&quot;: &quot;namespace&quot;,
+        &quot;type&quot;: &quot;query&quot;,
+        &quot;datasource&quot;: &quot;Prometheus&quot;,
+        &quot;query&quot;: &quot;label_values(kube_pod_info, namespace)&quot;,
+        &quot;refresh&quot;: 1,
+        &quot;multi&quot;: false
       },
       {
-        "name": "service",
-        "type": "query",
-        "datasource": "Prometheus",
-        "query": "label_values(kube_service_info{namespace=\"$namespace\"}, service)",
-        "refresh": 1,
-        "multi": true
+        &quot;name&quot;: &quot;service&quot;,
+        &quot;type&quot;: &quot;query&quot;,
+        &quot;datasource&quot;: &quot;Prometheus&quot;,
+        &quot;query&quot;: &quot;label_values(kube_service_info{namespace=\&quot;$namespace\&quot;}, service)&quot;,
+        &quot;refresh&quot;: 1,
+        &quot;multi&quot;: true
       }
     ]
   }
@@ -298,36 +348,36 @@ Design effective Grafana dashboards for monitoring applications, infrastructure,
 
 ### Use Variables in Queries
 ```
-sum(rate(http_requests_total{namespace="$namespace", service=~"$service"}[5m]))
+sum(rate(http_requests_total{namespace=&quot;$namespace&quot;, service=~&quot;$service&quot;}[5m]))
 ```
 
 ## Alerts in Dashboards
 
 ```json
 {
-  "alert": {
-    "name": "High Error Rate",
-    "conditions": [
+  &quot;alert&quot;: {
+    &quot;name&quot;: &quot;High Error Rate&quot;,
+    &quot;conditions&quot;: [
       {
-        "evaluator": {
-          "params": [5],
-          "type": "gt"
+        &quot;evaluator&quot;: {
+          &quot;params&quot;: [5],
+          &quot;type&quot;: &quot;gt&quot;
         },
-        "operator": {"type": "and"},
-        "query": {
-          "params": ["A", "5m", "now"]
+        &quot;operator&quot;: {&quot;type&quot;: &quot;and&quot;},
+        &quot;query&quot;: {
+          &quot;params&quot;: [&quot;A&quot;, &quot;5m&quot;, &quot;now&quot;]
         },
-        "reducer": {"type": "avg"},
-        "type": "query"
+        &quot;reducer&quot;: {&quot;type&quot;: &quot;avg&quot;},
+        &quot;type&quot;: &quot;query&quot;
       }
     ],
-    "executionErrorState": "alerting",
-    "for": "5m",
-    "frequency": "1m",
-    "message": "Error rate is above 5%",
-    "noDataState": "no_data",
-    "notifications": [
-      {"uid": "slack-channel"}
+    &quot;executionErrorState&quot;: &quot;alerting&quot;,
+    &quot;for&quot;: &quot;5m&quot;,
+    &quot;frequency&quot;: &quot;1m&quot;,
+    &quot;message&quot;: &quot;Error rate is above 5%&quot;,
+    &quot;noDataState&quot;: &quot;no_data&quot;,
+    &quot;notifications&quot;: [
+      {&quot;uid&quot;: &quot;slack-channel&quot;}
     ]
   }
 }
@@ -340,9 +390,9 @@ sum(rate(http_requests_total{namespace="$namespace", service=~"$service"}[5m]))
 apiVersion: 1
 
 providers:
-  - name: 'default'
+  - name: &#039;default&#039;
     orgId: 1
-    folder: 'General'
+    folder: &#039;General&#039;
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10
@@ -406,13 +456,13 @@ providers:
 ### Terraform Provisioning
 
 ```hcl
-resource "grafana_dashboard" "api_monitoring" {
-  config_json = file("${path.module}/dashboards/api-monitoring.json")
+resource &quot;grafana_dashboard&quot; &quot;api_monitoring&quot; {
+  config_json = file(&quot;${path.module}/dashboards/api-monitoring.json&quot;)
   folder      = grafana_folder.monitoring.id
 }
 
-resource "grafana_folder" "monitoring" {
-  title = "Production Monitoring"
+resource &quot;grafana_folder&quot; &quot;monitoring&quot; {
+  title = &quot;Production Monitoring&quot;
 }
 ```
 
@@ -421,10 +471,10 @@ resource "grafana_folder" "monitoring" {
 ```yaml
 - name: Deploy Grafana dashboards
   copy:
-    src: "{{ item }}"
+    src: &quot;{{ item }}&quot;
     dest: /etc/grafana/dashboards/
   with_fileglob:
-    - "dashboards/*.json"
+    - &quot;dashboards/*.json&quot;
   notify: restart grafana
 ```
 
@@ -439,8 +489,39 @@ resource "grafana_folder" "monitoring" {
 
 - `prometheus-configuration` - For metric collection
 - `slo-implementation` - For SLO dashboards
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>0</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

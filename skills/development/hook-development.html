@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>hook-development - AICCLI</title>
-  <meta name="description" content="hook-development - Claude Code skill for AICCLI">
+  <meta name="description" content="This skill should be used when the user asks to "create a hook", "add a PreToolUse/PostToolUse/Stop hook", "validate tool use", "implement prompt-based hooks", ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / hook-development</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>hook-development</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / hook-development
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>hook-development</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">This skill should be used when the user asks to "create a hook", "add a PreToolUse/PostToolUse/Stop hook", "validate tool use", "implement prompt-based hooks", "use ${CLAUDE_PLUGIN_ROOT}", "set up event-driven automation", "block dangerous commands", or mentions hook events (PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification). Provides comprehensive guidance for creating and implementing Claude Code plugin hooks with focus on advanced prompt-based hooks API.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/hook-development</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/hook-development</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/hook-development</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: Hook Development
-description: This skill should be used when the user asks to "create a hook", "add a PreToolUse/PostToolUse/Stop hook", "validate tool use", "implement prompt-based hooks", "use ${CLAUDE_PLUGIN_ROOT}", "set up event-driven automation", "block dangerous commands", or mentions hook events (PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification). Provides comprehensive guidance for creating and implementing Claude Code plugin hooks with focus on advanced prompt-based hooks API.
+description: This skill should be used when the user asks to &quot;create a hook&quot;, &quot;add a PreToolUse/PostToolUse/Stop hook&quot;, &quot;validate tool use&quot;, &quot;implement prompt-based hooks&quot;, &quot;use ${CLAUDE_PLUGIN_ROOT}&quot;, &quot;set up event-driven automation&quot;, &quot;block dangerous commands&quot;, or mentions hook events (PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification). Provides comprehensive guidance for creating and implementing Claude Code plugin hooks with focus on advanced prompt-based hooks API.
 version: 0.1.0
 ---
 
@@ -82,9 +132,9 @@ Use LLM-driven decision making for context-aware validation:
 
 ```json
 {
-  "type": "prompt",
-  "prompt": "Evaluate if this tool use is appropriate: $TOOL_INPUT",
-  "timeout": 30
+  &quot;type&quot;: &quot;prompt&quot;,
+  &quot;prompt&quot;: &quot;Evaluate if this tool use is appropriate: $TOOL_INPUT&quot;,
+  &quot;timeout&quot;: 30
 }
 ```
 
@@ -102,9 +152,9 @@ Execute bash commands for deterministic checks:
 
 ```json
 {
-  "type": "command",
-  "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh",
-  "timeout": 60
+  &quot;type&quot;: &quot;command&quot;,
+  &quot;command&quot;: &quot;bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh&quot;,
+  &quot;timeout&quot;: 60
 }
 ```
 
@@ -122,11 +172,11 @@ Execute bash commands for deterministic checks:
 
 ```json
 {
-  "description": "Brief explanation of hooks (optional)",
-  "hooks": {
-    "PreToolUse": [...],
-    "Stop": [...],
-    "SessionStart": [...]
+  &quot;description&quot;: &quot;Brief explanation of hooks (optional)&quot;,
+  &quot;hooks&quot;: {
+    &quot;PreToolUse&quot;: [...],
+    &quot;Stop&quot;: [...],
+    &quot;SessionStart&quot;: [...]
   }
 }
 ```
@@ -139,15 +189,15 @@ Execute bash commands for deterministic checks:
 **Example:**
 ```json
 {
-  "description": "Validation hooks for code quality",
-  "hooks": {
-    "PreToolUse": [
+  &quot;description&quot;: &quot;Validation hooks for code quality&quot;,
+  &quot;hooks&quot;: {
+    &quot;PreToolUse&quot;: [
       {
-        "matcher": "Write",
-        "hooks": [
+        &quot;matcher&quot;: &quot;Write&quot;,
+        &quot;hooks&quot;: [
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/validate.sh"
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;${CLAUDE_PLUGIN_ROOT}/hooks/validate.sh&quot;
           }
         ]
       }
@@ -162,9 +212,9 @@ Execute bash commands for deterministic checks:
 
 ```json
 {
-  "PreToolUse": [...],
-  "Stop": [...],
-  "SessionStart": [...]
+  &quot;PreToolUse&quot;: [...],
+  &quot;Stop&quot;: [...],
+  &quot;SessionStart&quot;: [...]
 }
 ```
 
@@ -173,7 +223,7 @@ Execute bash commands for deterministic checks:
 - No description field
 - This is the **settings format**
 
-**Important:** The examples below show the hook event structure that goes inside either format. For plugin hooks.json, wrap these in `{"hooks": {...}}`.
+**Important:** The examples below show the hook event structure that goes inside either format. For plugin hooks.json, wrap these in `{&quot;hooks&quot;: {...}}`.
 
 ## Hook Events
 
@@ -184,13 +234,13 @@ Execute before any tool runs. Use to approve, deny, or modify tool calls.
 **Example (prompt-based):**
 ```json
 {
-  "PreToolUse": [
+  &quot;PreToolUse&quot;: [
     {
-      "matcher": "Write|Edit",
-      "hooks": [
+      &quot;matcher&quot;: &quot;Write|Edit&quot;,
+      &quot;hooks&quot;: [
         {
-          "type": "prompt",
-          "prompt": "Validate file write safety. Check: system paths, credentials, path traversal, sensitive content. Return 'approve' or 'deny'."
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Validate file write safety. Check: system paths, credentials, path traversal, sensitive content. Return &#039;approve&#039; or &#039;deny&#039;.&quot;
         }
       ]
     }
@@ -201,11 +251,11 @@ Execute before any tool runs. Use to approve, deny, or modify tool calls.
 **Output for PreToolUse:**
 ```json
 {
-  "hookSpecificOutput": {
-    "permissionDecision": "allow|deny|ask",
-    "updatedInput": {"field": "modified_value"}
+  &quot;hookSpecificOutput&quot;: {
+    &quot;permissionDecision&quot;: &quot;allow|deny|ask&quot;,
+    &quot;updatedInput&quot;: {&quot;field&quot;: &quot;modified_value&quot;}
   },
-  "systemMessage": "Explanation for Claude"
+  &quot;systemMessage&quot;: &quot;Explanation for Claude&quot;
 }
 ```
 
@@ -216,13 +266,13 @@ Execute after tool completes. Use to react to results, provide feedback, or log.
 **Example:**
 ```json
 {
-  "PostToolUse": [
+  &quot;PostToolUse&quot;: [
     {
-      "matcher": "Edit",
-      "hooks": [
+      &quot;matcher&quot;: &quot;Edit&quot;,
+      &quot;hooks&quot;: [
         {
-          "type": "prompt",
-          "prompt": "Analyze edit result for potential issues: syntax errors, security vulnerabilities, breaking changes. Provide feedback."
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Analyze edit result for potential issues: syntax errors, security vulnerabilities, breaking changes. Provide feedback.&quot;
         }
       ]
     }
@@ -242,13 +292,13 @@ Execute when main agent considers stopping. Use to validate completeness.
 **Example:**
 ```json
 {
-  "Stop": [
+  &quot;Stop&quot;: [
     {
-      "matcher": "*",
-      "hooks": [
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
         {
-          "type": "prompt",
-          "prompt": "Verify task completion: tests run, build succeeded, questions answered. Return 'approve' to stop or 'block' with reason to continue."
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Verify task completion: tests run, build succeeded, questions answered. Return &#039;approve&#039; to stop or &#039;block&#039; with reason to continue.&quot;
         }
       ]
     }
@@ -259,9 +309,9 @@ Execute when main agent considers stopping. Use to validate completeness.
 **Decision output:**
 ```json
 {
-  "decision": "approve|block",
-  "reason": "Explanation",
-  "systemMessage": "Additional context"
+  &quot;decision&quot;: &quot;approve|block&quot;,
+  &quot;reason&quot;: &quot;Explanation&quot;,
+  &quot;systemMessage&quot;: &quot;Additional context&quot;
 }
 ```
 
@@ -278,13 +328,13 @@ Execute when user submits a prompt. Use to add context, validate, or block promp
 **Example:**
 ```json
 {
-  "UserPromptSubmit": [
+  &quot;UserPromptSubmit&quot;: [
     {
-      "matcher": "*",
-      "hooks": [
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
         {
-          "type": "prompt",
-          "prompt": "Check if prompt requires security guidance. If discussing auth, permissions, or API security, return relevant warnings."
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Check if prompt requires security guidance. If discussing auth, permissions, or API security, return relevant warnings.&quot;
         }
       ]
     }
@@ -299,13 +349,13 @@ Execute when Claude Code session begins. Use to load context and set environment
 **Example:**
 ```json
 {
-  "SessionStart": [
+  &quot;SessionStart&quot;: [
     {
-      "matcher": "*",
-      "hooks": [
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
         {
-          "type": "command",
-          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/load-context.sh"
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;bash ${CLAUDE_PLUGIN_ROOT}/scripts/load-context.sh&quot;
         }
       ]
     }
@@ -315,7 +365,7 @@ Execute when Claude Code session begins. Use to load context and set environment
 
 **Special capability:** Persist environment variables using `$CLAUDE_ENV_FILE`:
 ```bash
-echo "export PROJECT_TYPE=nodejs" &gt;&gt; "$CLAUDE_ENV_FILE"
+echo &quot;export PROJECT_TYPE=nodejs&quot; &gt;&gt; &quot;$CLAUDE_ENV_FILE&quot;
 ```
 
 See `examples/load-context.sh` for complete example.
@@ -338,9 +388,9 @@ Execute when Claude sends notifications. Use to react to user notifications.
 
 ```json
 {
-  "continue": true,
-  "suppressOutput": false,
-  "systemMessage": "Message for Claude"
+  &quot;continue&quot;: true,
+  &quot;suppressOutput&quot;: false,
+  &quot;systemMessage&quot;: &quot;Message for Claude&quot;
 }
 ```
 
@@ -360,11 +410,11 @@ All hooks receive JSON via stdin with common fields:
 
 ```json
 {
-  "session_id": "abc123",
-  "transcript_path": "/path/to/transcript.txt",
-  "cwd": "/current/working/dir",
-  "permission_mode": "ask|allow",
-  "hook_event_name": "PreToolUse"
+  &quot;session_id&quot;: &quot;abc123&quot;,
+  &quot;transcript_path&quot;: &quot;/path/to/transcript.txt&quot;,
+  &quot;cwd&quot;: &quot;/current/working/dir&quot;,
+  &quot;permission_mode&quot;: &quot;ask|allow&quot;,
+  &quot;hook_event_name&quot;: &quot;PreToolUse&quot;
 }
 ```
 
@@ -389,8 +439,8 @@ Available in all command hooks:
 
 ```json
 {
-  "type": "command",
-  "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh"
+  &quot;type&quot;: &quot;command&quot;,
+  &quot;command&quot;: &quot;bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh&quot;
 }
 ```
 
@@ -400,36 +450,36 @@ In plugins, define hooks in `hooks/hooks.json`:
 
 ```json
 {
-  "PreToolUse": [
+  &quot;PreToolUse&quot;: [
     {
-      "matcher": "Write|Edit",
-      "hooks": [
+      &quot;matcher&quot;: &quot;Write|Edit&quot;,
+      &quot;hooks&quot;: [
         {
-          "type": "prompt",
-          "prompt": "Validate file write safety"
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Validate file write safety&quot;
         }
       ]
     }
   ],
-  "Stop": [
+  &quot;Stop&quot;: [
     {
-      "matcher": "*",
-      "hooks": [
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
         {
-          "type": "prompt",
-          "prompt": "Verify task completion"
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Verify task completion&quot;
         }
       ]
     }
   ],
-  "SessionStart": [
+  &quot;SessionStart&quot;: [
     {
-      "matcher": "*",
-      "hooks": [
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
         {
-          "type": "command",
-          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/load-context.sh",
-          "timeout": 10
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;bash ${CLAUDE_PLUGIN_ROOT}/scripts/load-context.sh&quot;,
+          &quot;timeout&quot;: 10
         }
       ]
     }
@@ -437,7 +487,7 @@ In plugins, define hooks in `hooks/hooks.json`:
 }
 ```
 
-Plugin hooks merge with user's hooks and run in parallel.
+Plugin hooks merge with user&#039;s hooks and run in parallel.
 
 ## Matchers
 
@@ -445,22 +495,22 @@ Plugin hooks merge with user's hooks and run in parallel.
 
 **Exact match:**
 ```json
-"matcher": "Write"
+&quot;matcher&quot;: &quot;Write&quot;
 ```
 
 **Multiple tools:**
 ```json
-"matcher": "Read|Write|Edit"
+&quot;matcher&quot;: &quot;Read|Write|Edit&quot;
 ```
 
 **Wildcard (all tools):**
 ```json
-"matcher": "*"
+&quot;matcher&quot;: &quot;*&quot;
 ```
 
 **Regex patterns:**
 ```json
-"matcher": "mcp__.*__delete.*"  // All MCP delete tools
+&quot;matcher&quot;: &quot;mcp__.*__delete.*&quot;  // All MCP delete tools
 ```
 
 **Note:** Matchers are case-sensitive.
@@ -469,16 +519,16 @@ Plugin hooks merge with user's hooks and run in parallel.
 
 ```json
 // All MCP tools
-"matcher": "mcp__.*"
+&quot;matcher&quot;: &quot;mcp__.*&quot;
 
-// Specific plugin's MCP tools
-"matcher": "mcp__plugin_asana_.*"
+// Specific plugin&#039;s MCP tools
+&quot;matcher&quot;: &quot;mcp__plugin_asana_.*&quot;
 
 // All file operations
-"matcher": "Read|Write|Edit"
+&quot;matcher&quot;: &quot;Read|Write|Edit&quot;
 
 // Bash commands only
-"matcher": "Bash"
+&quot;matcher&quot;: &quot;Bash&quot;
 ```
 
 ## Security Best Practices
@@ -492,11 +542,11 @@ Always validate inputs in command hooks:
 set -euo pipefail
 
 input=$(cat)
-tool_name=$(echo "$input" | jq -r '.tool_name')
+tool_name=$(echo &quot;$input&quot; | jq -r &#039;.tool_name&#039;)
 
 # Validate tool name format
-if [[ ! "$tool_name" =~ ^[a-zA-Z0-9_]+$ ]]; then
-  echo '{"decision": "deny", "reason": "Invalid tool name"}' &gt;&2
+if [[ ! &quot;$tool_name&quot; =~ ^[a-zA-Z0-9_]+$ ]]; then
+  echo &#039;{&quot;decision&quot;: &quot;deny&quot;, &quot;reason&quot;: &quot;Invalid tool name&quot;}&#039; &gt;&amp;2
   exit 2
 fi
 ```
@@ -506,17 +556,17 @@ fi
 Check for path traversal and sensitive files:
 
 ```bash
-file_path=$(echo "$input" | jq -r '.tool_input.file_path')
+file_path=$(echo &quot;$input&quot; | jq -r &#039;.tool_input.file_path&#039;)
 
 # Deny path traversal
-if [[ "$file_path" == *".."* ]]; then
-  echo '{"decision": "deny", "reason": "Path traversal detected"}' &gt;&2
+if [[ &quot;$file_path&quot; == *&quot;..&quot;* ]]; then
+  echo &#039;{&quot;decision&quot;: &quot;deny&quot;, &quot;reason&quot;: &quot;Path traversal detected&quot;}&#039; &gt;&amp;2
   exit 2
 fi
 
 # Deny sensitive files
-if [[ "$file_path" == *".env"* ]]; then
-  echo '{"decision": "deny", "reason": "Sensitive file"}' &gt;&2
+if [[ &quot;$file_path&quot; == *&quot;.env&quot;* ]]; then
+  echo &#039;{&quot;decision&quot;: &quot;deny&quot;, &quot;reason&quot;: &quot;Sensitive file&quot;}&#039; &gt;&amp;2
   exit 2
 fi
 ```
@@ -527,8 +577,8 @@ See `examples/validate-write.sh` and `examples/validate-bash.sh` for complete ex
 
 ```bash
 # GOOD: Quoted
-echo "$file_path"
-cd "$CLAUDE_PROJECT_DIR"
+echo &quot;$file_path&quot;
+cd &quot;$CLAUDE_PROJECT_DIR&quot;
 
 # BAD: Unquoted (injection risk)
 echo $file_path
@@ -539,9 +589,9 @@ cd $CLAUDE_PROJECT_DIR
 
 ```json
 {
-  "type": "command",
-  "command": "bash script.sh",
-  "timeout": 10
+  &quot;type&quot;: &quot;command&quot;,
+  &quot;command&quot;: &quot;bash script.sh&quot;,
+  &quot;timeout&quot;: 10
 }
 ```
 
@@ -555,13 +605,13 @@ All matching hooks run **in parallel**:
 
 ```json
 {
-  "PreToolUse": [
+  &quot;PreToolUse&quot;: [
     {
-      "matcher": "Write",
-      "hooks": [
-        {"type": "command", "command": "check1.sh"},  // Parallel
-        {"type": "command", "command": "check2.sh"},  // Parallel
-        {"type": "prompt", "prompt": "Validate..."}   // Parallel
+      &quot;matcher&quot;: &quot;Write&quot;,
+      &quot;hooks&quot;: [
+        {&quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;check1.sh&quot;},  // Parallel
+        {&quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;check2.sh&quot;},  // Parallel
+        {&quot;type&quot;: &quot;prompt&quot;, &quot;prompt&quot;: &quot;Validate...&quot;}   // Parallel
       ]
     }
   ]
@@ -569,7 +619,7 @@ All matching hooks run **in parallel**:
 ```
 
 **Design implications:**
-- Hooks don't see each other's output
+- Hooks don&#039;t see each other&#039;s output
 - Non-deterministic ordering
 - Design for independence
 
@@ -588,9 +638,9 @@ Create hooks that activate conditionally by checking for a flag file or configur
 ```bash
 #!/bin/bash
 # Only active when flag file exists
-FLAG_FILE="$CLAUDE_PROJECT_DIR/.enable-strict-validation"
+FLAG_FILE=&quot;$CLAUDE_PROJECT_DIR/.enable-strict-validation&quot;
 
-if [ ! -f "$FLAG_FILE" ]; then
+if [ ! -f &quot;$FLAG_FILE&quot; ]; then
   # Flag not present, skip validation
   exit 0
 fi
@@ -604,11 +654,11 @@ input=$(cat)
 ```bash
 #!/bin/bash
 # Check configuration for activation
-CONFIG_FILE="$CLAUDE_PROJECT_DIR/.claude/plugin-config.json"
+CONFIG_FILE=&quot;$CLAUDE_PROJECT_DIR/.claude/plugin-config.json&quot;
 
-if [ -f "$CONFIG_FILE" ]; then
-  enabled=$(jq -r '.strictMode // false' "$CONFIG_FILE")
-  if [ "$enabled" != "true" ]; then
+if [ -f &quot;$CONFIG_FILE&quot; ]; then
+  enabled=$(jq -r &#039;.strictMode // false&#039; &quot;$CONFIG_FILE&quot;)
+  if [ &quot;$enabled&quot; != &quot;true&quot; ]; then
     exit 0  # Not enabled, skip
   fi
 fi
@@ -633,9 +683,9 @@ input=$(cat)
 **Important:** Hooks are loaded when Claude Code session starts. Changes to hook configuration require restarting Claude Code.
 
 **Cannot hot-swap hooks:**
-- Editing `hooks/hooks.json` won't affect current session
-- Adding new hook scripts won't be recognized
-- Changing hook commands/prompts won't update
+- Editing `hooks/hooks.json` won&#039;t affect current session
+- Adding new hook scripts won&#039;t be recognized
+- Changing hook commands/prompts won&#039;t update
 - Must restart Claude Code: exit and run `claude` again
 
 **To test hook changes:**
@@ -669,10 +719,10 @@ Look for hook registration, execution logs, input/output JSON, and timing inform
 Test command hooks directly:
 
 ```bash
-echo '{"tool_name": "Write", "tool_input": {"file_path": "/test"}}' | \
+echo &#039;{&quot;tool_name&quot;: &quot;Write&quot;, &quot;tool_input&quot;: {&quot;file_path&quot;: &quot;/test&quot;}}&#039; | \
   bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh
 
-echo "Exit code: $?"
+echo &quot;Exit code: $?&quot;
 ```
 
 ### Validate JSON Output
@@ -681,7 +731,7 @@ Ensure hooks output valid JSON:
 
 ```bash
 output=$(./your-hook.sh &lt; test-input.json)
-echo "$output" | jq .
+echo &quot;$output&quot; | jq .
 ```
 
 ## Quick Reference
@@ -711,7 +761,7 @@ echo "$output" | jq .
 - ✅ Return structured JSON output
 - ✅ Test hooks thoroughly
 
-**DON'T:**
+**DON&#039;T:**
 - ❌ Use hardcoded paths
 - ❌ Trust user input without validation
 - ❌ Create long-running hooks
@@ -767,8 +817,39 @@ To implement hooks in a plugin:
 9. Document hooks in plugin README
 
 Focus on prompt-based hooks for most use cases. Reserve command hooks for performance-critical or deterministic checks.
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>215</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>0.1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>rag-chroma - AICCLI</title>
-  <meta name="description" content="rag-chroma - Claude Code skill for AICCLI">
+  <meta name="description" content="Open-source embedding database for AI applications. Store embeddings and metadata, perform vector and full-text search, filter by metadata. Simple 4-function AP">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / rag-chroma</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>rag-chroma</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / rag-chroma
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>rag-chroma</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Open-source embedding database for AI applications. Store embeddings and metadata, perform vector and full-text search, filter by metadata. Simple 4-function API. Scales from notebooks to production clusters. Use for semantic search, RAG applications, or document retrieval. Best for local development and open-source projects.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/rag-chroma</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/rag-chroma</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/rag-chroma</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: chroma
 description: Open-source embedding database for AI applications. Store embeddings and metadata, perform vector and full-text search, filter by metadata. Simple 4-function API. Scales from notebooks to production clusters. Use for semantic search, RAG applications, or document retrieval. Best for local development and open-source projects.
 version: 1.0.0
@@ -112,18 +162,18 @@ import chromadb
 client = chromadb.Client()
 
 # Create collection
-collection = client.create_collection(name="my_collection")
+collection = client.create_collection(name=&quot;my_collection&quot;)
 
 # Add documents
 collection.add(
-    documents=["This is document 1", "This is document 2"],
-    metadatas=[{"source": "doc1"}, {"source": "doc2"}],
-    ids=["id1", "id2"]
+    documents=[&quot;This is document 1&quot;, &quot;This is document 2&quot;],
+    metadatas=[{&quot;source&quot;: &quot;doc1&quot;}, {&quot;source&quot;: &quot;doc2&quot;}],
+    ids=[&quot;id1&quot;, &quot;id2&quot;]
 )
 
 # Query
 results = collection.query(
-    query_texts=["document about topic"],
+    query_texts=[&quot;document about topic&quot;],
     n_results=2
 )
 
@@ -136,26 +186,26 @@ print(results)
 
 ```python
 # Simple collection
-collection = client.create_collection("my_docs")
+collection = client.create_collection(&quot;my_docs&quot;)
 
 # With custom embedding function
 from chromadb.utils import embedding_functions
 
 openai_ef = embedding_functions.OpenAIEmbeddingFunction(
-    api_key="your-key",
-    model_name="text-embedding-3-small"
+    api_key=&quot;your-key&quot;,
+    model_name=&quot;text-embedding-3-small&quot;
 )
 
 collection = client.create_collection(
-    name="my_docs",
+    name=&quot;my_docs&quot;,
     embedding_function=openai_ef
 )
 
 # Get existing collection
-collection = client.get_collection("my_docs")
+collection = client.get_collection(&quot;my_docs&quot;)
 
 # Delete collection
-client.delete_collection("my_docs")
+client.delete_collection(&quot;my_docs&quot;)
 ```
 
 ### 2. Add documents
@@ -163,20 +213,20 @@ client.delete_collection("my_docs")
 ```python
 # Add with auto-generated IDs
 collection.add(
-    documents=["Doc 1", "Doc 2", "Doc 3"],
+    documents=[&quot;Doc 1&quot;, &quot;Doc 2&quot;, &quot;Doc 3&quot;],
     metadatas=[
-        {"source": "web", "category": "tutorial"},
-        {"source": "pdf", "page": 5},
-        {"source": "api", "timestamp": "2025-01-01"}
+        {&quot;source&quot;: &quot;web&quot;, &quot;category&quot;: &quot;tutorial&quot;},
+        {&quot;source&quot;: &quot;pdf&quot;, &quot;page&quot;: 5},
+        {&quot;source&quot;: &quot;api&quot;, &quot;timestamp&quot;: &quot;2025-01-01&quot;}
     ],
-    ids=["id1", "id2", "id3"]
+    ids=[&quot;id1&quot;, &quot;id2&quot;, &quot;id3&quot;]
 )
 
 # Add with custom embeddings
 collection.add(
     embeddings=[[0.1, 0.2, ...], [0.3, 0.4, ...]],
-    documents=["Doc 1", "Doc 2"],
-    ids=["id1", "id2"]
+    documents=[&quot;Doc 1&quot;, &quot;Doc 2&quot;],
+    ids=[&quot;id1&quot;, &quot;id2&quot;]
 )
 ```
 
@@ -185,33 +235,33 @@ collection.add(
 ```python
 # Basic query
 results = collection.query(
-    query_texts=["machine learning tutorial"],
+    query_texts=[&quot;machine learning tutorial&quot;],
     n_results=5
 )
 
 # Query with filters
 results = collection.query(
-    query_texts=["Python programming"],
+    query_texts=[&quot;Python programming&quot;],
     n_results=3,
-    where={"source": "web"}
+    where={&quot;source&quot;: &quot;web&quot;}
 )
 
 # Query with metadata filters
 results = collection.query(
-    query_texts=["advanced topics"],
+    query_texts=[&quot;advanced topics&quot;],
     where={
-        "$and": [
-            {"category": "tutorial"},
-            {"difficulty": {"$gte": 3}}
+        &quot;$and&quot;: [
+            {&quot;category&quot;: &quot;tutorial&quot;},
+            {&quot;difficulty&quot;: {&quot;$gte&quot;: 3}}
         ]
     }
 )
 
 # Access results
-print(results["documents"])      # List of matching documents
-print(results["metadatas"])      # Metadata for each doc
-print(results["distances"])      # Similarity scores
-print(results["ids"])            # Document IDs
+print(results[&quot;documents&quot;])      # List of matching documents
+print(results[&quot;metadatas&quot;])      # Metadata for each doc
+print(results[&quot;distances&quot;])      # Similarity scores
+print(results[&quot;ids&quot;])            # Document IDs
 ```
 
 ### 4. Get documents
@@ -219,12 +269,12 @@ print(results["ids"])            # Document IDs
 ```python
 # Get by IDs
 docs = collection.get(
-    ids=["id1", "id2"]
+    ids=[&quot;id1&quot;, &quot;id2&quot;]
 )
 
 # Get with filters
 docs = collection.get(
-    where={"category": "tutorial"},
+    where={&quot;category&quot;: &quot;tutorial&quot;},
     limit=10
 )
 
@@ -237,9 +287,9 @@ docs = collection.get()
 ```python
 # Update document content
 collection.update(
-    ids=["id1"],
-    documents=["Updated content"],
-    metadatas=[{"source": "updated"}]
+    ids=[&quot;id1&quot;],
+    documents=[&quot;Updated content&quot;],
+    metadatas=[{&quot;source&quot;: &quot;updated&quot;}]
 )
 ```
 
@@ -247,11 +297,11 @@ collection.update(
 
 ```python
 # Delete by IDs
-collection.delete(ids=["id1", "id2"])
+collection.delete(ids=[&quot;id1&quot;, &quot;id2&quot;])
 
 # Delete with filter
 collection.delete(
-    where={"source": "outdated"}
+    where={&quot;source&quot;: &quot;outdated&quot;}
 )
 ```
 
@@ -259,15 +309,15 @@ collection.delete(
 
 ```python
 # Persist to disk
-client = chromadb.PersistentClient(path="./chroma_db")
+client = chromadb.PersistentClient(path=&quot;./chroma_db&quot;)
 
-collection = client.create_collection("my_docs")
-collection.add(documents=["Doc 1"], ids=["id1"])
+collection = client.create_collection(&quot;my_docs&quot;)
+collection.add(documents=[&quot;Doc 1&quot;], ids=[&quot;id1&quot;])
 
 # Data persisted automatically
 # Reload later with same path
-client = chromadb.PersistentClient(path="./chroma_db")
-collection = client.get_collection("my_docs")
+client = chromadb.PersistentClient(path=&quot;./chroma_db&quot;)
+collection = client.get_collection(&quot;my_docs&quot;)
 ```
 
 ## Embedding functions
@@ -276,7 +326,7 @@ collection = client.get_collection("my_docs")
 
 ```python
 # Uses sentence-transformers by default
-collection = client.create_collection("my_docs")
+collection = client.create_collection(&quot;my_docs&quot;)
 # Default model: all-MiniLM-L6-v2
 ```
 
@@ -286,12 +336,12 @@ collection = client.create_collection("my_docs")
 from chromadb.utils import embedding_functions
 
 openai_ef = embedding_functions.OpenAIEmbeddingFunction(
-    api_key="your-key",
-    model_name="text-embedding-3-small"
+    api_key=&quot;your-key&quot;,
+    model_name=&quot;text-embedding-3-small&quot;
 )
 
 collection = client.create_collection(
-    name="openai_docs",
+    name=&quot;openai_docs&quot;,
     embedding_function=openai_ef
 )
 ```
@@ -300,12 +350,12 @@ collection = client.create_collection(
 
 ```python
 huggingface_ef = embedding_functions.HuggingFaceEmbeddingFunction(
-    api_key="your-key",
-    model_name="sentence-transformers/all-mpnet-base-v2"
+    api_key=&quot;your-key&quot;,
+    model_name=&quot;sentence-transformers/all-mpnet-base-v2&quot;
 )
 
 collection = client.create_collection(
-    name="hf_docs",
+    name=&quot;hf_docs&quot;,
     embedding_function=huggingface_ef
 )
 ```
@@ -322,7 +372,7 @@ class MyEmbeddingFunction(EmbeddingFunction):
 
 my_ef = MyEmbeddingFunction()
 collection = client.create_collection(
-    name="custom_docs",
+    name=&quot;custom_docs&quot;,
     embedding_function=my_ef
 )
 ```
@@ -332,31 +382,31 @@ collection = client.create_collection(
 ```python
 # Exact match
 results = collection.query(
-    query_texts=["query"],
-    where={"category": "tutorial"}
+    query_texts=[&quot;query&quot;],
+    where={&quot;category&quot;: &quot;tutorial&quot;}
 )
 
 # Comparison operators
 results = collection.query(
-    query_texts=["query"],
-    where={"page": {"$gt": 10}}  # $gt, $gte, $lt, $lte, $ne
+    query_texts=[&quot;query&quot;],
+    where={&quot;page&quot;: {&quot;$gt&quot;: 10}}  # $gt, $gte, $lt, $lte, $ne
 )
 
 # Logical operators
 results = collection.query(
-    query_texts=["query"],
+    query_texts=[&quot;query&quot;],
     where={
-        "$and": [
-            {"category": "tutorial"},
-            {"difficulty": {"$lte": 3}}
+        &quot;$and&quot;: [
+            {&quot;category&quot;: &quot;tutorial&quot;},
+            {&quot;difficulty&quot;: {&quot;$lte&quot;: 3}}
         ]
     }  # Also: $or
 )
 
 # Contains
 results = collection.query(
-    query_texts=["query"],
-    where={"tags": {"$in": ["python", "ml"]}}
+    query_texts=[&quot;query&quot;],
+    where={&quot;tags&quot;: {&quot;$in&quot;: [&quot;python&quot;, &quot;ml&quot;]}}
 )
 ```
 
@@ -375,14 +425,14 @@ docs = text_splitter.split_documents(documents)
 vectorstore = Chroma.from_documents(
     documents=docs,
     embedding=OpenAIEmbeddings(),
-    persist_directory="./chroma_db"
+    persist_directory=&quot;./chroma_db&quot;
 )
 
 # Query
-results = vectorstore.similarity_search("machine learning", k=3)
+results = vectorstore.similarity_search(&quot;machine learning&quot;, k=3)
 
 # As retriever
-retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 5})
 ```
 
 ## LlamaIndex integration
@@ -393,8 +443,8 @@ from llama_index.core import VectorStoreIndex, StorageContext
 import chromadb
 
 # Initialize Chroma
-db = chromadb.PersistentClient(path="./chroma_db")
-collection = db.get_or_create_collection("my_collection")
+db = chromadb.PersistentClient(path=&quot;./chroma_db&quot;)
+collection = db.get_or_create_collection(&quot;my_collection&quot;)
 
 # Create vector store
 vector_store = ChromaVectorStore(chroma_collection=collection)
@@ -408,7 +458,7 @@ index = VectorStoreIndex.from_documents(
 
 # Query
 query_engine = index.as_query_engine()
-response = query_engine.query("What is machine learning?")
+response = query_engine.query(&quot;What is machine learning?&quot;)
 ```
 
 ## Server mode
@@ -422,18 +472,18 @@ import chromadb
 from chromadb.config import Settings
 
 client = chromadb.HttpClient(
-    host="localhost",
+    host=&quot;localhost&quot;,
     port=8000,
     settings=Settings(anonymized_telemetry=False)
 )
 
 # Use as normal
-collection = client.get_or_create_collection("my_docs")
+collection = client.get_or_create_collection(&quot;my_docs&quot;)
 ```
 
 ## Best practices
 
-1. **Use persistent client** - Don't lose data on restart
+1. **Use persistent client** - Don&#039;t lose data on restart
 2. **Add metadata** - Enables filtering and tracking
 3. **Batch operations** - Add multiple docs at once
 4. **Choose right embedding model** - Balance speed/quality
@@ -461,8 +511,46 @@ collection = client.get_or_create_collection("my_docs")
 - **License**: Apache 2.0
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">RAG</span><span class="tag">Chroma</span><span class="tag">Vector Database</span><span class="tag">Embeddings</span><span class="tag">Semantic Search</span><span class="tag">Open Source</span><span class="tag">Self-Hosted</span><span class="tag">Document Retrieval</span><span class="tag">Metadata Filtering</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>46</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

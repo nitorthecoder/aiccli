@@ -4,63 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>progressive-web-app - AICCLI</title>
-  <meta name="description" content="progressive-web-app - Claude Code skill for AICCLI">
+  <meta name="description" content=""Build Progressive Web Apps (PWAs) with offline support, installability, and caching strategies. Trigger whenever the user mentions PWA, service workers, web ap">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / progressive-web-app</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>progressive-web-app</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">web-development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / web-development / progressive-web-app
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>progressive-web-app</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">web-development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Build Progressive Web Apps (PWAs) with offline support, installability, and caching strategies. Trigger whenever the user mentions PWA, service workers, web app manifests, Workbox, 'add to home screen', or wants their web app to work offline, feel native, or be installable."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/progressive-web-app</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/progressive-web-app</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/progressive-web-app</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: progressive-web-app
-description: "Build Progressive Web Apps (PWAs) with offline support, installability, and caching strategies. Trigger whenever the user mentions PWA, service workers, web app manifests, Workbox, 'add to home screen', or wants their web app to work offline, feel native, or be installable."
+description: &quot;Build Progressive Web Apps (PWAs) with offline support, installability, and caching strategies. Trigger whenever the user mentions PWA, service workers, web app manifests, Workbox, &#039;add to home screen&#039;, or wants their web app to work offline, feel native, or be installable.&quot;
 risk: safe
 source: community
-date_added: "2026-03-17"
+date_added: &quot;2026-03-17&quot;
 tags: [pwa, web-dev, service-worker, frontend, offline, caching]
 tools: [gemini, cursor, claude]
 ---
@@ -81,7 +131,7 @@ A Progressive Web App is a web application that uses modern browser capabilities
 - Use when building a mobile-first web project where users should be able to install the app to their home screen.
 - Use when the user asks about caching strategies, service workers, or improving web app performance and resilience.
 - Use when the user mentions Workbox, web app manifests, background sync, or push notifications for the web.
-- Use when the user asks "can my website be installed like an app?" or "how do I make my site work offline?" — even if they don't use the word PWA.
+- Use when the user asks &quot;can my website be installed like an app?&quot; or &quot;how do I make my site work offline?&quot; — even if they don&#039;t use the word PWA.
 
 ## Deliverables Checklist
 
@@ -97,39 +147,39 @@ Every PWA implementation must include these files at minimum:
 
 ## Step 1: Web App Manifest (`manifest.json`)
 
-Defines how the app appears when installed. Must be linked from `&lt;head&gt;` via `&lt;link rel="manifest"&gt;`.
+Defines how the app appears when installed. Must be linked from `&lt;head&gt;` via `&lt;link rel=&quot;manifest&quot;&gt;`.
 
 ```json
 {
-  "name": "My Awesome PWA",
-  "short_name": "MyPWA",
-  "description": "A fast, offline-capable Progressive Web App.",
-  "start_url": "/",
-  "scope": "/",
-  "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#ffffff",
-  "theme_color": "#0055ff",
-  "icons": [
+  &quot;name&quot;: &quot;My Awesome PWA&quot;,
+  &quot;short_name&quot;: &quot;MyPWA&quot;,
+  &quot;description&quot;: &quot;A fast, offline-capable Progressive Web App.&quot;,
+  &quot;start_url&quot;: &quot;/&quot;,
+  &quot;scope&quot;: &quot;/&quot;,
+  &quot;display&quot;: &quot;standalone&quot;,
+  &quot;orientation&quot;: &quot;portrait-primary&quot;,
+  &quot;background_color&quot;: &quot;#ffffff&quot;,
+  &quot;theme_color&quot;: &quot;#0055ff&quot;,
+  &quot;icons&quot;: [
     {
-      "src": "/assets/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      &quot;src&quot;: &quot;/assets/icons/icon-192x192.png&quot;,
+      &quot;sizes&quot;: &quot;192x192&quot;,
+      &quot;type&quot;: &quot;image/png&quot;,
+      &quot;purpose&quot;: &quot;any maskable&quot;
     },
     {
-      "src": "/assets/icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      &quot;src&quot;: &quot;/assets/icons/icon-512x512.png&quot;,
+      &quot;sizes&quot;: &quot;512x512&quot;,
+      &quot;type&quot;: &quot;image/png&quot;,
+      &quot;purpose&quot;: &quot;any maskable&quot;
     }
   ],
-  "screenshots": [
+  &quot;screenshots&quot;: [
     {
-      "src": "/assets/screenshots/desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
+      &quot;src&quot;: &quot;/assets/screenshots/desktop.png&quot;,
+      &quot;sizes&quot;: &quot;1280x720&quot;,
+      &quot;type&quot;: &quot;image/png&quot;,
+      &quot;form_factor&quot;: &quot;wide&quot;
     }
   ]
 }
@@ -137,8 +187,8 @@ Defines how the app appears when installed. Must be linked from `&lt;head&gt;` v
 
 **Key fields:**
 - `display`: `standalone` hides browser UI; `minimal-ui` shows minimal controls; `browser` is standard tab.
-- `purpose: "maskable"` on icons enables adaptive icons on Android (safe zone matters — keep content in center 80%).
-- `screenshots` is optional but required for Chrome's enhanced install dialog on desktop.
+- `purpose: &quot;maskable&quot;` on icons enables adaptive icons on Android (safe zone matters — keep content in center 80%).
+- `screenshots` is optional but required for Chrome&#039;s enhanced install dialog on desktop.
 
 ---
 
@@ -146,79 +196,79 @@ Defines how the app appears when installed. Must be linked from `&lt;head&gt;` v
 
 ```html
 &lt;!DOCTYPE html&gt;
-&lt;html lang="en"&gt;
+&lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
-  &lt;meta charset="UTF-8"&gt;
-  &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
   &lt;title&gt;My Awesome PWA&lt;/title&gt;
 
   &lt;!-- PWA manifest --&gt;
-  &lt;link rel="manifest" href="/manifest.json"&gt;
+  &lt;link rel=&quot;manifest&quot; href=&quot;/manifest.json&quot;&gt;
 
   &lt;!-- Theme color for browser chrome --&gt;
-  &lt;meta name="theme-color" content="#0055ff"&gt;
+  &lt;meta name=&quot;theme-color&quot; content=&quot;#0055ff&quot;&gt;
 
-  &lt;!-- iOS-specific (Safari doesn't fully use manifest) --&gt;
-  &lt;meta name="apple-mobile-web-app-capable" content="yes"&gt;
-  &lt;meta name="apple-mobile-web-app-status-bar-style" content="default"&gt;
-  &lt;meta name="apple-mobile-web-app-title" content="MyPWA"&gt;
-  &lt;link rel="apple-touch-icon" href="/assets/icons/icon-192x192.png"&gt;
+  &lt;!-- iOS-specific (Safari doesn&#039;t fully use manifest) --&gt;
+  &lt;meta name=&quot;apple-mobile-web-app-capable&quot; content=&quot;yes&quot;&gt;
+  &lt;meta name=&quot;apple-mobile-web-app-status-bar-style&quot; content=&quot;default&quot;&gt;
+  &lt;meta name=&quot;apple-mobile-web-app-title&quot; content=&quot;MyPWA&quot;&gt;
+  &lt;link rel=&quot;apple-touch-icon&quot; href=&quot;/assets/icons/icon-192x192.png&quot;&gt;
 
-  &lt;link rel="stylesheet" href="/styles.css"&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;/styles.css&quot;&gt;
 &lt;/head&gt;
 &lt;body&gt;
-  &lt;div id="app"&gt;
+  &lt;div id=&quot;app&quot;&gt;
     &lt;header&gt;&lt;h1&gt;My PWA&lt;/h1&gt;&lt;/header&gt;
-    &lt;main id="content"&gt;Loading...&lt;/main&gt;
+    &lt;main id=&quot;content&quot;&gt;Loading...&lt;/main&gt;
     &lt;!-- Optional: install button, hidden by default --&gt;
-    &lt;button id="install-btn" hidden&gt;Install App&lt;/button&gt;
+    &lt;button id=&quot;install-btn&quot; hidden&gt;Install App&lt;/button&gt;
   &lt;/div&gt;
-  &lt;script src="/app.js"&gt;&lt;/script&gt;
+  &lt;script src=&quot;/app.js&quot;&gt;&lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;
 ```
 
 ---
 
-## Step 3: Service Worker Registration & Install Prompt (`app.js`)
+## Step 3: Service Worker Registration &amp; Install Prompt (`app.js`)
 
 ```javascript
 // ─── Service Worker Registration ───────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', async () =&gt; {
+if (&#039;serviceWorker&#039; in navigator) {
+  window.addEventListener(&#039;load&#039;, async () =&gt; {
     try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('[App] SW registered, scope:', registration.scope);
+      const registration = await navigator.serviceWorker.register(&#039;/sw.js&#039;);
+      console.log(&#039;[App] SW registered, scope:&#039;, registration.scope);
     } catch (err) {
-      console.error('[App] SW registration failed:', err);
+      console.error(&#039;[App] SW registration failed:&#039;, err);
     }
   });
 }
 
 // ─── Install Prompt (Add to Home Screen) ───────────────────────────────────
 let deferredPrompt;
-const installBtn = document.getElementById('install-btn'); // may be null if omitted
+const installBtn = document.getElementById(&#039;install-btn&#039;); // may be null if omitted
 
-// Capture the browser's install prompt — it fires before the browser's own UI
-window.addEventListener('beforeinstallprompt', (e) =&gt; {
+// Capture the browser&#039;s install prompt — it fires before the browser&#039;s own UI
+window.addEventListener(&#039;beforeinstallprompt&#039;, (e) =&gt; {
   e.preventDefault(); // Stop automatic mini-infobar on mobile
   deferredPrompt = e;
   if (installBtn) installBtn.hidden = false; // Show your custom install button
 });
 
 if (installBtn) {
-  installBtn.addEventListener('click', async () =&gt; {
+  installBtn.addEventListener(&#039;click&#039;, async () =&gt; {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    console.log('[App] Install outcome:', outcome);
+    console.log(&#039;[App] Install outcome:&#039;, outcome);
     deferredPrompt = null;
     installBtn.hidden = true;
   });
 }
 // Fires when the app is installed (via browser or your button)
-window.addEventListener('appinstalled', () =&gt; {
-  console.log('[App] PWA installed successfully');
+window.addEventListener(&#039;appinstalled&#039;, () =&gt; {
+  console.log(&#039;[App] PWA installed successfully&#039;);
   installBtn.hidden = true;
 });
 ```
@@ -230,29 +280,29 @@ window.addEventListener('appinstalled', () =&gt; {
 ### Cache Versioning (critical — always increment on deploy)
 
 ```javascript
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = &#039;v1&#039;;
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `dynamic-${CACHE_VERSION}`;
 
-// Files to pre-cache during install (the "App Shell")
+// Files to pre-cache during install (the &quot;App Shell&quot;)
 const APP_SHELL = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/assets/icons/icon-192x192.png',
-  '/offline.html', // Fallback page shown when network is unavailable
+  &#039;/&#039;,
+  &#039;/index.html&#039;,
+  &#039;/styles.css&#039;,
+  &#039;/app.js&#039;,
+  &#039;/assets/icons/icon-192x192.png&#039;,
+  &#039;/offline.html&#039;, // Fallback page shown when network is unavailable
 ];
 ```
 
 ### Install — Pre-cache the App Shell
 
 ```javascript
-self.addEventListener('install', (event) =&gt; {
-  console.log('[SW] Installing...');
+self.addEventListener(&#039;install&#039;, (event) =&gt; {
+  console.log(&#039;[SW] Installing...&#039;);
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) =&gt; {
-      console.log('[SW] Pre-caching app shell');
+      console.log(&#039;[SW] Pre-caching app shell&#039;);
       return cache.addAll(APP_SHELL);
     })
   );
@@ -264,15 +314,15 @@ self.addEventListener('install', (event) =&gt; {
 ### Activate — Clean Up Old Caches
 
 ```javascript
-self.addEventListener('activate', (event) =&gt; {
-  console.log('[SW] Activating...');
+self.addEventListener(&#039;activate&#039;, (event) =&gt; {
+  console.log(&#039;[SW] Activating...&#039;);
   event.waitUntil(
     caches.keys().then((cacheNames) =&gt; {
       return Promise.all(
         cacheNames
-          .filter((name) =&gt; name !== STATIC_CACHE && name !== DYNAMIC_CACHE)
+          .filter((name) =&gt; name !== STATIC_CACHE &amp;&amp; name !== DYNAMIC_CACHE)
           .map((name) =&gt; {
-            console.log('[SW] Deleting old cache:', name);
+            console.log(&#039;[SW] Deleting old cache:&#039;, name);
             return caches.delete(name);
           })
       );
@@ -288,12 +338,12 @@ self.addEventListener('activate', (event) =&gt; {
 Choose the right strategy per resource type:
 
 ```javascript
-self.addEventListener('fetch', (event) =&gt; {
+self.addEventListener(&#039;fetch&#039;, (event) =&gt; {
   const { request } = event;
   const url = new URL(request.url);
 
   // Only handle GET requests from our own origin
-  if (request.method !== 'GET' || url.origin !== location.origin) return;
+  if (request.method !== &#039;GET&#039; || url.origin !== location.origin) return;
 
   // Strategy A: Cache-First (for static assets — fast, tolerates stale)
   if (url.pathname.match(/\.(css|js|png|jpg|svg|woff2)$/)) {
@@ -302,13 +352,13 @@ self.addEventListener('fetch', (event) =&gt; {
   }
 
   // Strategy B: Network-First (for HTML pages — fresh, falls back to cache)
-  if (request.headers.get('Accept')?.includes('text/html')) {
+  if (request.headers.get(&#039;Accept&#039;)?.includes(&#039;text/html&#039;)) {
     event.respondWith(networkFirst(request));
     return;
   }
 
   // Strategy C: Stale-While-Revalidate (for API data — fast and eventually fresh)
-  if (url.pathname.startsWith('/api/')) {
+  if (url.pathname.startsWith(&#039;/api/&#039;)) {
     event.respondWith(staleWhileRevalidate(request));
     return;
   }
@@ -326,7 +376,7 @@ async function cacheFirst(request) {
     return response;
   } catch {
     // Nothing useful to fall back to for assets
-    return new Response('Asset unavailable offline', { status: 503 });
+    return new Response(&#039;Asset unavailable offline&#039;, { status: 503 });
   }
 }
 
@@ -338,7 +388,7 @@ async function networkFirst(request) {
     return response;
   } catch {
     const cached = await caches.match(request);
-    return cached || caches.match('/offline.html');
+    return cached || caches.match(&#039;/offline.html&#039;);
   }
 }
 
@@ -355,10 +405,10 @@ async function staleWhileRevalidate(request) {
 
 ---
 
-## Edge Cases & Platform Notes
+## Edge Cases &amp; Platform Notes
 
 ### iOS / Safari Quirks
-- Safari supports manifests and service workers but **does not support `beforeinstallprompt`** — users must install via the Share → "Add to Home Screen" menu manually.
+- Safari supports manifests and service workers but **does not support `beforeinstallprompt`** — users must install via the Share → &quot;Add to Home Screen&quot; menu manually.
 - Use the `apple-mobile-web-app-*` meta tags (shown in `index.html` above) for proper iOS integration.
 - Safari may clear service worker caches after ~7 days of inactivity (Intelligent Tracking Prevention).
 
@@ -371,18 +421,18 @@ async function staleWhileRevalidate(request) {
 - A common pattern is to inject the version automatically via your build tool (e.g., Vite, Webpack).
 
 ### Opaque Responses (cross-origin requests)
-- Requests to external origins (e.g., CDN fonts, third-party APIs) return "opaque" responses that cannot be inspected. Cache them with caution — a failed opaque response still gets a `200` status.
+- Requests to external origins (e.g., CDN fonts, third-party APIs) return &quot;opaque&quot; responses that cannot be inspected. Cache them with caution — a failed opaque response still gets a `200` status.
 - Prefer `staleWhileRevalidate` for cross-origin resources, or use a library like Workbox which handles this safely.
 
 ---
 
 ## Workbox (Optional: Production Shortcut)
 
-For production apps, consider [Workbox](https://developer.chrome.com/docs/workbox) (Google's PWA library) instead of hand-rolling strategies. It handles edge cases, cache expiry, and versioning automatically.
+For production apps, consider [Workbox](https://developer.chrome.com/docs/workbox) (Google&#039;s PWA library) instead of hand-rolling strategies. It handles edge cases, cache expiry, and versioning automatically.
 
 ```javascript
 // With Workbox (via CDN for simplicity — use npm + bundler in production)
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-sw.js');
+importScripts(&#039;https://storage.googleapis.com/workbox-cdn/releases/7.0.0/workbox-sw.js&#039;);
 
 const { registerRoute } = workbox.routing;
 const { CacheFirst, NetworkFirst, StaleWhileRevalidate } = workbox.strategies;
@@ -390,9 +440,9 @@ const { precacheAndRoute } = workbox.precaching;
 
 precacheAndRoute(self.__WB_MANIFEST || []); // Injected by build plugin
 
-registerRoute(({ request }) =&gt; request.destination === 'image', new CacheFirst());
-registerRoute(({ request }) =&gt; request.mode === 'navigate', new NetworkFirst());
-registerRoute(({ request }) =&gt; request.destination === 'script', new StaleWhileRevalidate());
+registerRoute(({ request }) =&gt; request.destination === &#039;image&#039;, new CacheFirst());
+registerRoute(({ request }) =&gt; request.mode === &#039;navigate&#039;, new NetworkFirst());
+registerRoute(({ request }) =&gt; request.destination === &#039;script&#039;, new StaleWhileRevalidate());
 ```
 
 ---
@@ -401,14 +451,52 @@ registerRoute(({ request }) =&gt; request.destination === 'script', new StaleWhi
 
 - [ ] Site is served over HTTPS
 - [ ] `manifest.json` has `name`, `short_name`, `start_url`, `display`, `icons` (192 + 512)
-- [ ] Icons have `purpose: "any maskable"`
+- [ ] Icons have `purpose: &quot;any maskable&quot;`
 - [ ] `sw.js` registers without errors in DevTools → Application → Service Workers
-- [ ] App shell loads from cache when network is throttled to "Offline" in DevTools
+- [ ] App shell loads from cache when network is throttled to &quot;Offline&quot; in DevTools
 - [ ] `offline.html` fallback is cached and served when navigation fails offline
 - [ ] Lighthouse PWA audit passes (Chrome DevTools → Lighthouse tab)
 - [ ] Tested on iOS Safari (manual install flow) and Android Chrome (install prompt)
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">pwa</span><span class="tag">web-dev</span><span class="tag">service-worker</span><span class="tag">frontend</span><span class="tag">offline</span><span class="tag">caching</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>0</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

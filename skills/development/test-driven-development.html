@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>test-driven-development - AICCLI</title>
-  <meta name="description" content="test-driven-development - Claude Code skill for AICCLI">
+  <meta name="description" content="Use when implementing any feature or bugfix, before writing implementation code">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / test-driven-development</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>test-driven-development</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / test-driven-development
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>test-driven-development</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Use when implementing any feature or bugfix, before writing implementation code</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/test-driven-development</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/test-driven-development</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/test-driven-development</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: test-driven-development
 description: Use when implementing any feature or bugfix, before writing implementation code
 ---
@@ -66,7 +116,7 @@ description: Use when implementing any feature or bugfix, before writing impleme
 
 Write the test first. Watch it fail. Write minimal code to pass.
 
-**Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
+**Core principle:** If you didn&#039;t watch the test fail, you don&#039;t know if it tests the right thing.
 
 **Violating the letter of the rules is violating the spirit of the rules.**
 
@@ -83,7 +133,7 @@ Write the test first. Watch it fail. Write minimal code to pass.
 - Generated code
 - Configuration files
 
-Thinking "skip TDD just this once"? Stop. That's rationalization.
+Thinking &quot;skip TDD just this once&quot;? Stop. That&#039;s rationalization.
 
 ## The Iron Law
 
@@ -94,9 +144,9 @@ NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
 Write code before the test? Delete it. Start over.
 
 **No exceptions:**
-- Don't keep it as "reference"
-- Don't "adapt" it while writing tests
-- Don't look at it
+- Don&#039;t keep it as &quot;reference&quot;
+- Don&#039;t &quot;adapt&quot; it while writing tests
+- Don&#039;t look at it
 - Delete means delete
 
 Implement fresh from tests. Period.
@@ -106,20 +156,20 @@ Implement fresh from tests. Period.
 ```dot
 digraph tdd_cycle {
     rankdir=LR;
-    red [label="RED\nWrite failing test", shape=box, style=filled, fillcolor="#ffcccc"];
-    verify_red [label="Verify fails\ncorrectly", shape=diamond];
-    green [label="GREEN\nMinimal code", shape=box, style=filled, fillcolor="#ccffcc"];
-    verify_green [label="Verify passes\nAll green", shape=diamond];
-    refactor [label="REFACTOR\nClean up", shape=box, style=filled, fillcolor="#ccccff"];
-    next [label="Next", shape=ellipse];
+    red [label=&quot;RED\nWrite failing test&quot;, shape=box, style=filled, fillcolor=&quot;#ffcccc&quot;];
+    verify_red [label=&quot;Verify fails\ncorrectly&quot;, shape=diamond];
+    green [label=&quot;GREEN\nMinimal code&quot;, shape=box, style=filled, fillcolor=&quot;#ccffcc&quot;];
+    verify_green [label=&quot;Verify passes\nAll green&quot;, shape=diamond];
+    refactor [label=&quot;REFACTOR\nClean up&quot;, shape=box, style=filled, fillcolor=&quot;#ccccff&quot;];
+    next [label=&quot;Next&quot;, shape=ellipse];
 
     red -&gt; verify_red;
-    verify_red -&gt; green [label="yes"];
-    verify_red -&gt; red [label="wrong\nfailure"];
+    verify_red -&gt; green [label=&quot;yes&quot;];
+    verify_red -&gt; red [label=&quot;wrong\nfailure&quot;];
     green -&gt; verify_green;
-    verify_green -&gt; refactor [label="yes"];
-    verify_green -&gt; green [label="no"];
-    refactor -&gt; verify_green [label="stay\ngreen"];
+    verify_green -&gt; refactor [label=&quot;yes&quot;];
+    verify_green -&gt; green [label=&quot;no&quot;];
+    refactor -&gt; verify_green [label=&quot;stay\ngreen&quot;];
     verify_green -&gt; next;
     next -&gt; red;
 }
@@ -131,17 +181,17 @@ Write one minimal test showing what should happen.
 
 &lt;Good&gt;
 ```typescript
-test('retries failed operations 3 times', async () =&gt; {
+test(&#039;retries failed operations 3 times&#039;, async () =&gt; {
   let attempts = 0;
   const operation = () =&gt; {
     attempts++;
-    if (attempts &lt; 3) throw new Error('fail');
-    return 'success';
+    if (attempts &lt; 3) throw new Error(&#039;fail&#039;);
+    return &#039;success&#039;;
   };
 
   const result = await retryOperation(operation);
 
-  expect(result).toBe('success');
+  expect(result).toBe(&#039;success&#039;);
   expect(attempts).toBe(3);
 });
 ```
@@ -150,11 +200,11 @@ Clear name, tests real behavior, one thing
 
 &lt;Bad&gt;
 ```typescript
-test('retry works', async () =&gt; {
+test(&#039;retry works&#039;, async () =&gt; {
   const mock = jest.fn()
     .mockRejectedValueOnce(new Error())
     .mockRejectedValueOnce(new Error())
-    .mockResolvedValueOnce('success');
+    .mockResolvedValueOnce(&#039;success&#039;);
   await retryOperation(mock);
   expect(mock).toHaveBeenCalledTimes(3);
 });
@@ -180,7 +230,7 @@ Confirm:
 - Failure message is expected
 - Fails because feature missing (not typos)
 
-**Test passes?** You're testing existing behavior. Fix test.
+**Test passes?** You&#039;re testing existing behavior. Fix test.
 
 **Test errors?** Fix error, re-run until it fails correctly.
 
@@ -198,7 +248,7 @@ async function retryOperation&lt;T&gt;(fn: () =&gt; Promise&lt;T&gt;): Promise&l
       if (i === 2) throw e;
     }
   }
-  throw new Error('unreachable');
+  throw new Error(&#039;unreachable&#039;);
 }
 ```
 Just enough to pass
@@ -210,7 +260,7 @@ async function retryOperation&lt;T&gt;(
   fn: () =&gt; Promise&lt;T&gt;,
   options?: {
     maxRetries?: number;
-    backoff?: 'linear' | 'exponential';
+    backoff?: &#039;linear&#039; | &#039;exponential&#039;;
     onRetry?: (attempt: number) =&gt; void;
   }
 ): Promise&lt;T&gt; {
@@ -220,7 +270,7 @@ async function retryOperation&lt;T&gt;(
 Over-engineered
 &lt;/Bad&gt;
 
-Don't add features, refactor other code, or "improve" beyond the test.
+Don&#039;t add features, refactor other code, or &quot;improve&quot; beyond the test.
 
 ### Verify GREEN - Watch It Pass
 
@@ -246,7 +296,7 @@ After green only:
 - Improve names
 - Extract helpers
 
-Keep tests green. Don't add behavior.
+Keep tests green. Don&#039;t add behavior.
 
 ### Repeat
 
@@ -256,13 +306,13 @@ Next failing test for next feature.
 
 | Quality | Good | Bad |
 |---------|------|-----|
-| **Minimal** | One thing. "and" in name? Split it. | `test('validates email and domain and whitespace')` |
-| **Clear** | Name describes behavior | `test('test1')` |
+| **Minimal** | One thing. &quot;and&quot; in name? Split it. | `test(&#039;validates email and domain and whitespace&#039;)` |
+| **Clear** | Name describes behavior | `test(&#039;test1&#039;)` |
 | **Shows intent** | Demonstrates desired API | Obscures what code should do |
 
 ## Why Order Matters
 
-**"I'll write tests after to verify it works"**
+**&quot;I&#039;ll write tests after to verify it works&quot;**
 
 Tests written after code pass immediately. Passing immediately proves nothing:
 - Might test wrong thing
@@ -272,25 +322,25 @@ Tests written after code pass immediately. Passing immediately proves nothing:
 
 Test-first forces you to see the test fail, proving it actually tests something.
 
-**"I already manually tested all the edge cases"**
+**&quot;I already manually tested all the edge cases&quot;**
 
 Manual testing is ad-hoc. You think you tested everything but:
 - No record of what you tested
-- Can't re-run when code changes
+- Can&#039;t re-run when code changes
 - Easy to forget cases under pressure
-- "It worked when I tried it" ≠ comprehensive
+- &quot;It worked when I tried it&quot; ≠ comprehensive
 
 Automated tests are systematic. They run the same way every time.
 
-**"Deleting X hours of work is wasteful"**
+**&quot;Deleting X hours of work is wasteful&quot;**
 
 Sunk cost fallacy. The time is already gone. Your choice now:
 - Delete and rewrite with TDD (X more hours, high confidence)
 - Keep it and add tests after (30 min, low confidence, likely bugs)
 
-The "waste" is keeping code you can't trust. Working code without real tests is technical debt.
+The &quot;waste&quot; is keeping code you can&#039;t trust. Working code without real tests is technical debt.
 
-**"TDD is dogmatic, being pragmatic means adapting"**
+**&quot;TDD is dogmatic, being pragmatic means adapting&quot;**
 
 TDD IS pragmatic:
 - Finds bugs before commit (faster than debugging after)
@@ -298,15 +348,15 @@ TDD IS pragmatic:
 - Documents behavior (tests show how to use code)
 - Enables refactoring (change freely, tests catch breaks)
 
-"Pragmatic" shortcuts = debugging in production = slower.
+&quot;Pragmatic&quot; shortcuts = debugging in production = slower.
 
-**"Tests after achieve the same goals - it's spirit not ritual"**
+**&quot;Tests after achieve the same goals - it&#039;s spirit not ritual&quot;**
 
-No. Tests-after answer "What does this do?" Tests-first answer "What should this do?"
+No. Tests-after answer &quot;What does this do?&quot; Tests-first answer &quot;What should this do?&quot;
 
-Tests-after are biased by your implementation. You test what you built, not what's required. You verify remembered edge cases, not discovered ones.
+Tests-after are biased by your implementation. You test what you built, not what&#039;s required. You verify remembered edge cases, not discovered ones.
 
-Tests-first force edge case discovery before implementing. Tests-after verify you remembered everything (you didn't).
+Tests-first force edge case discovery before implementing. Tests-after verify you remembered everything (you didn&#039;t).
 
 30 minutes of tests after ≠ TDD. You get coverage, lose proof tests work.
 
@@ -314,33 +364,33 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 
 | Excuse | Reality |
 |--------|---------|
-| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
-| "I'll test after" | Tests passing immediately prove nothing. |
-| "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
-| "Already manually tested" | Ad-hoc ≠ systematic. No record, can't re-run. |
-| "Deleting X hours is wasteful" | Sunk cost fallacy. Keeping unverified code is technical debt. |
-| "Keep as reference, write tests first" | You'll adapt it. That's testing after. Delete means delete. |
-| "Need to explore first" | Fine. Throw away exploration, start with TDD. |
-| "Test hard = design unclear" | Listen to test. Hard to test = hard to use. |
-| "TDD will slow me down" | TDD faster than debugging. Pragmatic = test-first. |
-| "Manual test faster" | Manual doesn't prove edge cases. You'll re-test every change. |
-| "Existing code has no tests" | You're improving it. Add tests for existing code. |
+| &quot;Too simple to test&quot; | Simple code breaks. Test takes 30 seconds. |
+| &quot;I&#039;ll test after&quot; | Tests passing immediately prove nothing. |
+| &quot;Tests after achieve same goals&quot; | Tests-after = &quot;what does this do?&quot; Tests-first = &quot;what should this do?&quot; |
+| &quot;Already manually tested&quot; | Ad-hoc ≠ systematic. No record, can&#039;t re-run. |
+| &quot;Deleting X hours is wasteful&quot; | Sunk cost fallacy. Keeping unverified code is technical debt. |
+| &quot;Keep as reference, write tests first&quot; | You&#039;ll adapt it. That&#039;s testing after. Delete means delete. |
+| &quot;Need to explore first&quot; | Fine. Throw away exploration, start with TDD. |
+| &quot;Test hard = design unclear&quot; | Listen to test. Hard to test = hard to use. |
+| &quot;TDD will slow me down&quot; | TDD faster than debugging. Pragmatic = test-first. |
+| &quot;Manual test faster&quot; | Manual doesn&#039;t prove edge cases. You&#039;ll re-test every change. |
+| &quot;Existing code has no tests&quot; | You&#039;re improving it. Add tests for existing code. |
 
 ## Red Flags - STOP and Start Over
 
 - Code before test
 - Test after implementation
 - Test passes immediately
-- Can't explain why test failed
-- Tests added "later"
-- Rationalizing "just this once"
-- "I already manually tested it"
-- "Tests after achieve the same purpose"
-- "It's about spirit not ritual"
-- "Keep as reference" or "adapt existing code"
-- "Already spent X hours, deleting is wasteful"
-- "TDD is dogmatic, I'm being pragmatic"
-- "This is different because..."
+- Can&#039;t explain why test failed
+- Tests added &quot;later&quot;
+- Rationalizing &quot;just this once&quot;
+- &quot;I already manually tested it&quot;
+- &quot;Tests after achieve the same purpose&quot;
+- &quot;It&#039;s about spirit not ritual&quot;
+- &quot;Keep as reference&quot; or &quot;adapt existing code&quot;
+- &quot;Already spent X hours, deleting is wasteful&quot;
+- &quot;TDD is dogmatic, I&#039;m being pragmatic&quot;
+- &quot;This is different because...&quot;
 
 **All of these mean: Delete code. Start over with TDD.**
 
@@ -350,23 +400,23 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 
 **RED**
 ```typescript
-test('rejects empty email', async () =&gt; {
-  const result = await submitForm({ email: '' });
-  expect(result.error).toBe('Email required');
+test(&#039;rejects empty email&#039;, async () =&gt; {
+  const result = await submitForm({ email: &#039;&#039; });
+  expect(result.error).toBe(&#039;Email required&#039;);
 });
 ```
 
 **Verify RED**
 ```bash
 $ npm test
-FAIL: expected 'Email required', got undefined
+FAIL: expected &#039;Email required&#039;, got undefined
 ```
 
 **GREEN**
 ```typescript
 function submitForm(data: FormData) {
   if (!data.email?.trim()) {
-    return { error: 'Email required' };
+    return { error: &#039;Email required&#039; };
   }
   // ...
 }
@@ -394,13 +444,13 @@ Before marking work complete:
 - [ ] Tests use real code (mocks only if unavoidable)
 - [ ] Edge cases and errors covered
 
-Can't check all boxes? You skipped TDD. Start over.
+Can&#039;t check all boxes? You skipped TDD. Start over.
 
 ## When Stuck
 
 | Problem | Solution |
 |---------|----------|
-| Don't know how to test | Write wished-for API. Write assertion first. Ask your human partner. |
+| Don&#039;t know how to test | Write wished-for API. Write assertion first. Ask your human partner. |
 | Test too complicated | Design too complicated. Simplify interface. |
 | Must mock everything | Code too coupled. Use dependency injection. |
 | Test setup huge | Extract helpers. Still complex? Simplify design. |
@@ -425,9 +475,40 @@ Production code → test exists and failed first
 Otherwise → not TDD
 ```
 
-No exceptions without your human partner's permission.
-</pre></div>
+No exceptions without your human partner&#039;s permission.
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>437</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

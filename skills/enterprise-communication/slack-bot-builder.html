@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>slack-bot-builder - AICCLI</title>
-  <meta name="description" content="slack-bot-builder - Claude Code skill for AICCLI">
+  <meta name="description" content=""Build Slack apps using the Bolt framework across Python, JavaScript, and Java. Covers Block Kit for rich UIs, interactive components, slash commands, event han">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / slack-bot-builder</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>slack-bot-builder</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">enterprise-communication</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / enterprise-communication / slack-bot-builder
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>slack-bot-builder</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">enterprise-communication</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Build Slack apps using the Bolt framework across Python, JavaScript, and Java. Covers Block Kit for rich UIs, interactive components, slash commands, event handling, OAuth installation flows, and Workflow Builder integration. Focus on best practices for production-ready Slack apps. Use when: slack bot, slack app, bolt framework, block kit, slash command."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/slack-bot-builder</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/slack-bot-builder</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/slack-bot-builder</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: slack-bot-builder
-description: "Build Slack apps using the Bolt framework across Python, JavaScript, and Java. Covers Block Kit for rich UIs, interactive components, slash commands, event handling, OAuth installation flows, and Workflow Builder integration. Focus on best practices for production-ready Slack apps. Use when: slack bot, slack app, bolt framework, block kit, slash command."
+description: &quot;Build Slack apps using the Bolt framework across Python, JavaScript, and Java. Covers Block Kit for rich UIs, interactive components, slash commands, event handling, OAuth installation flows, and Workflow Builder integration. Focus on best practices for production-ready Slack apps. Use when: slack bot, slack app, bolt framework, block kit, slash command.&quot;
 source: vibeship-spawner-skills (Apache 2.0)
 ---
 
@@ -67,7 +117,7 @@ source: vibeship-spawner-skills (Apache 2.0)
 
 ### Bolt App Foundation Pattern
 
-The Bolt framework is Slack's recommended approach for building apps.
+The Bolt framework is Slack&#039;s recommended approach for building apps.
 It handles authentication, event routing, request verification, and
 HTTP request processing so you can focus on app logic.
 
@@ -80,7 +130,7 @@ Key benefits:
 Available in: Python, JavaScript (Node.js), Java
 
 
-**When to use**: ['Starting any new Slack app', 'Migrating from legacy Slack APIs', 'Building production Slack integrations']
+**When to use**: [&#039;Starting any new Slack app&#039;, &#039;Migrating from legacy Slack APIs&#039;, &#039;Building production Slack integrations&#039;]
 
 ```python
 # Python Bolt App
@@ -90,64 +140,64 @@ import os
 
 # Initialize with tokens from environment
 app = App(
-    token=os.environ["SLACK_BOT_TOKEN"],
-    signing_secret=os.environ["SLACK_SIGNING_SECRET"]
+    token=os.environ[&quot;SLACK_BOT_TOKEN&quot;],
+    signing_secret=os.environ[&quot;SLACK_SIGNING_SECRET&quot;]
 )
 
-# Handle messages containing "hello"
-@app.message("hello")
+# Handle messages containing &quot;hello&quot;
+@app.message(&quot;hello&quot;)
 def handle_hello(message, say):
-    """Respond to messages containing 'hello'."""
-    user = message["user"]
-    say(f"Hey there &lt;@{user}&gt;!")
+    &quot;&quot;&quot;Respond to messages containing &#039;hello&#039;.&quot;&quot;&quot;
+    user = message[&quot;user&quot;]
+    say(f&quot;Hey there &lt;@{user}&gt;!&quot;)
 
 # Handle slash command
-@app.command("/ticket")
+@app.command(&quot;/ticket&quot;)
 def handle_ticket_command(ack, body, client):
-    """Handle /ticket slash command."""
+    &quot;&quot;&quot;Handle /ticket slash command.&quot;&quot;&quot;
     # Acknowledge immediately (within 3 seconds)
     ack()
 
     # Open a modal for ticket creation
     client.views_open(
-        trigger_id=body["trigger_id"],
+        trigger_id=body[&quot;trigger_id&quot;],
         view={
-            "type": "modal",
-            "callback_id": "ticket_modal",
-            "title": {"type": "plain_text", "text": "Create Ticket"},
-            "submit": {"type": "plain_text", "text": "Submit"},
-            "blocks": [
+            &quot;type&quot;: &quot;modal&quot;,
+            &quot;callback_id&quot;: &quot;ticket_modal&quot;,
+            &quot;title&quot;: {&quot;type&quot;: &quot;plain_text&quot;, &quot;text&quot;: &quot;Create Ticket&quot;},
+            &quot;submit&quot;: {&quot;type&quot;: &quot;plain_text&quot;, &quot;text&quot;: &quot;Submit&quot;},
+            &quot;blocks&quot;: [
                 {
-                    "type": "input",
-                    "block_id": "title_block",
-                    "element": {
-                        "type": "plain_text_input",
-                        "action_id": "title_input"
+                    &quot;type&quot;: &quot;input&quot;,
+                    &quot;block_id&quot;: &quot;title_block&quot;,
+                    &quot;element&quot;: {
+                        &quot;type&quot;: &quot;plain_text_input&quot;,
+                        &quot;action_id&quot;: &quot;title_input&quot;
                     },
-                    "label": {"type": "plain_text", "text": "Title"}
+                    &quot;label&quot;: {&quot;type&quot;: &quot;plain_text&quot;, &quot;text&quot;: &quot;Title&quot;}
                 },
                 {
-                    "type": "input",
-                    "block_id": "desc_block",
-                    "element": {
-                        "type": "plain_text_input",
-                        "multiline": True,
-                        "action_id": "desc_input"
+                    &quot;type&quot;: &quot;input&quot;,
+                    &quot;block_id&quot;: &quot;desc_block&quot;,
+                    &quot;element&quot;: {
+                        &quot;type&quot;: &quot;plain_text_input&quot;,
+                        &quot;multiline&quot;: True,
+                        &quot;action_id&quot;: &quot;desc_input&quot;
                     },
-                    "label": {"type": "plain_text", "text": "Description"}
+                    &quot;label&quot;: {&quot;type&quot;: &quot;plain_text&quot;, &quot;text&quot;: &quot;Description&quot;}
                 },
                 {
-                    "type": "input",
-                    "block_id": "priority_block",
-                    "element": {
-                        "type": "static_select",
-                        "action_id": "priority_select",
+                    &quot;type&quot;: &quot;input&quot;,
+                    &quot;block_id&quot;: &quot;priority_block&quot;,
+                    &quot;element&quot;: {
+                        &quot;type&quot;: &quot;static_select&quot;,
+                        &quot;action_id&quot;: &quot;priority_select&quot;,
    
 ```
 
 ### Block Kit UI Pattern
 
-Block Kit is Slack's UI framework for building rich, interactive messages.
+Block Kit is Slack&#039;s UI framework for building rich, interactive messages.
 Compose messages using blocks (sections, actions, inputs) and elements
 (buttons, menus, text inputs).
 
@@ -159,74 +209,74 @@ Limits:
 Use Block Kit Builder to prototype: https://app.slack.com/block-kit-builder
 
 
-**When to use**: ['Building rich message layouts', 'Adding interactive components to messages', 'Creating forms in modals', 'Building Home tab experiences']
+**When to use**: [&#039;Building rich message layouts&#039;, &#039;Adding interactive components to messages&#039;, &#039;Creating forms in modals&#039;, &#039;Building Home tab experiences&#039;]
 
 ```python
 from slack_bolt import App
 import os
 
-app = App(token=os.environ["SLACK_BOT_TOKEN"])
+app = App(token=os.environ[&quot;SLACK_BOT_TOKEN&quot;])
 
 def build_notification_blocks(incident: dict) -&gt; list:
-    """Build Block Kit blocks for incident notification."""
+    &quot;&quot;&quot;Build Block Kit blocks for incident notification.&quot;&quot;&quot;
     severity_emoji = {
-        "critical": ":red_circle:",
-        "high": ":large_orange_circle:",
-        "medium": ":large_yellow_circle:",
-        "low": ":white_circle:"
+        &quot;critical&quot;: &quot;:red_circle:&quot;,
+        &quot;high&quot;: &quot;:large_orange_circle:&quot;,
+        &quot;medium&quot;: &quot;:large_yellow_circle:&quot;,
+        &quot;low&quot;: &quot;:white_circle:&quot;
     }
 
     return [
         # Header
         {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": f"{severity_emoji.get(incident['severity'], '')} Incident Alert"
+            &quot;type&quot;: &quot;header&quot;,
+            &quot;text&quot;: {
+                &quot;type&quot;: &quot;plain_text&quot;,
+                &quot;text&quot;: f&quot;{severity_emoji.get(incident[&#039;severity&#039;], &#039;&#039;)} Incident Alert&quot;
             }
         },
         # Details section
         {
-            "type": "section",
-            "fields": [
+            &quot;type&quot;: &quot;section&quot;,
+            &quot;fields&quot;: [
                 {
-                    "type": "mrkdwn",
-                    "text": f"*Incident:*\n{incident['title']}"
+                    &quot;type&quot;: &quot;mrkdwn&quot;,
+                    &quot;text&quot;: f&quot;*Incident:*\n{incident[&#039;title&#039;]}&quot;
                 },
                 {
-                    "type": "mrkdwn",
-                    "text": f"*Severity:*\n{incident['severity'].upper()}"
+                    &quot;type&quot;: &quot;mrkdwn&quot;,
+                    &quot;text&quot;: f&quot;*Severity:*\n{incident[&#039;severity&#039;].upper()}&quot;
                 },
                 {
-                    "type": "mrkdwn",
-                    "text": f"*Service:*\n{incident['service']}"
+                    &quot;type&quot;: &quot;mrkdwn&quot;,
+                    &quot;text&quot;: f&quot;*Service:*\n{incident[&#039;service&#039;]}&quot;
                 },
                 {
-                    "type": "mrkdwn",
-                    "text": f"*Reported:*\n&lt;!date^{incident['timestamp']}^{date_short} {time}|{incident['timestamp']}&gt;"
+                    &quot;type&quot;: &quot;mrkdwn&quot;,
+                    &quot;text&quot;: f&quot;*Reported:*\n&lt;!date^{incident[&#039;timestamp&#039;]}^{date_short} {time}|{incident[&#039;timestamp&#039;]}&gt;&quot;
                 }
             ]
         },
         # Description
         {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": f"*Description:*\n{incident['description'][:2000]}"
+            &quot;type&quot;: &quot;section&quot;,
+            &quot;text&quot;: {
+                &quot;type&quot;: &quot;mrkdwn&quot;,
+                &quot;text&quot;: f&quot;*Description:*\n{incident[&#039;description&#039;][:2000]}&quot;
             }
         },
         # Divider
-        {"type": "divider"},
+        {&quot;type&quot;: &quot;divider&quot;},
         # Action buttons
         {
-            "type": "actions",
-            "block_id": f"incident_actions_{incident['id']}",
-            "elements": [
+            &quot;type&quot;: &quot;actions&quot;,
+            &quot;block_id&quot;: f&quot;incident_actions_{incident[&#039;id&#039;]}&quot;,
+            &quot;elements&quot;: [
                 {
-                    "type": "button",
-                    "text": {"type": "plain_text", "text": "Acknowledge"},
-                    "style": "primary",
-                    "action_id": "acknowle
+                    &quot;type&quot;: &quot;button&quot;,
+                    &quot;text&quot;: {&quot;type&quot;: &quot;plain_text&quot;, &quot;text&quot;: &quot;Acknowledge&quot;},
+                    &quot;style&quot;: &quot;primary&quot;,
+                    &quot;action_id&quot;: &quot;acknowle
 ```
 
 ### OAuth Installation Pattern
@@ -245,7 +295,7 @@ Key OAuth concepts:
 permission requests - request only what you need!
 
 
-**When to use**: ['Distributing app to multiple workspaces', 'Building public Slack apps', 'Enterprise-grade integrations']
+**When to use**: [&#039;Distributing app to multiple workspaces&#039;, &#039;Building public Slack apps&#039;, &#039;Enterprise-grade integrations&#039;]
 
 ```python
 from slack_bolt import App
@@ -258,46 +308,46 @@ import os
 # For example: PostgreSQL, MongoDB, Redis
 
 class DatabaseInstallationStore:
-    """Store installation data in your database."""
+    &quot;&quot;&quot;Store installation data in your database.&quot;&quot;&quot;
 
     async def save(self, installation):
-        """Save installation when user completes OAuth."""
+        &quot;&quot;&quot;Save installation when user completes OAuth.&quot;&quot;&quot;
         await db.installations.upsert({
-            "team_id": installation.team_id,
-            "enterprise_id": installation.enterprise_id,
-            "bot_token": encrypt(installation.bot_token),
-            "bot_user_id": installation.bot_user_id,
-            "bot_scopes": installation.bot_scopes,
-            "user_id": installation.user_id,
-            "installed_at": installation.installed_at
+            &quot;team_id&quot;: installation.team_id,
+            &quot;enterprise_id&quot;: installation.enterprise_id,
+            &quot;bot_token&quot;: encrypt(installation.bot_token),
+            &quot;bot_user_id&quot;: installation.bot_user_id,
+            &quot;bot_scopes&quot;: installation.bot_scopes,
+            &quot;user_id&quot;: installation.user_id,
+            &quot;installed_at&quot;: installation.installed_at
         })
 
     async def find_installation(self, *, enterprise_id, team_id, user_id=None, is_enterprise_install=False):
-        """Find installation for a workspace."""
+        &quot;&quot;&quot;Find installation for a workspace.&quot;&quot;&quot;
         record = await db.installations.find_one({
-            "team_id": team_id,
-            "enterprise_id": enterprise_id
+            &quot;team_id&quot;: team_id,
+            &quot;enterprise_id&quot;: enterprise_id
         })
 
         if record:
             return Installation(
-                bot_token=decrypt(record["bot_token"]),
+                bot_token=decrypt(record[&quot;bot_token&quot;]),
                 # ... other fields
             )
         return None
 
 # Initialize OAuth-enabled app
 app = App(
-    signing_secret=os.environ["SLACK_SIGNING_SECRET"],
+    signing_secret=os.environ[&quot;SLACK_SIGNING_SECRET&quot;],
     oauth_settings=OAuthSettings(
-        client_id=os.environ["SLACK_CLIENT_ID"],
-        client_secret=os.environ["SLACK_CLIENT_SECRET"],
+        client_id=os.environ[&quot;SLACK_CLIENT_ID&quot;],
+        client_secret=os.environ[&quot;SLACK_CLIENT_SECRET&quot;],
         scopes=[
-            "channels:history",
-            "channels:read",
-            "chat:write",
-            "commands",
-            "users:read"
+            &quot;channels:history&quot;,
+            &quot;channels:read&quot;,
+            &quot;chat:write&quot;,
+            &quot;commands&quot;,
+            &quot;users:read&quot;
         ],
         user_scopes=[],  # User token scopes if needed
         installation_store=DatabaseInstallationStore(),
@@ -319,8 +369,39 @@ app = App(
 | Issue | medium | ## Know and respect the limits |
 | Issue | high | ## Socket Mode: Only for development |
 | Issue | critical | ## Bolt handles this automatically |
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>20</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

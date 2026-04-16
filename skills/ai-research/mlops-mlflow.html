@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mlops-mlflow - AICCLI</title>
-  <meta name="description" content="mlops-mlflow - Claude Code skill for AICCLI">
+  <meta name="description" content="Track ML experiments, manage model registry with versioning, deploy models to production, and reproduce experiments with MLflow - framework-agnostic ML lifecycl">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / mlops-mlflow</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>mlops-mlflow</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / mlops-mlflow
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>mlops-mlflow</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Track ML experiments, manage model registry with versioning, deploy models to production, and reproduce experiments with MLflow - framework-agnostic ML lifecycle platform</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/mlops-mlflow</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/mlops-mlflow</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/mlops-mlflow</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: mlflow
 description: Track ML experiments, manage model registry with versioning, deploy models to production, and reproduce experiments with MLflow - framework-agnostic ML lifecycle platform
 version: 1.0.0
@@ -105,18 +155,18 @@ import mlflow
 # Start a run
 with mlflow.start_run():
     # Log parameters
-    mlflow.log_param("learning_rate", 0.001)
-    mlflow.log_param("batch_size", 32)
+    mlflow.log_param(&quot;learning_rate&quot;, 0.001)
+    mlflow.log_param(&quot;batch_size&quot;, 32)
 
     # Your training code
     model = train_model()
 
     # Log metrics
-    mlflow.log_metric("train_loss", 0.15)
-    mlflow.log_metric("val_accuracy", 0.92)
+    mlflow.log_metric(&quot;train_loss&quot;, 0.15)
+    mlflow.log_metric(&quot;val_accuracy&quot;, 0.92)
 
     # Log model
-    mlflow.sklearn.log_model(model, "model")
+    mlflow.sklearn.log_model(model, &quot;model&quot;)
 ```
 
 ### Autologging (Automatic Tracking)
@@ -146,25 +196,25 @@ model.fit(X_train, y_train)
 import mlflow
 
 # Create/set experiment
-mlflow.set_experiment("my-experiment")
+mlflow.set_experiment(&quot;my-experiment&quot;)
 
 # Start a run
-with mlflow.start_run(run_name="baseline-model"):
+with mlflow.start_run(run_name=&quot;baseline-model&quot;):
     # Log params
-    mlflow.log_param("model", "ResNet50")
-    mlflow.log_param("epochs", 10)
+    mlflow.log_param(&quot;model&quot;, &quot;ResNet50&quot;)
+    mlflow.log_param(&quot;epochs&quot;, 10)
 
     # Train
     model = train()
 
     # Log metrics
-    mlflow.log_metric("accuracy", 0.95)
+    mlflow.log_metric(&quot;accuracy&quot;, 0.95)
 
     # Log model
-    mlflow.pytorch.log_model(model, "model")
+    mlflow.pytorch.log_model(model, &quot;model&quot;)
 
 # Run ID is automatically generated
-print(f"Run ID: {mlflow.active_run().info.run_id}")
+print(f&quot;Run ID: {mlflow.active_run().info.run_id}&quot;)
 ```
 
 ### 2. Logging Parameters
@@ -172,25 +222,25 @@ print(f"Run ID: {mlflow.active_run().info.run_id}")
 ```python
 with mlflow.start_run():
     # Single parameter
-    mlflow.log_param("learning_rate", 0.001)
+    mlflow.log_param(&quot;learning_rate&quot;, 0.001)
 
     # Multiple parameters
     mlflow.log_params({
-        "batch_size": 32,
-        "epochs": 50,
-        "optimizer": "Adam",
-        "dropout": 0.2
+        &quot;batch_size&quot;: 32,
+        &quot;epochs&quot;: 50,
+        &quot;optimizer&quot;: &quot;Adam&quot;,
+        &quot;dropout&quot;: 0.2
     })
 
     # Nested parameters (as dict)
     config = {
-        "model": {
-            "architecture": "ResNet50",
-            "pretrained": True
+        &quot;model&quot;: {
+            &quot;architecture&quot;: &quot;ResNet50&quot;,
+            &quot;pretrained&quot;: True
         },
-        "training": {
-            "lr": 0.001,
-            "weight_decay": 1e-4
+        &quot;training&quot;: {
+            &quot;lr&quot;: 0.001,
+            &quot;weight_decay&quot;: 1e-4
         }
     }
 
@@ -209,17 +259,17 @@ with mlflow.start_run():
         val_loss = validate()
 
         # Log metrics at each step
-        mlflow.log_metric("train_loss", train_loss, step=epoch)
-        mlflow.log_metric("val_loss", val_loss, step=epoch)
+        mlflow.log_metric(&quot;train_loss&quot;, train_loss, step=epoch)
+        mlflow.log_metric(&quot;val_loss&quot;, val_loss, step=epoch)
 
         # Log multiple metrics
         mlflow.log_metrics({
-            "train_accuracy": train_acc,
-            "val_accuracy": val_acc
+            &quot;train_accuracy&quot;: train_acc,
+            &quot;val_accuracy&quot;: val_acc
         }, step=epoch)
 
     # Log final metrics (no step)
-    mlflow.log_metric("final_accuracy", final_acc)
+    mlflow.log_metric(&quot;final_accuracy&quot;, final_acc)
 ```
 
 ### 4. Logging Artifacts
@@ -227,21 +277,21 @@ with mlflow.start_run():
 ```python
 with mlflow.start_run():
     # Log file
-    model.save('model.pkl')
-    mlflow.log_artifact('model.pkl')
+    model.save(&#039;model.pkl&#039;)
+    mlflow.log_artifact(&#039;model.pkl&#039;)
 
     # Log directory
-    os.makedirs('plots', exist_ok=True)
-    plt.savefig('plots/loss_curve.png')
-    mlflow.log_artifacts('plots')
+    os.makedirs(&#039;plots&#039;, exist_ok=True)
+    plt.savefig(&#039;plots/loss_curve.png&#039;)
+    mlflow.log_artifacts(&#039;plots&#039;)
 
     # Log text
-    with open('config.txt', 'w') as f:
+    with open(&#039;config.txt&#039;, &#039;w&#039;) as f:
         f.write(str(config))
-    mlflow.log_artifact('config.txt')
+    mlflow.log_artifact(&#039;config.txt&#039;)
 
     # Log dict as JSON
-    mlflow.log_dict({'config': config}, 'config.json')
+    mlflow.log_dict({&#039;config&#039;: config}, &#039;config.json&#039;)
 ```
 
 ### 5. Logging Models
@@ -252,21 +302,21 @@ import mlflow.pytorch
 
 with mlflow.start_run():
     model = train_pytorch_model()
-    mlflow.pytorch.log_model(model, "model")
+    mlflow.pytorch.log_model(model, &quot;model&quot;)
 
 # Scikit-learn
 import mlflow.sklearn
 
 with mlflow.start_run():
     model = train_sklearn_model()
-    mlflow.sklearn.log_model(model, "model")
+    mlflow.sklearn.log_model(model, &quot;model&quot;)
 
 # Keras/TensorFlow
 import mlflow.keras
 
 with mlflow.start_run():
     model = train_keras_model()
-    mlflow.keras.log_model(model, "model")
+    mlflow.keras.log_model(model, &quot;model&quot;)
 
 # HuggingFace Transformers
 import mlflow.transformers
@@ -274,10 +324,10 @@ import mlflow.transformers
 with mlflow.start_run():
     mlflow.transformers.log_model(
         transformers_model={
-            "model": model,
-            "tokenizer": tokenizer
+            &quot;model&quot;: model,
+            &quot;tokenizer&quot;: tokenizer
         },
-        artifact_path="model"
+        artifact_path=&quot;model&quot;
     )
 ```
 
@@ -358,14 +408,14 @@ with mlflow.start_run():
     # Log model
     mlflow.sklearn.log_model(
         model,
-        "model",
-        registered_model_name="my-classifier"  # Register immediately
+        &quot;model&quot;,
+        registered_model_name=&quot;my-classifier&quot;  # Register immediately
     )
 
 # Or register later
-run_id = "abc123"
-model_uri = f"runs:/{run_id}/model"
-mlflow.register_model(model_uri, "my-classifier")
+run_id = &quot;abc123&quot;
+model_uri = f&quot;runs:/{run_id}/model&quot;
+mlflow.register_model(model_uri, &quot;my-classifier&quot;)
 ```
 
 ### Model Stages
@@ -379,24 +429,24 @@ client = MlflowClient()
 
 # Promote to staging
 client.transition_model_version_stage(
-    name="my-classifier",
+    name=&quot;my-classifier&quot;,
     version=3,
-    stage="Staging"
+    stage=&quot;Staging&quot;
 )
 
 # Promote to production
 client.transition_model_version_stage(
-    name="my-classifier",
+    name=&quot;my-classifier&quot;,
     version=3,
-    stage="Production",
+    stage=&quot;Production&quot;,
     archive_existing_versions=True  # Archive old production versions
 )
 
 # Archive model
 client.transition_model_version_stage(
-    name="my-classifier",
+    name=&quot;my-classifier&quot;,
     version=2,
-    stage="Archived"
+    stage=&quot;Archived&quot;
 )
 ```
 
@@ -406,13 +456,13 @@ client.transition_model_version_stage(
 import mlflow.pyfunc
 
 # Load latest production model
-model = mlflow.pyfunc.load_model("models:/my-classifier/Production")
+model = mlflow.pyfunc.load_model(&quot;models:/my-classifier/Production&quot;)
 
 # Load specific version
-model = mlflow.pyfunc.load_model("models:/my-classifier/3")
+model = mlflow.pyfunc.load_model(&quot;models:/my-classifier/3&quot;)
 
 # Load from staging
-model = mlflow.pyfunc.load_model("models:/my-classifier/Staging")
+model = mlflow.pyfunc.load_model(&quot;models:/my-classifier/Staging&quot;)
 
 # Use model
 predictions = model.predict(X_test)
@@ -424,20 +474,20 @@ predictions = model.predict(X_test)
 client = MlflowClient()
 
 # List all versions
-versions = client.search_model_versions("name='my-classifier'")
+versions = client.search_model_versions(&quot;name=&#039;my-classifier&#039;&quot;)
 
 for v in versions:
-    print(f"Version {v.version}: {v.current_stage}")
+    print(f&quot;Version {v.version}: {v.current_stage}&quot;)
 
 # Get latest version by stage
-latest_prod = client.get_latest_versions("my-classifier", stages=["Production"])
-latest_staging = client.get_latest_versions("my-classifier", stages=["Staging"])
+latest_prod = client.get_latest_versions(&quot;my-classifier&quot;, stages=[&quot;Production&quot;])
+latest_staging = client.get_latest_versions(&quot;my-classifier&quot;, stages=[&quot;Staging&quot;])
 
 # Get model version details
-version_info = client.get_model_version(name="my-classifier", version="3")
-print(f"Run ID: {version_info.run_id}")
-print(f"Stage: {version_info.current_stage}")
-print(f"Tags: {version_info.tags}")
+version_info = client.get_model_version(name=&quot;my-classifier&quot;, version=&quot;3&quot;)
+print(f&quot;Run ID: {version_info.run_id}&quot;)
+print(f&quot;Stage: {version_info.current_stage}&quot;)
+print(f&quot;Tags: {version_info.tags}&quot;)
 ```
 
 ### Model Annotations
@@ -447,24 +497,24 @@ client = MlflowClient()
 
 # Add description
 client.update_model_version(
-    name="my-classifier",
-    version="3",
-    description="ResNet50 classifier trained on 1M images with 95% accuracy"
+    name=&quot;my-classifier&quot;,
+    version=&quot;3&quot;,
+    description=&quot;ResNet50 classifier trained on 1M images with 95% accuracy&quot;
 )
 
 # Add tags
 client.set_model_version_tag(
-    name="my-classifier",
-    version="3",
-    key="validation_status",
-    value="approved"
+    name=&quot;my-classifier&quot;,
+    version=&quot;3&quot;,
+    key=&quot;validation_status&quot;,
+    value=&quot;approved&quot;
 )
 
 client.set_model_version_tag(
-    name="my-classifier",
-    version="3",
-    key="deployed_date",
-    value="2025-01-15"
+    name=&quot;my-classifier&quot;,
+    version=&quot;3&quot;,
+    key=&quot;deployed_date&quot;,
+    value=&quot;2025-01-15&quot;
 )
 ```
 
@@ -478,28 +528,28 @@ from mlflow.tracking import MlflowClient
 client = MlflowClient()
 
 # Search all runs in experiment
-experiment_id = client.get_experiment_by_name("my-experiment").experiment_id
+experiment_id = client.get_experiment_by_name(&quot;my-experiment&quot;).experiment_id
 runs = client.search_runs(
     experiment_ids=[experiment_id],
-    filter_string="metrics.accuracy &gt; 0.9",
-    order_by=["metrics.accuracy DESC"],
+    filter_string=&quot;metrics.accuracy &gt; 0.9&quot;,
+    order_by=[&quot;metrics.accuracy DESC&quot;],
     max_results=10
 )
 
 for run in runs:
-    print(f"Run ID: {run.info.run_id}")
-    print(f"Accuracy: {run.data.metrics['accuracy']}")
-    print(f"Params: {run.data.params}")
+    print(f&quot;Run ID: {run.info.run_id}&quot;)
+    print(f&quot;Accuracy: {run.data.metrics[&#039;accuracy&#039;]}&quot;)
+    print(f&quot;Params: {run.data.params}&quot;)
 
 # Search with complex filters
 runs = client.search_runs(
     experiment_ids=[experiment_id],
-    filter_string="""
+    filter_string=&quot;&quot;&quot;
         metrics.accuracy &gt; 0.9 AND
-        params.model = 'ResNet50' AND
-        tags.dataset = 'ImageNet'
-    """,
-    order_by=["metrics.f1_score DESC"]
+        params.model = &#039;ResNet50&#039; AND
+        tags.dataset = &#039;ImageNet&#039;
+    &quot;&quot;&quot;,
+    order_by=[&quot;metrics.f1_score DESC&quot;]
 )
 ```
 
@@ -518,29 +568,29 @@ mlflow.pytorch.autolog()
 with mlflow.start_run():
     # Log config
     config = {
-        "lr": 0.001,
-        "epochs": 10,
-        "batch_size": 32
+        &quot;lr&quot;: 0.001,
+        &quot;epochs&quot;: 10,
+        &quot;batch_size&quot;: 32
     }
     mlflow.log_params(config)
 
     # Train
     model = create_model()
-    optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"])
+    optimizer = torch.optim.Adam(model.parameters(), lr=config[&quot;lr&quot;])
 
-    for epoch in range(config["epochs"]):
+    for epoch in range(config[&quot;epochs&quot;]):
         train_loss = train_epoch(model, optimizer, train_loader)
         val_loss, val_acc = validate(model, val_loader)
 
         # Log metrics
         mlflow.log_metrics({
-            "train_loss": train_loss,
-            "val_loss": val_loss,
-            "val_accuracy": val_acc
+            &quot;train_loss&quot;: train_loss,
+            &quot;val_loss&quot;: val_loss,
+            &quot;val_accuracy&quot;: val_acc
         }, step=epoch)
 
     # Log model
-    mlflow.pytorch.log_model(model, "model")
+    mlflow.pytorch.log_model(model, &quot;model&quot;)
 ```
 
 ### HuggingFace Transformers
@@ -553,11 +603,11 @@ from transformers import Trainer, TrainingArguments
 mlflow.transformers.autolog()
 
 training_args = TrainingArguments(
-    output_dir="./results",
+    output_dir=&quot;./results&quot;,
     num_train_epochs=3,
     per_device_train_batch_size=16,
-    evaluation_strategy="epoch",
-    save_strategy="epoch",
+    evaluation_strategy=&quot;epoch&quot;,
+    save_strategy=&quot;epoch&quot;,
     load_best_model_at_end=True
 )
 
@@ -576,11 +626,11 @@ with mlflow.start_run():
     # Log final model to registry
     mlflow.transformers.log_model(
         transformers_model={
-            "model": trainer.model,
-            "tokenizer": tokenizer
+            &quot;model&quot;: trainer.model,
+            &quot;tokenizer&quot;: tokenizer
         },
-        artifact_path="model",
-        registered_model_name="hf-classifier"
+        artifact_path=&quot;model&quot;,
+        registered_model_name=&quot;hf-classifier&quot;
     )
 ```
 
@@ -598,10 +648,10 @@ with mlflow.start_run():
     dval = xgb.DMatrix(X_val, label=y_val)
 
     params = {
-        'max_depth': 6,
-        'learning_rate': 0.1,
-        'objective': 'binary:logistic',
-        'eval_metric': ['logloss', 'auc']
+        &#039;max_depth&#039;: 6,
+        &#039;learning_rate&#039;: 0.1,
+        &#039;objective&#039;: &#039;binary:logistic&#039;,
+        &#039;eval_metric&#039;: [&#039;logloss&#039;, &#039;auc&#039;]
     }
 
     # Train (automatically logged)
@@ -609,7 +659,7 @@ with mlflow.start_run():
         params,
         dtrain,
         num_boost_round=100,
-        evals=[(dtrain, 'train'), (dval, 'val')],
+        evals=[(dtrain, &#039;train&#039;), (dval, &#039;val&#039;)],
         early_stopping_rounds=10
     )
 
@@ -622,19 +672,19 @@ with mlflow.start_run():
 
 ```python
 # ✅ Good: Separate experiments for different tasks
-mlflow.set_experiment("sentiment-analysis")
-mlflow.set_experiment("image-classification")
-mlflow.set_experiment("recommendation-system")
+mlflow.set_experiment(&quot;sentiment-analysis&quot;)
+mlflow.set_experiment(&quot;image-classification&quot;)
+mlflow.set_experiment(&quot;recommendation-system&quot;)
 
 # ❌ Bad: Everything in one experiment
-mlflow.set_experiment("all-models")
+mlflow.set_experiment(&quot;all-models&quot;)
 ```
 
 ### 2. Use Descriptive Run Names
 
 ```python
 # ✅ Good: Descriptive names
-with mlflow.start_run(run_name="resnet50-imagenet-lr0.001-bs32"):
+with mlflow.start_run(run_name=&quot;resnet50-imagenet-lr0.001-bs32&quot;):
     train()
 
 # ❌ Bad: No name (auto-generated UUID)
@@ -648,36 +698,36 @@ with mlflow.start_run():
 with mlflow.start_run():
     # Log hyperparameters
     mlflow.log_params({
-        "learning_rate": 0.001,
-        "batch_size": 32,
-        "epochs": 50
+        &quot;learning_rate&quot;: 0.001,
+        &quot;batch_size&quot;: 32,
+        &quot;epochs&quot;: 50
     })
 
     # Log system info
     mlflow.set_tags({
-        "dataset": "ImageNet",
-        "framework": "PyTorch 2.0",
-        "gpu": "A100",
-        "git_commit": get_git_commit()
+        &quot;dataset&quot;: &quot;ImageNet&quot;,
+        &quot;framework&quot;: &quot;PyTorch 2.0&quot;,
+        &quot;gpu&quot;: &quot;A100&quot;,
+        &quot;git_commit&quot;: get_git_commit()
     })
 
     # Log data info
-    mlflow.log_param("train_samples", len(train_dataset))
-    mlflow.log_param("val_samples", len(val_dataset))
+    mlflow.log_param(&quot;train_samples&quot;, len(train_dataset))
+    mlflow.log_param(&quot;val_samples&quot;, len(val_dataset))
 ```
 
 ### 4. Track Model Lineage
 
 ```python
 # Link runs to understand lineage
-with mlflow.start_run(run_name="preprocessing"):
+with mlflow.start_run(run_name=&quot;preprocessing&quot;):
     data = preprocess()
-    mlflow.log_artifact("data.csv")
+    mlflow.log_artifact(&quot;data.csv&quot;)
     preprocessing_run_id = mlflow.active_run().info.run_id
 
-with mlflow.start_run(run_name="training"):
+with mlflow.start_run(run_name=&quot;training&quot;):
     # Reference parent run
-    mlflow.set_tag("preprocessing_run_id", preprocessing_run_id)
+    mlflow.set_tag(&quot;preprocessing_run_id&quot;, preprocessing_run_id)
     model = train(data)
 ```
 
@@ -685,11 +735,11 @@ with mlflow.start_run(run_name="training"):
 
 ```python
 # ✅ Good: Use registry for production
-model_uri = "models:/my-classifier/Production"
+model_uri = &quot;models:/my-classifier/Production&quot;
 model = mlflow.pyfunc.load_model(model_uri)
 
 # ❌ Bad: Hard-code run IDs
-model_uri = "runs:/abc123/model"
+model_uri = &quot;runs:/abc123/model&quot;
 model = mlflow.pyfunc.load_model(model_uri)
 ```
 
@@ -699,25 +749,25 @@ model = mlflow.pyfunc.load_model(model_uri)
 
 ```bash
 # Serve registered model
-mlflow models serve -m "models:/my-classifier/Production" -p 5001
+mlflow models serve -m &quot;models:/my-classifier/Production&quot; -p 5001
 
 # Serve from run
-mlflow models serve -m "runs:/&lt;RUN_ID&gt;/model" -p 5001
+mlflow models serve -m &quot;runs:/&lt;RUN_ID&gt;/model&quot; -p 5001
 
 # Test endpoint
-curl http://127.0.0.1:5001/invocations -H 'Content-Type: application/json' -d '{
-  "inputs": [[1.0, 2.0, 3.0, 4.0]]
-}'
+curl http://127.0.0.1:5001/invocations -H &#039;Content-Type: application/json&#039; -d &#039;{
+  &quot;inputs&quot;: [[1.0, 2.0, 3.0, 4.0]]
+}&#039;
 ```
 
 ### Deploy to Cloud
 
 ```bash
 # Deploy to AWS SageMaker
-mlflow sagemaker deploy -m "models:/my-classifier/Production" --region-name us-west-2
+mlflow sagemaker deploy -m &quot;models:/my-classifier/Production&quot; --region-name us-west-2
 
 # Deploy to Azure ML
-mlflow azureml deploy -m "models:/my-classifier/Production"
+mlflow azureml deploy -m &quot;models:/my-classifier/Production&quot;
 ```
 
 ## Configuration
@@ -739,7 +789,7 @@ mlflow server \
 import mlflow
 
 # Set tracking URI
-mlflow.set_tracking_uri("http://localhost:5000")
+mlflow.set_tracking_uri(&quot;http://localhost:5000&quot;)
 
 # Or use environment variable
 # export MLFLOW_TRACKING_URI=http://localhost:5000
@@ -759,8 +809,46 @@ mlflow.set_tracking_uri("http://localhost:5000")
 - `references/deployment.md` - Production deployment patterns
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">MLOps</span><span class="tag">MLflow</span><span class="tag">Experiment Tracking</span><span class="tag">Model Registry</span><span class="tag">ML Lifecycle</span><span class="tag">Deployment</span><span class="tag">Model Versioning</span><span class="tag">PyTorch</span><span class="tag">TensorFlow</span><span class="tag">Scikit-Learn</span><span class="tag">HuggingFace</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>34</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

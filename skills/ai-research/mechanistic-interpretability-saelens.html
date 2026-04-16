@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mechanistic-interpretability-saelens - AICCLI</title>
-  <meta name="description" content="mechanistic-interpretability-saelens - Claude Code skill for AICCLI">
+  <meta name="description" content="Provides guidance for training and analyzing Sparse Autoencoders (SAEs) using SAELens to decompose neural network activations into interpretable features. Use w">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / mechanistic-interpretability-saelens</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>mechanistic-interpretability-saelens</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / mechanistic-interpretability-saelens
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>mechanistic-interpretability-saelens</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Provides guidance for training and analyzing Sparse Autoencoders (SAEs) using SAELens to decompose neural network activations into interpretable features. Use when discovering interpretable features, analyzing superposition, or studying monosemantic representations in language models.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/mechanistic-interpretability-saelens</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/mechanistic-interpretability-saelens</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/mechanistic-interpretability-saelens</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: sparse-autoencoder-training
 description: Provides guidance for training and analyzing Sparse Autoencoders (SAEs) using SAELens to decompose neural network activations into interpretable features. Use when discovering interpretable features, analyzing superposition, or studying monosemantic representations in language models.
 version: 1.0.0
@@ -67,11 +117,11 @@ dependencies: [sae-lens&gt;=6.0.0, transformer-lens&gt;=2.0.0, torch&gt;=2.0.0]
 
 # SAELens: Sparse Autoencoders for Mechanistic Interpretability
 
-SAELens is the primary library for training and analyzing Sparse Autoencoders (SAEs) - a technique for decomposing polysemantic neural network activations into sparse, interpretable features. Based on Anthropic's groundbreaking research on monosemanticity.
+SAELens is the primary library for training and analyzing Sparse Autoencoders (SAEs) - a technique for decomposing polysemantic neural network activations into sparse, interpretable features. Based on Anthropic&#039;s groundbreaking research on monosemanticity.
 
 **GitHub**: [jbloomAus/SAELens](https://github.com/jbloomAus/SAELens) (1,100+ stars)
 
-## The Problem: Polysemanticity & Superposition
+## The Problem: Polysemanticity &amp; Superposition
 
 Individual neurons in neural networks are **polysemantic** - they activate in multiple, semantically distinct contexts. This happens because models use **superposition** to represent more features than they have neurons, making interpretability difficult.
 
@@ -116,7 +166,7 @@ Input Activation → Encoder → Sparse Features → Decoder → Reconstructed A
 
 ### Key Validation (Anthropic Research)
 
-In "Towards Monosemanticity", human evaluators found **70% of SAE features genuinely interpretable**. Features discovered include:
+In &quot;Towards Monosemanticity&quot;, human evaluators found **70% of SAE features genuinely interpretable**. Features discovered include:
 - DNA sequences, legal language, HTTP requests
 - Hebrew text, nutrition statements, code syntax
 - Sentiment, named entities, grammatical structures
@@ -130,27 +180,27 @@ from transformer_lens import HookedTransformer
 from sae_lens import SAE
 
 # 1. Load model and pre-trained SAE
-model = HookedTransformer.from_pretrained("gpt2-small", device="cuda")
+model = HookedTransformer.from_pretrained(&quot;gpt2-small&quot;, device=&quot;cuda&quot;)
 sae, cfg_dict, sparsity = SAE.from_pretrained(
-    release="gpt2-small-res-jb",
-    sae_id="blocks.8.hook_resid_pre",
-    device="cuda"
+    release=&quot;gpt2-small-res-jb&quot;,
+    sae_id=&quot;blocks.8.hook_resid_pre&quot;,
+    device=&quot;cuda&quot;
 )
 
 # 2. Get model activations
-tokens = model.to_tokens("The capital of France is Paris")
+tokens = model.to_tokens(&quot;The capital of France is Paris&quot;)
 _, cache = model.run_with_cache(tokens)
-activations = cache["resid_pre", 8]  # [batch, pos, d_model]
+activations = cache[&quot;resid_pre&quot;, 8]  # [batch, pos, d_model]
 
 # 3. Encode to SAE features
 sae_features = sae.encode(activations)  # [batch, pos, d_sae]
-print(f"Active features: {(sae_features &gt; 0).sum()}")
+print(f&quot;Active features: {(sae_features &gt; 0).sum()}&quot;)
 
 # 4. Find top features for each position
 for pos in range(tokens.shape[1]):
     top_features = sae_features[0, pos].topk(5)
     token = model.to_str_tokens(tokens[0, pos:pos+1])[0]
-    print(f"Token '{token}': features {top_features.indices.tolist()}")
+    print(f&quot;Token &#039;{token}&#039;: features {top_features.indices.tolist()}&quot;)
 
 # 5. Reconstruct activations
 reconstructed = sae.decode(sae_features)
@@ -182,15 +232,15 @@ from sae_lens import SAE, LanguageModelSAERunnerConfig, SAETrainingRunner
 # 1. Configure training
 cfg = LanguageModelSAERunnerConfig(
     # Model
-    model_name="gpt2-small",
-    hook_name="blocks.8.hook_resid_pre",
+    model_name=&quot;gpt2-small&quot;,
+    hook_name=&quot;blocks.8.hook_resid_pre&quot;,
     hook_layer=8,
     d_in=768,  # Model dimension
 
     # SAE architecture
-    architecture="standard",  # or "gated", "topk"
+    architecture=&quot;standard&quot;,  # or &quot;gated&quot;, &quot;topk&quot;
     d_sae=768 * 8,  # Expansion factor of 8
-    activation_fn="relu",
+    activation_fn=&quot;relu&quot;,
 
     # Training
     lr=4e-4,
@@ -200,15 +250,15 @@ cfg = LanguageModelSAERunnerConfig(
     training_tokens=100_000_000,
 
     # Data
-    dataset_path="monology/pile-uncopyrighted",
+    dataset_path=&quot;monology/pile-uncopyrighted&quot;,
     context_size=128,
 
     # Logging
     log_to_wandb=True,
-    wandb_project="sae-training",
+    wandb_project=&quot;sae-training&quot;,
 
     # Checkpointing
-    checkpoint_path="checkpoints",
+    checkpoint_path=&quot;checkpoints&quot;,
     n_checkpoints=5,
 )
 
@@ -217,8 +267,8 @@ trainer = SAETrainingRunner(cfg)
 sae = trainer.run()
 
 # 3. Evaluate
-print(f"L0 (avg active features): {trainer.metrics['l0']}")
-print(f"CE Loss Recovered: {trainer.metrics['ce_loss_score']}")
+print(f&quot;L0 (avg active features): {trainer.metrics[&#039;l0&#039;]}&quot;)
+print(f&quot;CE Loss Recovered: {trainer.metrics[&#039;ce_loss_score&#039;]}&quot;)
 ```
 
 ### Key Hyperparameters
@@ -244,7 +294,7 @@ print(f"CE Loss Recovered: {trainer.metrics['ce_loss_score']}")
 - [ ] Set expansion factor (d_sae = 4-16× d_model)
 - [ ] Tune L1 coefficient for desired sparsity
 - [ ] Enable L1 warm-up to prevent dead features
-- [ ] Monitor metrics during training (W&B)
+- [ ] Monitor metrics during training (W&amp;B)
 - [ ] Validate L0 and CE loss recovery
 - [ ] Check dead feature ratio
 
@@ -257,35 +307,35 @@ from transformer_lens import HookedTransformer
 from sae_lens import SAE
 import torch
 
-model = HookedTransformer.from_pretrained("gpt2-small", device="cuda")
+model = HookedTransformer.from_pretrained(&quot;gpt2-small&quot;, device=&quot;cuda&quot;)
 sae, _, _ = SAE.from_pretrained(
-    release="gpt2-small-res-jb",
-    sae_id="blocks.8.hook_resid_pre",
-    device="cuda"
+    release=&quot;gpt2-small-res-jb&quot;,
+    sae_id=&quot;blocks.8.hook_resid_pre&quot;,
+    device=&quot;cuda&quot;
 )
 
 # Find what activates a specific feature
 feature_idx = 1234
 test_texts = [
-    "The scientist conducted an experiment",
-    "I love chocolate cake",
-    "The code compiles successfully",
-    "Paris is beautiful in spring",
+    &quot;The scientist conducted an experiment&quot;,
+    &quot;I love chocolate cake&quot;,
+    &quot;The code compiles successfully&quot;,
+    &quot;Paris is beautiful in spring&quot;,
 ]
 
 for text in test_texts:
     tokens = model.to_tokens(text)
     _, cache = model.run_with_cache(tokens)
-    features = sae.encode(cache["resid_pre", 8])
+    features = sae.encode(cache[&quot;resid_pre&quot;, 8])
     activation = features[0, :, feature_idx].max().item()
-    print(f"{activation:.3f}: {text}")
+    print(f&quot;{activation:.3f}: {text}&quot;)
 ```
 
 ### Feature Steering
 
 ```python
 def steer_with_feature(model, sae, prompt, feature_idx, strength=5.0):
-    """Add SAE feature direction to residual stream."""
+    &quot;&quot;&quot;Add SAE feature direction to residual stream.&quot;&quot;&quot;
     tokens = model.to_tokens(prompt)
 
     # Get feature direction from decoder
@@ -300,7 +350,7 @@ def steer_with_feature(model, sae, prompt, feature_idx, strength=5.0):
     output = model.generate(
         tokens,
         max_new_tokens=50,
-        fwd_hooks=[("blocks.8.hook_resid_pre", steering_hook)]
+        fwd_hooks=[(&quot;blocks.8.hook_resid_pre&quot;, steering_hook)]
     )
     return model.to_string(output[0])
 ```
@@ -309,28 +359,28 @@ def steer_with_feature(model, sae, prompt, feature_idx, strength=5.0):
 
 ```python
 # Which features most affect a specific output?
-tokens = model.to_tokens("The capital of France is")
+tokens = model.to_tokens(&quot;The capital of France is&quot;)
 _, cache = model.run_with_cache(tokens)
 
 # Get features at final position
-features = sae.encode(cache["resid_pre", 8])[0, -1]  # [d_sae]
+features = sae.encode(cache[&quot;resid_pre&quot;, 8])[0, -1]  # [d_sae]
 
 # Get logit attribution per feature
 # Feature contribution = feature_activation × decoder_weight × unembedding
 W_dec = sae.W_dec  # [d_sae, d_model]
 W_U = model.W_U    # [d_model, vocab]
 
-# Contribution to "Paris" logit
-paris_token = model.to_single_token(" Paris")
+# Contribution to &quot;Paris&quot; logit
+paris_token = model.to_single_token(&quot; Paris&quot;)
 feature_contributions = features * (W_dec @ W_U[:, paris_token])
 
 top_features = feature_contributions.topk(10)
-print("Top features for 'Paris' prediction:")
+print(&quot;Top features for &#039;Paris&#039; prediction:&quot;)
 for idx, val in zip(top_features.indices, top_features.values):
-    print(f"  Feature {idx.item()}: {val.item():.3f}")
+    print(f&quot;  Feature {idx.item()}: {val.item():.3f}&quot;)
 ```
 
-## Common Issues & Solutions
+## Common Issues &amp; Solutions
 
 ### Issue: High dead feature ratio
 ```python
@@ -365,8 +415,8 @@ cfg = LanguageModelSAERunnerConfig(
 )
 # Or use TopK architecture
 cfg = LanguageModelSAERunnerConfig(
-    architecture="topk",
-    activation_fn_kwargs={"k": 50},  # Exactly 50 active features
+    architecture=&quot;topk&quot;,
+    activation_fn_kwargs={&quot;k&quot;: 50},  # Exactly 50 active features
 )
 ```
 
@@ -412,7 +462,7 @@ For detailed API documentation, tutorials, and advanced usage, see the `referenc
 ## External Resources
 
 ### Tutorials
-- [Basic Loading & Analysis](https://github.com/jbloomAus/SAELens/blob/main/tutorials/basic_loading_and_analysing.ipynb)
+- [Basic Loading &amp; Analysis](https://github.com/jbloomAus/SAELens/blob/main/tutorials/basic_loading_and_analysing.ipynb)
 - [Training a Sparse Autoencoder](https://github.com/jbloomAus/SAELens/blob/main/tutorials/training_a_sparse_autoencoder.ipynb)
 - [ARENA SAE Curriculum](https://www.lesswrong.com/posts/LnHowHgmrMbWtpkxx/intro-to-superposition-and-sparse-autoencoders-colab)
 
@@ -436,13 +486,51 @@ For detailed API documentation, tutorials, and advanced usage, see the `referenc
 ```python
 # TopK SAE (exactly 50 features active)
 cfg = LanguageModelSAERunnerConfig(
-    architecture="topk",
-    activation_fn="topk",
-    activation_fn_kwargs={"k": 50},
+    architecture=&quot;topk&quot;,
+    activation_fn=&quot;topk&quot;,
+    activation_fn_kwargs={&quot;k&quot;: 50},
 )
 ```
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Sparse Autoencoders</span><span class="tag">SAE</span><span class="tag">Mechanistic Interpretability</span><span class="tag">Feature Discovery</span><span class="tag">Superposition</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>16</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>neuropixels-analysis - AICCLI</title>
-  <meta name="description" content="neuropixels-analysis - Claude Code skill for AICCLI">
+  <meta name="description" content=""Neuropixels neural recording analysis. Load SpikeGLX/OpenEphys data, preprocess, motion correction, Kilosort4 spike sorting, quality metrics, Allen/IBL curatio">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / neuropixels-analysis</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>neuropixels-analysis</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / neuropixels-analysis
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>neuropixels-analysis</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Neuropixels neural recording analysis. Load SpikeGLX/OpenEphys data, preprocess, motion correction, Kilosort4 spike sorting, quality metrics, Allen/IBL curation, AI-assisted visual analysis, for Neuropixels 1.0/2.0 extracellular electrophysiology. Use when working with neural recordings, spike sorting, extracellular electrophysiology, or when the user mentions Neuropixels, SpikeGLX, Open Ephys, Kilosort, quality metrics, or unit curation."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/neuropixels-analysis</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/neuropixels-analysis</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/neuropixels-analysis</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: neuropixels-analysis
-description: "Neuropixels neural recording analysis. Load SpikeGLX/OpenEphys data, preprocess, motion correction, Kilosort4 spike sorting, quality metrics, Allen/IBL curation, AI-assisted visual analysis, for Neuropixels 1.0/2.0 extracellular electrophysiology. Use when working with neural recordings, spike sorting, extracellular electrophysiology, or when the user mentions Neuropixels, SpikeGLX, Open Ephys, Kilosort, quality metrics, or unit curation."
+description: &quot;Neuropixels neural recording analysis. Load SpikeGLX/OpenEphys data, preprocess, motion correction, Kilosort4 spike sorting, quality metrics, Allen/IBL curation, AI-assisted visual analysis, for Neuropixels 1.0/2.0 extracellular electrophysiology. Use when working with neural recordings, spike sorting, extracellular electrophysiology, or when the user mentions Neuropixels, SpikeGLX, Open Ephys, Kilosort, quality metrics, or unit curation.&quot;
 ---
 
 # Neuropixels Data Analysis
@@ -79,7 +129,7 @@ This skill should be used when:
 - Creating visualizations of neural data
 - Exporting results to Phy or NWB
 
-## Supported Hardware & Formats
+## Supported Hardware &amp; Formats
 
 | Probe | Electrodes | Channels | Notes |
 |-------|-----------|----------|-------|
@@ -102,21 +152,21 @@ import spikeinterface.full as si
 import neuropixels_analysis as npa
 
 # Configure parallel processing
-job_kwargs = dict(n_jobs=-1, chunk_duration='1s', progress_bar=True)
+job_kwargs = dict(n_jobs=-1, chunk_duration=&#039;1s&#039;, progress_bar=True)
 ```
 
 ### Loading Data
 
 ```python
 # SpikeGLX (most common)
-recording = si.read_spikeglx('/path/to/data', stream_id='imec0.ap')
+recording = si.read_spikeglx(&#039;/path/to/data&#039;, stream_id=&#039;imec0.ap&#039;)
 
 # Open Ephys (common for many labs)
-recording = si.read_openephys('/path/to/Record_Node_101/')
+recording = si.read_openephys(&#039;/path/to/Record_Node_101/&#039;)
 
 # Check available streams
-streams, ids = si.get_neo_streams('spikeglx', '/path/to/data')
-print(streams)  # ['imec0.ap', 'imec0.lf', 'nidq']
+streams, ids = si.get_neo_streams(&#039;spikeglx&#039;, &#039;/path/to/data&#039;)
+print(streams)  # [&#039;imec0.ap&#039;, &#039;imec0.lf&#039;, &#039;nidq&#039;]
 
 # For testing with subset of data
 recording = recording.frame_slice(0, int(60 * recording.get_sampling_frequency()))
@@ -128,15 +178,15 @@ recording = recording.frame_slice(0, int(60 * recording.get_sampling_frequency()
 # Run full analysis pipeline
 results = npa.run_pipeline(
     recording,
-    output_dir='output/',
-    sorter='kilosort4',
-    curation_method='allen',
+    output_dir=&#039;output/&#039;,
+    sorter=&#039;kilosort4&#039;,
+    curation_method=&#039;allen&#039;,
 )
 
 # Access results
-sorting = results['sorting']
-metrics = results['metrics']
-labels = results['labels']
+sorting = results[&#039;sorting&#039;]
+metrics = results[&#039;metrics&#039;]
+labels = results[&#039;labels&#039;]
 ```
 
 ## Standard Analysis Workflow
@@ -149,7 +199,7 @@ rec = si.highpass_filter(recording, freq_min=400)
 rec = si.phase_shift(rec)  # Required for Neuropixels 1.0
 bad_ids, _ = si.detect_bad_channels(rec)
 rec = rec.remove_channels(bad_ids)
-rec = si.common_reference(rec, operator='median')
+rec = si.common_reference(rec, operator=&#039;median&#039;)
 
 # Or use our wrapper
 rec = npa.preprocess(recording)
@@ -159,24 +209,24 @@ rec = npa.preprocess(recording)
 
 ```python
 # Check for drift (always do this!)
-motion_info = npa.estimate_motion(rec, preset='kilosort_like')
-npa.plot_drift(rec, motion_info, output='drift_map.png')
+motion_info = npa.estimate_motion(rec, preset=&#039;kilosort_like&#039;)
+npa.plot_drift(rec, motion_info, output=&#039;drift_map.png&#039;)
 
 # Apply correction if needed
-if motion_info['motion'].max() &gt; 10:  # microns
-    rec = npa.correct_motion(rec, preset='nonrigid_accurate')
+if motion_info[&#039;motion&#039;].max() &gt; 10:  # microns
+    rec = npa.correct_motion(rec, preset=&#039;nonrigid_accurate&#039;)
 ```
 
 ### 3. Spike Sorting
 
 ```python
 # Kilosort4 (recommended, requires GPU)
-sorting = si.run_sorter('kilosort4', rec, folder='ks4_output')
+sorting = si.run_sorter(&#039;kilosort4&#039;, rec, folder=&#039;ks4_output&#039;)
 
 # CPU alternatives
-sorting = si.run_sorter('tridesclous2', rec, folder='tdc2_output')
-sorting = si.run_sorter('spykingcircus2', rec, folder='sc2_output')
-sorting = si.run_sorter('mountainsort5', rec, folder='ms5_output')
+sorting = si.run_sorter(&#039;tridesclous2&#039;, rec, folder=&#039;tdc2_output&#039;)
+sorting = si.run_sorter(&#039;spykingcircus2&#039;, rec, folder=&#039;sc2_output&#039;)
+sorting = si.run_sorter(&#039;mountainsort5&#039;, rec, folder=&#039;ms5_output&#039;)
 
 # Check available sorters
 print(si.installed_sorters())
@@ -188,29 +238,29 @@ print(si.installed_sorters())
 # Create analyzer and compute all extensions
 analyzer = si.create_sorting_analyzer(sorting, rec, sparse=True)
 
-analyzer.compute('random_spikes', max_spikes_per_unit=500)
-analyzer.compute('waveforms', ms_before=1.0, ms_after=2.0)
-analyzer.compute('templates', operators=['average', 'std'])
-analyzer.compute('spike_amplitudes')
-analyzer.compute('correlograms', window_ms=50.0, bin_ms=1.0)
-analyzer.compute('unit_locations', method='monopolar_triangulation')
-analyzer.compute('quality_metrics')
+analyzer.compute(&#039;random_spikes&#039;, max_spikes_per_unit=500)
+analyzer.compute(&#039;waveforms&#039;, ms_before=1.0, ms_after=2.0)
+analyzer.compute(&#039;templates&#039;, operators=[&#039;average&#039;, &#039;std&#039;])
+analyzer.compute(&#039;spike_amplitudes&#039;)
+analyzer.compute(&#039;correlograms&#039;, window_ms=50.0, bin_ms=1.0)
+analyzer.compute(&#039;unit_locations&#039;, method=&#039;monopolar_triangulation&#039;)
+analyzer.compute(&#039;quality_metrics&#039;)
 
-metrics = analyzer.get_extension('quality_metrics').get_data()
+metrics = analyzer.get_extension(&#039;quality_metrics&#039;).get_data()
 ```
 
 ### 5. Curation
 
 ```python
 # Allen Institute criteria (conservative)
-good_units = metrics.query("""
+good_units = metrics.query(&quot;&quot;&quot;
     presence_ratio &gt; 0.9 and
     isi_violations_ratio &lt; 0.5 and
     amplitude_cutoff &lt; 0.1
-""").index.tolist()
+&quot;&quot;&quot;).index.tolist()
 
 # Or use automated curation
-labels = npa.curate(metrics, method='allen')  # 'allen', 'ibl', 'strict'
+labels = npa.curate(metrics, method=&#039;allen&#039;)  # &#039;allen&#039;, &#039;ibl&#039;, &#039;strict&#039;
 ```
 
 ### 6. AI-Assisted Curation (For Uncertain Units)
@@ -224,12 +274,12 @@ from anthropic import Anthropic
 client = Anthropic()
 
 # Analyze uncertain units visually
-uncertain = metrics.query('snr &gt; 3 and snr &lt; 8').index.tolist()
+uncertain = metrics.query(&#039;snr &gt; 3 and snr &lt; 8&#039;).index.tolist()
 
 for unit_id in uncertain:
     result = npa.analyze_unit_visually(analyzer, unit_id, api_client=client)
-    print(f"Unit {unit_id}: {result['classification']}")
-    print(f"  Reasoning: {result['reasoning'][:100]}...")
+    print(f&quot;Unit {unit_id}: {result[&#039;classification&#039;]}&quot;)
+    print(f&quot;  Reasoning: {result[&#039;reasoning&#039;][:100]}...&quot;)
 ```
 
 **Claude Code Integration**: When running within Claude Code, ask Claude to examine waveform/correlogram plots directly - no API setup required.
@@ -238,7 +288,7 @@ for unit_id in uncertain:
 
 ```python
 # Generate comprehensive HTML report with visualizations
-report_dir = npa.generate_analysis_report(results, 'output/')
+report_dir = npa.generate_analysis_report(results, &#039;output/&#039;)
 # Opens report.html with summary stats, figures, and unit table
 
 # Print formatted summary to console
@@ -249,23 +299,23 @@ npa.print_analysis_summary(results)
 
 ```python
 # Export to Phy for manual review
-si.export_to_phy(analyzer, output_folder='phy_export/',
+si.export_to_phy(analyzer, output_folder=&#039;phy_export/&#039;,
                  compute_pc_features=True, compute_amplitudes=True)
 
 # Export to NWB
 from spikeinterface.exporters import export_to_nwb
-export_to_nwb(rec, sorting, 'output.nwb')
+export_to_nwb(rec, sorting, &#039;output.nwb&#039;)
 
 # Save quality metrics
-metrics.to_csv('quality_metrics.csv')
+metrics.to_csv(&#039;quality_metrics.csv&#039;)
 ```
 
 ## Common Pitfalls and Best Practices
 
 1. **Always check drift** before spike sorting - drift &gt; 10μm significantly impacts quality
 2. **Use phase_shift** for Neuropixels 1.0 probes (not needed for 2.0)
-3. **Save preprocessed data** to avoid recomputing - use `rec.save(folder='preprocessed/')`
-4. **Use GPU** for Kilosort4 - it's 10-50x faster than CPU alternatives
+3. **Save preprocessed data** to avoid recomputing - use `rec.save(folder=&#039;preprocessed/&#039;)`
+4. **Use GPU** for Kilosort4 - it&#039;s 10-50x faster than CPU alternatives
 5. **Review uncertain units manually** - automated curation is a starting point
 6. **Combine metrics with AI** - use metrics for clear cases, AI for borderline units
 7. **Document your thresholds** - different analyses may need different criteria
@@ -278,7 +328,7 @@ metrics.to_csv('quality_metrics.csv')
 - `detect_threshold`: Bad channel detection sensitivity
 
 ### Motion Correction
-- `preset`: 'kilosort_like' (fast) or 'nonrigid_accurate' (better for severe drift)
+- `preset`: &#039;kilosort_like&#039; (fast) or &#039;nonrigid_accurate&#039; (better for severe drift)
 
 ### Spike Sorting (Kilosort4)
 - `batch_size`: Samples per batch (30000 default)
@@ -399,8 +449,39 @@ project/
 - **Allen Institute ecephys**: https://github.com/AllenInstitute/ecephys_spike_sorting
 - **Bombcell (Automated QC)**: https://github.com/Julie-Fabre/bombcell
 - **SpikeAgent (AI Curation)**: https://github.com/SpikeAgent/SpikeAgent
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>11</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

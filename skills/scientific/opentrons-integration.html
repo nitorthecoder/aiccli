@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>opentrons-integration - AICCLI</title>
-  <meta name="description" content="opentrons-integration - Claude Code skill for AICCLI">
+  <meta name="description" content=""Lab automation platform for Flex/OT-2 robots. Write Protocol API v2 protocols, liquid handling, hardware modules (heater-shaker, thermocycler), labware managem">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / opentrons-integration</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>opentrons-integration</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / opentrons-integration
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>opentrons-integration</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Lab automation platform for Flex/OT-2 robots. Write Protocol API v2 protocols, liquid handling, hardware modules (heater-shaker, thermocycler), labware management, for automated pipetting workflows."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/opentrons-integration</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/opentrons-integration</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/opentrons-integration</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: opentrons-integration
-description: "Lab automation platform for Flex/OT-2 robots. Write Protocol API v2 protocols, liquid handling, hardware modules (heater-shaker, thermocycler), labware management, for automated pipetting workflows."
+description: &quot;Lab automation platform for Flex/OT-2 robots. Write Protocol API v2 protocols, liquid handling, hardware modules (heater-shaker, thermocycler), labware management, for automated pipetting workflows.&quot;
 ---
 
 # Opentrons Integration
@@ -89,16 +139,16 @@ from opentrons import protocol_api
 
 # Metadata
 metadata = {
-    'protocolName': 'My Protocol',
-    'author': 'Name &lt;email@example.com&gt;',
-    'description': 'Protocol description',
-    'apiLevel': '2.19'  # Use latest available API version
+    &#039;protocolName&#039;: &#039;My Protocol&#039;,
+    &#039;author&#039;: &#039;Name &lt;email@example.com&gt;&#039;,
+    &#039;description&#039;: &#039;Protocol description&#039;,
+    &#039;apiLevel&#039;: &#039;2.19&#039;  # Use latest available API version
 }
 
 # Requirements (optional)
 requirements = {
-    'robotType': 'Flex',  # or 'OT-2'
-    'apiLevel': '2.19'
+    &#039;robotType&#039;: &#039;Flex&#039;,  # or &#039;OT-2&#039;
+    &#039;apiLevel&#039;: &#039;2.19&#039;
 }
 
 # Run function
@@ -122,8 +172,8 @@ def run(protocol: protocol_api.ProtocolContext):
 def run(protocol: protocol_api.ProtocolContext):
     # Load pipette on specific mount
     left_pipette = protocol.load_instrument(
-        'p1000_single_flex',  # Instrument name
-        'left',               # Mount: 'left' or 'right'
+        &#039;p1000_single_flex&#039;,  # Instrument name
+        &#039;left&#039;,               # Mount: &#039;left&#039; or &#039;right&#039;
         tip_racks=[tip_rack]  # List of tip rack labware objects
     )
 ```
@@ -137,37 +187,37 @@ Common pipette names:
 ```python
 # Load labware directly on deck
 plate = protocol.load_labware(
-    'corning_96_wellplate_360ul_flat',  # Labware API name
-    'D1',                                # Deck slot (Flex: A1-D3, OT-2: 1-11)
-    label='Sample Plate'                 # Optional display label
+    &#039;corning_96_wellplate_360ul_flat&#039;,  # Labware API name
+    &#039;D1&#039;,                                # Deck slot (Flex: A1-D3, OT-2: 1-11)
+    label=&#039;Sample Plate&#039;                 # Optional display label
 )
 
 # Load tip rack
-tip_rack = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'C1')
+tip_rack = protocol.load_labware(&#039;opentrons_flex_96_tiprack_1000ul&#039;, &#039;C1&#039;)
 
 # Load labware on adapter
-adapter = protocol.load_adapter('opentrons_flex_96_tiprack_adapter', 'B1')
-tips = adapter.load_labware('opentrons_flex_96_tiprack_200ul')
+adapter = protocol.load_adapter(&#039;opentrons_flex_96_tiprack_adapter&#039;, &#039;B1&#039;)
+tips = adapter.load_labware(&#039;opentrons_flex_96_tiprack_200ul&#039;)
 ```
 
 **Loading Modules:**
 
 ```python
 # Temperature module
-temp_module = protocol.load_module('temperature module gen2', 'D3')
-temp_plate = temp_module.load_labware('corning_96_wellplate_360ul_flat')
+temp_module = protocol.load_module(&#039;temperature module gen2&#039;, &#039;D3&#039;)
+temp_plate = temp_module.load_labware(&#039;corning_96_wellplate_360ul_flat&#039;)
 
 # Magnetic module
-mag_module = protocol.load_module('magnetic module gen2', 'C2')
-mag_plate = mag_module.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
+mag_module = protocol.load_module(&#039;magnetic module gen2&#039;, &#039;C2&#039;)
+mag_plate = mag_module.load_labware(&#039;nest_96_wellplate_100ul_pcr_full_skirt&#039;)
 
 # Heater-Shaker module
-hs_module = protocol.load_module('heaterShakerModuleV1', 'D1')
-hs_plate = hs_module.load_labware('corning_96_wellplate_360ul_flat')
+hs_module = protocol.load_module(&#039;heaterShakerModuleV1&#039;, &#039;D1&#039;)
+hs_plate = hs_module.load_labware(&#039;corning_96_wellplate_360ul_flat&#039;)
 
 # Thermocycler module (takes up specific slots automatically)
-tc_module = protocol.load_module('thermocyclerModuleV2')
-tc_plate = tc_module.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
+tc_module = protocol.load_module(&#039;thermocyclerModuleV2&#039;)
+tc_plate = tc_module.load_labware(&#039;nest_96_wellplate_100ul_pcr_full_skirt&#039;)
 ```
 
 ### 3. Liquid Handling Operations
@@ -181,13 +231,13 @@ pipette.pick_up_tip()
 # Aspirate (draw liquid in)
 pipette.aspirate(
     volume=100,           # Volume in µL
-    location=source['A1'] # Well or location object
+    location=source[&#039;A1&#039;] # Well or location object
 )
 
 # Dispense (expel liquid)
 pipette.dispense(
     volume=100,
-    location=dest['B1']
+    location=dest[&#039;B1&#039;]
 )
 
 # Drop tip
@@ -203,25 +253,25 @@ pipette.return_tip()
 # Transfer (combines pick_up, aspirate, dispense, drop_tip)
 pipette.transfer(
     volume=100,
-    source=source_plate['A1'],
-    dest=dest_plate['B1'],
-    new_tip='always'  # 'always', 'once', or 'never'
+    source=source_plate[&#039;A1&#039;],
+    dest=dest_plate[&#039;B1&#039;],
+    new_tip=&#039;always&#039;  # &#039;always&#039;, &#039;once&#039;, or &#039;never&#039;
 )
 
 # Distribute (one source to multiple destinations)
 pipette.distribute(
     volume=50,
-    source=reservoir['A1'],
-    dest=[plate['A1'], plate['A2'], plate['A3']],
-    new_tip='once'
+    source=reservoir[&#039;A1&#039;],
+    dest=[plate[&#039;A1&#039;], plate[&#039;A2&#039;], plate[&#039;A3&#039;]],
+    new_tip=&#039;once&#039;
 )
 
 # Consolidate (multiple sources to one destination)
 pipette.consolidate(
     volume=50,
-    source=[plate['A1'], plate['A2'], plate['A3']],
-    dest=reservoir['A1'],
-    new_tip='once'
+    source=[plate[&#039;A1&#039;], plate[&#039;A2&#039;], plate[&#039;A3&#039;]],
+    dest=reservoir[&#039;A1&#039;],
+    new_tip=&#039;once&#039;
 )
 ```
 
@@ -232,19 +282,19 @@ pipette.consolidate(
 pipette.mix(
     repetitions=3,
     volume=50,
-    location=plate['A1']
+    location=plate[&#039;A1&#039;]
 )
 
 # Air gap (prevent dripping)
-pipette.aspirate(100, source['A1'])
+pipette.aspirate(100, source[&#039;A1&#039;])
 pipette.air_gap(20)  # 20µL air gap
-pipette.dispense(120, dest['A1'])
+pipette.dispense(120, dest[&#039;A1&#039;])
 
 # Blow out (expel remaining liquid)
-pipette.blow_out(location=dest['A1'].top())
+pipette.blow_out(location=dest[&#039;A1&#039;].top())
 
 # Touch tip (remove droplets on tip exterior)
-pipette.touch_tip(location=plate['A1'])
+pipette.touch_tip(location=plate[&#039;A1&#039;])
 ```
 
 **Flow Rate Control:**
@@ -262,7 +312,7 @@ pipette.flow_rate.blow_out = 400
 
 ```python
 # By name
-well_a1 = plate['A1']
+well_a1 = plate[&#039;A1&#039;]
 
 # By index
 first_well = plate.wells()[0]
@@ -279,7 +329,7 @@ columns = plate.columns()  # Returns list of lists
 column_1 = plate.columns()[0]  # All wells in column 1
 
 # Wells by name (dictionary)
-wells_dict = plate.wells_by_name()  # {'A1': Well, 'A2': Well, ...}
+wells_dict = plate.wells_by_name()  # {&#039;A1&#039;: Well, &#039;A2&#039;: Well, ...}
 ```
 
 **Location Methods:**
@@ -326,7 +376,7 @@ mag_module.engage(height_from_base=10)  # mm from labware base
 mag_module.disengage()
 
 # Check status
-is_engaged = mag_module.status  # 'engaged' or 'disengaged'
+is_engaged = mag_module.status  # &#039;engaged&#039; or &#039;disengaged&#039;
 ```
 
 **Heater-Shaker Module:**
@@ -376,9 +426,9 @@ tc_module.set_block_temperature(
 
 # Execute profile (PCR cycling)
 profile = [
-    {'temperature': 95, 'hold_time_seconds': 30},
-    {'temperature': 57, 'hold_time_seconds': 30},
-    {'temperature': 72, 'hold_time_seconds': 60}
+    {&#039;temperature&#039;: 95, &#039;hold_time_seconds&#039;: 30},
+    {&#039;temperature&#039;: 57, &#039;hold_time_seconds&#039;: 30},
+    {&#039;temperature&#039;: 72, &#039;hold_time_seconds&#039;: 60}
 ]
 tc_module.execute_profile(
     steps=profile,
@@ -408,15 +458,15 @@ absorbance_data = result  # Dict with wavelength keys
 ```python
 # Define liquid types
 water = protocol.define_liquid(
-    name='Water',
-    description='Ultrapure water',
-    display_color='#0000FF'  # Hex color code
+    name=&#039;Water&#039;,
+    description=&#039;Ultrapure water&#039;,
+    display_color=&#039;#0000FF&#039;  # Hex color code
 )
 
 sample = protocol.define_liquid(
-    name='Sample',
-    description='Cell lysate sample',
-    display_color='#FF0000'
+    name=&#039;Sample&#039;,
+    description=&#039;Cell lysate sample&#039;,
+    display_color=&#039;#FF0000&#039;
 )
 ```
 
@@ -424,11 +474,11 @@ sample = protocol.define_liquid(
 
 ```python
 # Load liquid into specific wells
-reservoir['A1'].load_liquid(liquid=water, volume=50000)  # µL
-plate['A1'].load_liquid(liquid=sample, volume=100)
+reservoir[&#039;A1&#039;].load_liquid(liquid=water, volume=50000)  # µL
+plate[&#039;A1&#039;].load_liquid(liquid=sample, volume=100)
 
 # Mark wells as empty
-plate['B1'].load_empty()
+plate[&#039;B1&#039;].load_empty()
 ```
 
 ### 7. Protocol Control and Utilities
@@ -437,14 +487,14 @@ plate['B1'].load_empty()
 
 ```python
 # Pause protocol
-protocol.pause(msg='Replace tip box and resume')
+protocol.pause(msg=&#039;Replace tip box and resume&#039;)
 
 # Delay
 protocol.delay(seconds=60)
 protocol.delay(minutes=5)
 
 # Comment (appears in logs)
-protocol.comment('Starting serial dilution')
+protocol.comment(&#039;Starting serial dilution&#039;)
 
 # Home robot
 protocol.home()
@@ -455,9 +505,9 @@ protocol.home()
 ```python
 # Check if simulating
 if protocol.is_simulating():
-    protocol.comment('Running in simulation mode')
+    protocol.comment(&#039;Running in simulation mode&#039;)
 else:
-    protocol.comment('Running on actual robot')
+    protocol.comment(&#039;Running on actual robot&#039;)
 ```
 
 **Rail Lights (Flex only):**
@@ -477,21 +527,21 @@ When using multi-channel pipettes:
 ```python
 # Load 8-channel pipette
 multi_pipette = protocol.load_instrument(
-    'p300_multi_gen2',
-    'left',
+    &#039;p300_multi_gen2&#039;,
+    &#039;left&#039;,
     tip_racks=[tips]
 )
 
 # Access entire column with single well reference
 multi_pipette.transfer(
     volume=100,
-    source=source_plate['A1'],  # Accesses entire column 1
-    dest=dest_plate['A1']       # Dispenses to entire column 1
+    source=source_plate[&#039;A1&#039;],  # Accesses entire column 1
+    dest=dest_plate[&#039;A1&#039;]       # Dispenses to entire column 1
 )
 
 # Use rows() for row-wise operations
 for row in plate.rows():
-    multi_pipette.transfer(100, reservoir['A1'], row[0])
+    multi_pipette.transfer(100, reservoir[&#039;A1&#039;], row[0])
 ```
 
 ### 9. Common Protocol Patterns
@@ -501,15 +551,15 @@ for row in plate.rows():
 ```python
 def run(protocol: protocol_api.ProtocolContext):
     # Load labware
-    tips = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D1')
-    reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'D2')
-    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D3')
+    tips = protocol.load_labware(&#039;opentrons_flex_96_tiprack_200ul&#039;, &#039;D1&#039;)
+    reservoir = protocol.load_labware(&#039;nest_12_reservoir_15ml&#039;, &#039;D2&#039;)
+    plate = protocol.load_labware(&#039;corning_96_wellplate_360ul_flat&#039;, &#039;D3&#039;)
 
     # Load pipette
-    p300 = protocol.load_instrument('p300_single_flex', 'left', tip_racks=[tips])
+    p300 = protocol.load_instrument(&#039;p300_single_flex&#039;, &#039;left&#039;, tip_racks=[tips])
 
     # Add diluent to all wells except first
-    p300.transfer(100, reservoir['A1'], plate.rows()[0][1:])
+    p300.transfer(100, reservoir[&#039;A1&#039;], plate.rows()[0][1:])
 
     # Serial dilution across row
     p300.transfer(
@@ -517,7 +567,7 @@ def run(protocol: protocol_api.ProtocolContext):
         plate.rows()[0][:11],  # Source: wells 0-10
         plate.rows()[0][1:],   # Dest: wells 1-11
         mix_after=(3, 50),     # Mix 3x with 50µL after dispense
-        new_tip='always'
+        new_tip=&#039;always&#039;
     )
 ```
 
@@ -526,19 +576,19 @@ def run(protocol: protocol_api.ProtocolContext):
 ```python
 def run(protocol: protocol_api.ProtocolContext):
     # Load labware
-    tips = protocol.load_labware('opentrons_flex_96_tiprack_1000ul', 'C1')
-    source = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D1')
-    dest = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D2')
+    tips = protocol.load_labware(&#039;opentrons_flex_96_tiprack_1000ul&#039;, &#039;C1&#039;)
+    source = protocol.load_labware(&#039;corning_96_wellplate_360ul_flat&#039;, &#039;D1&#039;)
+    dest = protocol.load_labware(&#039;corning_96_wellplate_360ul_flat&#039;, &#039;D2&#039;)
 
     # Load pipette
-    p1000 = protocol.load_instrument('p1000_single_flex', 'left', tip_racks=[tips])
+    p1000 = protocol.load_instrument(&#039;p1000_single_flex&#039;, &#039;left&#039;, tip_racks=[tips])
 
     # Transfer from all wells in source to dest
     p1000.transfer(
         100,
         source.wells(),
         dest.wells(),
-        new_tip='always'
+        new_tip=&#039;always&#039;
     )
 ```
 
@@ -547,15 +597,15 @@ def run(protocol: protocol_api.ProtocolContext):
 ```python
 def run(protocol: protocol_api.ProtocolContext):
     # Load thermocycler
-    tc_mod = protocol.load_module('thermocyclerModuleV2')
-    tc_plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
+    tc_mod = protocol.load_module(&#039;thermocyclerModuleV2&#039;)
+    tc_plate = tc_mod.load_labware(&#039;nest_96_wellplate_100ul_pcr_full_skirt&#039;)
 
     # Load tips and reagents
-    tips = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'C1')
-    reagents = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', 'D1')
+    tips = protocol.load_labware(&#039;opentrons_flex_96_tiprack_200ul&#039;, &#039;C1&#039;)
+    reagents = protocol.load_labware(&#039;opentrons_24_tuberack_nest_1.5ml_snapcap&#039;, &#039;D1&#039;)
 
     # Load pipette
-    p300 = protocol.load_instrument('p300_single_flex', 'left', tip_racks=[tips])
+    p300 = protocol.load_instrument(&#039;p300_single_flex&#039;, &#039;left&#039;, tip_racks=[tips])
 
     # Open thermocycler lid
     tc_mod.open_lid()
@@ -563,14 +613,14 @@ def run(protocol: protocol_api.ProtocolContext):
     # Distribute master mix
     p300.distribute(
         20,
-        reagents['A1'],
+        reagents[&#039;A1&#039;],
         tc_plate.wells(),
-        new_tip='once'
+        new_tip=&#039;once&#039;
     )
 
     # Add samples (example for first 8 wells)
     for i, well in enumerate(tc_plate.wells()[:8]):
-        p300.transfer(5, reagents.wells()[i+1], well, new_tip='always')
+        p300.transfer(5, reagents.wells()[i+1], well, new_tip=&#039;always&#039;)
 
     # Run PCR
     tc_mod.close_lid()
@@ -580,9 +630,9 @@ def run(protocol: protocol_api.ProtocolContext):
     tc_mod.set_block_temperature(95, hold_time_seconds=180)
 
     profile = [
-        {'temperature': 95, 'hold_time_seconds': 15},
-        {'temperature': 60, 'hold_time_seconds': 30},
-        {'temperature': 72, 'hold_time_seconds': 30}
+        {&#039;temperature&#039;: 95, &#039;hold_time_seconds&#039;: 15},
+        {&#039;temperature&#039;: 60, &#039;hold_time_seconds&#039;: 30},
+        {&#039;temperature&#039;: 72, &#039;hold_time_seconds&#039;: 30}
     ]
     tc_mod.execute_profile(steps=profile, repetitions=35, block_max_volume=25)
 
@@ -603,7 +653,7 @@ def run(protocol: protocol_api.ProtocolContext):
 6. **Handle errors gracefully**: Add pauses for manual intervention when needed
 7. **Consider timing**: Use delays when protocols require incubation periods
 8. **Track liquids**: Use liquid tracking for better setup validation
-9. **Optimize tip usage**: Use `new_tip='once'` when appropriate to save tips
+9. **Optimize tip usage**: Use `new_tip=&#039;once&#039;` when appropriate to save tips
 10. **Control flow rates**: Adjust flow rates for viscous or volatile liquids
 
 ## Troubleshooting
@@ -612,7 +662,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
 - **Out of tips**: Verify tip rack capacity matches protocol requirements
 - **Labware collisions**: Check deck layout for spatial conflicts
-- **Volume errors**: Ensure volumes don't exceed well or pipette capacities
+- **Volume errors**: Ensure volumes don&#039;t exceed well or pipette capacities
 - **Module not responding**: Verify module is properly connected and firmware is updated
 - **Inaccurate volumes**: Calibrate pipettes and check for air bubbles
 - **Protocol fails in simulation**: Check API version compatibility and labware definitions
@@ -622,8 +672,39 @@ def run(protocol: protocol_api.ProtocolContext):
 For detailed API documentation, see `references/api_reference.md` in this skill directory.
 
 For example protocol templates, see `scripts/` directory.
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>9</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

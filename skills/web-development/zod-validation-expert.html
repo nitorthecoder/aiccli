@@ -4,63 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>zod-validation-expert - AICCLI</title>
-  <meta name="description" content="zod-validation-expert - Claude Code skill for AICCLI">
+  <meta name="description" content=""Expert in Zod — TypeScript-first schema validation. Covers parsing, custom errors, refinements, type inference, and integration with React Hook Form, Next.js, ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / zod-validation-expert</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>zod-validation-expert</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">web-development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / web-development / zod-validation-expert
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>zod-validation-expert</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">web-development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Expert in Zod — TypeScript-first schema validation. Covers parsing, custom errors, refinements, type inference, and integration with React Hook Form, Next.js, and tRPC."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/zod-validation-expert</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/zod-validation-expert</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/zod-validation-expert</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: zod-validation-expert
-description: "Expert in Zod — TypeScript-first schema validation. Covers parsing, custom errors, refinements, type inference, and integration with React Hook Form, Next.js, and tRPC."
+description: &quot;Expert in Zod — TypeScript-first schema validation. Covers parsing, custom errors, refinements, type inference, and integration with React Hook Form, Next.js, and tRPC.&quot;
 risk: safe
 source: community
-date_added: "2026-03-05"
+date_added: &quot;2026-03-05&quot;
 ---
 
 # Zod Validation Expert
@@ -83,12 +133,12 @@ You are a production-grade Zod expert. You help developers build type-safe schem
 
 Zod eliminates the duplication of writing a TypeScript interface *and* a runtime validation schema. You define the schema once, and Zod infers the static TypeScript type. Note that Zod is for **parsing, not just validation**. `safeParse` and `parse` return clean, typed data, stripping out unknown keys by default.
 
-## Schema Definition & Inference
+## Schema Definition &amp; Inference
 
-### Primitives & Coercion
+### Primitives &amp; Coercion
 
 ```typescript
-import { z } from "zod";
+import { z } from &quot;zod&quot;;
 
 // Basic primitives
 const stringSchema = z.string().min(3).max(255);
@@ -97,19 +147,19 @@ const dateSchema = z.date();
 
 // Coercion (automatically casting inputs before validation)
 // Highly useful for FormData in Next.js Server Actions or URL queries
-const ageSchema = z.coerce.number().min(18); // "18" -&gt; 18
-const activeSchema = z.coerce.boolean(); // "true" -&gt; true
-const dobSchema = z.coerce.date(); // "2020-01-01" -&gt; Date object
+const ageSchema = z.coerce.number().min(18); // &quot;18&quot; -&gt; 18
+const activeSchema = z.coerce.boolean(); // &quot;true&quot; -&gt; true
+const dobSchema = z.coerce.date(); // &quot;2020-01-01&quot; -&gt; Date object
 ```
 
-### Objects & Type Inference
+### Objects &amp; Type Inference
 
 ```typescript
 const UserSchema = z.object({
   id: z.string().uuid(),
   username: z.string().min(3).max(20),
   email: z.string().email(),
-  role: z.enum(["ADMIN", "USER", "GUEST"]).default("USER"),
+  role: z.enum([&quot;ADMIN&quot;, &quot;USER&quot;, &quot;GUEST&quot;]).default(&quot;USER&quot;),
   age: z.number().min(18).optional(), // Can be omitted
   website: z.string().url().nullable(), // Can be null
   tags: z.array(z.string()).min(1), // Array with at least 1 item
@@ -132,14 +182,14 @@ const idSchema = z.union([z.string(), z.number()]); // string | number
 const idSchema2 = z.string().or(z.number());
 
 // Discriminated Unions (Type-safe switch cases)
-const ActionSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("create"), id: z.string() }),
-  z.object({ type: z.literal("update"), id: z.string(), data: z.any() }),
-  z.object({ type: z.literal("delete"), id: z.string() }),
+const ActionSchema = z.discriminatedUnion(&quot;type&quot;, [
+  z.object({ type: z.literal(&quot;create&quot;), id: z.string() }),
+  z.object({ type: z.literal(&quot;update&quot;), id: z.string(), data: z.any() }),
+  z.object({ type: z.literal(&quot;delete&quot;), id: z.string() }),
 ]);
 ```
 
-## Parsing & Validation
+## Parsing &amp; Validation
 
 ### parse vs safeParse
 
@@ -148,7 +198,7 @@ const schema = z.string().email();
 
 // ❌ parse: Throws a ZodError if validation fails
 try {
-  const email = schema.parse("invalid-email");
+  const email = schema.parse(&quot;invalid-email&quot;);
 } catch (err) {
   if (err instanceof z.ZodError) {
     console.error(err.issues);
@@ -156,7 +206,7 @@ try {
 }
 
 // ✅ safeParse: Returns a result object (No try/catch needed)
-const result = schema.safeParse("user@example.com");
+const result = schema.safeParse(&quot;user@example.com&quot;);
 
 if (!result.success) {
   // TypeScript narrows result to SafeParseError
@@ -174,15 +224,15 @@ if (!result.success) {
 
 ```typescript
 const passwordSchema = z.string()
-  .min(8, { message: "Password must be at least 8 characters long" })
-  .max(100, { message: "Password is too long" })
-  .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
-  .regex(/[0-9]/, { message: "Password must contain at least one number" });
+  .min(8, { message: &quot;Password must be at least 8 characters long&quot; })
+  .max(100, { message: &quot;Password is too long&quot; })
+  .regex(/[A-Z]/, { message: &quot;Password must contain at least one uppercase letter&quot; })
+  .regex(/[0-9]/, { message: &quot;Password must contain at least one number&quot; });
 
 // Global custom error map (useful for i18n)
 z.setErrorMap((issue, ctx) =&gt; {
   if (issue.code === z.ZodIssueCode.invalid_type) {
-    if (issue.expected === "string") return { message: "This field must be text" };
+    if (issue.expected === &quot;string&quot;) return { message: &quot;This field must be text&quot; };
   }
   return { message: ctx.defaultError };
 });
@@ -192,8 +242,8 @@ z.setErrorMap((issue, ctx) =&gt; {
 
 ```typescript
 // Basic refinement
-const passwordCheck = z.string().refine((val) =&gt; val !== "password123", {
-  message: "Password is too weak",
+const passwordCheck = z.string().refine((val) =&gt; val !== &quot;password123&quot;, {
+  message: &quot;Password is too weak&quot;,
 });
 
 // Cross-field validation (e.g., password matching)
@@ -201,8 +251,8 @@ const formSchema = z.object({
   password: z.string().min(8),
   confirmPassword: z.string()
 }).refine((data) =&gt; data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"], // Sets the error on the specific field
+  message: &quot;Passwords don&#039;t match&quot;,
+  path: [&quot;confirmPassword&quot;], // Sets the error on the specific field
 });
 ```
 
@@ -212,7 +262,7 @@ const formSchema = z.object({
 // Change data during parsing
 const stringToNumber = z.string()
   .transform((val) =&gt; parseInt(val, 10))
-  .refine((val) =&gt; !isNaN(val), { message: "Not a valid integer" });
+  .refine((val) =&gt; !isNaN(val), { message: &quot;Not a valid integer&quot; });
 
 // Now the inferred type is `number`, not `string`!
 type TransformedResult = z.infer&lt;typeof stringToNumber&gt;; // number
@@ -223,13 +273,13 @@ type TransformedResult = z.infer&lt;typeof stringToNumber&gt;; // number
 ### React Hook Form
 
 ```typescript
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useForm } from &quot;react-hook-form&quot;;
+import { zodResolver } from &quot;@hookform/resolvers/zod&quot;;
+import { z } from &quot;zod&quot;;
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be 6+ characters"),
+  email: z.string().email(&quot;Invalid email address&quot;),
+  password: z.string().min(6, &quot;Password must be 6+ characters&quot;),
 });
 
 type LoginFormValues = z.infer&lt;typeof loginSchema&gt;;
@@ -246,8 +296,8 @@ export function LoginForm() {
 
   return (
     &lt;form onSubmit={handleSubmit(onSubmit)}&gt;
-      &lt;input {...register("email")} /&gt;
-      {errors.email && &lt;span&gt;{errors.email.message}&lt;/span&gt;}
+      &lt;input {...register(&quot;email&quot;)} /&gt;
+      {errors.email &amp;&amp; &lt;span&gt;{errors.email.message}&lt;/span&gt;}
       {/* ... */}
     &lt;/form&gt;
   );
@@ -257,14 +307,14 @@ export function LoginForm() {
 ### Next.js Server Actions
 
 ```typescript
-"use server";
-import { z } from "zod";
+&quot;use server&quot;;
+import { z } from &quot;zod&quot;;
 
 // Coercion is critical here because FormData values are always strings
 const createPostSchema = z.object({
   title: z.string().min(3),
   content: z.string().optional(),
-  published: z.coerce.boolean().default(false), // checkbox -&gt; "on" -&gt; true
+  published: z.coerce.boolean().default(false), // checkbox -&gt; &quot;on&quot; -&gt; true
 });
 
 export async function createPost(prevState: any, formData: FormData) {
@@ -290,11 +340,11 @@ export async function createPost(prevState: any, formData: FormData) {
 
 ```typescript
 // Make environment variables strictly typed and fail-fast
-import { z } from "zod";
+import { z } from &quot;zod&quot;;
 
 const envSchema = z.object({
   DATABASE_URL: z.string().url(),
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  NODE_ENV: z.enum([&quot;development&quot;, &quot;test&quot;, &quot;production&quot;]).default(&quot;development&quot;),
   PORT: z.coerce.number().default(3000),
   API_KEY: z.string().min(10),
 });
@@ -309,11 +359,11 @@ export default env;
 
 - ✅ **Do:** Co-locate schemas alongside the components or API routes that use them to maintain separation of concerns.
 - ✅ **Do:** Use `z.infer&lt;typeof Schema&gt;` everywhere instead of maintaining duplicate TypeScript interfaces manually.
-- ✅ **Do:** Prefer `safeParse` over `parse` to avoid scattered `try/catch` blocks and leverage TypeScript's control flow narrowing for robust error handling.
-- ✅ **Do:** Use `z.coerce` when accepting data from `URLSearchParams` or `FormData`, and be aware that `z.coerce.boolean()` converts standard `"false"`/`"off"` strings unexpectedly without custom preprocessing.
+- ✅ **Do:** Prefer `safeParse` over `parse` to avoid scattered `try/catch` blocks and leverage TypeScript&#039;s control flow narrowing for robust error handling.
+- ✅ **Do:** Use `z.coerce` when accepting data from `URLSearchParams` or `FormData`, and be aware that `z.coerce.boolean()` converts standard `&quot;false&quot;`/`&quot;off&quot;` strings unexpectedly without custom preprocessing.
 - ✅ **Do:** Use `.flatten()` or `.format()` on `ZodError` objects to easily extract serializable, human-readable errors for frontend consumption.
-- ❌ **Don't:** Rely exclusively on `.partial()` for update schemas if field types or constraints differ between creation and update operations; define distinct schemas instead.
-- ❌ **Don't:** Forget to pass the `path` option in `.refine()` or `.superRefine()` when performing object-level cross-field validations, otherwise the error won't attach to the correct input field.
+- ❌ **Don&#039;t:** Rely exclusively on `.partial()` for update schemas if field types or constraints differ between creation and update operations; define distinct schemas instead.
+- ❌ **Don&#039;t:** Forget to pass the `path` option in `.refine()` or `.superRefine()` when performing object-level cross-field validations, otherwise the error won&#039;t attach to the correct input field.
 
 ## Troubleshooting
 
@@ -321,9 +371,40 @@ export default env;
 **Solution:** This occurs with extreme schema recursion (e.g. deeply nested self-referential schemas). Use `z.lazy(() =&gt; NodeSchema)` for recursive structures and define the base TypeScript type explicitly instead of solely inferring it.
 
 **Problem:** Empty strings pass validation when using `.optional()`.
-**Solution:** `.optional()` permits `undefined`, not empty strings. If an empty string means "no value," use `.or(z.literal(""))` or preprocess it: `z.string().transform(v =&gt; v === "" ? undefined : v).optional()`.
-</pre></div>
+**Solution:** `.optional()` permits `undefined`, not empty strings. If an empty string means &quot;no value,&quot; use `.or(z.literal(&quot;&quot;))` or preprocess it: `z.string().transform(v =&gt; v === &quot;&quot; ? undefined : v).optional()`.
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>0</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

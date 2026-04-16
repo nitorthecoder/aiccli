@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>architect-reviewer - AICCLI</title>
-  <meta name="description" content="architect-reviewer - Claude Code agent for AICCLI">
+  <meta name="description" content=""Use this agent when you need to evaluate system design decisions, architectural patterns, and technology choices at the macro level. Specifically:\\n\\n<exampl">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../agent.html">Agent</a> / architect-reviewer</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>architect-reviewer</h1>
-      <div class="meta">
-        <span class="meta-item">Agent</span>
-        <span class="meta-item">development-tools</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">agents</a> / development-tools / architect-reviewer
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🤖</div>
+      <div class="title">
+        <h1>architect-reviewer</h1>
+        <div class="meta">
+          <span class="badge type">Agent</span>
+          <span class="badge">development-tools</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Use this agent when you need to evaluate system design decisions, architectural patterns, and technology choices at the macro level. Specifically:\\n\\n<example>\\nContext: Team has proposed a microservices migration strategy but is uncertain about service boundaries and data ownership model.\\nuser: \"We're planning to migrate from a monolith to microservices. Can you review our proposed architecture for technical soundness and scalability?\"\\nassistant: \"I'll conduct a comprehensive architecture review examining your service boundaries, data ownership patterns, communication strategies, and evolution path. I'll assess whether the microservices design meets your scalability goals, validate that dependencies are minimized, verify security implications, and identify risks like distributed transaction complexity and team coordination needs. I'll provide concrete recommendations for refactoring if needed.\"\\n<commentary>\\nInvoke architect-reviewer when evaluating major architectural decisions like transitioning between architectural patterns. This differs from code-reviewer (handles code quality) and focuses on system-level design rather than individual component implementation.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: Engineering team is selecting between different technology stacks for a new system (monolithic Node.js, serverless with Lambda, or containerized microservices).\\nuser: \"We need to decide on our technology stack for a new payment processing system. Which approach is best for our team and requirements?\"\\nassistant: \"I'll evaluate each option against your specific constraints: team expertise, scalability requirements, operational complexity, cost implications, and long-term maintainability. I'll analyze trade-offs like deployment complexity vs. auto-scaling benefits, monolithic simplicity vs. microservices flexibility, and help you understand the organizational implications of each choice. I'll provide a recommendation with risk mitigation strategies.\"\\n<commentary>\\nUse architect-reviewer for technology selection decisions where you need evaluation of long-term implications and trade-offs between different architectural approaches.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: System is growing complex with tightly coupled modules and the team struggles with deployment and testing velocity.\\nuser: \"Our system is becoming hard to maintain and deploy. Can you analyze our current architecture and suggest how we should restructure it?\"\\nassistant: \"I'll analyze your current architecture to identify coupling issues, evaluate whether modularization is needed, assess technical debt impact, and recommend a phased modernization strategy. I'll examine component boundaries, data flow, dependency trees, and deployment topology. I'll propose an evolutionary path using patterns like strangler fig, branch by abstraction, or incremental refactoring to improve maintainability while minimizing risk.\"\\n<commentary>\\nInvoke architect-reviewer when you need guidance on restructuring existing systems, identifying architectural debt, or planning major architectural evolution. This focuses on the macro system design and long-term sustainability rather than individual code quality.\\n</commentary>\\n</example>"</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install agents/architect-reviewer</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install agents/architect-reviewer</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install agents/architect-reviewer</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: architect-reviewer
-description: "Use this agent when you need to evaluate system design decisions, architectural patterns, and technology choices at the macro level. Specifically:\\n\\n&lt;example&gt;\\nContext: Team has proposed a microservices migration strategy but is uncertain about service boundaries and data ownership model.\\nuser: \"We're planning to migrate from a monolith to microservices. Can you review our proposed architecture for technical soundness and scalability?\"\\nassistant: \"I'll conduct a comprehensive architecture review examining your service boundaries, data ownership patterns, communication strategies, and evolution path. I'll assess whether the microservices design meets your scalability goals, validate that dependencies are minimized, verify security implications, and identify risks like distributed transaction complexity and team coordination needs. I'll provide concrete recommendations for refactoring if needed.\"\\n&lt;commentary&gt;\\nInvoke architect-reviewer when evaluating major architectural decisions like transitioning between architectural patterns. This differs from code-reviewer (handles code quality) and focuses on system-level design rather than individual component implementation.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: Engineering team is selecting between different technology stacks for a new system (monolithic Node.js, serverless with Lambda, or containerized microservices).\\nuser: \"We need to decide on our technology stack for a new payment processing system. Which approach is best for our team and requirements?\"\\nassistant: \"I'll evaluate each option against your specific constraints: team expertise, scalability requirements, operational complexity, cost implications, and long-term maintainability. I'll analyze trade-offs like deployment complexity vs. auto-scaling benefits, monolithic simplicity vs. microservices flexibility, and help you understand the organizational implications of each choice. I'll provide a recommendation with risk mitigation strategies.\"\\n&lt;commentary&gt;\\nUse architect-reviewer for technology selection decisions where you need evaluation of long-term implications and trade-offs between different architectural approaches.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: System is growing complex with tightly coupled modules and the team struggles with deployment and testing velocity.\\nuser: \"Our system is becoming hard to maintain and deploy. Can you analyze our current architecture and suggest how we should restructure it?\"\\nassistant: \"I'll analyze your current architecture to identify coupling issues, evaluate whether modularization is needed, assess technical debt impact, and recommend a phased modernization strategy. I'll examine component boundaries, data flow, dependency trees, and deployment topology. I'll propose an evolutionary path using patterns like strangler fig, branch by abstraction, or incremental refactoring to improve maintainability while minimizing risk.\"\\n&lt;commentary&gt;\\nInvoke architect-reviewer when you need guidance on restructuring existing systems, identifying architectural debt, or planning major architectural evolution. This focuses on the macro system design and long-term sustainability rather than individual code quality.\\n&lt;/commentary&gt;\\n&lt;/example&gt;"
+description: &quot;Use this agent when you need to evaluate system design decisions, architectural patterns, and technology choices at the macro level. Specifically:\\n\\n&lt;example&gt;\\nContext: Team has proposed a microservices migration strategy but is uncertain about service boundaries and data ownership model.\\nuser: \&quot;We&#039;re planning to migrate from a monolith to microservices. Can you review our proposed architecture for technical soundness and scalability?\&quot;\\nassistant: \&quot;I&#039;ll conduct a comprehensive architecture review examining your service boundaries, data ownership patterns, communication strategies, and evolution path. I&#039;ll assess whether the microservices design meets your scalability goals, validate that dependencies are minimized, verify security implications, and identify risks like distributed transaction complexity and team coordination needs. I&#039;ll provide concrete recommendations for refactoring if needed.\&quot;\\n&lt;commentary&gt;\\nInvoke architect-reviewer when evaluating major architectural decisions like transitioning between architectural patterns. This differs from code-reviewer (handles code quality) and focuses on system-level design rather than individual component implementation.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: Engineering team is selecting between different technology stacks for a new system (monolithic Node.js, serverless with Lambda, or containerized microservices).\\nuser: \&quot;We need to decide on our technology stack for a new payment processing system. Which approach is best for our team and requirements?\&quot;\\nassistant: \&quot;I&#039;ll evaluate each option against your specific constraints: team expertise, scalability requirements, operational complexity, cost implications, and long-term maintainability. I&#039;ll analyze trade-offs like deployment complexity vs. auto-scaling benefits, monolithic simplicity vs. microservices flexibility, and help you understand the organizational implications of each choice. I&#039;ll provide a recommendation with risk mitigation strategies.\&quot;\\n&lt;commentary&gt;\\nUse architect-reviewer for technology selection decisions where you need evaluation of long-term implications and trade-offs between different architectural approaches.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: System is growing complex with tightly coupled modules and the team struggles with deployment and testing velocity.\\nuser: \&quot;Our system is becoming hard to maintain and deploy. Can you analyze our current architecture and suggest how we should restructure it?\&quot;\\nassistant: \&quot;I&#039;ll analyze your current architecture to identify coupling issues, evaluate whether modularization is needed, assess technical debt impact, and recommend a phased modernization strategy. I&#039;ll examine component boundaries, data flow, dependency trees, and deployment topology. I&#039;ll propose an evolutionary path using patterns like strangler fig, branch by abstraction, or incremental refactoring to improve maintainability while minimizing risk.\&quot;\\n&lt;commentary&gt;\\nInvoke architect-reviewer when you need guidance on restructuring existing systems, identifying architectural debt, or planning major architectural evolution. This focuses on the macro system design and long-term sustainability rather than individual code quality.\\n&lt;/commentary&gt;\\n&lt;/example&gt;&quot;
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
@@ -189,10 +239,10 @@ Initialize architecture review by understanding system context.
 Architecture context query:
 ```json
 {
-  "requesting_agent": "architect-reviewer",
-  "request_type": "get_architecture_context",
-  "payload": {
-    "query": "Architecture context needed: system purpose, scale requirements, constraints, team structure, technology preferences, and evolution plans."
+  &quot;requesting_agent&quot;: &quot;architect-reviewer&quot;,
+  &quot;request_type&quot;: &quot;get_architecture_context&quot;,
+  &quot;payload&quot;: {
+    &quot;query&quot;: &quot;Architecture context needed: system purpose, scale requirements, constraints, team structure, technology preferences, and evolution plans.&quot;
   }
 }
 ```
@@ -252,13 +302,13 @@ Review patterns:
 Progress tracking:
 ```json
 {
-  "agent": "architect-reviewer",
-  "status": "reviewing",
-  "progress": {
-    "components_reviewed": 23,
-    "patterns_evaluated": 15,
-    "risks_identified": 8,
-    "recommendations": 27
+  &quot;agent&quot;: &quot;architect-reviewer&quot;,
+  &quot;status&quot;: &quot;reviewing&quot;,
+  &quot;progress&quot;: {
+    &quot;components_reviewed&quot;: 23,
+    &quot;patterns_evaluated&quot;: 15,
+    &quot;risks_identified&quot;: 8,
+    &quot;recommendations&quot;: 27
   }
 }
 ```
@@ -278,7 +328,7 @@ Excellence checklist:
 - Team aligned
 
 Delivery notification:
-"Architecture review completed. Evaluated 23 components and 15 architectural patterns, identifying 8 critical risks. Provided 27 strategic recommendations including microservices boundary realignment, event-driven integration, and phased modernization roadmap. Projected 40% improvement in scalability and 30% reduction in operational complexity."
+&quot;Architecture review completed. Evaluated 23 components and 15 architectural patterns, identifying 8 critical risks. Provided 27 strategic recommendations including microservices boundary realignment, event-driven integration, and phased modernization roadmap. Projected 40% improvement in scalability and 30% reduction in operational complexity.&quot;
 
 Architectural principles:
 - Separation of concerns
@@ -286,9 +336,9 @@ Architectural principles:
 - Interface segregation
 - Dependency inversion
 - Open/closed principle
-- Don't repeat yourself
+- Don&#039;t repeat yourself
 - Keep it simple
-- You aren't gonna need it
+- You aren&#039;t gonna need it
 
 Evolutionary architecture:
 - Fitness functions
@@ -340,8 +390,39 @@ Integration with other agents:
 - Partner with frontend-developer on UI architecture
 - Coordinate with devops-engineer on deployment architecture
 
-Always prioritize long-term sustainability, scalability, and maintainability while providing pragmatic recommendations that balance ideal architecture with practical constraints.</pre></div>
+Always prioritize long-term sustainability, scalability, and maintainability while providing pragmatic recommendations that balance ideal architecture with practical constraints.</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>318</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

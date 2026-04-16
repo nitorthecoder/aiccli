@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>treatment-plans - AICCLI</title>
-  <meta name="description" content="treatment-plans - Claude Code skill for AICCLI">
+  <meta name="description" content=""Generate concise (3-4 page), focused medical treatment plans in LaTeX/PDF format for all clinical specialties. Supports general medical treatment, rehabilitati">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / treatment-plans</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>treatment-plans</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / treatment-plans
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>treatment-plans</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Generate concise (3-4 page), focused medical treatment plans in LaTeX/PDF format for all clinical specialties. Supports general medical treatment, rehabilitation therapy, mental health care, chronic disease management, perioperative care, and pain management. Includes SMART goal frameworks, evidence-based interventions with minimal text citations, regulatory compliance (HIPAA), and professional formatting. Prioritizes brevity and clinical actionability."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/treatment-plans</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/treatment-plans</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/treatment-plans</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: treatment-plans
-description: "Generate concise (3-4 page), focused medical treatment plans in LaTeX/PDF format for all clinical specialties. Supports general medical treatment, rehabilitation therapy, mental health care, chronic disease management, perioperative care, and pain management. Includes SMART goal frameworks, evidence-based interventions with minimal text citations, regulatory compliance (HIPAA), and professional formatting. Prioritizes brevity and clinical actionability."
+description: &quot;Generate concise (3-4 page), focused medical treatment plans in LaTeX/PDF format for all clinical specialties. Supports general medical treatment, rehabilitation therapy, mental health care, chronic disease management, perioperative care, and pain management. Includes SMART goal frameworks, evidence-based interventions with minimal text citations, regulatory compliance (HIPAA), and professional formatting. Prioritizes brevity and clinical actionability.&quot;
 allowed-tools: [Read, Write, Edit, Bash]
 ---
 
@@ -68,7 +118,7 @@ allowed-tools: [Read, Write, Edit, Bash]
 Treatment plan writing is the systematic documentation of clinical care strategies designed to address patient health conditions through evidence-based interventions, measurable goals, and structured follow-up. This skill provides comprehensive LaTeX templates and validation tools for creating **concise, focused** treatment plans (3-4 pages standard) across all medical specialties with full regulatory compliance.
 
 **Critical Principles:**
-1. **CONCISE & ACTIONABLE**: Treatment plans default to 3-4 pages maximum, focusing only on clinically essential information that impacts care decisions
+1. **CONCISE &amp; ACTIONABLE**: Treatment plans default to 3-4 pages maximum, focusing only on clinically essential information that impacts care decisions
 2. **Patient-Centered**: Plans must be evidence-based, measurable, and compliant with healthcare regulations (HIPAA, documentation standards)
 3. **Minimal Citations**: Use brief in-text citations only when needed to support clinical recommendations; avoid extensive bibliographies
 
@@ -104,7 +154,7 @@ This is not optional. Treatment plans benefit greatly from visual elements. Befo
 
 **How to generate schematics:**
 ```bash
-python scripts/generate_schematic.py "your diagram description" -o figures/output.png
+python scripts/generate_schematic.py &quot;your diagram description&quot; -o figures/output.png
 ```
 
 The AI will automatically:
@@ -149,7 +199,7 @@ Treatment plans come in three format options based on clinical complexity and us
 3. **Supportive Care**: Brief bullet points
 4. **Rationale**: 1-2 sentence justification (optional for standard protocols)
 5. **Monitoring**: Key parameters and frequency
-6. **Evidence Level**: Guideline reference or evidence grade (e.g., "Level 1, FDA approved")
+6. **Evidence Level**: Guideline reference or evidence grade (e.g., &quot;Level 1, FDA approved&quot;)
 7. **Expected Outcome**: Timeline and success metrics
 
 **Design principles**:
@@ -157,7 +207,7 @@ Treatment plans come in three format options based on clinical complexity and us
 - Eliminate all non-essential text
 - Use abbreviations familiar to clinicians
 - Dense information layout - maximize information per square inch
-- Think "quick reference card" not "comprehensive documentation"
+- Think &quot;quick reference card&quot; not &quot;comprehensive documentation&quot;
 
 **Example structure**:
 ```latex
@@ -209,8 +259,8 @@ Following the Foundation Medicine model for precision medicine reporting and cli
 **Required First Page Structure (in order):**
 
 1. **Title and Subtitle**
-   - Main title: Treatment plan type (e.g., "Comprehensive Treatment Plan")
-   - Subtitle: Specific condition or focus (e.g., "Type 2 Diabetes Mellitus - Young Adult Patient")
+   - Main title: Treatment plan type (e.g., &quot;Comprehensive Treatment Plan&quot;)
+   - Subtitle: Specific condition or focus (e.g., &quot;Type 2 Diabetes Mellitus - Young Adult Patient&quot;)
 
 2. **Report Information Box** (using `\begin{infobox}` or `\begin{patientinfo}`)
    - Report type/document purpose
@@ -291,7 +341,7 @@ Treatment plans should prioritize **clarity and actionability** over exhaustive 
 
 **Streamlining Guidelines:**
 - **First Page Summary**: Use individual colored boxes to consolidate key information (goals, interventions, decision points) - this alone can often convey the essential treatment plan
-- **Eliminate Redundancy**: If information is in the first-page summary, don't repeat it verbatim in detailed sections
+- **Eliminate Redundancy**: If information is in the first-page summary, don&#039;t repeat it verbatim in detailed sections
 - **Patient Education section**: 3-5 key bullet points on critical topics and warning signs only
 - **Risk Mitigation section**: Highlight only critical medication safety concerns and emergency actions (not exhaustive lists)
 - **Expected Outcomes section**: 2-3 concise statements on anticipated responses and timelines
@@ -302,7 +352,7 @@ Treatment plans should prioritize **clarity and actionability** over exhaustive 
 
 ### Quality Over Quantity
 
-The goal is professional, clinically complete documentation that respects clinicians' time while ensuring comprehensive patient care. Every section should add value; remove or condense sections that don't directly inform treatment decisions.
+The goal is professional, clinically complete documentation that respects clinicians&#039; time while ensuring comprehensive patient care. Every section should add value; remove or condense sections that don&#039;t directly inform treatment decisions.
 
 ### Citations and Evidence Support
 
@@ -310,8 +360,8 @@ The goal is professional, clinically complete documentation that respects clinic
 
 - **Text Citations Preferred**: Use brief in-text citations (Author Year) or simple references rather than extensive bibliographies unless specifically requested
 - **When to Cite**:
-  - Clinical practice guideline recommendations (e.g., "per ADA 2024 guidelines")
-  - Specific medication dosing or protocols (e.g., "ACC/AHA recommendations")
+  - Clinical practice guideline recommendations (e.g., &quot;per ADA 2024 guidelines&quot;)
+  - Specific medication dosing or protocols (e.g., &quot;ACC/AHA recommendations&quot;)
   - Novel or controversial interventions requiring evidence support
   - Risk stratification tools or validated assessment scales
 - **When NOT to Cite**:
@@ -319,8 +369,8 @@ The goal is professional, clinically complete documentation that respects clinic
   - Basic medical facts and routine clinical practices
   - General patient education content
 - **Citation Format**: 
-  - Inline: "Initiate metformin as first-line therapy (ADA Standards of Care 2024)"
-  - Minimal: "Treatment follows ACC/AHA heart failure guidelines"
+  - Inline: &quot;Initiate metformin as first-line therapy (ADA Standards of Care 2024)&quot;
+  - Minimal: &quot;Treatment follows ACC/AHA heart failure guidelines&quot;
   - Avoid formal numbered references and extensive bibliography sections unless document is for academic/research purposes
 - **Keep it Brief**: A 3-4 page treatment plan should have 0-3 citations maximum, only where essential for clinical credibility or novel recommendations
 
@@ -351,11 +401,11 @@ General medical treatment plans address common chronic conditions and acute medi
 **Treatment Goals (SMART Format)**
 
 Short-term goals (1-3 months):
-- **Specific**: Clearly defined outcome (e.g., "Reduce HbA1c to &lt;7%")
-- **Measurable**: Quantifiable metrics (e.g., "Decrease systolic BP by 10 mmHg")
+- **Specific**: Clearly defined outcome (e.g., &quot;Reduce HbA1c to &lt;7%&quot;)
+- **Measurable**: Quantifiable metrics (e.g., &quot;Decrease systolic BP by 10 mmHg&quot;)
 - **Achievable**: Realistic given patient capabilities
 - **Relevant**: Aligned with patient priorities and values
-- **Time-bound**: Specific timeframe (e.g., "within 8 weeks")
+- **Time-bound**: Specific timeframe (e.g., &quot;within 8 weeks&quot;)
 
 Long-term goals (6-12 months):
 - Disease control or remission targets
@@ -759,8 +809,8 @@ Multimodal approaches to acute and chronic pain using evidence-based interventio
 
 - **1-page format is PREFERRED**: For most clinical scenarios, a single-page treatment plan (like precision oncology reports) provides all necessary information
 - **Default to shortest format possible**: Start with 1-page; only expand if clinical complexity genuinely requires it
-- **Every sentence must add value**: If a section doesn't change clinical decision-making, omit it entirely
-- **Think "quick reference card" not "comprehensive textbook"**: Busy clinicians need scannable, dense information
+- **Every sentence must add value**: If a section doesn&#039;t change clinical decision-making, omit it entirely
+- **Think &quot;quick reference card&quot; not &quot;comprehensive textbook&quot;**: Busy clinicians need scannable, dense information
 - **Avoid academic verbosity**: This is clinical documentation, not a literature review or teaching document
 - **Maximum lengths by complexity**:
   - Simple/standard cases: 1 page
@@ -773,7 +823,7 @@ Multimodal approaches to acute and chronic pain using evidence-based interventio
 - The first page must contain ONLY: Title, Report Info Box, and Key Findings boxes
 - This provides an at-a-glance overview similar to precision medicine reports
 - Table of contents and detailed sections start on page 2 or later
-- Think of it as a "clinical highlights" page that a busy clinician can scan in 30 seconds
+- Think of it as a &quot;clinical highlights&quot; page that a busy clinician can scan in 30 seconds
 - Use 2-4 colored boxes for different key findings (goals, interventions, decision points)
 - **A strong first page can often stand alone** - subsequent pages are for details, not repetition
 
@@ -781,7 +831,7 @@ Multimodal approaches to acute and chronic pain using evidence-based interventio
 
 All treatment goals should meet SMART criteria:
 
-- **Specific**: "Improve HbA1c to &lt;7%" not "Better diabetes control"
+- **Specific**: &quot;Improve HbA1c to &lt;7%&quot; not &quot;Better diabetes control&quot;
 - **Measurable**: Use quantifiable metrics, validated scales, objective measures
 - **Achievable**: Consider patient capabilities, resources, social support
 - **Relevant**: Align with patient values, priorities, and life circumstances
@@ -792,7 +842,7 @@ All treatment goals should meet SMART criteria:
 ✓ **Shared Decision-Making**: Involve patients in goal-setting and treatment choices  
 ✓ **Cultural Competence**: Respect cultural beliefs, language preferences, health literacy  
 ✓ **Patient Preferences**: Honor treatment preferences and personal values  
-✓ **Individualization**: Tailor plans to patient's unique circumstances  
+✓ **Individualization**: Tailor plans to patient&#039;s unique circumstances  
 ✓ **Empowerment**: Support patient activation and self-management  
 
 ### Evidence-Based Practice
@@ -958,7 +1008,7 @@ Review treatment plans against the quality checklist (`quality_checklist.md`):
 Treatment plans often accompany other clinical documentation:
 
 - **SOAP Notes** (`clinical-reports` skill): Document ongoing implementation
-- **H&P** (`clinical-reports` skill): Initial assessment informs treatment plan
+- **H&amp;P** (`clinical-reports` skill): Initial assessment informs treatment plan
 - **Discharge Summaries** (`clinical-reports` skill): Summarize treatment plan execution
 - **Progress Notes**: Track goal achievement and plan modifications
 
@@ -1254,10 +1304,10 @@ For patient demographics and baseline information:
 ```latex
 \begin{patientinfo}
   \begin{tabular}{ll}
-    \textbf{Age:} & 23 years \\
-    \textbf{Sex:} & Male \\
-    \textbf{Diagnosis:} & Type 2 Diabetes Mellitus \\
-    \textbf{Plan Start Date:} & \today \\
+    \textbf{Age:} &amp; 23 years \\
+    \textbf{Sex:} &amp; Male \\
+    \textbf{Diagnosis:} &amp; Type 2 Diabetes Mellitus \\
+    \textbf{Plan Start Date:} &amp; \today \\
   \end{tabular}
 \end{patientinfo}
 ```
@@ -1273,16 +1323,16 @@ Enhanced table environment with medical styling:
 \begin{tabular}{|p{5cm}|p{4cm}|p{4.5cm}|}
 \hline
 \tableheadercolor  % Blue header with white text
-\textcolor{white}{\textbf{Column 1}} & 
-\textcolor{white}{\textbf{Column 2}} & 
+\textcolor{white}{\textbf{Column 1}} &amp; 
+\textcolor{white}{\textbf{Column 2}} &amp; 
 \textcolor{white}{\textbf{Column 3}} \\
 \hline
-Data row 1 content & Value 1 & Details 1 \\
+Data row 1 content &amp; Value 1 &amp; Details 1 \\
 \hline
 \tablerowcolor  % Alternating light gray row
-Data row 2 content & Value 2 & Details 2 \\
+Data row 2 content &amp; Value 2 &amp; Details 2 \\
 \hline
-Data row 3 content & Value 3 & Details 3 \\
+Data row 3 content &amp; Value 3 &amp; Details 3 \\
 \hline
 \end{tabular}
 \caption{Table caption}
@@ -1501,7 +1551,7 @@ sudo tlmgr install tcolorbox tikz pgf
 
 1. **Appropriate Box Usage**
    - Match box type to content purpose (goals→green, warnings→yellow/red)
-   - Don't overuse boxes; reserve for truly important information
+   - Don&#039;t overuse boxes; reserve for truly important information
    - Keep box content concise and focused
 
 2. **Visual Hierarchy**
@@ -1516,7 +1566,7 @@ sudo tlmgr install tcolorbox tikz pgf
    - Maintain consistent meaning (red=warning, green=goals)
 
 4. **White Space**
-   - Don't overcrowd pages with boxes
+   - Don&#039;t overcrowd pages with boxes
    - Use `\vspace{0.5cm}` between major sections
    - Allow breathing room around colored elements
 
@@ -1631,8 +1681,39 @@ Balance medical recommendations with patient autonomy and values while promoting
 
 Part of the Claude Scientific Writer project. See main LICENSE file.
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>44</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

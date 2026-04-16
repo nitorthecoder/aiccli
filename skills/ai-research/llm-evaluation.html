@@ -4,63 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>llm-evaluation - AICCLI</title>
-  <meta name="description" content="llm-evaluation - Claude Code skill for AICCLI">
+  <meta name="description" content=""Master comprehensive evaluation strategies for LLM applications, from automated metrics to human evaluation and A/B testing."">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / llm-evaluation</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>llm-evaluation</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / llm-evaluation
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>llm-evaluation</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Master comprehensive evaluation strategies for LLM applications, from automated metrics to human evaluation and A/B testing."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/llm-evaluation</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/llm-evaluation</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/llm-evaluation</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: llm-evaluation
-description: "Master comprehensive evaluation strategies for LLM applications, from automated metrics to human evaluation and A/B testing."
+description: &quot;Master comprehensive evaluation strategies for LLM applications, from automated metrics to human evaluation and A/B testing.&quot;
 risk: unknown
 source: community
-date_added: "2026-02-27"
+date_added: &quot;2026-02-27&quot;
 ---
 
 # LLM Evaluation
@@ -143,15 +193,15 @@ suite = EvaluationSuite([
     Metric.accuracy(),
     Metric.bleu(),
     Metric.bertscore(),
-    Metric.custom(name="groundedness", fn=check_groundedness)
+    Metric.custom(name=&quot;groundedness&quot;, fn=check_groundedness)
 ])
 
 # Prepare test cases
 test_cases = [
     {
-        "input": "What is the capital of France?",
-        "expected": "Paris",
-        "context": "France is a country in Europe. Paris is its capital."
+        &quot;input&quot;: &quot;What is the capital of France?&quot;,
+        &quot;expected&quot;: &quot;Paris&quot;,
+        &quot;context&quot;: &quot;France is a country in Europe. Paris is its capital.&quot;
     },
     # ... more test cases
 ]
@@ -162,8 +212,8 @@ results = suite.evaluate(
     test_cases=test_cases
 )
 
-print(f"Overall Accuracy: {results.metrics['accuracy']}")
-print(f"BLEU Score: {results.metrics['bleu']}")
+print(f&quot;Overall Accuracy: {results.metrics[&#039;accuracy&#039;]}&quot;)
+print(f&quot;BLEU Score: {results.metrics[&#039;bleu&#039;]}&quot;)
 ```
 
 ## Automated Metrics Implementation
@@ -173,7 +223,7 @@ print(f"BLEU Score: {results.metrics['bleu']}")
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
 def calculate_bleu(reference, hypothesis):
-    """Calculate BLEU score between reference and hypothesis."""
+    &quot;&quot;&quot;Calculate BLEU score between reference and hypothesis.&quot;&quot;&quot;
     smoothie = SmoothingFunction().method4
 
     return sentence_bleu(
@@ -184,8 +234,8 @@ def calculate_bleu(reference, hypothesis):
 
 # Usage
 bleu = calculate_bleu(
-    reference="The cat sat on the mat",
-    hypothesis="A cat is sitting on the mat"
+    reference=&quot;The cat sat on the mat&quot;,
+    hypothesis=&quot;A cat is sitting on the mat&quot;
 )
 ```
 
@@ -194,14 +244,14 @@ bleu = calculate_bleu(
 from rouge_score import rouge_scorer
 
 def calculate_rouge(reference, hypothesis):
-    """Calculate ROUGE scores."""
-    scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
+    &quot;&quot;&quot;Calculate ROUGE scores.&quot;&quot;&quot;
+    scorer = rouge_scorer.RougeScorer([&#039;rouge1&#039;, &#039;rouge2&#039;, &#039;rougeL&#039;], use_stemmer=True)
     scores = scorer.score(reference, hypothesis)
 
     return {
-        'rouge1': scores['rouge1'].fmeasure,
-        'rouge2': scores['rouge2'].fmeasure,
-        'rougeL': scores['rougeL'].fmeasure
+        &#039;rouge1&#039;: scores[&#039;rouge1&#039;].fmeasure,
+        &#039;rouge2&#039;: scores[&#039;rouge2&#039;].fmeasure,
+        &#039;rougeL&#039;: scores[&#039;rougeL&#039;].fmeasure
     }
 ```
 
@@ -210,44 +260,44 @@ def calculate_rouge(reference, hypothesis):
 from bert_score import score
 
 def calculate_bertscore(references, hypotheses):
-    """Calculate BERTScore using pre-trained BERT."""
+    &quot;&quot;&quot;Calculate BERTScore using pre-trained BERT.&quot;&quot;&quot;
     P, R, F1 = score(
         hypotheses,
         references,
-        lang='en',
-        model_type='microsoft/deberta-xlarge-mnli'
+        lang=&#039;en&#039;,
+        model_type=&#039;microsoft/deberta-xlarge-mnli&#039;
     )
 
     return {
-        'precision': P.mean().item(),
-        'recall': R.mean().item(),
-        'f1': F1.mean().item()
+        &#039;precision&#039;: P.mean().item(),
+        &#039;recall&#039;: R.mean().item(),
+        &#039;f1&#039;: F1.mean().item()
     }
 ```
 
 ### Custom Metrics
 ```python
 def calculate_groundedness(response, context):
-    """Check if response is grounded in provided context."""
+    &quot;&quot;&quot;Check if response is grounded in provided context.&quot;&quot;&quot;
     # Use NLI model to check entailment
     from transformers import pipeline
 
-    nli = pipeline("text-classification", model="microsoft/deberta-large-mnli")
+    nli = pipeline(&quot;text-classification&quot;, model=&quot;microsoft/deberta-large-mnli&quot;)
 
-    result = nli(f"{context} [SEP] {response}")[0]
+    result = nli(f&quot;{context} [SEP] {response}&quot;)[0]
 
     # Return confidence that response is entailed by context
-    return result['score'] if result['label'] == 'ENTAILMENT' else 0.0
+    return result[&#039;score&#039;] if result[&#039;label&#039;] == &#039;ENTAILMENT&#039; else 0.0
 
 def calculate_toxicity(text):
-    """Measure toxicity in generated text."""
+    &quot;&quot;&quot;Measure toxicity in generated text.&quot;&quot;&quot;
     from detoxify import Detoxify
 
-    results = Detoxify('original').predict(text)
+    results = Detoxify(&#039;original&#039;).predict(text)
     return max(results.values())  # Return highest toxicity score
 
 def calculate_factuality(claim, knowledge_base):
-    """Verify factual claims against knowledge base."""
+    &quot;&quot;&quot;Verify factual claims against knowledge base.&quot;&quot;&quot;
     # Implementation depends on your knowledge base
     # Could use retrieval + NLI, or fact-checking API
     pass
@@ -258,8 +308,8 @@ def calculate_factuality(claim, knowledge_base):
 ### Single Output Evaluation
 ```python
 def llm_judge_quality(response, question):
-    """Use GPT-5 to judge response quality."""
-    prompt = f"""Rate the following response on a scale of 1-10 for:
+    &quot;&quot;&quot;Use GPT-5 to judge response quality.&quot;&quot;&quot;
+    prompt = f&quot;&quot;&quot;Rate the following response on a scale of 1-10 for:
 1. Accuracy (factually correct)
 2. Helpfulness (answers the question)
 3. Clarity (well-written and understandable)
@@ -269,16 +319,16 @@ Response: {response}
 
 Provide ratings in JSON format:
 {{
-  "accuracy": &lt;1-10&gt;,
-  "helpfulness": &lt;1-10&gt;,
-  "clarity": &lt;1-10&gt;,
-  "reasoning": "&lt;brief explanation&gt;"
+  &quot;accuracy&quot;: &lt;1-10&gt;,
+  &quot;helpfulness&quot;: &lt;1-10&gt;,
+  &quot;clarity&quot;: &lt;1-10&gt;,
+  &quot;reasoning&quot;: &quot;&lt;brief explanation&gt;&quot;
 }}
-"""
+&quot;&quot;&quot;
 
     result = openai.ChatCompletion.create(
-        model="gpt-5",
-        messages=[{"role": "user", "content": prompt}],
+        model=&quot;gpt-5&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
         temperature=0
     )
 
@@ -288,8 +338,8 @@ Provide ratings in JSON format:
 ### Pairwise Comparison
 ```python
 def compare_responses(question, response_a, response_b):
-    """Compare two responses using LLM judge."""
-    prompt = f"""Compare these two responses to the question and determine which is better.
+    &quot;&quot;&quot;Compare two responses using LLM judge.&quot;&quot;&quot;
+    prompt = f&quot;&quot;&quot;Compare these two responses to the question and determine which is better.
 
 Question: {question}
 
@@ -301,15 +351,15 @@ Which response is better and why? Consider accuracy, helpfulness, and clarity.
 
 Answer with JSON:
 {{
-  "winner": "A" or "B" or "tie",
-  "reasoning": "&lt;explanation&gt;",
-  "confidence": &lt;1-10&gt;
+  &quot;winner&quot;: &quot;A&quot; or &quot;B&quot; or &quot;tie&quot;,
+  &quot;reasoning&quot;: &quot;&lt;explanation&gt;&quot;,
+  &quot;confidence&quot;: &lt;1-10&gt;
 }}
-"""
+&quot;&quot;&quot;
 
     result = openai.ChatCompletion.create(
-        model="gpt-5",
-        messages=[{"role": "user", "content": prompt}],
+        model=&quot;gpt-5&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
         temperature=0
     )
 
@@ -321,7 +371,7 @@ Answer with JSON:
 ### Annotation Guidelines
 ```python
 class AnnotationTask:
-    """Structure for human annotation task."""
+    &quot;&quot;&quot;Structure for human annotation task.&quot;&quot;&quot;
 
     def __init__(self, response, question, context=None):
         self.response = response
@@ -330,30 +380,30 @@ class AnnotationTask:
 
     def get_annotation_form(self):
         return {
-            "question": self.question,
-            "context": self.context,
-            "response": self.response,
-            "ratings": {
-                "accuracy": {
-                    "scale": "1-5",
-                    "description": "Is the response factually correct?"
+            &quot;question&quot;: self.question,
+            &quot;context&quot;: self.context,
+            &quot;response&quot;: self.response,
+            &quot;ratings&quot;: {
+                &quot;accuracy&quot;: {
+                    &quot;scale&quot;: &quot;1-5&quot;,
+                    &quot;description&quot;: &quot;Is the response factually correct?&quot;
                 },
-                "relevance": {
-                    "scale": "1-5",
-                    "description": "Does it answer the question?"
+                &quot;relevance&quot;: {
+                    &quot;scale&quot;: &quot;1-5&quot;,
+                    &quot;description&quot;: &quot;Does it answer the question?&quot;
                 },
-                "coherence": {
-                    "scale": "1-5",
-                    "description": "Is it logically consistent?"
+                &quot;coherence&quot;: {
+                    &quot;scale&quot;: &quot;1-5&quot;,
+                    &quot;description&quot;: &quot;Is it logically consistent?&quot;
                 }
             },
-            "issues": {
-                "factual_error": False,
-                "hallucination": False,
-                "off_topic": False,
-                "unsafe_content": False
+            &quot;issues&quot;: {
+                &quot;factual_error&quot;: False,
+                &quot;hallucination&quot;: False,
+                &quot;off_topic&quot;: False,
+                &quot;unsafe_content&quot;: False
             },
-            "feedback": ""
+            &quot;feedback&quot;: &quot;&quot;
         }
 ```
 
@@ -362,21 +412,21 @@ class AnnotationTask:
 from sklearn.metrics import cohen_kappa_score
 
 def calculate_agreement(rater1_scores, rater2_scores):
-    """Calculate inter-rater agreement."""
+    &quot;&quot;&quot;Calculate inter-rater agreement.&quot;&quot;&quot;
     kappa = cohen_kappa_score(rater1_scores, rater2_scores)
 
     interpretation = {
-        kappa &lt; 0: "Poor",
-        kappa &lt; 0.2: "Slight",
-        kappa &lt; 0.4: "Fair",
-        kappa &lt; 0.6: "Moderate",
-        kappa &lt; 0.8: "Substantial",
-        kappa &lt;= 1.0: "Almost Perfect"
+        kappa &lt; 0: &quot;Poor&quot;,
+        kappa &lt; 0.2: &quot;Slight&quot;,
+        kappa &lt; 0.4: &quot;Fair&quot;,
+        kappa &lt; 0.6: &quot;Moderate&quot;,
+        kappa &lt; 0.8: &quot;Substantial&quot;,
+        kappa &lt;= 1.0: &quot;Almost Perfect&quot;
     }
 
     return {
-        "kappa": kappa,
-        "interpretation": interpretation[True]
+        &quot;kappa&quot;: kappa,
+        &quot;interpretation&quot;: interpretation[True]
     }
 ```
 
@@ -388,53 +438,53 @@ from scipy import stats
 import numpy as np
 
 class ABTest:
-    def __init__(self, variant_a_name="A", variant_b_name="B"):
-        self.variant_a = {"name": variant_a_name, "scores": []}
-        self.variant_b = {"name": variant_b_name, "scores": []}
+    def __init__(self, variant_a_name=&quot;A&quot;, variant_b_name=&quot;B&quot;):
+        self.variant_a = {&quot;name&quot;: variant_a_name, &quot;scores&quot;: []}
+        self.variant_b = {&quot;name&quot;: variant_b_name, &quot;scores&quot;: []}
 
     def add_result(self, variant, score):
-        """Add evaluation result for a variant."""
-        if variant == "A":
-            self.variant_a["scores"].append(score)
+        &quot;&quot;&quot;Add evaluation result for a variant.&quot;&quot;&quot;
+        if variant == &quot;A&quot;:
+            self.variant_a[&quot;scores&quot;].append(score)
         else:
-            self.variant_b["scores"].append(score)
+            self.variant_b[&quot;scores&quot;].append(score)
 
     def analyze(self, alpha=0.05):
-        """Perform statistical analysis."""
-        a_scores = self.variant_a["scores"]
-        b_scores = self.variant_b["scores"]
+        &quot;&quot;&quot;Perform statistical analysis.&quot;&quot;&quot;
+        a_scores = self.variant_a[&quot;scores&quot;]
+        b_scores = self.variant_b[&quot;scores&quot;]
 
         # T-test
         t_stat, p_value = stats.ttest_ind(a_scores, b_scores)
 
-        # Effect size (Cohen's d)
+        # Effect size (Cohen&#039;s d)
         pooled_std = np.sqrt((np.std(a_scores)**2 + np.std(b_scores)**2) / 2)
         cohens_d = (np.mean(b_scores) - np.mean(a_scores)) / pooled_std
 
         return {
-            "variant_a_mean": np.mean(a_scores),
-            "variant_b_mean": np.mean(b_scores),
-            "difference": np.mean(b_scores) - np.mean(a_scores),
-            "relative_improvement": (np.mean(b_scores) - np.mean(a_scores)) / np.mean(a_scores),
-            "p_value": p_value,
-            "statistically_significant": p_value &lt; alpha,
-            "cohens_d": cohens_d,
-            "effect_size": self.interpret_cohens_d(cohens_d),
-            "winner": "B" if np.mean(b_scores) &gt; np.mean(a_scores) else "A"
+            &quot;variant_a_mean&quot;: np.mean(a_scores),
+            &quot;variant_b_mean&quot;: np.mean(b_scores),
+            &quot;difference&quot;: np.mean(b_scores) - np.mean(a_scores),
+            &quot;relative_improvement&quot;: (np.mean(b_scores) - np.mean(a_scores)) / np.mean(a_scores),
+            &quot;p_value&quot;: p_value,
+            &quot;statistically_significant&quot;: p_value &lt; alpha,
+            &quot;cohens_d&quot;: cohens_d,
+            &quot;effect_size&quot;: self.interpret_cohens_d(cohens_d),
+            &quot;winner&quot;: &quot;B&quot; if np.mean(b_scores) &gt; np.mean(a_scores) else &quot;A&quot;
         }
 
     @staticmethod
     def interpret_cohens_d(d):
-        """Interpret Cohen's d effect size."""
+        &quot;&quot;&quot;Interpret Cohen&#039;s d effect size.&quot;&quot;&quot;
         abs_d = abs(d)
         if abs_d &lt; 0.2:
-            return "negligible"
+            return &quot;negligible&quot;
         elif abs_d &lt; 0.5:
-            return "small"
+            return &quot;small&quot;
         elif abs_d &lt; 0.8:
-            return "medium"
+            return &quot;medium&quot;
         else:
-            return "large"
+            return &quot;large&quot;
 ```
 
 ## Regression Testing
@@ -447,7 +497,7 @@ class RegressionDetector:
         self.threshold = threshold
 
     def check_for_regression(self, new_results):
-        """Detect if new results show regression."""
+        &quot;&quot;&quot;Detect if new results show regression.&quot;&quot;&quot;
         regressions = []
 
         for metric in self.baseline.keys():
@@ -463,15 +513,15 @@ class RegressionDetector:
             # Flag if significant decrease
             if relative_change &lt; -self.threshold:
                 regressions.append({
-                    "metric": metric,
-                    "baseline": baseline_score,
-                    "current": new_score,
-                    "change": relative_change
+                    &quot;metric&quot;: metric,
+                    &quot;baseline&quot;: baseline_score,
+                    &quot;current&quot;: new_score,
+                    &quot;change&quot;: relative_change
                 })
 
         return {
-            "has_regression": len(regressions) &gt; 0,
-            "regressions": regressions
+            &quot;has_regression&quot;: len(regressions) &gt; 0,
+            &quot;regressions&quot;: regressions
         }
 ```
 
@@ -484,29 +534,29 @@ class BenchmarkRunner:
         self.dataset = benchmark_dataset
 
     def run_benchmark(self, model, metrics):
-        """Run model on benchmark and calculate metrics."""
+        &quot;&quot;&quot;Run model on benchmark and calculate metrics.&quot;&quot;&quot;
         results = {metric.name: [] for metric in metrics}
 
         for example in self.dataset:
             # Generate prediction
-            prediction = model.predict(example["input"])
+            prediction = model.predict(example[&quot;input&quot;])
 
             # Calculate each metric
             for metric in metrics:
                 score = metric.calculate(
                     prediction=prediction,
-                    reference=example["reference"],
-                    context=example.get("context")
+                    reference=example[&quot;reference&quot;],
+                    context=example.get(&quot;context&quot;)
                 )
                 results[metric.name].append(score)
 
         # Aggregate results
         return {
             metric: {
-                "mean": np.mean(scores),
-                "std": np.std(scores),
-                "min": min(scores),
-                "max": max(scores)
+                &quot;mean&quot;: np.mean(scores),
+                &quot;std&quot;: np.std(scores),
+                &quot;min&quot;: min(scores),
+                &quot;max&quot;: max(scores)
             }
             for metric, scores in results.items()
         }
@@ -541,8 +591,39 @@ class BenchmarkRunner:
 - **Data Contamination**: Testing on training data
 - **Ignoring Variance**: Not accounting for statistical uncertainty
 - **Metric Mismatch**: Using metrics not aligned with business goals
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>0</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

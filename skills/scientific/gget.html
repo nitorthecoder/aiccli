@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>gget - AICCLI</title>
-  <meta name="description" content="gget - Claude Code skill for AICCLI">
+  <meta name="description" content=""CLI/Python toolkit for rapid bioinformatics queries. Preferred for quick BLAST searches. Access to 20+ databases: gene info (Ensembl/UniProt), AlphaFold, ARCHS">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / gget</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>gget</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / gget
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>gget</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"CLI/Python toolkit for rapid bioinformatics queries. Preferred for quick BLAST searches. Access to 20+ databases: gene info (Ensembl/UniProt), AlphaFold, ARCHS4, Enrichr, OpenTargets, COSMIC, genome downloads. For advanced BLAST/batch processing, use biopython. For multi-database integration, use bioservices."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/gget</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/gget</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/gget</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: gget
-description: "CLI/Python toolkit for rapid bioinformatics queries. Preferred for quick BLAST searches. Access to 20+ databases: gene info (Ensembl/UniProt), AlphaFold, ARCHS4, Enrichr, OpenTargets, COSMIC, genome downloads. For advanced BLAST/batch processing, use biopython. For multi-database integration, use bioservices."
+description: &quot;CLI/Python toolkit for rapid bioinformatics queries. Preferred for quick BLAST searches. Access to 20+ databases: gene info (Ensembl/UniProt), AlphaFold, ARCHS4, Enrichr, OpenTargets, COSMIC, genome downloads. For advanced BLAST/batch processing, use biopython. For multi-database integration, use bioservices.&quot;
 ---
 
 # gget
@@ -106,14 +156,14 @@ Common flags across modules:
 
 ## Module Categories
 
-### 1. Reference & Gene Information
+### 1. Reference &amp; Gene Information
 
 #### gget ref - Reference Genome Downloads
 
 Retrieve download links and metadata for Ensembl reference genomes.
 
 **Parameters**:
-- `species`: Genus_species format (e.g., 'homo_sapiens', 'mus_musculus'). Shortcuts: 'human', 'mouse'
+- `species`: Genus_species format (e.g., &#039;homo_sapiens&#039;, &#039;mus_musculus&#039;). Shortcuts: &#039;human&#039;, &#039;mouse&#039;
 - `-w/--which`: Specify return types (gtf, cdna, dna, cds, cdrna, pep). Default: all
 - `-r/--release`: Ensembl release number (default: latest)
 - `-l/--list_species`: List available vertebrate species
@@ -135,8 +185,8 @@ gget ref -w gtf -d mouse
 
 ```python
 # Python
-gget.ref("homo_sapiens")
-gget.ref("mus_musculus", which="gtf", download=True)
+gget.ref(&quot;homo_sapiens&quot;)
+gget.ref(&quot;mus_musculus&quot;, which=&quot;gtf&quot;, download=True)
 ```
 
 #### gget search - Gene Search
@@ -145,10 +195,10 @@ Locate genes by name or description across species.
 
 **Parameters**:
 - `searchwords`: One or more search terms (case-insensitive)
-- `-s/--species`: Target species (e.g., 'homo_sapiens', 'mouse')
+- `-s/--species`: Target species (e.g., &#039;homo_sapiens&#039;, &#039;mouse&#039;)
 - `-r/--release`: Ensembl release number
-- `-t/--id_type`: Return 'gene' (default) or 'transcript'
-- `-ao/--andor`: 'or' (default) finds ANY searchword; 'and' requires ALL
+- `-t/--id_type`: Return &#039;gene&#039; (default) or &#039;transcript&#039;
+- `-ao/--andor`: &#039;or&#039; (default) finds ANY searchword; &#039;and&#039; requires ALL
 - `-l/--limit`: Maximum results to return
 
 **Returns**: ensembl_id, gene_name, ensembl_description, ext_ref_description, biotype, URL
@@ -164,7 +214,7 @@ gget search -s mouse -ao and pax7 transcription
 
 ```python
 # Python
-gget.search(["gaba", "gamma-aminobutyric"], species="homo_sapiens")
+gget.search([&quot;gaba&quot;, &quot;gamma-aminobutyric&quot;], species=&quot;homo_sapiens&quot;)
 ```
 
 #### gget info - Gene/Transcript Information
@@ -190,7 +240,7 @@ gget info ENSG00000034713 -pdb
 
 ```python
 # Python
-gget.info(["ENSG00000034713", "ENSG00000104853"], pdb=True)
+gget.info([&quot;ENSG00000034713&quot;, &quot;ENSG00000104853&quot;], pdb=True)
 ```
 
 #### gget seq - Sequence Retrieval
@@ -215,10 +265,10 @@ gget seq -t -iso ENSG00000034713
 
 ```python
 # Python
-gget.seq(["ENSG00000034713"], translate=True, isoforms=True)
+gget.seq([&quot;ENSG00000034713&quot;], translate=True, isoforms=True)
 ```
 
-### 2. Sequence Analysis & Alignment
+### 2. Sequence Analysis &amp; Alignment
 
 #### gget blast - BLAST Searches
 
@@ -246,7 +296,7 @@ gget blast sequence.fasta -db swissprot -l 10
 
 ```python
 # Python
-gget.blast("MKWMFK...", database="swissprot", limit=10)
+gget.blast(&quot;MKWMFK...&quot;, database=&quot;swissprot&quot;, limit=10)
 ```
 
 #### gget blat - BLAT Searches
@@ -255,8 +305,8 @@ Locate genomic positions of sequences using UCSC BLAT.
 
 **Parameters**:
 - `sequence`: Sequence string or path to FASTA/.txt file
-- `-st/--seqtype`: 'DNA', 'protein', 'translated%20RNA', 'translated%20DNA' (auto-detected)
-- `-a/--assembly`: Target assembly (default: 'human'/hg38; options: 'mouse'/mm39, 'zebrafinch'/taeGut2, etc.)
+- `-st/--seqtype`: &#039;DNA&#039;, &#039;protein&#039;, &#039;translated%20RNA&#039;, &#039;translated%20DNA&#039; (auto-detected)
+- `-a/--assembly`: Target assembly (default: &#039;human&#039;/hg38; options: &#039;mouse&#039;/mm39, &#039;zebrafinch&#039;/taeGut2, etc.)
 
 **Returns**: genome, query size, alignment positions, matches, mismatches, alignment percentage
 
@@ -271,7 +321,7 @@ gget blat -a mm39 ATCGATCGATCGATCG
 
 ```python
 # Python
-gget.blat("ATCGATCGATCGATCG", assembly="mouse")
+gget.blat(&quot;ATCGATCGATCGATCG&quot;, assembly=&quot;mouse&quot;)
 ```
 
 #### gget muscle - Multiple Sequence Alignment
@@ -295,7 +345,7 @@ gget muscle large_dataset.fasta -s5
 
 ```python
 # Python
-gget.muscle("sequences.fasta", save=True)
+gget.muscle(&quot;sequences.fasta&quot;, save=True)
 ```
 
 #### gget diamond - Local Sequence Alignment
@@ -323,17 +373,17 @@ gget diamond query.fasta -ref ref.fasta --diamond_db my_db.dmnd
 
 ```python
 # Python
-gget.diamond("GGETISAWESQME", reference="reference.fasta", threads=4)
+gget.diamond(&quot;GGETISAWESQME&quot;, reference=&quot;reference.fasta&quot;, threads=4)
 ```
 
-### 3. Structural & Protein Analysis
+### 3. Structural &amp; Protein Analysis
 
 #### gget pdb - Protein Structures
 
 Query RCSB Protein Data Bank for structure and metadata.
 
 **Parameters**:
-- `pdb_id`: PDB identifier (e.g., '7S7U')
+- `pdb_id`: PDB identifier (e.g., &#039;7S7U&#039;)
 - `-r/--resource`: Data type (pdb, entry, pubmed, assembly, entity types)
 - `-i/--identifier`: Assembly, entity, or chain ID
 
@@ -350,7 +400,7 @@ gget pdb 7S7U -r entry
 
 ```python
 # Python
-gget.pdb("7S7U", save=True)
+gget.pdb(&quot;7S7U&quot;, save=True)
 ```
 
 #### gget alphafold - Protein Structure Prediction
@@ -387,10 +437,10 @@ gget alphafold sequence1.fasta -mr 20 -r
 
 ```python
 # Python with visualization
-gget.alphafold("MKWMFK...", plot=True, show_sidechains=True)
+gget.alphafold(&quot;MKWMFK...&quot;, plot=True, show_sidechains=True)
 
 # Multimer prediction
-gget.alphafold(["sequence1", "sequence2"], multimer_recycles=20)
+gget.alphafold([&quot;sequence1&quot;, &quot;sequence2&quot;], multimer_recycles=20)
 ```
 
 #### gget elm - Eukaryotic Linear Motifs
@@ -406,7 +456,7 @@ gget setup elm
 - `sequence`: Amino acid sequence or UniProt Acc
 - `-u/--uniprot`: Indicates sequence is UniProt Acc
 - `-e/--expand`: Include protein names, organisms, references
-- `-s/--sensitivity`: DIAMOND alignment sensitivity (default: "very-sensitive")
+- `-s/--sensitivity`: DIAMOND alignment sensitivity (default: &quot;very-sensitive&quot;)
 - `-t/--threads`: Number of threads (default: 1)
 
 **Returns**: Two outputs:
@@ -424,19 +474,19 @@ gget elm --uniprot Q02410 -e
 
 ```python
 # Python
-ortholog_df, regex_df = gget.elm("LIAQSIGQASFV")
+ortholog_df, regex_df = gget.elm(&quot;LIAQSIGQASFV&quot;)
 ```
 
-### 4. Expression & Disease Data
+### 4. Expression &amp; Disease Data
 
-#### gget archs4 - Gene Correlation & Tissue Expression
+#### gget archs4 - Gene Correlation &amp; Tissue Expression
 
 Query ARCHS4 database for correlated genes or tissue expression data.
 
 **Parameters**:
 - `gene`: Gene symbol or Ensembl ID (with `--ensembl` flag)
-- `-w/--which`: 'correlation' (default, returns 100 most correlated genes) or 'tissue' (expression atlas)
-- `-s/--species`: 'human' (default) or 'mouse' (tissue data only)
+- `-w/--which`: &#039;correlation&#039; (default, returns 100 most correlated genes) or &#039;tissue&#039; (expression atlas)
+- `-s/--species`: &#039;human&#039; (default) or &#039;mouse&#039; (tissue data only)
 - `-e/--ensembl`: Input is Ensembl ID
 
 **Returns**:
@@ -454,7 +504,7 @@ gget archs4 -w tissue ACE2
 
 ```python
 # Python
-gget.archs4("ACE2", which="tissue")
+gget.archs4(&quot;ACE2&quot;, which=&quot;tissue&quot;)
 ```
 
 #### gget cellxgene - Single-Cell RNA-seq Data
@@ -467,11 +517,11 @@ gget setup cellxgene
 ```
 
 **Parameters**:
-- `--gene` (-g): Gene names or Ensembl IDs (case-sensitive! 'PAX7' for human, 'Pax7' for mouse)
+- `--gene` (-g): Gene names or Ensembl IDs (case-sensitive! &#039;PAX7&#039; for human, &#039;Pax7&#039; for mouse)
 - `--tissue`: Tissue type(s)
 - `--cell_type`: Specific cell type(s)
-- `--species` (-s): 'homo_sapiens' (default) or 'mus_musculus'
-- `--census_version` (-cv): Version ("stable", "latest", or dated)
+- `--species` (-s): &#039;homo_sapiens&#039; (default) or &#039;mus_musculus&#039;
+- `--census_version` (-cv): Version (&quot;stable&quot;, &quot;latest&quot;, or dated)
 - `--ensembl` (-e): Use Ensembl IDs
 - `--meta_only` (-mo): Return metadata only
 - Additional filters: disease, development_stage, sex, assay, dataset_id, donor_id, ethnicity, suspension_type
@@ -481,7 +531,7 @@ gget setup cellxgene
 **Examples**:
 ```bash
 # Get single-cell data for specific genes and cell types
-gget cellxgene --gene ACE2 ABCA1 --tissue lung --cell_type "mucus secreting cell" -o lung_data.h5ad
+gget cellxgene --gene ACE2 ABCA1 --tissue lung --cell_type &quot;mucus secreting cell&quot; -o lung_data.h5ad
 
 # Metadata only
 gget cellxgene --gene PAX7 --tissue muscle --meta_only -o metadata.csv
@@ -489,7 +539,7 @@ gget cellxgene --gene PAX7 --tissue muscle --meta_only -o metadata.csv
 
 ```python
 # Python
-adata = gget.cellxgene(gene=["ACE2", "ABCA1"], tissue="lung", cell_type="mucus secreting cell")
+adata = gget.cellxgene(gene=[&quot;ACE2&quot;, &quot;ABCA1&quot;], tissue=&quot;lung&quot;, cell_type=&quot;mucus secreting cell&quot;)
 ```
 
 #### gget enrichr - Enrichment Analysis
@@ -498,18 +548,18 @@ Perform ontology enrichment analysis on gene lists using Enrichr.
 
 **Parameters**:
 - `genes`: Gene symbols or Ensembl IDs
-- `-db/--database`: Reference database (supports shortcuts: 'pathway', 'transcription', 'ontology', 'diseases_drugs', 'celltypes')
+- `-db/--database`: Reference database (supports shortcuts: &#039;pathway&#039;, &#039;transcription&#039;, &#039;ontology&#039;, &#039;diseases_drugs&#039;, &#039;celltypes&#039;)
 - `-s/--species`: human (default), mouse, fly, yeast, worm, fish
 - `-bkg_l/--background_list`: Background genes for comparison
 - `-ko/--kegg_out`: Save KEGG pathway images with highlighted genes
 - `plot`: Python-only; generate graphical results
 
 **Database Shortcuts**:
-- 'pathway' → KEGG_2021_Human
-- 'transcription' → ChEA_2016
-- 'ontology' → GO_Biological_Process_2021
-- 'diseases_drugs' → GWAS_Catalog_2019
-- 'celltypes' → PanglaoDB_Augmented_2021
+- &#039;pathway&#039; → KEGG_2021_Human
+- &#039;transcription&#039; → ChEA_2016
+- &#039;ontology&#039; → GO_Biological_Process_2021
+- &#039;diseases_drugs&#039; → GWAS_Catalog_2019
+- &#039;celltypes&#039; → PanglaoDB_Augmented_2021
 
 **Examples**:
 ```bash
@@ -522,16 +572,16 @@ gget enrichr -db pathway ACE2 AGT AGTR1 -ko ./kegg_images/
 
 ```python
 # Python with plot
-gget.enrichr(["ACE2", "AGT", "AGTR1"], database="ontology", plot=True)
+gget.enrichr([&quot;ACE2&quot;, &quot;AGT&quot;, &quot;AGTR1&quot;], database=&quot;ontology&quot;, plot=True)
 ```
 
-#### gget bgee - Orthology & Expression
+#### gget bgee - Orthology &amp; Expression
 
 Retrieve orthology and gene expression data from Bgee database.
 
 **Parameters**:
 - `ens_id`: Ensembl gene ID or NCBI gene ID (for non-Ensembl species). Multiple IDs supported when `type=expression`
-- `-t/--type`: 'orthologs' (default) or 'expression'
+- `-t/--type`: &#039;orthologs&#039; (default) or &#039;expression&#039;
 
 **Returns**:
 - **Orthologs mode**: Matching genes across species with IDs, names, taxonomic info
@@ -551,10 +601,10 @@ gget bgee ENSBTAG00000047356 ENSBTAG00000018317 -t expression
 
 ```python
 # Python
-gget.bgee("ENSG00000169194", type="orthologs")
+gget.bgee(&quot;ENSG00000169194&quot;, type=&quot;orthologs&quot;)
 ```
 
-#### gget opentargets - Disease & Drug Associations
+#### gget opentargets - Disease &amp; Drug Associations
 
 Retrieve disease and drug associations from OpenTargets.
 
@@ -582,7 +632,7 @@ gget opentargets ENSG00000169194 -r expression --filter_tissue brain
 
 ```python
 # Python
-gget.opentargets("ENSG00000169194", resource="diseases", limit=5)
+gget.opentargets(&quot;ENSG00000169194&quot;, resource=&quot;diseases&quot;, limit=5)
 ```
 
 #### gget cbio - cBioPortal Cancer Genomics
@@ -603,7 +653,7 @@ gget cbio search breast lung
 - `-g/--genes`: Space-separated gene names or Ensembl IDs (required)
 - `-st/--stratification`: Column to organize data (tissue, cancer_type, cancer_type_detailed, study_id, sample)
 - `-vt/--variation_type`: Data type (mutation_occurrences, cna_nonbinary, sv_occurrences, cna_occurrences, Consequence)
-- `-f/--filter`: Filter by column value (e.g., 'study_id:msk_impact_2017')
+- `-f/--filter`: Filter by column value (e.g., &#039;study_id:msk_impact_2017&#039;)
 - `-dd/--data_dir`: Cache directory (default: ./gget_cbio_cache)
 - `-fd/--figure_dir`: Output directory (default: ./gget_cbio_figures)
 - `-dpi`: Resolution (default: 100)
@@ -621,8 +671,8 @@ gget cbio plot -s msk_impact_2017 -g AKT1 ALK BRAF -st tissue -vt mutation_occur
 
 ```python
 # Python
-gget.cbio_search(["esophag", "ovary"])
-gget.cbio_plot(["msk_impact_2017"], ["AKT1", "ALK"], stratification="tissue")
+gget.cbio_search([&quot;esophag&quot;, &quot;ovary&quot;])
+gget.cbio_plot([&quot;msk_impact_2017&quot;], [&quot;AKT1&quot;, &quot;ALK&quot;], stratification=&quot;tissue&quot;)
 ```
 
 #### gget cosmic - COSMIC Database
@@ -655,7 +705,7 @@ gget cosmic EGFR -ctp cosmic_data.tsv -l 10
 
 ```python
 # Python
-gget.cosmic("EGFR", cosmic_tsv_path="cosmic_data.tsv", limit=10)
+gget.cosmic(&quot;EGFR&quot;, cosmic_tsv_path=&quot;cosmic_data.tsv&quot;, limit=10)
 ```
 
 ### 5. Additional Tools
@@ -667,8 +717,8 @@ Generate mutated nucleotide sequences from mutation annotations.
 **Parameters**:
 - `sequences`: FASTA file path or direct sequence input (string/list)
 - `-m/--mutations`: CSV/TSV file or DataFrame with mutation data (required)
-- `-mc/--mut_column`: Mutation column name (default: 'mutation')
-- `-sic/--seq_id_column`: Sequence ID column (default: 'seq_ID')
+- `-mc/--mut_column`: Mutation column name (default: &#039;mutation&#039;)
+- `-sic/--seq_id_column`: Sequence ID column (default: &#039;seq_ID&#039;)
 - `-mic/--mut_id_column`: Mutation ID column
 - `-k/--k`: Length of flanking sequences (default: 30 nucleotides)
 
@@ -677,7 +727,7 @@ Generate mutated nucleotide sequences from mutation annotations.
 **Examples**:
 ```bash
 # Single mutation
-gget mutate ATCGCTAAGCT -m "c.4G&gt;T"
+gget mutate ATCGCTAAGCT -m &quot;c.4G&gt;T&quot;
 
 # Multiple sequences with mutations from file
 gget mutate sequences.fasta -m mutations.csv -o mutated.fasta
@@ -686,13 +736,13 @@ gget mutate sequences.fasta -m mutations.csv -o mutated.fasta
 ```python
 # Python
 import pandas as pd
-mutations_df = pd.DataFrame({"seq_ID": ["seq1"], "mutation": ["c.4G&gt;T"]})
-gget.mutate(["ATCGCTAAGCT"], mutations=mutations_df)
+mutations_df = pd.DataFrame({&quot;seq_ID&quot;: [&quot;seq1&quot;], &quot;mutation&quot;: [&quot;c.4G&gt;T&quot;]})
+gget.mutate([&quot;ATCGCTAAGCT&quot;], mutations=mutations_df)
 ```
 
 #### gget gpt - OpenAI Text Generation
 
-Generate natural language text using OpenAI's API.
+Generate natural language text using OpenAI&#039;s API.
 
 **Setup Required**:
 ```bash
@@ -709,12 +759,12 @@ gget setup gpt
 
 **Examples**:
 ```bash
-gget gpt "Explain CRISPR" --api_key your_key_here
+gget gpt &quot;Explain CRISPR&quot; --api_key your_key_here
 ```
 
 ```python
 # Python
-gget.gpt("Explain CRISPR", api_key="your_key_here")
+gget.gpt(&quot;Explain CRISPR&quot;, api_key=&quot;your_key_here&quot;)
 ```
 
 #### gget setup - Install Dependencies
@@ -742,7 +792,7 @@ gget setup elm -o /path/to/elm_data
 
 ```python
 # Python
-gget.setup("alphafold")
+gget.setup(&quot;alphafold&quot;)
 ```
 
 ## Common Workflows
@@ -753,10 +803,10 @@ Find and analyze genes of interest:
 
 ```python
 # 1. Search for genes
-results = gget.search(["GABA", "receptor"], species="homo_sapiens")
+results = gget.search([&quot;GABA&quot;, &quot;receptor&quot;], species=&quot;homo_sapiens&quot;)
 
 # 2. Get detailed information
-gene_ids = results["ensembl_id"].tolist()
+gene_ids = results[&quot;ensembl_id&quot;].tolist()
 info = gget.info(gene_ids[:5])
 
 # 3. Retrieve sequences
@@ -769,10 +819,10 @@ Align sequences and predict structures:
 
 ```python
 # 1. Align multiple sequences
-alignment = gget.muscle("sequences.fasta")
+alignment = gget.muscle(&quot;sequences.fasta&quot;)
 
 # 2. Find similar sequences
-blast_results = gget.blast(my_sequence, database="swissprot", limit=10)
+blast_results = gget.blast(my_sequence, database=&quot;swissprot&quot;, limit=10)
 
 # 3. Predict structure
 structure = gget.alphafold(my_sequence, plot=True)
@@ -787,17 +837,17 @@ Analyze expression patterns and functional enrichment:
 
 ```python
 # 1. Get tissue expression
-tissue_expr = gget.archs4("ACE2", which="tissue")
+tissue_expr = gget.archs4(&quot;ACE2&quot;, which=&quot;tissue&quot;)
 
 # 2. Find correlated genes
-correlated = gget.archs4("ACE2", which="correlation")
+correlated = gget.archs4(&quot;ACE2&quot;, which=&quot;correlation&quot;)
 
 # 3. Get single-cell data
-adata = gget.cellxgene(gene=["ACE2"], tissue="lung", cell_type="epithelial cell")
+adata = gget.cellxgene(gene=[&quot;ACE2&quot;], tissue=&quot;lung&quot;, cell_type=&quot;epithelial cell&quot;)
 
 # 4. Perform enrichment analysis
-gene_list = correlated["gene_symbol"].tolist()[:50]
-enrichment = gget.enrichr(gene_list, database="ontology", plot=True)
+gene_list = correlated[&quot;gene_symbol&quot;].tolist()[:50]
+enrichment = gget.enrichr(gene_list, database=&quot;ontology&quot;, plot=True)
 ```
 
 ### Workflow 4: Disease and Drug Analysis
@@ -806,20 +856,20 @@ Investigate disease associations and therapeutic targets:
 
 ```python
 # 1. Search for genes
-genes = gget.search(["breast cancer"], species="homo_sapiens")
+genes = gget.search([&quot;breast cancer&quot;], species=&quot;homo_sapiens&quot;)
 
 # 2. Get disease associations
-diseases = gget.opentargets("ENSG00000169194", resource="diseases")
+diseases = gget.opentargets(&quot;ENSG00000169194&quot;, resource=&quot;diseases&quot;)
 
 # 3. Get drug associations
-drugs = gget.opentargets("ENSG00000169194", resource="drugs")
+drugs = gget.opentargets(&quot;ENSG00000169194&quot;, resource=&quot;drugs&quot;)
 
 # 4. Query cancer genomics data
-study_ids = gget.cbio_search(["breast"])
-gget.cbio_plot(study_ids[:2], ["BRCA1", "BRCA2"], stratification="cancer_type")
+study_ids = gget.cbio_search([&quot;breast&quot;])
+gget.cbio_plot(study_ids[:2], [&quot;BRCA1&quot;, &quot;BRCA2&quot;], stratification=&quot;cancer_type&quot;)
 
 # 5. Search COSMIC for mutations
-cosmic_results = gget.cosmic("BRCA1", cosmic_tsv_path="cosmic.tsv")
+cosmic_results = gget.cosmic(&quot;BRCA1&quot;, cosmic_tsv_path=&quot;cosmic.tsv&quot;)
 ```
 
 ### Workflow 5: Comparative Genomics
@@ -828,17 +878,17 @@ Compare proteins across species:
 
 ```python
 # 1. Get orthologs
-orthologs = gget.bgee("ENSG00000169194", type="orthologs")
+orthologs = gget.bgee(&quot;ENSG00000169194&quot;, type=&quot;orthologs&quot;)
 
 # 2. Get sequences for comparison
-human_seq = gget.seq("ENSG00000169194", translate=True)
-mouse_seq = gget.seq("ENSMUSG00000026091", translate=True)
+human_seq = gget.seq(&quot;ENSG00000169194&quot;, translate=True)
+mouse_seq = gget.seq(&quot;ENSMUSG00000026091&quot;, translate=True)
 
 # 3. Align sequences
 alignment = gget.muscle([human_seq, mouse_seq])
 
 # 4. Compare structures
-human_structure = gget.pdb("7S7U")
+human_structure = gget.pdb(&quot;7S7U&quot;)
 mouse_structure = gget.alphafold(mouse_seq)
 ```
 
@@ -875,7 +925,7 @@ gget ref -w dna -d homo_sapiens
 - For multiple sequence alignment, use `-s5/--super5` for large datasets
 
 ### Expression and Disease Data
-- Gene symbols are case-sensitive in cellxgene (e.g., 'PAX7' vs 'Pax7')
+- Gene symbols are case-sensitive in cellxgene (e.g., &#039;PAX7&#039; vs &#039;Pax7&#039;)
 - Run `gget setup` before first use of alphafold, cellxgene, elm, gpt
 - For enrichment analysis, use database shortcuts for convenience
 - Cache cBioPortal data with `-dd` to avoid repeated downloads
@@ -904,7 +954,7 @@ gget ref -w dna -d homo_sapiens
 ### Python
 - Default: DataFrame or dictionary
 - JSON: Add `json=True` parameter
-- Save to file: Add `save=True` or specify `out="filename"`
+- Save to file: Add `save=True` or specify `out=&quot;filename&quot;`
 - AnnData: gget cellxgene
 
 ## Resources
@@ -919,9 +969,40 @@ This skill includes reference documentation for detailed module information:
 For additional help:
 - Official documentation: https://pachterlab.github.io/gget/
 - GitHub issues: https://github.com/pachterlab/gget/issues
-- Citation: Luebbert, L. & Pachter, L. (2023). Efficient querying of genomic reference databases with gget. Bioinformatics. https://doi.org/10.1093/bioinformatics/btac836
-</pre></div>
+- Citation: Luebbert, L. &amp; Pachter, L. (2023). Efficient querying of genomic reference databases with gget. Bioinformatics. https://doi.org/10.1093/bioinformatics/btac836
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>14</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

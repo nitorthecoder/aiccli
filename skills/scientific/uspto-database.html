@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>uspto-database - AICCLI</title>
-  <meta name="description" content="uspto-database - Claude Code skill for AICCLI">
+  <meta name="description" content=""Access USPTO APIs for patent/trademark searches, examination history (PEDS), assignments, citations, office actions, TSDR, for IP analysis and prior art search">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / uspto-database</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>uspto-database</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / uspto-database
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>uspto-database</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Access USPTO APIs for patent/trademark searches, examination history (PEDS), assignments, citations, office actions, TSDR, for IP analysis and prior art searches."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/uspto-database</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/uspto-database</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/uspto-database</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: uspto-database
-description: "Access USPTO APIs for patent/trademark searches, examination history (PEDS), assignments, citations, office actions, TSDR, for IP analysis and prior art searches."
+description: &quot;Access USPTO APIs for patent/trademark searches, examination history (PEDS), assignments, citations, office actions, TSDR, for IP analysis and prior art searches.&quot;
 ---
 
 # USPTO Database
@@ -99,7 +149,7 @@ The USPTO provides multiple specialized APIs for different data needs:
    - Use `uspto-opendata-python` Python library
    - **Replaced**: PAIR Bulk Data (PBD) - decommissioned
 
-3. **TSDR (Trademark Status & Document Retrieval)** - Trademark data
+3. **TSDR (Trademark Status &amp; Document Retrieval)** - Trademark data
    - Trademark status, ownership, prosecution history
    - Search by serial or registration number
    - **Base URL**: `https://tsdrapi.uspto.gov/ts/cd/`
@@ -125,7 +175,7 @@ All USPTO APIs require an API key. Register at:
 
 Set the API key as an environment variable:
 ```bash
-export USPTO_API_KEY="your_api_key_here"
+export USPTO_API_KEY=&quot;your_api_key_here&quot;
 ```
 
 ### Helper Scripts
@@ -152,31 +202,31 @@ client = PatentSearchClient()
 
 # Search for machine learning patents
 results = client.search_patents({
-    "patent_abstract": {"_text_all": ["machine", "learning"]}
+    &quot;patent_abstract&quot;: {&quot;_text_all&quot;: [&quot;machine&quot;, &quot;learning&quot;]}
 })
 
-for patent in results['patents']:
-    print(f"{patent['patent_number']}: {patent['patent_title']}")
+for patent in results[&#039;patents&#039;]:
+    print(f&quot;{patent[&#039;patent_number&#039;]}: {patent[&#039;patent_title&#039;]}&quot;)
 ```
 
 **Search by inventor:**
 ```python
-results = client.search_by_inventor("John Smith")
+results = client.search_by_inventor(&quot;John Smith&quot;)
 ```
 
 **Search by assignee/company:**
 ```python
-results = client.search_by_assignee("Google")
+results = client.search_by_assignee(&quot;Google&quot;)
 ```
 
 **Search by date range:**
 ```python
-results = client.search_by_date_range("2024-01-01", "2024-12-31")
+results = client.search_by_date_range(&quot;2024-01-01&quot;, &quot;2024-12-31&quot;)
 ```
 
 **Search by CPC classification:**
 ```python
-results = client.search_by_classification("H04N")  # Video/image tech
+results = client.search_by_classification(&quot;H04N&quot;)  # Video/image tech
 ```
 
 #### Advanced Patent Search
@@ -185,11 +235,11 @@ Combine multiple criteria with logical operators:
 
 ```python
 results = client.advanced_search(
-    keywords=["artificial", "intelligence"],
-    assignee="Microsoft",
-    start_date="2023-01-01",
-    end_date="2024-12-31",
-    cpc_codes=["G06N", "G06F"]  # AI and computing classifications
+    keywords=[&quot;artificial&quot;, &quot;intelligence&quot;],
+    assignee=&quot;Microsoft&quot;,
+    start_date=&quot;2023-01-01&quot;,
+    end_date=&quot;2024-12-31&quot;,
+    cpc_codes=[&quot;G06N&quot;, &quot;G06F&quot;]  # AI and computing classifications
 )
 ```
 
@@ -200,23 +250,23 @@ For complex queries, use the API directly:
 ```python
 import requests
 
-url = "https://search.patentsview.org/api/v1/patent"
+url = &quot;https://search.patentsview.org/api/v1/patent&quot;
 headers = {
-    "X-Api-Key": "YOUR_API_KEY",
-    "Content-Type": "application/json"
+    &quot;X-Api-Key&quot;: &quot;YOUR_API_KEY&quot;,
+    &quot;Content-Type&quot;: &quot;application/json&quot;
 }
 
 query = {
-    "q": {
-        "_and": [
-            {"patent_date": {"_gte": "2024-01-01"}},
-            {"assignee_organization": {"_text_any": ["Google", "Alphabet"]}},
-            {"cpc_subclass_id": ["G06N", "H04N"]}
+    &quot;q&quot;: {
+        &quot;_and&quot;: [
+            {&quot;patent_date&quot;: {&quot;_gte&quot;: &quot;2024-01-01&quot;}},
+            {&quot;assignee_organization&quot;: {&quot;_text_any&quot;: [&quot;Google&quot;, &quot;Alphabet&quot;]}},
+            {&quot;cpc_subclass_id&quot;: [&quot;G06N&quot;, &quot;H04N&quot;]}
         ]
     },
-    "f": ["patent_number", "patent_title", "patent_date", "inventor_name"],
-    "s": [{"patent_date": "desc"}],
-    "o": {"per_page": 100, "page": 1}
+    &quot;f&quot;: [&quot;patent_number&quot;, &quot;patent_title&quot;, &quot;patent_date&quot;, &quot;inventor_name&quot;],
+    &quot;s&quot;: [{&quot;patent_date&quot;: &quot;desc&quot;}],
+    &quot;o&quot;: {&quot;per_page&quot;: 100, &quot;page&quot;: 1}
 }
 
 response = requests.post(url, headers=headers, json=query)
@@ -225,7 +275,7 @@ results = response.json()
 
 ### Query Operators
 
-- **Equality**: `{"field": "value"}` or `{"field": {"_eq": "value"}}`
+- **Equality**: `{&quot;field&quot;: &quot;value&quot;}` or `{&quot;field&quot;: {&quot;_eq&quot;: &quot;value&quot;}}`
 - **Comparison**: `_gt`, `_gte`, `_lt`, `_lte`, `_neq`
 - **Text search**: `_text_all`, `_text_any`, `_text_phrase`
 - **String matching**: `_begins`, `_contains`
@@ -274,46 +324,46 @@ from scripts.peds_client import PEDSHelper
 helper = PEDSHelper()
 
 # By application number
-app_data = helper.get_application("16123456")
-print(f"Title: {app_data['title']}")
-print(f"Status: {app_data['app_status']}")
+app_data = helper.get_application(&quot;16123456&quot;)
+print(f&quot;Title: {app_data[&#039;title&#039;]}&quot;)
+print(f&quot;Status: {app_data[&#039;app_status&#039;]}&quot;)
 
 # By patent number
-patent_data = helper.get_patent("11234567")
+patent_data = helper.get_patent(&quot;11234567&quot;)
 ```
 
 **Get transaction history:**
 ```python
-transactions = helper.get_transaction_history("16123456")
+transactions = helper.get_transaction_history(&quot;16123456&quot;)
 
 for trans in transactions:
-    print(f"{trans['date']}: {trans['code']} - {trans['description']}")
+    print(f&quot;{trans[&#039;date&#039;]}: {trans[&#039;code&#039;]} - {trans[&#039;description&#039;]}&quot;)
 ```
 
 **Get office actions:**
 ```python
-office_actions = helper.get_office_actions("16123456")
+office_actions = helper.get_office_actions(&quot;16123456&quot;)
 
 for oa in office_actions:
-    if oa['code'] == 'CTNF':
-        print(f"Non-final rejection: {oa['date']}")
-    elif oa['code'] == 'CTFR':
-        print(f"Final rejection: {oa['date']}")
-    elif oa['code'] == 'NOA':
-        print(f"Notice of allowance: {oa['date']}")
+    if oa[&#039;code&#039;] == &#039;CTNF&#039;:
+        print(f&quot;Non-final rejection: {oa[&#039;date&#039;]}&quot;)
+    elif oa[&#039;code&#039;] == &#039;CTFR&#039;:
+        print(f&quot;Final rejection: {oa[&#039;date&#039;]}&quot;)
+    elif oa[&#039;code&#039;] == &#039;NOA&#039;:
+        print(f&quot;Notice of allowance: {oa[&#039;date&#039;]}&quot;)
 ```
 
 **Get status summary:**
 ```python
-summary = helper.get_status_summary("16123456")
+summary = helper.get_status_summary(&quot;16123456&quot;)
 
-print(f"Current status: {summary['current_status']}")
-print(f"Filing date: {summary['filing_date']}")
-print(f"Pendency: {summary['pendency_days']} days")
+print(f&quot;Current status: {summary[&#039;current_status&#039;]}&quot;)
+print(f&quot;Filing date: {summary[&#039;filing_date&#039;]}&quot;)
+print(f&quot;Pendency: {summary[&#039;pendency_days&#039;]} days&quot;)
 
-if summary['is_patented']:
-    print(f"Patent number: {summary['patent_number']}")
-    print(f"Issue date: {summary['issue_date']}")
+if summary[&#039;is_patented&#039;]:
+    print(f&quot;Patent number: {summary[&#039;patent_number&#039;]}&quot;)
+    print(f&quot;Issue date: {summary[&#039;issue_date&#039;]}&quot;)
 ```
 
 #### Prosecution Analysis
@@ -321,13 +371,13 @@ if summary['is_patented']:
 Analyze prosecution patterns:
 
 ```python
-analysis = helper.analyze_prosecution("16123456")
+analysis = helper.analyze_prosecution(&quot;16123456&quot;)
 
-print(f"Total office actions: {analysis['total_office_actions']}")
-print(f"Non-final rejections: {analysis['non_final_rejections']}")
-print(f"Final rejections: {analysis['final_rejections']}")
-print(f"Allowed: {analysis['allowance']}")
-print(f"Responses filed: {analysis['responses']}")
+print(f&quot;Total office actions: {analysis[&#039;total_office_actions&#039;]}&quot;)
+print(f&quot;Non-final rejections: {analysis[&#039;non_final_rejections&#039;]}&quot;)
+print(f&quot;Final rejections: {analysis[&#039;final_rejections&#039;]}&quot;)
+print(f&quot;Allowed: {analysis[&#039;allowance&#039;]}&quot;)
+print(f&quot;Responses filed: {analysis[&#039;responses&#039;]}&quot;)
 ```
 
 ### Common Transaction Codes
@@ -350,7 +400,7 @@ See `references/peds_api.md` for complete PEDS documentation including:
 
 ## Task 3: Searching and Monitoring Trademarks
 
-### Using TSDR (Trademark Status & Document Retrieval)
+### Using TSDR (Trademark Status &amp; Document Retrieval)
 
 Access trademark status, ownership, and prosecution history.
 
@@ -363,37 +413,37 @@ from scripts.trademark_client import TrademarkClient
 client = TrademarkClient()
 
 # By serial number
-tm_data = client.get_trademark_by_serial("87654321")
+tm_data = client.get_trademark_by_serial(&quot;87654321&quot;)
 
 # By registration number
-tm_data = client.get_trademark_by_registration("5678901")
+tm_data = client.get_trademark_by_registration(&quot;5678901&quot;)
 ```
 
 **Get trademark status:**
 ```python
-status = client.get_trademark_status("87654321")
+status = client.get_trademark_status(&quot;87654321&quot;)
 
-print(f"Mark: {status['mark_text']}")
-print(f"Status: {status['status']}")
-print(f"Filing date: {status['filing_date']}")
+print(f&quot;Mark: {status[&#039;mark_text&#039;]}&quot;)
+print(f&quot;Status: {status[&#039;status&#039;]}&quot;)
+print(f&quot;Filing date: {status[&#039;filing_date&#039;]}&quot;)
 
-if status['is_registered']:
-    print(f"Registration #: {status['registration_number']}")
-    print(f"Registration date: {status['registration_date']}")
+if status[&#039;is_registered&#039;]:
+    print(f&quot;Registration #: {status[&#039;registration_number&#039;]}&quot;)
+    print(f&quot;Registration date: {status[&#039;registration_date&#039;]}&quot;)
 ```
 
 **Check trademark health:**
 ```python
-health = client.check_trademark_health("87654321")
+health = client.check_trademark_health(&quot;87654321&quot;)
 
-print(f"Mark: {health['mark']}")
-print(f"Status: {health['status']}")
+print(f&quot;Mark: {health[&#039;mark&#039;]}&quot;)
+print(f&quot;Status: {health[&#039;status&#039;]}&quot;)
 
-for alert in health['alerts']:
+for alert in health[&#039;alerts&#039;]:
     print(alert)
 
-if health['needs_attention']:
-    print("⚠️  This mark needs attention!")
+if health[&#039;needs_attention&#039;]:
+    print(&quot;⚠️  This mark needs attention!&quot;)
 ```
 
 #### Trademark Portfolio Monitoring
@@ -402,24 +452,24 @@ Monitor multiple trademarks:
 
 ```python
 def monitor_portfolio(serial_numbers, api_key):
-    """Monitor trademark portfolio health."""
+    &quot;&quot;&quot;Monitor trademark portfolio health.&quot;&quot;&quot;
     client = TrademarkClient(api_key)
 
     results = {
-        'active': [],
-        'pending': [],
-        'problems': []
+        &#039;active&#039;: [],
+        &#039;pending&#039;: [],
+        &#039;problems&#039;: []
     }
 
     for sn in serial_numbers:
         health = client.check_trademark_health(sn)
 
-        if 'REGISTERED' in health['status']:
-            results['active'].append(health)
-        elif 'PENDING' in health['status'] or 'PUBLISHED' in health['status']:
-            results['pending'].append(health)
-        elif health['needs_attention']:
-            results['problems'].append(health)
+        if &#039;REGISTERED&#039; in health[&#039;status&#039;]:
+            results[&#039;active&#039;].append(health)
+        elif &#039;PENDING&#039; in health[&#039;status&#039;] or &#039;PUBLISHED&#039; in health[&#039;status&#039;]:
+            results[&#039;pending&#039;].append(health)
+        elif health[&#039;needs_attention&#039;]:
+            results[&#039;problems&#039;].append(health)
 
     return results
 ```
@@ -459,32 +509,32 @@ import requests
 import xml.etree.ElementTree as ET
 
 def get_patent_assignments(patent_number, api_key):
-    url = f"https://assignment-api.uspto.gov/patent/v1.4/assignment/patent/{patent_number}"
-    headers = {"X-Api-Key": api_key}
+    url = f&quot;https://assignment-api.uspto.gov/patent/v1.4/assignment/patent/{patent_number}&quot;
+    headers = {&quot;X-Api-Key&quot;: api_key}
 
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         return response.text  # Returns XML
 
-assignments_xml = get_patent_assignments("11234567", api_key)
+assignments_xml = get_patent_assignments(&quot;11234567&quot;, api_key)
 root = ET.fromstring(assignments_xml)
 
-for assignment in root.findall('.//assignment'):
-    recorded_date = assignment.find('recordedDate').text
-    assignor = assignment.find('.//assignor/name').text
-    assignee = assignment.find('.//assignee/name').text
-    conveyance = assignment.find('conveyanceText').text
+for assignment in root.findall(&#039;.//assignment&#039;):
+    recorded_date = assignment.find(&#039;recordedDate&#039;).text
+    assignor = assignment.find(&#039;.//assignor/name&#039;).text
+    assignee = assignment.find(&#039;.//assignee/name&#039;).text
+    conveyance = assignment.find(&#039;conveyanceText&#039;).text
 
-    print(f"{recorded_date}: {assignor} → {assignee}")
-    print(f"  Type: {conveyance}\n")
+    print(f&quot;{recorded_date}: {assignor} → {assignee}&quot;)
+    print(f&quot;  Type: {conveyance}\n&quot;)
 ```
 
 **Search by company name:**
 ```python
 def find_company_patents(company_name, api_key):
-    url = "https://assignment-api.uspto.gov/patent/v1.4/assignment/search"
-    headers = {"X-Api-Key": api_key}
-    data = {"criteria": {"assigneeName": company_name}}
+    url = &quot;https://assignment-api.uspto.gov/patent/v1.4/assignment/search&quot;
+    headers = {&quot;X-Api-Key&quot;: api_key}
+    data = {&quot;criteria&quot;: {&quot;assigneeName&quot;: company_name}}
 
     response = requests.post(url, headers=headers, json=data)
     return response.text
@@ -549,9 +599,9 @@ Combine multiple APIs for complete patent intelligence:
 
 ```python
 def comprehensive_patent_analysis(patent_number, api_key):
-    """
+    &quot;&quot;&quot;
     Full patent analysis using multiple USPTO APIs.
-    """
+    &quot;&quot;&quot;
     from scripts.patent_search import PatentSearchClient
     from scripts.peds_client import PEDSHelper
 
@@ -560,36 +610,36 @@ def comprehensive_patent_analysis(patent_number, api_key):
     # 1. Get patent details
     patent_client = PatentSearchClient(api_key)
     patent_data = patent_client.get_patent(patent_number)
-    results['patent'] = patent_data
+    results[&#039;patent&#039;] = patent_data
 
     # 2. Get examination history
     peds = PEDSHelper()
-    results['prosecution'] = peds.analyze_prosecution(patent_number)
-    results['status'] = peds.get_status_summary(patent_number)
+    results[&#039;prosecution&#039;] = peds.analyze_prosecution(patent_number)
+    results[&#039;status&#039;] = peds.get_status_summary(patent_number)
 
     # 3. Get assignment history
     import requests
-    assign_url = f"https://assignment-api.uspto.gov/patent/v1.4/assignment/patent/{patent_number}"
-    assign_resp = requests.get(assign_url, headers={"X-Api-Key": api_key})
-    results['assignments'] = assign_resp.text if assign_resp.status_code == 200 else None
+    assign_url = f&quot;https://assignment-api.uspto.gov/patent/v1.4/assignment/patent/{patent_number}&quot;
+    assign_resp = requests.get(assign_url, headers={&quot;X-Api-Key&quot;: api_key})
+    results[&#039;assignments&#039;] = assign_resp.text if assign_resp.status_code == 200 else None
 
     # 4. Analyze results
-    print(f"\n=== Patent {patent_number} Analysis ===\n")
-    print(f"Title: {patent_data['patent_title']}")
-    print(f"Assignee: {', '.join(patent_data.get('assignee_organization', []))}")
-    print(f"Issue Date: {patent_data['patent_date']}")
+    print(f&quot;\n=== Patent {patent_number} Analysis ===\n&quot;)
+    print(f&quot;Title: {patent_data[&#039;patent_title&#039;]}&quot;)
+    print(f&quot;Assignee: {&#039;, &#039;.join(patent_data.get(&#039;assignee_organization&#039;, []))}&quot;)
+    print(f&quot;Issue Date: {patent_data[&#039;patent_date&#039;]}&quot;)
 
-    print(f"\nProsecution:")
-    print(f"  Office Actions: {results['prosecution']['total_office_actions']}")
-    print(f"  Rejections: {results['prosecution']['non_final_rejections']} non-final, {results['prosecution']['final_rejections']} final")
-    print(f"  Pendency: {results['prosecution']['pendency_days']} days")
+    print(f&quot;\nProsecution:&quot;)
+    print(f&quot;  Office Actions: {results[&#039;prosecution&#039;][&#039;total_office_actions&#039;]}&quot;)
+    print(f&quot;  Rejections: {results[&#039;prosecution&#039;][&#039;non_final_rejections&#039;]} non-final, {results[&#039;prosecution&#039;][&#039;final_rejections&#039;]} final&quot;)
+    print(f&quot;  Pendency: {results[&#039;prosecution&#039;][&#039;pendency_days&#039;]} days&quot;)
 
     # Analyze citations
-    if 'cited_patent_number' in patent_data:
-        print(f"\nCitations:")
-        print(f"  Cites: {len(patent_data['cited_patent_number'])} patents")
-    if 'citedby_patent_number' in patent_data:
-        print(f"  Cited by: {len(patent_data['citedby_patent_number'])} patents")
+    if &#039;cited_patent_number&#039; in patent_data:
+        print(f&quot;\nCitations:&quot;)
+        print(f&quot;  Cites: {len(patent_data[&#039;cited_patent_number&#039;])} patents&quot;)
+    if &#039;citedby_patent_number&#039; in patent_data:
+        print(f&quot;  Cited by: {len(patent_data[&#039;citedby_patent_number&#039;])} patents&quot;)
 
     return results
 ```
@@ -652,8 +702,39 @@ def comprehensive_patent_analysis(patent_number, api_key):
 - `scripts/patent_search.py` - PatentSearch API client
 - `scripts/peds_client.py` - PEDS examination data client
 - `scripts/trademark_client.py` - Trademark search client
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>15</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

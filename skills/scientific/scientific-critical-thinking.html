@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>scientific-critical-thinking - AICCLI</title>
-  <meta name="description" content="scientific-critical-thinking - Claude Code skill for AICCLI">
+  <meta name="description" content=""Evaluate research rigor. Assess methodology, experimental design, statistical validity, biases, confounding, evidence quality (GRADE, Cochrane ROB), for critic">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / scientific-critical-thinking</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>scientific-critical-thinking</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / scientific-critical-thinking
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>scientific-critical-thinking</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Evaluate research rigor. Assess methodology, experimental design, statistical validity, biases, confounding, evidence quality (GRADE, Cochrane ROB), for critical analysis of scientific claims."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/scientific-critical-thinking</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/scientific-critical-thinking</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/scientific-critical-thinking</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: scientific-critical-thinking
-description: "Evaluate research rigor. Assess methodology, experimental design, statistical validity, biases, confounding, evidence quality (GRADE, Cochrane ROB), for critical analysis of scientific claims."
+description: &quot;Evaluate research rigor. Assess methodology, experimental design, statistical validity, biases, confounding, evidence quality (GRADE, Cochrane ROB), for critical analysis of scientific claims.&quot;
 allowed-tools: [Read, Write, Edit, Bash]
 ---
 
@@ -91,7 +141,7 @@ If your document does not already contain schematics or diagrams:
 
 **How to generate schematics:**
 ```bash
-python scripts/generate_schematic.py "your diagram description" -o figures/output.png
+python scripts/generate_schematic.py &quot;your diagram description&quot; -o figures/output.png
 ```
 
 The AI will automatically:
@@ -189,7 +239,7 @@ Identify and evaluate potential sources of bias that could distort findings.
    - **Sampling bias:** Is sample representative of target population?
    - **Volunteer bias:** Do participants self-select in systematic ways?
    - **Attrition bias:** Is dropout differential between groups?
-   - **Survivorship bias:** Are only "survivors" visible in sample?
+   - **Survivorship bias:** Are only &quot;survivors&quot; visible in sample?
    - Examine participant flow diagrams and compare baseline characteristics
 
 3. **Measurement Biases**
@@ -246,9 +296,9 @@ Critically assess statistical methods, interpretation, and reporting.
 
 4. **P-Value Interpretation**
    - Are p-values interpreted correctly (probability of data if null is true)?
-   - Is non-significance incorrectly interpreted as "no effect"?
+   - Is non-significance incorrectly interpreted as &quot;no effect&quot;?
    - Is statistical significance conflated with practical importance?
-   - Are exact p-values reported, or only "p &lt; .05"?
+   - Are exact p-values reported, or only &quot;p &lt; .05&quot;?
    - Is there suspicious clustering just below .05?
 
 5. **Effect Sizes and Confidence Intervals**
@@ -274,7 +324,7 @@ Critically assess statistical methods, interpretation, and reporting.
    - Ignoring regression to the mean
    - Base rate neglect
    - Texas sharpshooter fallacy (pattern finding in noise)
-   - Simpson's paradox (confounding by subgroups)
+   - Simpson&#039;s paradox (confounding by subgroups)
 
 **Reference:** See `references/statistical_pitfalls.md` for detailed pitfalls and correct practices.
 
@@ -299,7 +349,7 @@ Evaluate the strength and quality of evidence systematically.
    - Case series/reports
    - Expert opinion (lowest)
 
-   **Important:** Higher-level designs aren't always better quality. A well-designed observational study can be stronger than a poorly-conducted RCT.
+   **Important:** Higher-level designs aren&#039;t always better quality. A well-designed observational study can be stronger than a poorly-conducted RCT.
 
 2. **Quality Within Design Type**
    - Risk of bias assessment (use appropriate tool: Cochrane ROB, Newcastle-Ottawa, etc.)
@@ -354,7 +404,7 @@ Detect and name logical errors in scientific arguments and claims.
 **Common fallacies in science:**
 
 1. **Causation Fallacies**
-   - **Post hoc ergo propter hoc:** "B followed A, so A caused B"
+   - **Post hoc ergo propter hoc:** &quot;B followed A, so A caused B&quot;
    - **Correlation = causation:** Confusing association with causality
    - **Reverse causation:** Mistaking cause for effect
    - **Single cause fallacy:** Attributing complex outcomes to one factor
@@ -366,26 +416,26 @@ Detect and name logical errors in scientific arguments and claims.
    - **Ecological fallacy:** Group patterns applied to individuals
 
 3. **Authority and Source Fallacies**
-   - **Appeal to authority:** "Expert said it, so it's true" (without evidence)
+   - **Appeal to authority:** &quot;Expert said it, so it&#039;s true&quot; (without evidence)
    - **Ad hominem:** Attacking person, not argument
    - **Genetic fallacy:** Judging by origin, not merits
-   - **Appeal to nature:** "Natural = good/safe"
+   - **Appeal to nature:** &quot;Natural = good/safe&quot;
 
 4. **Statistical Fallacies**
    - **Base rate neglect:** Ignoring prior probability
    - **Texas sharpshooter:** Finding patterns in random data
    - **Multiple comparisons:** Not correcting for multiple tests
-   - **Prosecutor's fallacy:** Confusing P(E|H) with P(H|E)
+   - **Prosecutor&#039;s fallacy:** Confusing P(E|H) with P(H|E)
 
 5. **Structural Fallacies**
-   - **False dichotomy:** "Either A or B" when more options exist
-   - **Moving goalposts:** Changing evidence standards after they're met
+   - **False dichotomy:** &quot;Either A or B&quot; when more options exist
+   - **Moving goalposts:** Changing evidence standards after they&#039;re met
    - **Begging the question:** Circular reasoning
    - **Straw man:** Misrepresenting arguments to attack them
 
 6. **Science-Specific Fallacies**
-   - **Galileo gambit:** "They laughed at Galileo, so my fringe idea is correct"
-   - **Argument from ignorance:** "Not proven false, so true"
+   - **Galileo gambit:** &quot;They laughed at Galileo, so my fringe idea is correct&quot;
+   - **Argument from ignorance:** &quot;Not proven false, so true&quot;
    - **Nirvana fallacy:** Rejecting imperfect solutions
    - **Unfalsifiability:** Making untestable claims
 
@@ -393,7 +443,7 @@ Detect and name logical errors in scientific arguments and claims.
 - Name the specific fallacy
 - Explain why the reasoning is flawed
 - Identify what evidence would be needed for valid inference
-- Note that fallacious reasoning doesn't prove the conclusion false—just that this argument doesn't support it
+- Note that fallacious reasoning doesn&#039;t prove the conclusion false—just that this argument doesn&#039;t support it
 
 **Reference:** See `references/logical_fallacies.md` for comprehensive fallacy catalog with examples and detection strategies.
 
@@ -502,7 +552,7 @@ Systematically evaluate scientific claims for validity and support.
 
 6. **Red Flags**
    - Causal language from correlational studies
-   - "Proves" or absolute certainty
+   - &quot;Proves&quot; or absolute certainty
    - Cherry-picked citations
    - Ignoring contradictory evidence
    - Dismissing limitations
@@ -525,7 +575,7 @@ Systematically evaluate scientific claims for validity and support.
    - Recognize that all research has limitations
 
 2. **Be Specific**
-   - Point to specific instances (e.g., "Table 2 shows..." or "In the Methods section...")
+   - Point to specific instances (e.g., &quot;Table 2 shows...&quot; or &quot;In the Methods section...&quot;)
    - Quote problematic statements
    - Provide concrete examples of issues
    - Reference specific principles or standards violated
@@ -538,7 +588,7 @@ Systematically evaluate scientific claims for validity and support.
 
 4. **Apply Consistent Standards**
    - Use same criteria across all studies
-   - Don't apply stricter standards to findings you dislike
+   - Don&#039;t apply stricter standards to findings you dislike
    - Acknowledge your own potential biases
    - Base judgments on methodology, not results
 
@@ -557,7 +607,7 @@ Systematically evaluate scientific claims for validity and support.
 3. **Concerns:** Issues organized by severity
    - Critical issues (threaten validity of main conclusions)
    - Important issues (affect interpretation but not fatally)
-   - Minor issues (worth noting but don't change conclusions)
+   - Minor issues (worth noting but don&#039;t change conclusions)
 4. **Specific Recommendations:** Actionable suggestions for improvement
 5. **Overall Assessment:** Balanced conclusion about evidence quality and what can be concluded
 
@@ -569,9 +619,9 @@ Systematically evaluate scientific claims for validity and support.
 
 ### When Uncertain
 
-- **Acknowledge uncertainty:** "This could be X or Y; additional information needed is Z"
-- **Ask clarifying questions:** "Was [methodological detail] done? This affects interpretation."
-- **Provide conditional assessments:** "If X was done, then Y follows; if not, then Z is concern"
+- **Acknowledge uncertainty:** &quot;This could be X or Y; additional information needed is Z&quot;
+- **Ask clarifying questions:** &quot;Was [methodological detail] done? This affects interpretation.&quot;
+- **Provide conditional assessments:** &quot;If X was done, then Y follows; if not, then Z is concern&quot;
 - **Note what additional information would resolve uncertainty**
 
 ## Reference Materials
@@ -592,7 +642,7 @@ This skill includes comprehensive reference materials that provide detailed fram
 
 **When to consult references:**
 - Load references into context when detailed frameworks are needed
-- Use grep to search references for specific topics: `grep -r "pattern" references/`
+- Use grep to search references for specific topics: `grep -r &quot;pattern&quot; references/`
 - References provide depth; SKILL.md provides procedural guidance
 - Consult references for comprehensive lists, detailed criteria, and specific examples
 
@@ -621,8 +671,39 @@ This skill includes comprehensive reference materials that provide detailed fram
 3. Recognize limitations and uncertainties
 4. Suggest improvements for future work
 5. Advance scientific understanding
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>361</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

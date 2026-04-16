@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>molfeat - AICCLI</title>
-  <meta name="description" content="molfeat - Claude Code skill for AICCLI">
+  <meta name="description" content=""Molecular featurization for ML (100+ featurizers). ECFP, MACCS, descriptors, pretrained models (ChemBERTa), convert SMILES to features, for QSAR and molecular ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / molfeat</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>molfeat</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / molfeat
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>molfeat</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Molecular featurization for ML (100+ featurizers). ECFP, MACCS, descriptors, pretrained models (ChemBERTa), convert SMILES to features, for QSAR and molecular ML."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/molfeat</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/molfeat</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/molfeat</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: molfeat
-description: "Molecular featurization for ML (100+ featurizers). ECFP, MACCS, descriptors, pretrained models (ChemBERTa), convert SMILES to features, for QSAR and molecular ML."
+description: &quot;Molecular featurization for ML (100+ featurizers). ECFP, MACCS, descriptors, pretrained models (ChemBERTa), convert SMILES to features, for QSAR and molecular ML.&quot;
 ---
 
 # Molfeat - Molecular Featurization Hub
@@ -83,7 +133,7 @@ This skill should be used when working with:
 uv pip install molfeat
 
 # With all optional dependencies
-uv pip install "molfeat[all]"
+uv pip install &quot;molfeat[all]&quot;
 ```
 
 **Optional dependencies for specific featurizers:**
@@ -110,8 +160,8 @@ Callable objects that convert individual molecules into feature vectors. Accept 
 ```python
 from molfeat.calc import FPCalculator
 
-calc = FPCalculator("ecfp", radius=3, fpSize=2048)
-features = calc("CCO")  # Returns numpy array (2048,)
+calc = FPCalculator(&quot;ecfp&quot;, radius=3, fpSize=2048)
+features = calc(&quot;CCO&quot;)  # Returns numpy array (2048,)
 ```
 
 ### 2. Transformers (`molfeat.trans`)
@@ -128,7 +178,7 @@ Scikit-learn compatible transformers that wrap calculators for batch processing 
 from molfeat.trans import MoleculeTransformer
 from molfeat.calc import FPCalculator
 
-transformer = MoleculeTransformer(FPCalculator("ecfp"), n_jobs=-1)
+transformer = MoleculeTransformer(FPCalculator(&quot;ecfp&quot;), n_jobs=-1)
 features = transformer(smiles_list)  # Parallel processing
 ```
 
@@ -145,7 +195,7 @@ Specialized transformers for deep learning models with batched inference and cac
 ```python
 from molfeat.trans.pretrained import PretrainedMolTransformer
 
-transformer = PretrainedMolTransformer("ChemBERTa-77M-MLM", n_jobs=-1)
+transformer = PretrainedMolTransformer(&quot;ChemBERTa-77M-MLM&quot;, n_jobs=-1)
 embeddings = transformer(smiles_list)  # Deep learning embeddings
 ```
 
@@ -159,25 +209,25 @@ from molfeat.calc import FPCalculator
 from molfeat.trans import MoleculeTransformer
 
 # Load molecular data
-smiles = ["CCO", "CC(=O)O", "c1ccccc1", "CC(C)O"]
+smiles = [&quot;CCO&quot;, &quot;CC(=O)O&quot;, &quot;c1ccccc1&quot;, &quot;CC(C)O&quot;]
 
 # Create calculator and transformer
-calc = FPCalculator("ecfp", radius=3)
+calc = FPCalculator(&quot;ecfp&quot;, radius=3)
 transformer = MoleculeTransformer(calc, n_jobs=-1)
 
 # Featurize molecules
 features = transformer(smiles)
-print(f"Shape: {features.shape}")  # (4, 2048)
+print(f&quot;Shape: {features.shape}&quot;)  # (4, 2048)
 ```
 
 ### Save and Load Configuration
 
 ```python
 # Save featurizer configuration for reproducibility
-transformer.to_state_yaml_file("featurizer_config.yml")
+transformer.to_state_yaml_file(&quot;featurizer_config.yml&quot;)
 
 # Reload exact configuration
-loaded = MoleculeTransformer.from_state_yaml_file("featurizer_config.yml")
+loaded = MoleculeTransformer.from_state_yaml_file(&quot;featurizer_config.yml&quot;)
 ```
 
 ### Handle Errors Gracefully
@@ -202,13 +252,13 @@ features = transformer(smiles_with_errors)
 **Start with fingerprints:**
 ```python
 # ECFP - Most popular, general-purpose
-FPCalculator("ecfp", radius=3, fpSize=2048)
+FPCalculator(&quot;ecfp&quot;, radius=3, fpSize=2048)
 
 # MACCS - Fast, good for scaffold hopping
-FPCalculator("maccs")
+FPCalculator(&quot;maccs&quot;)
 
 # MAP4 - Efficient for large-scale screening
-FPCalculator("map4")
+FPCalculator(&quot;map4&quot;)
 ```
 
 **For interpretable models:**
@@ -227,8 +277,8 @@ MordredDescriptors()
 from molfeat.trans import FeatConcat
 
 concat = FeatConcat([
-    FPCalculator("maccs"),      # 167 dimensions
-    FPCalculator("ecfp")         # 2048 dimensions
+    FPCalculator(&quot;maccs&quot;),      # 167 dimensions
+    FPCalculator(&quot;ecfp&quot;)         # 2048 dimensions
 ])  # Result: 2215-dimensional combined features
 ```
 
@@ -237,33 +287,33 @@ concat = FeatConcat([
 **Transformer-based embeddings:**
 ```python
 # ChemBERTa - Pre-trained on 77M PubChem compounds
-PretrainedMolTransformer("ChemBERTa-77M-MLM")
+PretrainedMolTransformer(&quot;ChemBERTa-77M-MLM&quot;)
 
 # ChemGPT - Autoregressive language model
-PretrainedMolTransformer("ChemGPT-1.2B")
+PretrainedMolTransformer(&quot;ChemGPT-1.2B&quot;)
 ```
 
 **Graph neural networks:**
 ```python
 # GIN models with different pre-training objectives
-PretrainedMolTransformer("gin-supervised-masking")
-PretrainedMolTransformer("gin-supervised-infomax")
+PretrainedMolTransformer(&quot;gin-supervised-masking&quot;)
+PretrainedMolTransformer(&quot;gin-supervised-infomax&quot;)
 
 # Graphormer for quantum chemistry
-PretrainedMolTransformer("Graphormer-pcqm4mv2")
+PretrainedMolTransformer(&quot;Graphormer-pcqm4mv2&quot;)
 ```
 
 ### For Similarity Searching
 
 ```python
 # ECFP - General purpose, most widely used
-FPCalculator("ecfp")
+FPCalculator(&quot;ecfp&quot;)
 
 # MACCS - Fast, scaffold-based similarity
-FPCalculator("maccs")
+FPCalculator(&quot;maccs&quot;)
 
 # MAP4 - Efficient for large databases
-FPCalculator("map4")
+FPCalculator(&quot;map4&quot;)
 
 # USR/USRCAT - 3D shape similarity
 from molfeat.calc import USRDescriptors
@@ -274,14 +324,14 @@ USRDescriptors()
 
 ```python
 # FCFP - Functional group based
-FPCalculator("fcfp")
+FPCalculator(&quot;fcfp&quot;)
 
 # CATS - Pharmacophore pair distributions
 from molfeat.calc import CATSCalculator
-CATSCalculator(mode="2D")
+CATSCalculator(mode=&quot;2D&quot;)
 
 # Gobbi - Explicit pharmacophore features
-FPCalculator("gobbi2D")
+FPCalculator(&quot;gobbi2D&quot;)
 ```
 
 ## Common Workflows
@@ -295,16 +345,16 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_val_score
 
 # Featurize molecules
-transformer = MoleculeTransformer(FPCalculator("ecfp"), n_jobs=-1)
+transformer = MoleculeTransformer(FPCalculator(&quot;ecfp&quot;), n_jobs=-1)
 X = transformer(smiles_train)
 
 # Train model
 model = RandomForestRegressor(n_estimators=100)
 scores = cross_val_score(model, X, y_train, cv=5)
-print(f"R² = {scores.mean():.3f}")
+print(f&quot;R² = {scores.mean():.3f}&quot;)
 
 # Save configuration for deployment
-transformer.to_state_yaml_file("production_featurizer.yml")
+transformer.to_state_yaml_file(&quot;production_featurizer.yml&quot;)
 ```
 
 ### Virtual Screening Pipeline
@@ -313,7 +363,7 @@ transformer.to_state_yaml_file("production_featurizer.yml")
 from sklearn.ensemble import RandomForestClassifier
 
 # Train on known actives/inactives
-transformer = MoleculeTransformer(FPCalculator("ecfp"), n_jobs=-1)
+transformer = MoleculeTransformer(FPCalculator(&quot;ecfp&quot;), n_jobs=-1)
 X_train = transformer(train_smiles)
 clf = RandomForestClassifier(n_estimators=500)
 clf.fit(X_train, train_labels)
@@ -333,7 +383,7 @@ top_hits = [screening_library[i] for i in top_indices]
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Query molecule
-calc = FPCalculator("ecfp")
+calc = FPCalculator(&quot;ecfp&quot;)
 query_fp = calc(query_smiles).reshape(1, -1)
 
 # Database fingerprints
@@ -353,8 +403,8 @@ from sklearn.ensemble import RandomForestClassifier
 
 # Create end-to-end pipeline
 pipeline = Pipeline([
-    ('featurizer', MoleculeTransformer(FPCalculator("ecfp"), n_jobs=-1)),
-    ('classifier', RandomForestClassifier(n_estimators=100))
+    (&#039;featurizer&#039;, MoleculeTransformer(FPCalculator(&quot;ecfp&quot;), n_jobs=-1)),
+    (&#039;classifier&#039;, RandomForestClassifier(n_estimators=100))
 ])
 
 # Train and predict directly on SMILES
@@ -366,10 +416,10 @@ predictions = pipeline.predict(smiles_test)
 
 ```python
 featurizers = {
-    'ECFP': FPCalculator("ecfp"),
-    'MACCS': FPCalculator("maccs"),
-    'Descriptors': RDKitDescriptors2D(),
-    'ChemBERTa': PretrainedMolTransformer("ChemBERTa-77M-MLM")
+    &#039;ECFP&#039;: FPCalculator(&quot;ecfp&quot;),
+    &#039;MACCS&#039;: FPCalculator(&quot;maccs&quot;),
+    &#039;Descriptors&#039;: RDKitDescriptors2D(),
+    &#039;ChemBERTa&#039;: PretrainedMolTransformer(&quot;ChemBERTa-77M-MLM&quot;)
 }
 
 results = {}
@@ -392,19 +442,19 @@ store = ModelStore()
 
 # List all available models
 all_models = store.available_models
-print(f"Total featurizers: {len(all_models)}")
+print(f&quot;Total featurizers: {len(all_models)}&quot;)
 
 # Search for specific models
-chemberta_models = store.search(name="ChemBERTa")
+chemberta_models = store.search(name=&quot;ChemBERTa&quot;)
 for model in chemberta_models:
-    print(f"- {model.name}: {model.description}")
+    print(f&quot;- {model.name}: {model.description}&quot;)
 
 # Get usage information
-model_card = store.search(name="ChemBERTa-77M-MLM")[0]
+model_card = store.search(name=&quot;ChemBERTa-77M-MLM&quot;)[0]
 model_card.usage()  # Display usage examples
 
 # Load model
-transformer = store.load("ChemBERTa-77M-MLM")
+transformer = store.load(&quot;ChemBERTa-77M-MLM&quot;)
 ```
 
 ## Advanced Features
@@ -414,21 +464,21 @@ transformer = store.load("ChemBERTa-77M-MLM")
 ```python
 class CustomTransformer(MoleculeTransformer):
     def preprocess(self, mol):
-        """Custom preprocessing pipeline"""
+        &quot;&quot;&quot;Custom preprocessing pipeline&quot;&quot;&quot;
         if isinstance(mol, str):
             mol = dm.to_mol(mol)
         mol = dm.standardize_mol(mol)
         mol = dm.remove_salts(mol)
         return mol
 
-transformer = CustomTransformer(FPCalculator("ecfp"), n_jobs=-1)
+transformer = CustomTransformer(FPCalculator(&quot;ecfp&quot;), n_jobs=-1)
 ```
 
 ### Batch Processing Large Datasets
 
 ```python
 def featurize_in_chunks(smiles_list, transformer, chunk_size=10000):
-    """Process large datasets in chunks to manage memory"""
+    &quot;&quot;&quot;Process large datasets in chunks to manage memory&quot;&quot;&quot;
     all_features = []
     for i in range(0, len(smiles_list), chunk_size):
         chunk = smiles_list[i:i+chunk_size]
@@ -442,15 +492,15 @@ def featurize_in_chunks(smiles_list, transformer, chunk_size=10000):
 ```python
 import pickle
 
-cache_file = "embeddings_cache.pkl"
-transformer = PretrainedMolTransformer("ChemBERTa-77M-MLM", n_jobs=-1)
+cache_file = &quot;embeddings_cache.pkl&quot;
+transformer = PretrainedMolTransformer(&quot;ChemBERTa-77M-MLM&quot;, n_jobs=-1)
 
 try:
-    with open(cache_file, "rb") as f:
+    with open(cache_file, &quot;rb&quot;) as f:
         embeddings = pickle.load(f)
 except FileNotFoundError:
     embeddings = transformer(smiles_list)
-    with open(cache_file, "wb") as f:
+    with open(cache_file, &quot;wb&quot;) as f:
         pickle.dump(embeddings, f)
 ```
 
@@ -507,8 +557,8 @@ Comprehensive catalog of all 100+ featurizers organized by category:
 
 **Search tip:** Use grep to find specific featurizer types:
 ```bash
-grep -i "chembert" references/available_featurizers.md
-grep -i "pharmacophore" references/available_featurizers.md
+grep -i &quot;chembert&quot; references/available_featurizers.md
+grep -i &quot;pharmacophore&quot; references/available_featurizers.md
 ```
 
 ### references/examples.md
@@ -542,16 +592,16 @@ Process in chunks or use streaming approaches for datasets &gt; 100K molecules.
 ### Pretrained Model Dependencies
 Some models require additional packages. Install specific extras:
 ```bash
-uv pip install "molfeat[transformer]"  # For ChemBERTa/ChemGPT
-uv pip install "molfeat[dgl]"          # For GIN models
+uv pip install &quot;molfeat[transformer]&quot;  # For ChemBERTa/ChemGPT
+uv pip install &quot;molfeat[dgl]&quot;          # For GIN models
 ```
 
 ### Reproducibility
 Save exact configurations and document versions:
 ```python
-transformer.to_state_yaml_file("config.yml")
+transformer.to_state_yaml_file(&quot;config.yml&quot;)
 import molfeat
-print(f"molfeat version: {molfeat.__version__}")
+print(f&quot;molfeat version: {molfeat.__version__}&quot;)
 ```
 
 ## Additional Resources
@@ -560,8 +610,39 @@ print(f"molfeat version: {molfeat.__version__}")
 - **GitHub Repository**: https://github.com/datamol-io/molfeat
 - **PyPI Package**: https://pypi.org/project/molfeat/
 - **Tutorial**: https://portal.valencelabs.com/datamol/post/types-of-featurizers-b1e8HHrbFMkbun6
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>8</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

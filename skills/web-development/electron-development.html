@@ -4,68 +4,118 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>electron-development - AICCLI</title>
-  <meta name="description" content="electron-development - Claude Code skill for AICCLI">
+  <meta name="description" content=""Master Electron desktop app development with secure IPC, contextIsolation, preload scripts, multi-process architecture, electron-builder packaging, code signin">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / electron-development</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>electron-development</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">web-development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / web-development / electron-development
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>electron-development</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">web-development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Master Electron desktop app development with secure IPC, contextIsolation, preload scripts, multi-process architecture, electron-builder packaging, code signing, and auto-update."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/electron-development</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/electron-development</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/electron-development</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: electron-development
-description: "Master Electron desktop app development with secure IPC, contextIsolation, preload scripts, multi-process architecture, electron-builder packaging, code signing, and auto-update."
+description: &quot;Master Electron desktop app development with secure IPC, contextIsolation, preload scripts, multi-process architecture, electron-builder packaging, code signing, and auto-update.&quot;
 risk: safe
 source: community
-date_added: "2026-03-12"
+date_added: &quot;2026-03-12&quot;
 ---
 
 # Electron Development
 
-You are a senior Electron engineer specializing in secure, production-grade desktop application architecture. You have deep expertise in Electron's multi-process model, IPC security patterns, native OS integration, application packaging, code signing, and auto-update strategies.
+You are a senior Electron engineer specializing in secure, production-grade desktop application architecture. You have deep expertise in Electron&#039;s multi-process model, IPC security patterns, native OS integration, application packaging, code signing, and auto-update strategies.
 
 ## Use this skill when
 
@@ -99,7 +149,7 @@ You are a senior Electron engineer specializing in secure, production-grade desk
 
 ## Core Expertise Areas
 
-### 1. Project Structure & Architecture
+### 1. Project Structure &amp; Architecture
 
 **Recommended project layout:**
 ```
@@ -152,8 +202,8 @@ Electron runs **multiple processes** that are isolated by design:
 
 **BrowserWindow with security defaults (MANDATORY):**
 ```typescript
-import { BrowserWindow } from 'electron';
-import path from 'node:path';
+import { BrowserWindow } from &#039;electron&#039;;
+import path from &#039;node:path&#039;;
 
 function createMainWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -166,7 +216,7 @@ function createMainWindow(): BrowserWindow {
       sandbox: true,              // OS-level process sandboxing
       
       // ── PRELOAD SCRIPT ──
-      preload: path.join(__dirname, '../preload/preload.js'),
+      preload: path.join(__dirname, &#039;../preload/preload.js&#039;),
       
       // ── ADDITIONAL HARDENING ──
       webSecurity: true,          // Enforce same-origin policy
@@ -180,8 +230,8 @@ function createMainWindow(): BrowserWindow {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        'Content-Security-Policy': [
-          "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:;"
+        &#039;Content-Security-Policy&#039;: [
+          &quot;default-src &#039;self&#039;; script-src &#039;self&#039;; style-src &#039;self&#039; &#039;unsafe-inline&#039;; img-src &#039;self&#039; data:; font-src &#039;self&#039; data:;&quot;
         ],
       },
     });
@@ -202,30 +252,30 @@ IPC is the **only** safe channel for communication between main and renderer pro
 **Preload script (contextBridge + explicit whitelisting):**
 ```typescript
 // src/preload/preload.ts
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer } from &#039;electron&#039;;
 
 // ── WHITELIST: Only expose specific channels ──
 const ALLOWED_SEND_CHANNELS = [
-  'file:save',
-  'file:open',
-  'app:get-version',
-  'dialog:show-open',
+  &#039;file:save&#039;,
+  &#039;file:open&#039;,
+  &#039;app:get-version&#039;,
+  &#039;dialog:show-open&#039;,
 ] as const;
 
 const ALLOWED_RECEIVE_CHANNELS = [
-  'file:saved',
-  'file:opened',
-  'app:version',
-  'update:available',
-  'update:progress',
-  'update:downloaded',
-  'update:error',
+  &#039;file:saved&#039;,
+  &#039;file:opened&#039;,
+  &#039;app:version&#039;,
+  &#039;update:available&#039;,
+  &#039;update:progress&#039;,
+  &#039;update:downloaded&#039;,
+  &#039;update:error&#039;,
 ] as const;
 
 type SendChannel = typeof ALLOWED_SEND_CHANNELS[number];
 type ReceiveChannel = typeof ALLOWED_RECEIVE_CHANNELS[number];
 
-contextBridge.exposeInMainWorld('electronAPI', {
+contextBridge.exposeInMainWorld(&#039;electronAPI&#039;, {
   // One-way: renderer → main
   send: (channel: SendChannel, ...args: unknown[]) =&gt; {
     if (ALLOWED_SEND_CHANNELS.includes(channel)) {
@@ -238,7 +288,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     if (ALLOWED_SEND_CHANNELS.includes(channel)) {
       return ipcRenderer.invoke(channel, ...args);
     }
-    return Promise.reject(new Error(`Channel "${channel}" is not allowed`));
+    return Promise.reject(new Error(`Channel &quot;${channel}&quot; is not allowed`));
   },
 
   // One-way: main → renderer (subscriptions)
@@ -256,33 +306,33 @@ contextBridge.exposeInMainWorld('electronAPI', {
 **Main process IPC handlers:**
 ```typescript
 // src/main/ipc-handlers.ts
-import { ipcMain, dialog, BrowserWindow } from 'electron';
-import { readFile, writeFile } from 'node:fs/promises';
+import { ipcMain, dialog, BrowserWindow } from &#039;electron&#039;;
+import { readFile, writeFile } from &#039;node:fs/promises&#039;;
 
 export function registerIpcHandlers(): void {
   // invoke() pattern: returns a value to the renderer
-  ipcMain.handle('file:open', async () =&gt; {
+  ipcMain.handle(&#039;file:open&#039;, async () =&gt; {
     const { canceled, filePaths } = await dialog.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'Text Files', extensions: ['txt', 'md'] }],
+      properties: [&#039;openFile&#039;],
+      filters: [{ name: &#039;Text Files&#039;, extensions: [&#039;txt&#039;, &#039;md&#039;] }],
     });
     
     if (canceled || filePaths.length === 0) return null;
     
-    const content = await readFile(filePaths[0], 'utf-8');
+    const content = await readFile(filePaths[0], &#039;utf-8&#039;);
     return { path: filePaths[0], content };
   });
 
-  ipcMain.handle('file:save', async (_event, filePath: string, content: string) =&gt; {
+  ipcMain.handle(&#039;file:save&#039;, async (_event, filePath: string, content: string) =&gt; {
     // VALIDATE INPUTS — never trust renderer data blindly
-    if (typeof filePath !== 'string' || typeof content !== 'string') {
-      throw new Error('Invalid arguments');
+    if (typeof filePath !== &#039;string&#039; || typeof content !== &#039;string&#039;) {
+      throw new Error(&#039;Invalid arguments&#039;);
     }
-    await writeFile(filePath, content, 'utf-8');
+    await writeFile(filePath, content, &#039;utf-8&#039;);
     return { success: true };
   });
 
-  ipcMain.handle('app:get-version', () =&gt; {
+  ipcMain.handle(&#039;app:get-version&#039;, () =&gt; {
     return process.versions.electron;
   });
 }
@@ -305,15 +355,15 @@ declare global {
 
 // Open a file via IPC
 async function openFile() {
-  const result = await window.electronAPI.invoke('file:open');
+  const result = await window.electronAPI.invoke(&#039;file:open&#039;);
   if (result) {
-    console.log('File content:', result.content);
+    console.log(&#039;File content:&#039;, result.content);
   }
 }
 
 // Subscribe to updates from main process
-const unsubscribe = window.electronAPI.on('update:available', (version) =&gt; {
-  console.log('Update available:', version);
+const unsubscribe = window.electronAPI.on(&#039;update:available&#039;, (version) =&gt; {
+  console.log(&#039;Update available:&#039;, version);
 });
 
 // Cleanup on unmount
@@ -328,7 +378,7 @@ const unsubscribe = window.electronAPI.on('update:available', (version) =&gt; {
 | **Request/Response** | `ipcRenderer.invoke()` → `ipcMain.handle()` | File operations, dialogs, data queries |
 | **Push to renderer** | `webContents.send()` → `ipcRenderer.on()` | Progress updates, download status, auto-update |
 
-&gt; ⚠️ **Never** use `ipcRenderer.sendSync()` in production — it blocks the renderer's event loop and freezes the UI.
+&gt; ⚠️ **Never** use `ipcRenderer.sendSync()` in production — it blocks the renderer&#039;s event loop and freezes the UI.
 
 ---
 
@@ -357,8 +407,8 @@ const unsubscribe = window.electronAPI.on('update:available', (version) =&gt; {
 [ ] protocol.registerSchemesAsPrivileged() uses minimal permissions
 
 ── NAVIGATION ──
-[ ] webContents 'will-navigate' event intercepted — block unexpected URLs
-[ ] webContents 'new-window' event intercepted — prevent pop-up exploitation
+[ ] webContents &#039;will-navigate&#039; event intercepted — block unexpected URLs
+[ ] webContents &#039;new-window&#039; event intercepted — prevent pop-up exploitation
 [ ] No shell.openExternal() with unsanitized URLs
 
 ── PACKAGING ──
@@ -371,10 +421,10 @@ const unsubscribe = window.electronAPI.on('update:available', (version) =&gt; {
 **Preventing Navigation Hijacking:**
 ```typescript
 // In main process, after creating a BrowserWindow
-win.webContents.on('will-navigate', (event, url) =&gt; {
+win.webContents.on(&#039;will-navigate&#039;, (event, url) =&gt; {
   const parsedUrl = new URL(url);
   // Only allow navigation within your app
-  if (parsedUrl.origin !== 'http://localhost:5173') { // dev server
+  if (parsedUrl.origin !== &#039;http://localhost:5173&#039;) { // dev server
     event.preventDefault();
     console.warn(`Blocked navigation to: ${url}`);
   }
@@ -384,12 +434,12 @@ win.webContents.on('will-navigate', (event, url) =&gt; {
 win.webContents.setWindowOpenHandler(({ url }) =&gt; {
   try {
     const externalUrl = new URL(url);
-    const allowedHosts = new Set(['example.com', 'docs.example.com']);
+    const allowedHosts = new Set([&#039;example.com&#039;, &#039;docs.example.com&#039;]);
 
     // Never forward raw renderer-controlled URLs to the OS.
     // Unvalidated links can enable phishing or abuse platform URL handlers.
-    if (externalUrl.protocol === 'https:' && allowedHosts.has(externalUrl.hostname)) {
-      require('electron').shell.openExternal(externalUrl.toString());
+    if (externalUrl.protocol === &#039;https:&#039; &amp;&amp; allowedHosts.has(externalUrl.hostname)) {
+      require(&#039;electron&#039;).shell.openExternal(externalUrl.toString());
     } else {
       console.warn(`Blocked external URL: ${url}`);
     }
@@ -397,32 +447,32 @@ win.webContents.setWindowOpenHandler(({ url }) =&gt; {
     console.warn(`Rejected invalid external URL: ${url}`);
   }
 
-  return { action: 'deny' }; // Block all new Electron windows
+  return { action: &#039;deny&#039; }; // Block all new Electron windows
 });
 ```
 
 **Custom Protocol Registration (secure):**
 ```typescript
-import { protocol } from 'electron';
-import path from 'node:path';
-import { readFile } from 'node:fs/promises';
-import { URL } from 'node:url';
+import { protocol } from &#039;electron&#039;;
+import path from &#039;node:path&#039;;
+import { readFile } from &#039;node:fs/promises&#039;;
+import { URL } from &#039;node:url&#039;;
 
 // Register a custom protocol for loading local assets securely
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true } },
+  { scheme: &#039;app&#039;, privileges: { standard: true, secure: true, supportFetchAPI: true } },
 ]);
 
 app.whenReady().then(() =&gt; {
-  protocol.handle('app', async (request) =&gt; {
+  protocol.handle(&#039;app&#039;, async (request) =&gt; {
     const url = new URL(request.url);
-    const baseDir = path.resolve(__dirname, '../renderer');
+    const baseDir = path.resolve(__dirname, &#039;../renderer&#039;);
     // Strip the leading slash so path.resolve keeps baseDir as the root.
-    const relativePath = path.normalize(decodeURIComponent(url.pathname).replace(/^[/\\]+/, ''));
+    const relativePath = path.normalize(decodeURIComponent(url.pathname).replace(/^[/\\]+/, &#039;&#039;));
     const filePath = path.resolve(baseDir, relativePath);
 
     if (!filePath.startsWith(baseDir)) {
-      return new Response('Forbidden', { status: 403 });
+      return new Response(&#039;Forbidden&#039;, { status: 403 });
     }
 
     const data = await readFile(filePath);
@@ -438,18 +488,18 @@ app.whenReady().then(() =&gt; {
 **Strategy 1: Main process as single source of truth (recommended for most apps)**
 ```typescript
 // src/main/store.ts
-import { app } from 'electron';
-import { readFileSync, writeFileSync } from 'node:fs';
-import path from 'node:path';
+import { app } from &#039;electron&#039;;
+import { readFileSync, writeFileSync } from &#039;node:fs&#039;;
+import path from &#039;node:path&#039;;
 
 interface AppState {
-  theme: 'light' | 'dark';
+  theme: &#039;light&#039; | &#039;dark&#039;;
   recentFiles: string[];
   windowBounds: { x: number; y: number; width: number; height: number };
 }
 
 const DEFAULTS: AppState = {
-  theme: 'light',
+  theme: &#039;light&#039;,
   recentFiles: [],
   windowBounds: { x: 0, y: 0, width: 1200, height: 800 },
 };
@@ -459,13 +509,13 @@ class Store {
   private filePath: string;
 
   constructor() {
-    this.filePath = path.join(app.getPath('userData'), 'settings.json');
+    this.filePath = path.join(app.getPath(&#039;userData&#039;), &#039;settings.json&#039;);
     this.data = this.load();
   }
 
   private load(): AppState {
     try {
-      const raw = readFileSync(this.filePath, 'utf-8');
+      const raw = readFileSync(this.filePath, &#039;utf-8&#039;);
       return { ...DEFAULTS, ...JSON.parse(raw) };
     } catch {
       return { ...DEFAULTS };
@@ -487,30 +537,30 @@ export const store = new Store();
 
 **Strategy 2: electron-store (lightweight persistent storage)**
 ```typescript
-import Store from 'electron-store';
+import Store from &#039;electron-store&#039;;
 
 const store = new Store({
   schema: {
-    theme: { type: 'string', enum: ['light', 'dark'], default: 'light' },
+    theme: { type: &#039;string&#039;, enum: [&#039;light&#039;, &#039;dark&#039;], default: &#039;light&#039; },
     windowBounds: {
-      type: 'object',
+      type: &#039;object&#039;,
       properties: {
-        width: { type: 'number', default: 1200 },
-        height: { type: 'number', default: 800 },
+        width: { type: &#039;number&#039;, default: 1200 },
+        height: { type: &#039;number&#039;, default: 800 },
       },
     },
   },
 });
 
 // Usage
-store.set('theme', 'dark');
-console.log(store.get('theme')); // 'dark'
+store.set(&#039;theme&#039;, &#039;dark&#039;);
+console.log(store.get(&#039;theme&#039;)); // &#039;dark&#039;
 ```
 
 **Multi-window state synchronization:**
 ```typescript
 // Main process: broadcast state changes to all windows
-import { BrowserWindow } from 'electron';
+import { BrowserWindow } from &#039;electron&#039;;
 
 function broadcastToAllWindows(channel: string, data: unknown): void {
   for (const win of BrowserWindow.getAllWindows()) {
@@ -521,15 +571,15 @@ function broadcastToAllWindows(channel: string, data: unknown): void {
 }
 
 // When theme changes:
-ipcMain.handle('settings:set-theme', (_event, theme: 'light' | 'dark') =&gt; {
-  store.set('theme', theme);
-  broadcastToAllWindows('settings:theme-changed', theme);
+ipcMain.handle(&#039;settings:set-theme&#039;, (_event, theme: &#039;light&#039; | &#039;dark&#039;) =&gt; {
+  store.set(&#039;theme&#039;, theme);
+  broadcastToAllWindows(&#039;settings:theme-changed&#039;, theme);
 });
 ```
 
 ---
 
-### 6. Build, Signing & Distribution
+### 6. Build, Signing &amp; Distribution
 
 #### electron-builder Configuration
 
@@ -542,9 +592,9 @@ directories:
   buildResources: resources
 
 files:
-  - "out/**/*"       # compiled main + preload
-  - "renderer/**/*"  # built renderer assets
-  - "package.json"
+  - &quot;out/**/*&quot;       # compiled main + preload
+  - &quot;renderer/**/*&quot;  # built renderer assets
+  - &quot;package.json&quot;
 
 asar: true
 compression: maximum
@@ -594,13 +644,13 @@ publish:
 ```bash
 # macOS: requires Apple Developer certificate
 # Set environment variables before building:
-export CSC_LINK="path/to/Developer_ID_Application.p12"
-export CSC_KEY_PASSWORD="your-password"
+export CSC_LINK=&quot;path/to/Developer_ID_Application.p12&quot;
+export CSC_KEY_PASSWORD=&quot;your-password&quot;
 
 # Windows: requires EV or standard code signing certificate
 # Set environment variables:
-export WIN_CSC_LINK="path/to/code-signing.pfx"
-export WIN_CSC_KEY_PASSWORD="your-password"
+export WIN_CSC_LINK=&quot;path/to/code-signing.pfx&quot;
+export WIN_CSC_KEY_PASSWORD=&quot;your-password&quot;
 
 # Build signed app
 npx electron-builder --mac --win --publish never
@@ -610,36 +660,36 @@ npx electron-builder --mac --win --publish never
 
 ```typescript
 // src/main/updater.ts
-import { autoUpdater } from 'electron-updater';
-import { BrowserWindow } from 'electron';
-import log from 'electron-log';
+import { autoUpdater } from &#039;electron-updater&#039;;
+import { BrowserWindow } from &#039;electron&#039;;
+import log from &#039;electron-log&#039;;
 
 export function setupAutoUpdater(mainWindow: BrowserWindow): void {
   autoUpdater.logger = log;
   autoUpdater.autoDownload = false; // Let user decide
   autoUpdater.autoInstallOnAppQuit = true;
 
-  autoUpdater.on('update-available', (info) =&gt; {
-    mainWindow.webContents.send('update:available', {
+  autoUpdater.on(&#039;update-available&#039;, (info) =&gt; {
+    mainWindow.webContents.send(&#039;update:available&#039;, {
       version: info.version,
       releaseNotes: info.releaseNotes,
     });
   });
 
-  autoUpdater.on('download-progress', (progress) =&gt; {
-    mainWindow.webContents.send('update:progress', {
+  autoUpdater.on(&#039;download-progress&#039;, (progress) =&gt; {
+    mainWindow.webContents.send(&#039;update:progress&#039;, {
       percent: Math.round(progress.percent),
       bytesPerSecond: progress.bytesPerSecond,
     });
   });
 
-  autoUpdater.on('update-downloaded', () =&gt; {
-    mainWindow.webContents.send('update:downloaded');
+  autoUpdater.on(&#039;update-downloaded&#039;, () =&gt; {
+    mainWindow.webContents.send(&#039;update:downloaded&#039;);
   });
 
-  autoUpdater.on('error', (err) =&gt; {
-    log.error('Update error:', err);
-    mainWindow.webContents.send('update:error', err.message);
+  autoUpdater.on(&#039;error&#039;, (err) =&gt; {
+    log.error(&#039;Update error:&#039;, err);
+    mainWindow.webContents.send(&#039;update:error&#039;, err.message);
   });
 
   // Check for updates every 4 hours
@@ -648,35 +698,35 @@ export function setupAutoUpdater(mainWindow: BrowserWindow): void {
 }
 
 // Expose to renderer via IPC
-ipcMain.handle('update:download', () =&gt; autoUpdater.downloadUpdate());
-ipcMain.handle('update:install', () =&gt; autoUpdater.quitAndInstall());
+ipcMain.handle(&#039;update:download&#039;, () =&gt; autoUpdater.downloadUpdate());
+ipcMain.handle(&#039;update:install&#039;, () =&gt; autoUpdater.quitAndInstall());
 ```
 
 #### Bundle Size Optimization
 
 - ✅ Use `asar: true` to package sources into a single archive
 - ✅ Set `compression: maximum` in electron-builder config
-- ✅ Exclude dev dependencies: `"files"` pattern should only include compiled output
+- ✅ Exclude dev dependencies: `&quot;files&quot;` pattern should only include compiled output
 - ✅ Use a bundler (Vite, webpack, esbuild) to tree-shake the renderer
-- ✅ Audit `node_modules` shipped with the app — use `electron-builder`'s `files` exclude patterns
+- ✅ Audit `node_modules` shipped with the app — use `electron-builder`&#039;s `files` exclude patterns
 - ✅ Consider `@electron/rebuild` for native modules instead of shipping prebuilt for all platforms
 - ❌ Do NOT bundle the entire `node_modules` — only production dependencies
 
 ---
 
-### 7. Developer Experience & Debugging
+### 7. Developer Experience &amp; Debugging
 
 #### Development Setup with Hot Reload
 
 ```json
 // package.json scripts
 {
-  "scripts": {
-    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:main\"",
-    "dev:renderer": "vite",
-    "dev:main": "electron-vite dev",
-    "build": "electron-vite build",
-    "start": "electron ."
+  &quot;scripts&quot;: {
+    &quot;dev&quot;: &quot;concurrently \&quot;npm run dev:renderer\&quot; \&quot;npm run dev:main\&quot;&quot;,
+    &quot;dev:renderer&quot;: &quot;vite&quot;,
+    &quot;dev:main&quot;: &quot;electron-vite dev&quot;,
+    &quot;build&quot;: &quot;electron-vite build&quot;,
+    &quot;start&quot;: &quot;electron .&quot;
   }
 }
 ```
@@ -691,19 +741,19 @@ ipcMain.handle('update:install', () =&gt; autoUpdater.quitAndInstall());
 ```json
 // .vscode/launch.json
 {
-  "version": "0.2.0",
-  "configurations": [
+  &quot;version&quot;: &quot;0.2.0&quot;,
+  &quot;configurations&quot;: [
     {
-      "name": "Debug Main Process",
-      "type": "node",
-      "request": "launch",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-      "args": [".", "--remote-debugging-port=9223"],
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "env": {
-        "NODE_ENV": "development"
+      &quot;name&quot;: &quot;Debug Main Process&quot;,
+      &quot;type&quot;: &quot;node&quot;,
+      &quot;request&quot;: &quot;launch&quot;,
+      &quot;cwd&quot;: &quot;${workspaceFolder}&quot;,
+      &quot;runtimeExecutable&quot;: &quot;${workspaceFolder}/node_modules/.bin/electron&quot;,
+      &quot;args&quot;: [&quot;.&quot;, &quot;--remote-debugging-port=9223&quot;],
+      &quot;sourceMaps&quot;: true,
+      &quot;outFiles&quot;: [&quot;${workspaceFolder}/out/**/*.js&quot;],
+      &quot;env&quot;: {
+        &quot;NODE_ENV&quot;: &quot;development&quot;
       }
     }
   ]
@@ -713,8 +763,8 @@ ipcMain.handle('update:install', () =&gt; autoUpdater.quitAndInstall());
 **Other debugging techniques:**
 ```typescript
 // Enable DevTools only in development
-if (process.env.NODE_ENV === 'development') {
-  win.webContents.openDevTools({ mode: 'detach' });
+if (process.env.NODE_ENV === &#039;development&#039;) {
+  win.webContents.openDevTools({ mode: &#039;detach&#039; });
 }
 
 // Inspect specific renderer processes from command line:
@@ -726,15 +776,15 @@ if (process.env.NODE_ENV === 'development') {
 **Unit testing (Vitest / Jest):**
 ```typescript
 // tests/unit/store.test.ts
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from &#039;vitest&#039;;
 
 // Mock Electron modules for unit tests
-vi.mock('electron', () =&gt; ({
-  app: { getPath: () =&gt; '/tmp/test' },
+vi.mock(&#039;electron&#039;, () =&gt; ({
+  app: { getPath: () =&gt; &#039;/tmp/test&#039; },
 }));
 
-describe('Store', () =&gt; {
-  it('returns default values for missing keys', () =&gt; {
+describe(&#039;Store&#039;, () =&gt; {
+  it(&#039;returns default values for missing keys&#039;, () =&gt; {
     // Test store logic without Electron runtime
   });
 });
@@ -743,31 +793,31 @@ describe('Store', () =&gt; {
 **E2E testing (Playwright + Electron):**
 ```typescript
 // tests/e2e/app.spec.ts
-import { test, expect, _electron as electron } from '@playwright/test';
+import { test, expect, _electron as electron } from &#039;@playwright/test&#039;;
 
-test('app launches and shows main window', async () =&gt; {
-  const app = await electron.launch({ args: ['.'] });
+test(&#039;app launches and shows main window&#039;, async () =&gt; {
+  const app = await electron.launch({ args: [&#039;.&#039;] });
   const window = await app.firstWindow();
 
   // Wait for the app to fully load
-  await window.waitForLoadState('domcontentloaded');
+  await window.waitForLoadState(&#039;domcontentloaded&#039;);
 
   const title = await window.title();
-  expect(title).toBe('My App');
+  expect(title).toBe(&#039;My App&#039;);
 
   // Take a screenshot for visual regression
-  await window.screenshot({ path: 'tests/screenshots/main-window.png' });
+  await window.screenshot({ path: &#039;tests/screenshots/main-window.png&#039; });
 
   await app.close();
 });
 
-test('file open dialog works via IPC', async () =&gt; {
-  const app = await electron.launch({ args: ['.'] });
+test(&#039;file open dialog works via IPC&#039;, async () =&gt; {
+  const app = await electron.launch({ args: [&#039;.&#039;] });
   const window = await app.firstWindow();
 
   // Test IPC by evaluating in the renderer context
   const version = await window.evaluate(async () =&gt; {
-    return window.electronAPI.invoke('app:get-version');
+    return window.electronAPI.invoke(&#039;app:get-version&#039;);
   });
 
   expect(version).toBeTruthy();
@@ -778,15 +828,15 @@ test('file open dialog works via IPC', async () =&gt; {
 **Playwright config for Electron:**
 ```typescript
 // playwright.config.ts
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from &#039;@playwright/test&#039;;
 
 export default defineConfig({
-  testDir: './tests/e2e',
+  testDir: &#039;./tests/e2e&#039;,
   timeout: 30_000,
   retries: 1,
   use: {
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
+    trace: &#039;on-first-retry&#039;,
+    screenshot: &#039;only-on-failure&#039;,
   },
 });
 ```
@@ -797,10 +847,10 @@ export default defineConfig({
 
 ```typescript
 // src/main/main.ts
-import { app, BrowserWindow } from 'electron';
-import { registerIpcHandlers } from './ipc-handlers';
-import { setupAutoUpdater } from './updater';
-import { store } from './store';
+import { app, BrowserWindow } from &#039;electron&#039;;
+import { registerIpcHandlers } from &#039;./ipc-handlers&#039;;
+import { setupAutoUpdater } from &#039;./updater&#039;;
+import { store } from &#039;./store&#039;;
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -809,12 +859,12 @@ app.whenReady().then(() =&gt; {
   mainWindow = createMainWindow();
 
   // Restore window bounds
-  const bounds = store.get('windowBounds');
+  const bounds = store.get(&#039;windowBounds&#039;);
   if (bounds) mainWindow.setBounds(bounds);
 
   // Save window bounds on close
-  mainWindow.on('close', () =&gt; {
-    if (mainWindow) store.set('windowBounds', mainWindow.getBounds());
+  mainWindow.on(&#039;close&#039;, () =&gt; {
+    if (mainWindow) store.set(&#039;windowBounds&#039;, mainWindow.getBounds());
   });
 
   // Auto-update (only in production)
@@ -823,7 +873,7 @@ app.whenReady().then(() =&gt; {
   }
 
   // macOS: re-create window when dock icon is clicked
-  app.on('activate', () =&gt; {
+  app.on(&#039;activate&#039;, () =&gt; {
     if (BrowserWindow.getAllWindows().length === 0) {
       mainWindow = createMainWindow();
     }
@@ -831,15 +881,15 @@ app.whenReady().then(() =&gt; {
 });
 
 // Quit when all windows are closed (except on macOS)
-app.on('window-all-closed', () =&gt; {
-  if (process.platform !== 'darwin') {
+app.on(&#039;window-all-closed&#039;, () =&gt; {
+  if (process.platform !== &#039;darwin&#039;) {
     app.quit();
   }
 });
 
 // Security: prevent additional renderers from being created
-app.on('web-contents-created', (_event, contents) =&gt; {
-  contents.on('will-attach-webview', (event) =&gt; {
+app.on(&#039;web-contents-created&#039;, (_event, contents) =&gt; {
+  contents.on(&#039;will-attach-webview&#039;, (event) =&gt; {
     event.preventDefault(); // Block &lt;webview&gt; tags
   });
 });
@@ -885,8 +935,8 @@ app.on('web-contents-created', (_event, contents) =&gt; {
 - ✅ **Always** configure Content Security Policy headers
 - ✅ **Always** sanitize URLs before passing to `shell.openExternal()`
 - ✅ **Always** code-sign your production builds
-- ✅ Use Playwright with `@playwright/test`'s Electron support for E2E tests
-- ✅ Store user data in `app.getPath('userData')`, never in the app directory
+- ✅ Use Playwright with `@playwright/test`&#039;s Electron support for E2E tests
+- ✅ Store user data in `app.getPath(&#039;userData&#039;)`, never in the app directory
 - ❌ **Never** set `nodeIntegration: true` — this is the #1 Electron security vulnerability
 - ❌ **Never** expose raw `ipcRenderer` or `require()` to the renderer context
 - ❌ **Never** use `remote` module (deprecated and insecure)
@@ -906,13 +956,44 @@ app.on('web-contents-created', (_event, contents) =&gt; {
 ## Related Skills
 
 - `chrome-extension-developer` — When building browser extensions instead of desktop apps (shares multi-process model concepts)
-- `docker-expert` — When containerizing Electron's build pipeline or CI/CD
+- `docker-expert` — When containerizing Electron&#039;s build pipeline or CI/CD
 - `react-patterns` / `react-best-practices` — When using React for the renderer UI
 - `typescript-pro` — When setting up advanced TypeScript configurations for multi-target builds
 - `nodejs-backend-patterns` — When the main process needs complex backend logic
 - `github-actions-templates` — When setting up CI/CD for cross-platform Electron builds
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>0</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

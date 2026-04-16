@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>developer-growth-analysis - AICCLI</title>
-  <meta name="description" content="developer-growth-analysis - Claude Code skill for AICCLI">
+  <meta name="description" content="Analyzes your recent Claude Code chat history to identify coding patterns, development gaps, and areas for improvement, curates relevant learning resources from">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / developer-growth-analysis</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>developer-growth-analysis</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / developer-growth-analysis
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>developer-growth-analysis</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Analyzes your recent Claude Code chat history to identify coding patterns, development gaps, and areas for improvement, curates relevant learning resources from HackerNews, and automatically sends a personalized growth report to your Slack DMs.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/developer-growth-analysis</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/developer-growth-analysis</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/developer-growth-analysis</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: developer-growth-analysis
 description: Analyzes your recent Claude Code chat history to identify coding patterns, development gaps, and areas for improvement, curates relevant learning resources from HackerNews, and automatically sends a personalized growth report to your Slack DMs.
 ---
@@ -72,7 +122,7 @@ Use this skill when you want to:
 - Discover which topics would benefit from deeper study
 - Get curated learning resources tailored to your actual work patterns
 - Track improvement areas across your recent projects
-- Find high-quality articles that directly address the skills you're developing
+- Find high-quality articles that directly address the skills you&#039;re developing
 
 This skill is ideal for developers who want structured feedback on their growth without waiting for code reviews, and who prefer data-driven insights from their own work history.
 
@@ -80,9 +130,9 @@ This skill is ideal for developers who want structured feedback on their growth 
 
 This skill performs a six-step analysis of your development work:
 
-1. **Reads Your Chat History**: Accesses your local Claude Code chat history from the past 24-48 hours to understand what you've been working on.
+1. **Reads Your Chat History**: Accesses your local Claude Code chat history from the past 24-48 hours to understand what you&#039;ve been working on.
 
-2. **Identifies Development Patterns**: Analyzes the types of problems you're solving, technologies you're using, challenges you encounter, and how you approach different kinds of tasks.
+2. **Identifies Development Patterns**: Analyzes the types of problems you&#039;re solving, technologies you&#039;re using, challenges you encounter, and how you approach different kinds of tasks.
 
 3. **Detects Improvement Areas**: Recognizes patterns that suggest skill gaps, repeated struggles, inefficient approaches, or areas where you might benefit from deeper knowledge.
 
@@ -120,7 +170,7 @@ When a user requests analysis of their developer growth or coding patterns from 
 1. **Access Chat History**
 
    Read the chat history from `~/.claude/history.jsonl`. This file is a JSONL format where each line contains:
-   - `display`: The user's message/request
+   - `display`: The user&#039;s message/request
    - `project`: The project being worked on
    - `timestamp`: Unix timestamp (in milliseconds)
    - `pastedContents`: Any code or content pasted
@@ -143,16 +193,16 @@ When a user requests analysis of their developer growth or coding patterns from 
 3. **Identify Improvement Areas**
 
    Based on the analysis, identify 3-5 specific areas where the user could improve. These should be:
-   - **Specific** (not vague like "improve coding skills")
+   - **Specific** (not vague like &quot;improve coding skills&quot;)
    - **Evidence-based** (grounded in actual chat history)
    - **Actionable** (practical improvements that can be made)
    - **Prioritized** (most impactful first)
 
    Examples of good improvement areas:
-   - "Advanced TypeScript patterns (generics, utility types, type guards) - you struggled with type safety in [specific project]"
-   - "Error handling and validation - I noticed you patched several bugs related to missing null checks"
-   - "Async/await patterns - your recent work shows some race conditions and timing issues"
-   - "Database query optimization - you rewrote the same query multiple times"
+   - &quot;Advanced TypeScript patterns (generics, utility types, type guards) - you struggled with type safety in [specific project]&quot;
+   - &quot;Error handling and validation - I noticed you patched several bugs related to missing null checks&quot;
+   - &quot;Async/await patterns - your recent work shows some race conditions and timing issues&quot;
+   - &quot;Database query optimization - you rewrote the same query multiple times&quot;
 
 4. **Generate Report**
 
@@ -169,13 +219,13 @@ When a user requests analysis of their developer growth or coding patterns from 
    [2-3 paragraphs summarizing what the user worked on, projects touched, technologies used, and overall focus areas]
 
    Example:
-   "Over the past 24 hours, you focused primarily on backend development with three distinct projects. Your work involved TypeScript, React, and deployment infrastructure. You tackled a mix of feature implementation, debugging, and architectural decisions, with a particular focus on API design and database optimization."
+   &quot;Over the past 24 hours, you focused primarily on backend development with three distinct projects. Your work involved TypeScript, React, and deployment infrastructure. You tackled a mix of feature implementation, debugging, and architectural decisions, with a particular focus on API design and database optimization.&quot;
 
    ## Improvement Areas (Prioritized)
 
    ### 1. [Area Name]
 
-   **Why This Matters**: [Explanation of why this skill is important for the user's work]
+   **Why This Matters**: [Explanation of why this skill is important for the user&#039;s work]
 
    **What I Observed**: [Specific evidence from chat history showing this gap]
 
@@ -189,7 +239,7 @@ When a user requests analysis of their developer growth or coding patterns from 
 
    ## Strengths Observed
 
-   [2-3 bullet points highlighting things you're doing well - things to continue doing]
+   [2-3 bullet points highlighting things you&#039;re doing well - things to continue doing]
 
    ## Action Items
 
@@ -209,14 +259,14 @@ When a user requests analysis of their developer growth or coding patterns from 
 
    - For each improvement area, construct a search query targeting high-quality resources
    - Search HackerNews using RUBE_SEARCH_TOOLS with queries like:
-     - "Learn [Technology/Pattern] best practices"
-     - "[Technology] advanced patterns and techniques"
-     - "Debugging [specific problem type] in [language]"
+     - &quot;Learn [Technology/Pattern] best practices&quot;
+     - &quot;[Technology] advanced patterns and techniques&quot;
+     - &quot;Debugging [specific problem type] in [language]&quot;
    - Prioritize posts with high engagement (comments, upvotes)
    - For each area, include 2-3 most relevant articles with:
      - Article title
      - Publication date
-     - Brief description of why it's relevant
+     - Brief description of why it&#039;s relevant
      - Link to the article
 
    Add this section to the report:
@@ -227,7 +277,7 @@ When a user requests analysis of their developer growth or coding patterns from 
    ### For: [Improvement Area]
 
    1. **[Article Title]** - [Date]
-      [Description of what it covers and why it's relevant to your improvement area]
+      [Description of what it covers and why it&#039;s relevant to your improvement area]
       [Link]
 
    2. **[Article Title]** - [Date]
@@ -247,7 +297,7 @@ When a user requests analysis of their developer growth or coding patterns from 
 
 7. **Send Report to Slack DMs**
 
-   Use Rube MCP to send the complete report to the user's own Slack DMs:
+   Use Rube MCP to send the complete report to the user&#039;s own Slack DMs:
 
    - Check if Slack connection is active via RUBE_SEARCH_TOOLS
    - If not connected, use RUBE_MANAGE_CONNECTIONS to initiate Slack auth
@@ -286,9 +336,9 @@ Over the past two days, you focused on backend infrastructure and API developmen
 
 **Why This Matters**: TypeScript is central to your work, but leveraging its advanced features (generics, utility types, conditional types, type guards) can significantly improve code reliability and reduce runtime errors. Better type safety catches bugs at compile time rather than in production.
 
-**What I Observed**: In your recent chats, you were working with connection data structures and struggled a few times with typing auth configurations properly. You also had to iterate on union types for different connection states. There's an opportunity to use discriminated unions and type guards more effectively.
+**What I Observed**: In your recent chats, you were working with connection data structures and struggled a few times with typing auth configurations properly. You also had to iterate on union types for different connection states. There&#039;s an opportunity to use discriminated unions and type guards more effectively.
 
-**Recommendation**: Study TypeScript's advanced type system, particularly utility types (Omit, Pick, Record), conditional types, and discriminated unions. Apply these patterns to your connection configuration handling and auth state management.
+**Recommendation**: Study TypeScript&#039;s advanced type system, particularly utility types (Omit, Pick, Record), conditional types, and discriminated unions. Apply these patterns to your connection configuration handling and auth state management.
 
 **Time to Skill Up**: 5-8 hours of focused learning and practice
 
@@ -296,7 +346,7 @@ Over the past two days, you focused on backend infrastructure and API developmen
 
 **Why This Matters**: You identified and fixed a security concern where sensitive connection data was being displayed in your console. Preventing information leakage is critical for applications handling user credentials and API keys. Good practices here prevent security incidents and user trust violations.
 
-**What I Observed**: You caught that your "Your Apps" page was showing full connection data including auth configs. This shows good security instincts, and the next step is building this into your default thinking when handling sensitive information.
+**What I Observed**: You caught that your &quot;Your Apps&quot; page was showing full connection data including auth configs. This shows good security instincts, and the next step is building this into your default thinking when handling sensitive information.
 
 **Recommendation**: Review security best practices for handling sensitive data in frontend applications. Create reusable patterns for filtering/masking sensitive information before displaying it. Consider implementing a secure data layer that explicitly whitelist what can be shown in the UI.
 
@@ -304,9 +354,9 @@ Over the past two days, you focused on backend infrastructure and API developmen
 
 ### 3. Component Architecture and Responsive UI Patterns
 
-**Why This Matters**: You're designing UIs that need to work across different screen sizes and user interactions. Strong component architecture makes it easier to build complex UIs without bugs and improves maintainability.
+**Why This Matters**: You&#039;re designing UIs that need to work across different screen sizes and user interactions. Strong component architecture makes it easier to build complex UIs without bugs and improves maintainability.
 
-**What I Observed**: You worked on the "Marketplace" UI (formerly Browse Tools), recreating it from a design image. You also identified and fixed scrolling issues where content was overflowing containers. There's an opportunity to strengthen your understanding of layout containment and responsive design patterns.
+**What I Observed**: You worked on the &quot;Marketplace&quot; UI (formerly Browse Tools), recreating it from a design image. You also identified and fixed scrolling issues where content was overflowing containers. There&#039;s an opportunity to strengthen your understanding of layout containment and responsive design patterns.
 
 **Recommendation**: Study React component composition patterns and CSS layout best practices (especially flexbox and grid). Focus on container queries and responsive patterns that prevent overflow issues. Look into component composition libraries and design system approaches.
 
@@ -331,8 +381,8 @@ Priority order:
 
 ### For: Advanced TypeScript Patterns
 
-1. **TypeScript's Advanced Types: Generics, Utility Types, and Conditional Types** - HackerNews, October 2024
-   Deep dive into TypeScript's type system with practical examples and real-world applications. Covers discriminated unions, type guards, and patterns for ensuring compile-time safety in complex applications.
+1. **TypeScript&#039;s Advanced Types: Generics, Utility Types, and Conditional Types** - HackerNews, October 2024
+   Deep dive into TypeScript&#039;s type system with practical examples and real-world applications. Covers discriminated unions, type guards, and patterns for ensuring compile-time safety in complex applications.
    [Link to discussion]
 
 2. **Building Type-Safe APIs in TypeScript** - HackerNews, September 2024
@@ -366,7 +416,7 @@ Priority order:
 - Pick one improvement area at a time and focus on it for a few days before moving to the next
 - Use the learning resources as a study guide; work through the recommended materials and practice applying the patterns
 - Revisit this report after focusing on an area for a week to see how your work patterns change
-- The learning resources are intentionally curated for your actual work, not generic topics, so they'll be highly relevant to what you're building
+- The learning resources are intentionally curated for your actual work, not generic topics, so they&#039;ll be highly relevant to what you&#039;re building
 
 ## How Accuracy and Quality Are Maintained
 
@@ -377,8 +427,39 @@ This skill:
 - Focuses on actionable improvements, not vague feedback
 - Provides specific time estimates based on complexity
 - Prioritizes areas that will have the most impact on your development velocity
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>267</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

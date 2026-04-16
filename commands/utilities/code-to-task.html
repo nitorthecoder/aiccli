@@ -4,77 +4,127 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>code-to-task - AICCLI</title>
-  <meta name="description" content="code-to-task - Claude Code command for AICCLI">
+  <meta name="description" content="">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../command.html">Command</a> / code-to-task</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>code-to-task</h1>
-      <div class="meta">
-        <span class="meta-item">Command</span>
-        <span class="meta-item">utilities</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">commands</a> / utilities / code-to-task
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⌨️</div>
+      <div class="title">
+        <h1>code-to-task</h1>
+        <div class="meta">
+          <span class="badge type">Command</span>
+          <span class="badge">utilities</span>
+          
+        </div>
       </div>
-      <div class="description"><pre># Convert Code Analysis to Linear Tasks
+    </div>
+
+    <p class="desc">No description available.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/code-to-task</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install commands/code-to-task</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install commands/code-to-task</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code># Convert Code Analysis to Linear Tasks
 
 Convert code analysis to Linear tasks
 
 ## Purpose
-This command scans your codebase for TODO/FIXME comments, technical debt markers, deprecated code, and other indicators that should be tracked as tasks. It automatically creates organized, prioritized Linear tasks to ensure important code improvements aren't forgotten.
+This command scans your codebase for TODO/FIXME comments, technical debt markers, deprecated code, and other indicators that should be tracked as tasks. It automatically creates organized, prioritized Linear tasks to ensure important code improvements aren&#039;t forgotten.
 
 ## Usage
 ```bash
 # Scan entire codebase for TODOs and create tasks
-claude "Create tasks from all TODO comments in the codebase"
+claude &quot;Create tasks from all TODO comments in the codebase&quot;
 
 # Scan specific directory or module
-claude "Find TODOs in src/api and create Linear tasks"
+claude &quot;Find TODOs in src/api and create Linear tasks&quot;
 
 # Create tasks from specific patterns
-claude "Create tasks for all deprecated functions"
+claude &quot;Create tasks for all deprecated functions&quot;
 
 # Generate technical debt report
-claude "Analyze technical debt in the project and create improvement tasks"
+claude &quot;Analyze technical debt in the project and create improvement tasks&quot;
 ```
 
 ## Instructions
@@ -84,22 +134,22 @@ Search for common patterns indicating needed work:
 
 ```bash
 # Find TODO comments
-rg "TODO|FIXME|HACK|XXX|OPTIMIZE|REFACTOR" --type-add 'code:*.{js,ts,py,java,go,rb,php}' -t code
+rg &quot;TODO|FIXME|HACK|XXX|OPTIMIZE|REFACTOR&quot; --type-add &#039;code:*.{js,ts,py,java,go,rb,php}&#039; -t code
 
 # Find deprecated markers
-rg "@deprecated|DEPRECATED|@obsolete" -t code
+rg &quot;@deprecated|DEPRECATED|@obsolete&quot; -t code
 
 # Find temporary code
-rg "TEMPORARY|TEMP|REMOVE BEFORE|DELETE ME" -t code -i
+rg &quot;TEMPORARY|TEMP|REMOVE BEFORE|DELETE ME&quot; -t code -i
 
 # Find technical debt markers
-rg "TECHNICAL DEBT|TECH DEBT|REFACTOR|NEEDS REFACTORING" -t code -i
+rg &quot;TECHNICAL DEBT|TECH DEBT|REFACTOR|NEEDS REFACTORING&quot; -t code -i
 
 # Find security concerns
-rg "SECURITY|INSECURE|VULNERABILITY|CVE-" -t code -i
+rg &quot;SECURITY|INSECURE|VULNERABILITY|CVE-&quot; -t code -i
 
 # Find performance issues
-rg "SLOW|PERFORMANCE|OPTIMIZE|BOTTLENECK" -t code -i
+rg &quot;SLOW|PERFORMANCE|OPTIMIZE|BOTTLENECK&quot; -t code -i
 ```
 
 ### 2. Parse Comment Context
@@ -109,33 +159,33 @@ Extract meaningful information from comments:
 class CommentParser {
   parseComment(file, lineNumber, comment) {
     const parsed = {
-      type: 'todo',
-      priority: 'medium',
-      title: '',
-      description: '',
+      type: &#039;todo&#039;,
+      priority: &#039;medium&#039;,
+      title: &#039;&#039;,
+      description: &#039;&#039;,
       author: null,
       date: null,
       tags: [],
-      code_context: '',
+      code_context: &#039;&#039;,
       file_path: file,
       line_number: lineNumber
     };
     
     // Detect comment type
     if (comment.match(/FIXME/i)) {
-      parsed.type = 'fixme';
-      parsed.priority = 'high';
+      parsed.type = &#039;fixme&#039;;
+      parsed.priority = &#039;high&#039;;
     } else if (comment.match(/HACK|XXX/i)) {
-      parsed.type = 'hack';
-      parsed.priority = 'high';
+      parsed.type = &#039;hack&#039;;
+      parsed.priority = &#039;high&#039;;
     } else if (comment.match(/OPTIMIZE|PERFORMANCE/i)) {
-      parsed.type = 'optimization';
+      parsed.type = &#039;optimization&#039;;
     } else if (comment.match(/DEPRECATED/i)) {
-      parsed.type = 'deprecation';
-      parsed.priority = 'high';
+      parsed.type = &#039;deprecation&#039;;
+      parsed.priority = &#039;high&#039;;
     } else if (comment.match(/SECURITY/i)) {
-      parsed.type = 'security';
-      parsed.priority = 'urgent';
+      parsed.type = &#039;security&#039;;
+      parsed.priority = &#039;urgent&#039;;
     }
     
     // Extract author and date
@@ -151,14 +201,14 @@ class CommentParser {
     
     // Extract title and description
     const cleanComment = comment
-      .replace(/^\/\/\s*|^\/\*\s*|\*\/\s*$|^#\s*/g, '')
-      .replace(/TODO|FIXME|HACK|XXX/i, '')
+      .replace(/^\/\/\s*|^\/\*\s*|\*\/\s*$|^#\s*/g, &#039;&#039;)
+      .replace(/TODO|FIXME|HACK|XXX/i, &#039;&#039;)
       .trim();
     
     const parts = cleanComment.split(/[:\-–—]/);
     if (parts.length &gt; 1) {
       parsed.title = parts[0].trim();
-      parsed.description = parts.slice(1).join(':').trim();
+      parsed.description = parts.slice(1).join(&#039;:&#039;).trim();
     } else {
       parsed.title = cleanComment;
     }
@@ -232,8 +282,8 @@ class TaskGrouper {
       
       // Find similar tasks
       const similar = tasks.filter(t =&gt; 
-        t !== task &&
-        !seen.has(t) &&
+        t !== task &amp;&amp;
+        !seen.has(t) &amp;&amp;
         this.areSimilar(task, t)
       );
       
@@ -270,7 +320,7 @@ class TechnicalDebtAnalyzer {
   async analyzeFile(filePath) {
     const issues = [];
     const content = await readFile(filePath);
-    const lines = content.split('\n');
+    const lines = content.split(&#039;\n&#039;);
     
     // Check for long functions
     const functionMatches = content.matchAll(/function\s+(\w+)|(\w+)\s*=\s*\(.*?\)\s*=&gt;/g);
@@ -281,8 +331,8 @@ class TechnicalDebtAnalyzer {
       
       if (functionLength &gt; 50) {
         issues.push({
-          type: 'long_function',
-          severity: functionLength &gt; 100 ? 'high' : 'medium',
+          type: &#039;long_function&#039;,
+          severity: functionLength &gt; 100 ? &#039;high&#039; : &#039;medium&#039;,
           title: `Refactor long function: ${functionName}`,
           description: `Function ${functionName} is ${functionLength} lines long. Consider breaking it into smaller functions.`,
           file_path: filePath,
@@ -295,9 +345,9 @@ class TechnicalDebtAnalyzer {
     const duplicates = await this.findDuplicateCode(filePath);
     for (const dup of duplicates) {
       issues.push({
-        type: 'duplicate_code',
-        severity: 'medium',
-        title: 'Remove duplicate code',
+        type: &#039;duplicate_code&#039;,
+        severity: &#039;medium&#039;,
+        title: &#039;Remove duplicate code&#039;,
         description: `Similar code found in ${dup.otherFile}:${dup.otherLine}`,
         file_path: filePath,
         line_number: dup.line
@@ -308,24 +358,24 @@ class TechnicalDebtAnalyzer {
     const complexConditions = content.matchAll(/if\s*\([^)]{50,}\)/g);
     for (const match of complexConditions) {
       issues.push({
-        type: 'complex_condition',
-        severity: 'low',
-        title: 'Simplify complex conditional',
-        description: 'Consider extracting conditional logic into named variables or functions',
+        type: &#039;complex_condition&#039;,
+        severity: &#039;low&#039;,
+        title: &#039;Simplify complex conditional&#039;,
+        description: &#039;Consider extracting conditional logic into named variables or functions&#039;,
         file_path: filePath,
         line_number: getLineNumber(content, match.index)
       });
     }
     
     // Check for outdated dependencies
-    if (filePath.endsWith('package.json')) {
+    if (filePath.endsWith(&#039;package.json&#039;)) {
       const outdated = await this.checkOutdatedDependencies(filePath);
       for (const dep of outdated) {
         issues.push({
-          type: 'outdated_dependency',
-          severity: dep.major ? 'high' : 'low',
+          type: &#039;outdated_dependency&#039;,
+          severity: dep.major ? &#039;high&#039; : &#039;low&#039;,
           title: `Update ${dep.name} from ${dep.current} to ${dep.latest}`,
-          description: dep.major ? 'Major version update available' : 'Minor update available',
+          description: dep.major ? &#039;Major version update available&#039; : &#039;Minor update available&#039;,
           file_path: filePath
         });
       }
@@ -345,16 +395,16 @@ async function createLinearTasks(groupedTasks, options = {}) {
   const skipped = [];
   
   // Check for existing tasks to avoid duplicates
-  const existingTasks = await linear.searchTasks('TODO OR FIXME');
+  const existingTasks = await linear.searchTasks(&#039;TODO OR FIXME&#039;);
   const existingTitles = new Set(existingTasks.map(t =&gt; t.title));
   
   // Create parent task for large groups
-  if (options.createEpic && groupedTasks.length &gt; 10) {
+  if (options.createEpic &amp;&amp; groupedTasks.length &gt; 10) {
     const epic = await linear.createTask({
-      title: `Technical Debt: ${options.module || 'Codebase'} Cleanup`,
+      title: `Technical Debt: ${options.module || &#039;Codebase&#039;} Cleanup`,
       description: `Parent task for ${groupedTasks.length} code improvements`,
       priority: 2,
-      labels: ['technical-debt', 'code-quality']
+      labels: [&#039;technical-debt&#039;, &#039;code-quality&#039;]
     });
     options.parentId = epic.id;
   }
@@ -362,7 +412,7 @@ async function createLinearTasks(groupedTasks, options = {}) {
   for (const task of groupedTasks) {
     // Skip if similar task exists
     if (existingTitles.has(task.title)) {
-      skipped.push({ task, reason: 'duplicate' });
+      skipped.push({ task, reason: &#039;duplicate&#039; });
       continue;
     }
     
@@ -407,20 +457,20 @@ async function createLinearTasks(groupedTasks, options = {}) {
 }
 
 function buildTaskDescription(task) {
-  let description = task.description || '';
+  let description = task.description || &#039;&#039;;
   
   // Add code context
   if (task.code_context) {
-    description += '\n\n### Code Context\n```\n';
+    description += &#039;\n\n### Code Context\n```\n&#039;;
     task.code_context.forEach(line =&gt; {
-      const prefix = line.isTarget ? '&gt;&gt;&gt; ' : '    ';
+      const prefix = line.isTarget ? &#039;&gt;&gt;&gt; &#039; : &#039;    &#039;;
       description += `${prefix}${line.number}: ${line.content}\n`;
     });
-    description += '```\n';
+    description += &#039;```\n&#039;;
   }
   
   // Add metadata
-  description += '\n\n### Details\n';
+  description += &#039;\n\n### Details\n&#039;;
   description += `- **Type**: ${task.type}\n`;
   description += `- **File**: \`${task.file_path}\`\n`;
   description += `- **Line**: ${task.line_number}\n`;
@@ -432,16 +482,16 @@ function buildTaskDescription(task) {
     description += `- **Date**: ${task.date}\n`;
   }
   if (task.tags.length &gt; 0) {
-    description += `- **Tags**: ${task.tags.join(', ')}\n`;
+    description += `- **Tags**: ${task.tags.join(&#039;, &#039;)}\n`;
   }
   
   // Add suggestions
-  if (task.type === 'deprecated') {
-    description += '\n### Suggested Actions\n';
-    description += '1. Identify all usages of this deprecated code\n';
-    description += '2. Update to use the recommended alternative\n';
-    description += '3. Add deprecation warnings if not present\n';
-    description += '4. Schedule for removal in next major version\n';
+  if (task.type === &#039;deprecated&#039;) {
+    description += &#039;\n### Suggested Actions\n&#039;;
+    description += &#039;1. Identify all usages of this deprecated code\n&#039;;
+    description += &#039;2. Update to use the recommended alternative\n&#039;;
+    description += &#039;3. Add deprecation warnings if not present\n&#039;;
+    description += &#039;4. Schedule for removal in next major version\n&#039;;
   }
   
   return description;
@@ -475,16 +525,16 @@ function generateReport(scanResults, createdTasks) {
   // Generate recommendations
   if (report.summary.byType.security &gt; 0) {
     report.recommendations.push({
-      priority: 'urgent',
-      action: 'Address security-related TODOs immediately',
-      tasks: scanResults.filter(r =&gt; r.type === 'security').length
+      priority: &#039;urgent&#039;,
+      action: &#039;Address security-related TODOs immediately&#039;,
+      tasks: scanResults.filter(r =&gt; r.type === &#039;security&#039;).length
     });
   }
   
   if (report.summary.byType.deprecated &gt; 5) {
     report.recommendations.push({
-      priority: 'high',
-      action: 'Create deprecation removal sprint',
+      priority: &#039;high&#039;,
+      action: &#039;Create deprecation removal sprint&#039;,
       tasks: report.summary.byType.deprecated
     });
   }
@@ -499,7 +549,7 @@ function generateReport(scanResults, createdTasks) {
 try {
   await scanDirectory(path);
 } catch (error) {
-  if (error.code === 'EACCES') {
+  if (error.code === &#039;EACCES&#039;) {
     console.warn(`Skipping ${path} - permission denied`);
   }
 }
@@ -511,7 +561,7 @@ const rateLimiter = {
   
   async createTask(taskData) {
     if (this.tasksCreated &gt;= 50) {
-      console.log('Rate limit approaching, batching remaining tasks...');
+      console.log(&#039;Rate limit approaching, batching remaining tasks...&#039;);
       // Create single task with list of TODOs
       return this.createBatchTask(remainingTasks);
     }
@@ -527,9 +577,9 @@ const safeParser = {
       return this.parseComment(comment);
     } catch (error) {
       return {
-        type: 'todo',
-        title: comment.substring(0, 50) + '...',
-        priority: 'low',
+        type: &#039;todo&#039;,
+        title: comment.substring(0, 50) + &#039;...&#039;,
+        priority: &#039;low&#039;,
         parseError: true
       };
     }
@@ -584,14 +634,14 @@ Found 47 items across 23 files:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ✅ Created 32 Linear tasks:
-   - Epic: "Q1 Technical Debt Cleanup" (LIN-456)
+   - Epic: &quot;Q1 Technical Debt Cleanup&quot; (LIN-456)
    - 3 urgent security tasks
    - 10 high-priority fixes
    - 19 medium-priority improvements
 
 ⏭️ Skipped 15 items:
    - 8 duplicates (tasks already exist)
-   - 4 low-value comments (e.g., "TODO: think about this")
+   - 4 low-value comments (e.g., &quot;TODO: think about this&quot;)
    - 3 external dependencies (waiting on upstream)
 
 📊 Estimates:
@@ -615,19 +665,19 @@ https://linear.app/yourteam/project/q1-technical-debt-cleanup
 Define project-specific patterns:
 ```bash
 # Add custom markers to scan
-claude "Scan for REVIEW, QUESTION, and ASSUMPTION comments"
+claude &quot;Scan for REVIEW, QUESTION, and ASSUMPTION comments&quot;
 ```
 
 ### Integration with CI/CD
 ```bash
 # Fail build if critical TODOs found
-claude "Check for SECURITY or FIXME comments and exit with error if found"
+claude &quot;Check for SECURITY or FIXME comments and exit with error if found&quot;
 ```
 
 ### Scheduled Scans
 ```bash
 # Weekly technical debt report
-claude "Generate weekly technical debt report and create tasks for new items"
+claude &quot;Generate weekly technical debt report and create tasks for new items&quot;
 ```
 
 ## Tips
@@ -637,8 +687,39 @@ claude "Generate weekly technical debt report and create tasks for new items"
 - Link TODOs to existing Linear issues when possible
 - Set up IDE snippets for properly formatted TODOs
 - Review and close completed TODO tasks
-- Use TODO comments as a quality gate in PR reviews</pre></div>
+- Use TODO comments as a quality gate in PR reviews</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>107</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

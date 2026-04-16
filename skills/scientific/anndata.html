@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>anndata - AICCLI</title>
-  <meta name="description" content="anndata - Claude Code skill for AICCLI">
+  <meta name="description" content="This skill should be used when working with annotated data matrices in Python, particularly for single-cell genomics analysis, managing experimental measurement">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / anndata</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>anndata</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / anndata
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>anndata</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">This skill should be used when working with annotated data matrices in Python, particularly for single-cell genomics analysis, managing experimental measurements with metadata, or handling large-scale biological datasets. Use when tasks involve AnnData objects, h5ad files, single-cell RNA-seq data, or integration with scanpy/scverse tools.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/anndata</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/anndata</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/anndata</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: anndata
 description: This skill should be used when working with annotated data matrices in Python, particularly for single-cell genomics analysis, managing experimental measurements with metadata, or handling large-scale biological datasets. Use when tasks involve AnnData objects, h5ad files, single-cell RNA-seq data, or integration with scanpy/scverse tools.
 ---
@@ -100,13 +150,13 @@ adata = ad.AnnData(X)
 
 # With metadata
 obs = pd.DataFrame({
-    'cell_type': ['T cell', 'B cell'] * 50,
-    'sample': ['A', 'B'] * 50
-}, index=[f'cell_{i}' for i in range(100)])
+    &#039;cell_type&#039;: [&#039;T cell&#039;, &#039;B cell&#039;] * 50,
+    &#039;sample&#039;: [&#039;A&#039;, &#039;B&#039;] * 50
+}, index=[f&#039;cell_{i}&#039; for i in range(100)])
 
 var = pd.DataFrame({
-    'gene_name': [f'Gene_{i}' for i in range(2000)]
-}, index=[f'ENSG{i:05d}' for i in range(2000)])
+    &#039;gene_name&#039;: [f&#039;Gene_{i}&#039; for i in range(2000)]
+}, index=[f&#039;ENSG{i:05d}&#039; for i in range(2000)])
 
 adata = ad.AnnData(X=X, obs=obs, var=var)
 ```
@@ -114,44 +164,44 @@ adata = ad.AnnData(X=X, obs=obs, var=var)
 ### Reading data
 ```python
 # Read h5ad file
-adata = ad.read_h5ad('data.h5ad')
+adata = ad.read_h5ad(&#039;data.h5ad&#039;)
 
 # Read with backed mode (for large files)
-adata = ad.read_h5ad('large_data.h5ad', backed='r')
+adata = ad.read_h5ad(&#039;large_data.h5ad&#039;, backed=&#039;r&#039;)
 
 # Read other formats
-adata = ad.read_csv('data.csv')
-adata = ad.read_loom('data.loom')
-adata = ad.read_10x_h5('filtered_feature_bc_matrix.h5')
+adata = ad.read_csv(&#039;data.csv&#039;)
+adata = ad.read_loom(&#039;data.loom&#039;)
+adata = ad.read_10x_h5(&#039;filtered_feature_bc_matrix.h5&#039;)
 ```
 
 ### Writing data
 ```python
 # Write h5ad file
-adata.write_h5ad('output.h5ad')
+adata.write_h5ad(&#039;output.h5ad&#039;)
 
 # Write with compression
-adata.write_h5ad('output.h5ad', compression='gzip')
+adata.write_h5ad(&#039;output.h5ad&#039;, compression=&#039;gzip&#039;)
 
 # Write other formats
-adata.write_zarr('output.zarr')
-adata.write_csvs('output_dir/')
+adata.write_zarr(&#039;output.zarr&#039;)
+adata.write_csvs(&#039;output_dir/&#039;)
 ```
 
 ### Basic operations
 ```python
 # Subset by conditions
-t_cells = adata[adata.obs['cell_type'] == 'T cell']
+t_cells = adata[adata.obs[&#039;cell_type&#039;] == &#039;T cell&#039;]
 
 # Subset by indices
 subset = adata[0:50, 0:100]
 
 # Add metadata
-adata.obs['quality_score'] = np.random.rand(adata.n_obs)
-adata.var['highly_variable'] = np.random.rand(adata.n_vars) &gt; 0.8
+adata.obs[&#039;quality_score&#039;] = np.random.rand(adata.n_obs)
+adata.var[&#039;highly_variable&#039;] = np.random.rand(adata.n_vars) &gt; 0.8
 
 # Access dimensions
-print(f"{adata.n_obs} observations × {adata.n_vars} variables")
+print(f&quot;{adata.n_obs} observations × {adata.n_vars} variables&quot;)
 ```
 
 ## Core Capabilities
@@ -181,14 +231,14 @@ Read and write data in various formats with support for compression, backed mode
 Common commands:
 ```python
 # Read/write h5ad
-adata = ad.read_h5ad('data.h5ad', backed='r')
-adata.write_h5ad('output.h5ad', compression='gzip')
+adata = ad.read_h5ad(&#039;data.h5ad&#039;, backed=&#039;r&#039;)
+adata.write_h5ad(&#039;output.h5ad&#039;, compression=&#039;gzip&#039;)
 
 # Read 10X data
-adata = ad.read_10x_h5('filtered_feature_bc_matrix.h5')
+adata = ad.read_10x_h5(&#039;filtered_feature_bc_matrix.h5&#039;)
 
 # Read MTX format
-adata = ad.read_mtx('matrix.mtx').T
+adata = ad.read_mtx(&#039;matrix.mtx&#039;).T
 ```
 
 ### 3. Concatenation
@@ -209,9 +259,9 @@ Common commands:
 adata = ad.concat(
     [adata1, adata2, adata3],
     axis=0,
-    join='inner',
-    label='batch',
-    keys=['batch1', 'batch2', 'batch3']
+    join=&#039;inner&#039;,
+    label=&#039;batch&#039;,
+    keys=[&#039;batch1&#039;, &#039;batch2&#039;, &#039;batch3&#039;]
 )
 
 # Concatenate variables (combine modalities)
@@ -220,9 +270,9 @@ adata = ad.concat([adata_rna, adata_protein], axis=1)
 # Lazy concatenation
 from anndata.experimental import AnnCollection
 collection = AnnCollection(
-    ['data1.h5ad', 'data2.h5ad'],
-    join_obs='outer',
-    label='dataset'
+    [&#039;data1.h5ad&#039;, &#039;data2.h5ad&#039;],
+    join_obs=&#039;outer&#039;,
+    label=&#039;dataset&#039;
 )
 ```
 
@@ -243,8 +293,8 @@ Transform, subset, filter, and reorganize data efficiently.
 Common commands:
 ```python
 # Subset by metadata
-filtered = adata[adata.obs['quality_score'] &gt; 0.8]
-hv_genes = adata[:, adata.var['highly_variable']]
+filtered = adata[adata.obs[&#039;quality_score&#039;] &gt; 0.8]
+hv_genes = adata[:, adata.var[&#039;highly_variable&#039;]]
 
 # Transpose
 adata_T = adata.T
@@ -283,11 +333,11 @@ adata.X = csr_matrix(adata.X)
 adata.strings_to_categoricals()
 
 # Use backed mode for large files
-adata = ad.read_h5ad('large.h5ad', backed='r')
+adata = ad.read_h5ad(&#039;large.h5ad&#039;, backed=&#039;r&#039;)
 
 # Store raw before filtering
 adata.raw = adata.copy()
-adata = adata[:, adata.var['highly_variable']]
+adata = adata[:, adata.var[&#039;highly_variable&#039;]]
 ```
 
 ## Integration with Scverse Ecosystem
@@ -311,7 +361,7 @@ sc.tl.umap(adata)
 sc.tl.leiden(adata)
 
 # Visualization
-sc.pl.umap(adata, color=['cell_type', 'leiden'])
+sc.pl.umap(adata, color=[&#039;cell_type&#039;, &#039;leiden&#039;])
 ```
 
 ### Muon (Multimodal data)
@@ -319,7 +369,7 @@ sc.pl.umap(adata, color=['cell_type', 'leiden'])
 import muon as mu
 
 # Combine RNA and protein data
-mdata = mu.MuData({'rna': adata_rna, 'protein': adata_protein})
+mdata = mu.MuData({&#039;rna&#039;: adata_rna, &#039;protein&#039;: adata_protein})
 ```
 
 ### PyTorch integration
@@ -342,13 +392,13 @@ import anndata as ad
 import scanpy as sc
 
 # 1. Load data
-adata = ad.read_10x_h5('filtered_feature_bc_matrix.h5')
+adata = ad.read_10x_h5(&#039;filtered_feature_bc_matrix.h5&#039;)
 
 # 2. Quality control
-adata.obs['n_genes'] = (adata.X &gt; 0).sum(axis=1)
-adata.obs['n_counts'] = adata.X.sum(axis=1)
-adata = adata[adata.obs['n_genes'] &gt; 200]
-adata = adata[adata.obs['n_counts'] &lt; 50000]
+adata.obs[&#039;n_genes&#039;] = (adata.X &gt; 0).sum(axis=1)
+adata.obs[&#039;n_counts&#039;] = adata.X.sum(axis=1)
+adata = adata[adata.obs[&#039;n_genes&#039;] &gt; 200]
+adata = adata[adata.obs[&#039;n_counts&#039;] &lt; 50000]
 
 # 3. Store raw
 adata.raw = adata.copy()
@@ -357,30 +407,30 @@ adata.raw = adata.copy()
 sc.pp.normalize_total(adata, target_sum=1e4)
 sc.pp.log1p(adata)
 sc.pp.highly_variable_genes(adata, n_top_genes=2000)
-adata = adata[:, adata.var['highly_variable']]
+adata = adata[:, adata.var[&#039;highly_variable&#039;]]
 
 # 5. Save processed data
-adata.write_h5ad('processed.h5ad')
+adata.write_h5ad(&#039;processed.h5ad&#039;)
 ```
 
 ### Batch integration
 ```python
 # Load multiple batches
-adata1 = ad.read_h5ad('batch1.h5ad')
-adata2 = ad.read_h5ad('batch2.h5ad')
-adata3 = ad.read_h5ad('batch3.h5ad')
+adata1 = ad.read_h5ad(&#039;batch1.h5ad&#039;)
+adata2 = ad.read_h5ad(&#039;batch2.h5ad&#039;)
+adata3 = ad.read_h5ad(&#039;batch3.h5ad&#039;)
 
 # Concatenate with batch labels
 adata = ad.concat(
     [adata1, adata2, adata3],
-    label='batch',
-    keys=['batch1', 'batch2', 'batch3'],
-    join='inner'
+    label=&#039;batch&#039;,
+    keys=[&#039;batch1&#039;, &#039;batch2&#039;, &#039;batch3&#039;],
+    join=&#039;inner&#039;
 )
 
 # Apply batch correction
 import scanpy as sc
-sc.pp.combat(adata, key='batch')
+sc.pp.combat(adata, key=&#039;batch&#039;)
 
 # Continue analysis
 sc.pp.pca(adata)
@@ -391,10 +441,10 @@ sc.tl.umap(adata)
 ### Working with large datasets
 ```python
 # Open in backed mode
-adata = ad.read_h5ad('100GB_dataset.h5ad', backed='r')
+adata = ad.read_h5ad(&#039;100GB_dataset.h5ad&#039;, backed=&#039;r&#039;)
 
 # Filter based on metadata (no data loading)
-high_quality = adata[adata.obs['quality_score'] &gt; 0.8]
+high_quality = adata[adata.obs[&#039;quality_score&#039;] &gt; 0.8]
 
 # Load filtered subset
 adata_subset = high_quality.to_memory()
@@ -415,7 +465,7 @@ for i in range(0, adata.n_obs, chunk_size):
 Use backed mode or convert to sparse matrices:
 ```python
 # Backed mode
-adata = ad.read_h5ad('file.h5ad', backed='r')
+adata = ad.read_h5ad(&#039;file.h5ad&#039;, backed=&#039;r&#039;)
 
 # Sparse matrices
 from scipy.sparse import csr_matrix
@@ -427,20 +477,20 @@ Use compression and appropriate formats:
 ```python
 # Optimize for storage
 adata.strings_to_categoricals()
-adata.write_h5ad('file.h5ad', compression='gzip')
+adata.write_h5ad(&#039;file.h5ad&#039;, compression=&#039;gzip&#039;)
 
 # Use Zarr for cloud storage
-adata.write_zarr('file.zarr', chunks=(1000, 1000))
+adata.write_zarr(&#039;file.zarr&#039;, chunks=(1000, 1000))
 ```
 
 ### Index alignment issues
 Always align external data on index:
 ```python
 # Wrong
-adata.obs['new_col'] = external_data['values']
+adata.obs[&#039;new_col&#039;] = external_data[&#039;values&#039;]
 
 # Correct
-adata.obs['new_col'] = external_data.set_index('cell_id').loc[adata.obs_names, 'values']
+adata.obs[&#039;new_col&#039;] = external_data.set_index(&#039;cell_id&#039;).loc[adata.obs_names, &#039;values&#039;]
 ```
 
 ## Additional Resources
@@ -449,8 +499,39 @@ adata.obs['new_col'] = external_data.set_index('cell_id').loc[adata.obs_names, '
 - **Scanpy tutorials**: https://scanpy.readthedocs.io/
 - **Scverse ecosystem**: https://scverse.org/
 - **GitHub repository**: https://github.com/scverse/anndata
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>12</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

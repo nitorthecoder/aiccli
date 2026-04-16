@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>clinical-reports - AICCLI</title>
-  <meta name="description" content="clinical-reports - Claude Code skill for AICCLI">
+  <meta name="description" content=""Write comprehensive clinical reports including case reports (CARE guidelines), diagnostic reports (radiology/pathology/lab), clinical trial reports (ICH-E3, SA">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / clinical-reports</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>clinical-reports</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / clinical-reports
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>clinical-reports</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Write comprehensive clinical reports including case reports (CARE guidelines), diagnostic reports (radiology/pathology/lab), clinical trial reports (ICH-E3, SAE, CSR), and patient documentation (SOAP, H&P, discharge summaries). Full support with templates, regulatory compliance (HIPAA, FDA, ICH-GCP), and validation tools."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/clinical-reports</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/clinical-reports</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/clinical-reports</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: clinical-reports
-description: "Write comprehensive clinical reports including case reports (CARE guidelines), diagnostic reports (radiology/pathology/lab), clinical trial reports (ICH-E3, SAE, CSR), and patient documentation (SOAP, H&P, discharge summaries). Full support with templates, regulatory compliance (HIPAA, FDA, ICH-GCP), and validation tools."
+description: &quot;Write comprehensive clinical reports including case reports (CARE guidelines), diagnostic reports (radiology/pathology/lab), clinical trial reports (ICH-E3, SAE, CSR), and patient documentation (SOAP, H&amp;P, discharge summaries). Full support with templates, regulatory compliance (HIPAA, FDA, ICH-GCP), and validation tools.&quot;
 allowed-tools: [Read, Write, Edit, Bash]
 ---
 
@@ -77,7 +127,7 @@ This skill should be used when:
 - Documenting clinical trial data and adverse events
 - Preparing clinical study reports (CSR) for regulatory submission
 - Writing patient progress notes, SOAP notes, and clinical summaries
-- Drafting discharge summaries, H&P documents, or consultation notes
+- Drafting discharge summaries, H&amp;P documents, or consultation notes
 - Ensuring HIPAA compliance and proper de-identification
 - Validating clinical documentation for completeness and accuracy
 - Preparing serious adverse event (SAE) reports
@@ -99,7 +149,7 @@ This is not optional. Clinical reports benefit greatly from visual elements. Bef
 
 **How to generate schematics:**
 ```bash
-python scripts/generate_schematic.py "your diagram description" -o figures/output.png
+python scripts/generate_schematic.py &quot;your diagram description&quot; -o figures/output.png
 ```
 
 The AI will automatically:
@@ -132,9 +182,9 @@ Clinical case reports describe unusual clinical presentations, novel diagnoses, 
 The CARE (CAse REport) guidelines provide a standardized framework for case report writing. All case reports should follow this checklist:
 
 **Title**
-- Include the words "case report" or "case study"
+- Include the words &quot;case report&quot; or &quot;case study&quot;
 - Indicate the area of focus
-- Example: "Unusual Presentation of Acute Myocardial Infarction in a Young Patient: A Case Report"
+- Example: &quot;Unusual Presentation of Acute Myocardial Infarction in a Young Patient: A Case Report&quot;
 
 **Keywords**
 - 2-5 keywords for indexing and searchability
@@ -208,7 +258,7 @@ The CARE (CAse REport) guidelines provide a standardized framework for case repo
 - Unanswered questions or areas for future research
 
 **Patient Perspective** (optional but encouraged)
-- Patient's experience and viewpoint
+- Patient&#039;s experience and viewpoint
 - Impact on quality of life
 - Patient-reported outcomes
 - Quote from patient if appropriate
@@ -217,7 +267,7 @@ The CARE (CAse REport) guidelines provide a standardized framework for case repo
 - Statement documenting patient consent for publication
 - If patient deceased or unable to consent, describe proxy consent
 - For pediatric cases, parental/guardian consent
-- Example: "Written informed consent was obtained from the patient for publication of this case report and accompanying images. A copy of the written consent is available for review by the Editor-in-Chief of this journal."
+- Example: &quot;Written informed consent was obtained from the patient for publication of this case report and accompanying images. A copy of the written consent is available for review by the Editor-in-Chief of this journal.&quot;
 
 For detailed CARE guidelines, refer to `references/case_report_guidelines.md`.
 
@@ -255,9 +305,9 @@ Check journal instructions for authors before submission.
 18. Any other unique identifying characteristic
 
 **Best Practices:**
-- Use "the patient" instead of names
-- Report age ranges (e.g., "a woman in her 60s") or exact age if relevant
-- Use approximate dates or time intervals (e.g., "3 months prior")
+- Use &quot;the patient&quot; instead of names
+- Report age ranges (e.g., &quot;a woman in her 60s&quot;) or exact age if relevant
+- Use approximate dates or time intervals (e.g., &quot;3 months prior&quot;)
 - Remove institution names unless necessary
 - Blur or crop identifying features in images
 - Obtain explicit consent for any potentially identifying information
@@ -282,7 +332,7 @@ Radiology reports follow a standardized structure to ensure clarity and complete
 - Reason for examination
 - Relevant clinical history
 - Specific clinical question to be answered
-- Example: "Rule out pulmonary embolism in patient with acute dyspnea"
+- Example: &quot;Rule out pulmonary embolism in patient with acute dyspnea&quot;
 
 **3. Technique**
 - Imaging modality (X-ray, CT, MRI, ultrasound, PET, etc.)
@@ -290,13 +340,13 @@ Radiology reports follow a standardized structure to ensure clarity and complete
 - Contrast administration (type, route, volume)
 - Protocol or sequence used
 - Technical quality and limitations
-- Example: "Contrast-enhanced CT of the chest, abdomen, and pelvis was performed using 100 mL of intravenous iodinated contrast. Oral contrast was not administered."
+- Example: &quot;Contrast-enhanced CT of the chest, abdomen, and pelvis was performed using 100 mL of intravenous iodinated contrast. Oral contrast was not administered.&quot;
 
 **4. Comparison**
 - Prior imaging studies available for comparison
 - Dates of prior studies
 - Stability or change from prior imaging
-- Example: "Comparison: CT chest from [date]"
+- Example: &quot;Comparison: CT chest from [date]&quot;
 
 **5. Findings**
 - Systematic description of imaging findings
@@ -316,9 +366,9 @@ Radiology reports follow a standardized structure to ensure clarity and complete
 - Recommendations for follow-up or additional studies
 - Level of suspicion or diagnostic certainty
 - Example:
-  - "1. Bilateral ground-glass opacities consistent with viral pneumonia or atypical infection. COVID-19 cannot be excluded. Clinical correlation recommended.
+  - &quot;1. Bilateral ground-glass opacities consistent with viral pneumonia or atypical infection. COVID-19 cannot be excluded. Clinical correlation recommended.
   - 2. No evidence of pulmonary embolism.
-  - 3. Recommend follow-up imaging in 4-6 weeks to assess resolution."
+  - 3. Recommend follow-up imaging in 4-6 weeks to assess resolution.&quot;
 
 **Structured Reporting:**
 
@@ -351,20 +401,20 @@ Pathology reports document microscopic findings from tissue specimens and provid
 - Anatomical site
 - Laterality if applicable
 - Number of specimens/blocks/slides
-- Example: "Skin, left forearm, excisional biopsy"
+- Example: &quot;Skin, left forearm, excisional biopsy&quot;
 
 **3. Clinical History**
 - Relevant clinical information
 - Indication for biopsy
 - Prior diagnoses
-- Example: "History of melanoma. New pigmented lesion, rule out recurrence."
+- Example: &quot;History of melanoma. New pigmented lesion, rule out recurrence.&quot;
 
 **4. Gross Description**
 - Macroscopic appearance of specimen
 - Size, weight, color, consistency
 - Orientation markers if present
 - Sectioning and sampling approach
-- Example: "The specimen consists of an ellipse of skin measuring 2.5 x 1.0 x 0.5 cm. A pigmented lesion measuring 0.6 cm in diameter is present on the surface. The specimen is serially sectioned and entirely submitted in cassettes A1-A3."
+- Example: &quot;The specimen consists of an ellipse of skin measuring 2.5 x 1.0 x 0.5 cm. A pigmented lesion measuring 0.6 cm in diameter is present on the surface. The specimen is serially sectioned and entirely submitted in cassettes A1-A3.&quot;
 
 **5. Microscopic Description**
 - Histological findings
@@ -381,13 +431,13 @@ Pathology reports document microscopic findings from tissue specimens and provid
 - Lymph node status if applicable
 - Synoptic reporting for cancers (CAP protocols)
 - Example:
-  - "MALIGNANT MELANOMA, SUPERFICIAL SPREADING TYPE
+  - &quot;MALIGNANT MELANOMA, SUPERFICIAL SPREADING TYPE
   - Breslow thickness: 1.2 mm
   - Clark level: IV
   - Mitotic rate: 3/mm²
   - Ulceration: Absent
   - Margins: Negative (closest margin 0.4 cm)
-  - Lymphovascular invasion: Not identified"
+  - Lymphovascular invasion: Not identified&quot;
 
 **7. Comment** (if needed)
 - Additional context or interpretation
@@ -514,7 +564,7 @@ An adverse event is serious if it:
 - Outcome and follow-up plan
 
 **6. Expectedness**
-- Expected per protocol or investigator's brochure
+- Expected per protocol or investigator&#039;s brochure
 - Unexpected event requiring expedited reporting
 - Comparison to known safety profile
 
@@ -617,7 +667,7 @@ The ICH E3 guideline defines the structure and content of clinical study reports
 - Sample case report forms
 - List of investigators and ethics committees
 - Patient information and consent forms
-- Investigator's brochure references
+- Investigator&#039;s brochure references
 - Publications based on the study
 
 **Key Principles:**
@@ -658,11 +708,11 @@ SOAP notes are the most common format for progress notes in clinical practice.
 **Structure:**
 
 **S - Subjective**
-- Patient's reported symptoms and concerns
+- Patient&#039;s reported symptoms and concerns
 - History of present illness (HPI)
 - Review of systems (ROS) relevant to visit
-- Patient's own words (use quotes when helpful)
-- Example: "Patient reports worsening shortness of breath over the past 3 days, particularly with exertion. Denies chest pain, fever, or cough."
+- Patient&#039;s own words (use quotes when helpful)
+- Example: &quot;Patient reports worsening shortness of breath over the past 3 days, particularly with exertion. Denies chest pain, fever, or cough.&quot;
 
 **O - Objective**
 - Measurable clinical findings
@@ -682,9 +732,9 @@ SOAP notes are the most common format for progress notes in clinical practice.
 - Severity and stability
 - Progress toward treatment goals
 - Example:
-  - "1. Acute decompensated heart failure, NYHA Class III
+  - &quot;1. Acute decompensated heart failure, NYHA Class III
   - 2. Hypertension, poorly controlled
-  - 3. Chronic kidney disease, stage 3"
+  - 3. Chronic kidney disease, stage 3&quot;
 
 **P - Plan**
 - Diagnostic plan (further testing)
@@ -692,10 +742,10 @@ SOAP notes are the most common format for progress notes in clinical practice.
 - Patient education and counseling
 - Follow-up arrangements
 - Example:
-  - "Diagnostics: BNP, chest X-ray, echocardiogram
+  - &quot;Diagnostics: BNP, chest X-ray, echocardiogram
   - Therapeutics: Increase furosemide to 40 mg PO BID, continue lisinopril 10 mg daily, strict fluid restriction to 1.5 L/day
   - Education: Signs of worsening heart failure, daily weights
-  - Follow-up: Cardiology appointment in 1 week, call if weight gain &gt;2 lbs in 1 day"
+  - Follow-up: Cardiology appointment in 1 week, call if weight gain &gt;2 lbs in 1 day&quot;
 
 **Documentation Tips:**
 - Be concise but complete
@@ -704,20 +754,20 @@ SOAP notes are the most common format for progress notes in clinical practice.
 - Sign and date all notes
 - Avoid speculation or judgment
 - Document medical necessity for billing
-- Include patient's response to treatment
+- Include patient&#039;s response to treatment
 
 For SOAP note templates and examples, see `assets/soap_note_template.md`.
 
-#### History and Physical (H&P)
+#### History and Physical (H&amp;P)
 
-The H&P is a comprehensive assessment performed at admission or initial encounter.
+The H&amp;P is a comprehensive assessment performed at admission or initial encounter.
 
 **Components:**
 
 **1. Chief Complaint (CC)**
 - Brief statement of why patient is seeking care
-- Use patient's own words
-- Example: "Chest pain for 2 hours"
+- Use patient&#039;s own words
+- Example: &quot;Chest pain for 2 hours&quot;
 
 **2. History of Present Illness (HPI)**
 - Detailed chronological narrative of current problem
@@ -735,7 +785,7 @@ The H&P is a comprehensive assessment performed at admission or initial encounte
 - Chronic medical conditions
 - Previous hospitalizations
 - Surgeries and procedures
-- Example: "Hypertension (diagnosed 2015), type 2 diabetes mellitus (diagnosed 2018), prior appendectomy (2010)"
+- Example: &quot;Hypertension (diagnosed 2015), type 2 diabetes mellitus (diagnosed 2018), prior appendectomy (2010)&quot;
 
 **4. Medications**
 - Current medications with doses and frequencies
@@ -747,13 +797,13 @@ The H&P is a comprehensive assessment performed at admission or initial encounte
 - Drug allergies with type of reaction
 - Food allergies
 - Environmental allergies
-- Example: "Penicillin (rash), shellfish (anaphylaxis)"
+- Example: &quot;Penicillin (rash), shellfish (anaphylaxis)&quot;
 
 **6. Family History (FH)**
 - Medical conditions in first-degree relatives
 - Age and cause of death of parents
 - Hereditary conditions
-- Example: "Father with coronary artery disease (MI at age 55), mother with breast cancer (diagnosed age 62)"
+- Example: &quot;Father with coronary artery disease (MI at age 55), mother with breast cancer (diagnosed age 62)&quot;
 
 **7. Social History (SH)**
 - Tobacco use (pack-years)
@@ -762,7 +812,7 @@ The H&P is a comprehensive assessment performed at admission or initial encounte
 - Occupation
 - Living situation
 - Sexual history if relevant
-- Example: "Former smoker, quit 5 years ago (20 pack-year history). Occasional alcohol (2-3 drinks/week). Works as accountant. Lives with spouse."
+- Example: &quot;Former smoker, quit 5 years ago (20 pack-year history). Occasional alcohol (2-3 drinks/week). Works as accountant. Lives with spouse.&quot;
 
 **8. Review of Systems (ROS)**
 - Systematic review of symptoms by organ system
@@ -783,7 +833,7 @@ The H&P is a comprehensive assessment performed at admission or initial encounte
 - Diagnostic and therapeutic plans
 - Disposition (admit, discharge, transfer)
 
-For H&P templates, see `assets/history_physical_template.md`.
+For H&amp;P templates, see `assets/history_physical_template.md`.
 
 #### Discharge Summaries
 
@@ -924,12 +974,12 @@ For ICH-GCP compliance, see `references/regulatory_compliance.md`.
 Use standard abbreviations to improve efficiency while maintaining clarity.
 
 **Do Not Use List (Joint Commission):**
-- U (unit) - write "unit"
-- IU (international unit) - write "international unit"
-- QD, QOD (daily, every other day) - write "daily" or "every other day"
+- U (unit) - write &quot;unit&quot;
+- IU (international unit) - write &quot;international unit&quot;
+- QD, QOD (daily, every other day) - write &quot;daily&quot; or &quot;every other day&quot;
 - Trailing zero (X.0 mg) - never use after decimal
 - Lack of leading zero (.X mg) - always use before decimal (0.X mg)
-- MS, MSO4, MgSO4 - write "morphine sulfate" or "magnesium sulfate"
+- MS, MSO4, MgSO4 - write &quot;morphine sulfate&quot; or &quot;magnesium sulfate&quot;
 
 For comprehensive terminology standards, see `references/medical_terminology.md`.
 
@@ -1095,7 +1145,7 @@ This skill includes comprehensive reference files and templates:
 - `references/case_report_guidelines.md` - CARE guidelines, journal requirements, writing tips
 - `references/diagnostic_reports_standards.md` - ACR, CAP, laboratory reporting standards
 - `references/clinical_trial_reporting.md` - ICH-E3, CONSORT, SAE reporting, CSR structure
-- `references/patient_documentation.md` - SOAP notes, H&P, discharge summaries, coding
+- `references/patient_documentation.md` - SOAP notes, H&amp;P, discharge summaries, coding
 - `references/regulatory_compliance.md` - HIPAA, 21 CFR Part 11, ICH-GCP, FDA requirements
 - `references/medical_terminology.md` - SNOMED, LOINC, ICD-10, abbreviations, nomenclature
 - `references/data_presentation.md` - Tables, figures, safety data, CONSORT diagrams
@@ -1110,7 +1160,7 @@ This skill includes comprehensive reference files and templates:
 - `assets/clinical_trial_sae_template.md` - Serious adverse event report form
 - `assets/clinical_trial_csr_template.md` - Clinical study report outline per ICH-E3
 - `assets/soap_note_template.md` - SOAP progress note format
-- `assets/history_physical_template.md` - Comprehensive H&P template
+- `assets/history_physical_template.md` - Comprehensive H&amp;P template
 - `assets/discharge_summary_template.md` - Hospital discharge summary
 - `assets/consult_note_template.md` - Consultation note format
 - `assets/quality_checklist.md` - Quality assurance checklist for all report types
@@ -1139,7 +1189,7 @@ Load these resources as needed when working on specific clinical reports.
 - **Overgeneralization**: Drawing broad conclusions from single case
 
 ### Diagnostic Reports
-- **Vague language**: Using ambiguous terms like "unremarkable" without specifics
+- **Vague language**: Using ambiguous terms like &quot;unremarkable&quot; without specifics
 - **Incomplete comparison**: Not reviewing prior imaging
 - **Missing clinical correlation**: Failing to answer clinical question
 - **Technical jargon**: Overuse of terminology without explanation
@@ -1182,8 +1232,39 @@ Before finalizing any clinical report, verify:
 
 **Final Note**: Clinical report writing requires attention to detail, medical accuracy, regulatory compliance, and clear communication. Whether documenting patient care, reporting research findings, or communicating diagnostic results, the quality of clinical reports directly impacts patient safety, healthcare delivery, and medical knowledge advancement. Always prioritize accuracy, privacy, and professionalism in all clinical documentation.
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>49</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

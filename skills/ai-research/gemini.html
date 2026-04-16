@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>gemini - AICCLI</title>
-  <meta name="description" content="gemini - Claude Code skill for AICCLI">
+  <meta name="description" content="Use when the user asks to run Gemini CLI for code review, plan review, or big context (>200k) processing. Ideal for comprehensive analysis requiring large conte">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / gemini</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>gemini</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / gemini
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>gemini</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Use when the user asks to run Gemini CLI for code review, plan review, or big context (>200k) processing. Ideal for comprehensive analysis requiring large context windows. Uses Gemini 3 Pro by default for state-of-the-art reasoning and coding.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/gemini</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/gemini</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/gemini</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: gemini
 description: Use when the user asks to run Gemini CLI for code review, plan review, or big context (&gt;200k) processing. Ideal for comprehensive analysis requiring large context windows. Uses Gemini 3 Pro by default for state-of-the-art reasoning and coding.
 ---
@@ -81,7 +131,7 @@ description: Use when the user asks to run Gemini CLI for code review, plan revi
 **Symptoms of hung Gemini:**
 - Process running 20+ minutes with 0% CPU usage
 - No network activity
-- Process state shows 'S' (sleeping)
+- Process state shows &#039;S&#039; (sleeping)
 
 **Fix hung process:**
 ```bash
@@ -89,13 +139,13 @@ description: Use when the user asks to run Gemini CLI for code review, plan revi
 ps aux | grep gemini | grep -v grep
 
 # Kill if necessary
-pkill -9 -f "gemini.*gemini-3-pro-preview"
+pkill -9 -f &quot;gemini.*gemini-3-pro-preview&quot;
 ```
 
 ## Running a Task
 
 1. Ask the user (via `AskUserQuestion`) which model to use in a **single prompt**. Available models:
-   - `gemini-3-pro-preview` ⭐ (flagship model, best for coding & complex reasoning, 35% better at software engineering than 2.5 Pro)
+   - `gemini-3-pro-preview` ⭐ (flagship model, best for coding &amp; complex reasoning, 35% better at software engineering than 2.5 Pro)
    - `gemini-3-flash` (sub-second latency, distilled from 3 Pro, best for speed-critical tasks)
    - `gemini-2.5-pro` (legacy option, strong all-around performance)
    - `gemini-2.5-flash` (legacy option, cost-efficient with thinking capabilities)
@@ -110,7 +160,7 @@ pkill -9 -f "gemini.*gemini-3-pro-preview"
    - `-m, --model &lt;MODEL&gt;` - Model selection
    - `--approval-mode &lt;default|auto_edit|yolo&gt;` - Control tool approval
    - `-y, --yolo` - Alternative to `--approval-mode yolo`
-   - `-i, --prompt-interactive "prompt"` - Execute prompt and continue interactively
+   - `-i, --prompt-interactive &quot;prompt&quot;` - Execute prompt and continue interactively
    - `--include-directories &lt;DIR&gt;` - Additional directories to include in workspace
    - `-s, --sandbox` - Run in sandbox mode for isolation
 
@@ -119,18 +169,18 @@ pkill -9 -f "gemini.*gemini-3-pro-preview"
 5. Run the command and capture the output. For background/automated mode:
    ```bash
    # Recommended: Use yolo for background tasks
-   gemini -m gemini-3-pro-preview --approval-mode yolo "Review this codebase for security issues"
+   gemini -m gemini-3-pro-preview --approval-mode yolo &quot;Review this codebase for security issues&quot;
 
    # Or with timeout (5 min limit)
-   timeout 300 gemini -m gemini-3-pro-preview --approval-mode yolo "Review this codebase"
+   timeout 300 gemini -m gemini-3-pro-preview --approval-mode yolo &quot;Review this codebase&quot;
    ```
 
 6. For interactive sessions with an initial prompt:
    ```bash
-   gemini -m gemini-3-pro-preview -i "Review the authentication system" --approval-mode auto_edit
+   gemini -m gemini-3-pro-preview -i &quot;Review the authentication system&quot; --approval-mode auto_edit
    ```
 
-7. **After Gemini completes**, inform the user: "The Gemini analysis is complete. You can start a new Gemini session for follow-up analysis or continue exploring the findings."
+7. **After Gemini completes**, inform the user: &quot;The Gemini analysis is complete. You can start a new Gemini session for follow-up analysis or continue exploring the findings.&quot;
 
 ### Quick Reference
 
@@ -145,7 +195,7 @@ pkill -9 -f "gemini.*gemini-3-pro-preview"
 | Speed-critical background | `yolo` ✅ | `-m gemini-3-flash --approval-mode yolo` |
 | Cost-optimized background | `yolo` ✅ | `-m gemini-2.5-flash --approval-mode yolo` |
 | Multi-directory analysis | `yolo` (if background) | `--include-directories &lt;DIR1&gt; --include-directories &lt;DIR2&gt;` |
-| Interactive with prompt | `auto_edit` or `default` | `-i "prompt" --approval-mode &lt;mode&gt;` |
+| Interactive with prompt | `auto_edit` or `default` | `-i &quot;prompt&quot; --approval-mode &lt;mode&gt;` |
 
 ### Model Selection Guide
 
@@ -167,49 +217,49 @@ pkill -9 -f "gemini.*gemini-3-pro-preview"
 ```bash
 # For background execution (Claude Code, CI/CD, etc.)
 gemini -m gemini-3-pro-preview --approval-mode yolo \
-  "Perform a comprehensive code review focusing on:
+  &quot;Perform a comprehensive code review focusing on:
    1. Security vulnerabilities
    2. Performance issues
    3. Code quality and maintainability
-   4. Best practices violations"
+   4. Best practices violations&quot;
 
 # With timeout safety (5 minutes)
 timeout 300 gemini -m gemini-3-pro-preview --approval-mode yolo \
-  "Perform a comprehensive code review..."
+  &quot;Perform a comprehensive code review...&quot;
 ```
 
 ### Plan Review (Background/Automated)
 ```bash
 # For background execution
 gemini -m gemini-3-pro-preview --approval-mode yolo \
-  "Review this architectural plan for:
+  &quot;Review this architectural plan for:
    1. Scalability concerns
    2. Missing components
    3. Integration challenges
-   4. Alternative approaches"
+   4. Alternative approaches&quot;
 ```
 
 ### Big Context Analysis (Background/Automated)
 ```bash
 # For background execution
 gemini -m gemini-3-pro-preview --approval-mode yolo \
-  "Analyze the entire codebase to understand:
+  &quot;Analyze the entire codebase to understand:
    1. Overall architecture
    2. Key patterns and conventions
    3. Potential technical debt
-   4. Refactoring opportunities"
+   4. Refactoring opportunities&quot;
 ```
 
 ### Interactive Code Review (Terminal Only)
 ```bash
 # ONLY use default mode in interactive terminal
 gemini -m gemini-3-pro-preview --approval-mode default \
-  "Review the authentication flow for security issues"
+  &quot;Review the authentication flow for security issues&quot;
 ```
 
 ## Following Up
 
-- Gemini CLI sessions are typically one-shot or interactive. Unlike Codex, there's no built-in resume functionality.
+- Gemini CLI sessions are typically one-shot or interactive. Unlike Codex, there&#039;s no built-in resume functionality.
 - For follow-up analysis, start a new Gemini session with context from previous findings.
 - When proposing follow-up actions, restate the chosen model and approval mode.
 - Use `AskUserQuestion` after each Gemini command to confirm next steps or gather clarifications.
@@ -226,12 +276,12 @@ gemini -m gemini-3-pro-preview --approval-mode default \
 ### Detection
 ```bash
 # Check for hung processes
-ps aux | grep -E "gemini.*gemini-3" | grep -v grep
+ps aux | grep -E &quot;gemini.*gemini-3&quot; | grep -v grep
 
 # Look for these symptoms:
 # - Process running 20+ minutes
 # - CPU usage at 0%
-# - Process state 'S' (sleeping)
+# - Process state &#039;S&#039; (sleeping)
 # - No network connections
 ```
 
@@ -241,14 +291,14 @@ ps aux | grep -E "gemini.*gemini-3" | grep -v grep
 ps -o pid,etime,pcpu,stat,command -p &lt;PID&gt;
 
 # Check network activity
-lsof -p &lt;PID&gt; 2&gt;/dev/null | grep -E "(TCP|ESTABLISHED)" | wc -l
+lsof -p &lt;PID&gt; 2&gt;/dev/null | grep -E &quot;(TCP|ESTABLISHED)&quot; | wc -l
 # If result is 0, process is hung
 ```
 
 ### Resolution
 ```bash
 # Kill hung Gemini processes
-pkill -9 -f "gemini.*gemini-3-pro-preview"
+pkill -9 -f &quot;gemini.*gemini-3-pro-preview&quot;
 
 # Or kill specific PID
 kill -9 &lt;PID&gt;
@@ -271,15 +321,46 @@ ps aux | grep gemini | grep -v grep
    - Use `gemini-3-pro-preview` for complex reasoning, coding tasks, and maximum analysis quality (recommended default)
    - Use `gemini-3-flash` for speed-critical tasks requiring sub-second response times
    - Use `gemini-2.5-flash` for cost-optimized high-volume processing
-4. **Leverage Gemini 3's strengths**: 35% better at software engineering tasks, exceptional at agentic workflows and vibe coding
+4. **Leverage Gemini 3&#039;s strengths**: 35% better at software engineering tasks, exceptional at agentic workflows and vibe coding
 5. **Break down complex tasks**: Even with large context, structured analysis is more effective
 6. **Save findings**: Ask Gemini to output structured reports that can be saved for reference
 
 ## CLI Version
 
 Requires Gemini CLI v0.16.0 or later for Gemini 3 model support. Check version: `gemini --version`
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>75</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

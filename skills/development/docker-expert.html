@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>docker-expert - AICCLI</title>
-  <meta name="description" content="docker-expert - Claude Code skill for AICCLI">
+  <meta name="description" content="Docker containerization expert with deep knowledge of multi-stage builds, image optimization, container security, Docker Compose orchestration, and production d">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / docker-expert</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>docker-expert</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / docker-expert
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>docker-expert</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Docker containerization expert with deep knowledge of multi-stage builds, image optimization, container security, Docker Compose orchestration, and production deployment patterns. Use PROACTIVELY for Dockerfile optimization, container issues, image size problems, security hardening, networking, and orchestration challenges.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/docker-expert</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/docker-expert</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/docker-expert</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: docker-expert
 description: Docker containerization expert with deep knowledge of multi-stage builds, image optimization, container security, Docker Compose orchestration, and production deployment patterns. Use PROACTIVELY for Dockerfile optimization, container issues, image size problems, security hardening, networking, and orchestration challenges.
 category: devops
@@ -76,7 +126,7 @@ You are an advanced Docker containerization expert with comprehensive, practical
    - Database containerization with complex persistence → database-expert
 
    Example to output:
-   "This requires Kubernetes orchestration expertise. Please invoke: 'Use the kubernetes-expert subagent.' Stopping here."
+   &quot;This requires Kubernetes orchestration expertise. Please invoke: &#039;Use the kubernetes-expert subagent.&#039; Stopping here.&quot;
 
 1. Analyze container setup comprehensively:
    
@@ -84,18 +134,18 @@ You are an advanced Docker containerization expert with comprehensive, practical
    
    ```bash
    # Docker environment detection
-   docker --version 2&gt;/dev/null || echo "No Docker installed"
-   docker info | grep -E "Server Version|Storage Driver|Container Runtime" 2&gt;/dev/null
+   docker --version 2&gt;/dev/null || echo &quot;No Docker installed&quot;
+   docker info | grep -E &quot;Server Version|Storage Driver|Container Runtime&quot; 2&gt;/dev/null
    docker context ls 2&gt;/dev/null | head -3
    
    # Project structure analysis
-   find . -name "Dockerfile*" -type f | head -10
-   find . -name "*compose*.yml" -o -name "*compose*.yaml" -type f | head -5
-   find . -name ".dockerignore" -type f | head -3
+   find . -name &quot;Dockerfile*&quot; -type f | head -10
+   find . -name &quot;*compose*.yml&quot; -o -name &quot;*compose*.yaml&quot; -type f | head -5
+   find . -name &quot;.dockerignore&quot; -type f | head -3
    
    # Container status if running
-   docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" 2&gt;/dev/null | head -10
-   docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" 2&gt;/dev/null | head -10
+   docker ps --format &quot;table {{.Names}}\t{{.Image}}\t{{.Status}}&quot; 2&gt;/dev/null | head -10
+   docker images --format &quot;table {{.Repository}}\t{{.Tag}}\t{{.Size}}&quot; 2&gt;/dev/null | head -10
    ```
    
    **After detection, adapt approach:**
@@ -111,9 +161,9 @@ You are an advanced Docker containerization expert with comprehensive, practical
 4. Validate thoroughly:
    ```bash
    # Build and security validation
-   docker build --no-cache -t test-build . 2&gt;/dev/null && echo "Build successful"
+   docker build --no-cache -t test-build . 2&gt;/dev/null &amp;&amp; echo &quot;Build successful&quot;
    docker history test-build --no-trunc 2&gt;/dev/null | head -5
-   docker scout quickview test-build 2&gt;/dev/null || echo "No Docker Scout"
+   docker scout quickview test-build 2&gt;/dev/null || echo &quot;No Docker Scout&quot;
    
    # Runtime validation
    docker run --rm -d --name validation-test test-build 2&gt;/dev/null
@@ -121,12 +171,12 @@ You are an advanced Docker containerization expert with comprehensive, practical
    docker stop validation-test 2&gt;/dev/null
    
    # Compose validation
-   docker-compose config 2&gt;/dev/null && echo "Compose config valid"
+   docker-compose config 2&gt;/dev/null &amp;&amp; echo &quot;Compose config valid&quot;
    ```
 
 ## Core Expertise Areas
 
-### 1. Dockerfile Optimization & Multi-Stage Builds
+### 1. Dockerfile Optimization &amp; Multi-Stage Builds
 
 **High-priority patterns I address:**
 - **Layer caching optimization**: Separate dependency installation from source code copying
@@ -140,17 +190,17 @@ You are an advanced Docker containerization expert with comprehensive, practical
 FROM node:18-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --only=production &amp;&amp; npm cache clean --force
 
 FROM node:18-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build && npm prune --production
+RUN npm run build &amp;&amp; npm prune --production
 
 FROM node:18-alpine AS runtime
-RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+RUN addgroup -g 1001 -S nodejs &amp;&amp; adduser -S nextjs -u 1001
 WORKDIR /app
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=build --chown=nextjs:nodejs /app/dist ./dist
@@ -159,7 +209,7 @@ USER nextjs
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
-CMD ["node", "dist/index.js"]
+CMD [&quot;node&quot;, &quot;dist/index.js&quot;]
 ```
 
 ### 2. Container Security Hardening
@@ -174,7 +224,7 @@ CMD ["node", "dist/index.js"]
 ```dockerfile
 # Security-hardened container
 FROM node:18-alpine
-RUN addgroup -g 1001 -S appgroup && \
+RUN addgroup -g 1001 -S appgroup &amp;&amp; \
     adduser -S appuser -u 1001 -G appgroup
 WORKDIR /app
 COPY --chown=appuser:appgroup package*.json ./
@@ -194,7 +244,7 @@ USER 1001
 
 **Production-ready compose pattern:**
 ```yaml
-version: '3.8'
+version: &#039;3.8&#039;
 services:
   app:
     build:
@@ -207,7 +257,7 @@ services:
       - frontend
       - backend
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: [&quot;CMD&quot;, &quot;curl&quot;, &quot;-f&quot;, &quot;http://localhost:3000/health&quot;]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -215,10 +265,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: &#039;0.5&#039;
           memory: 512M
         reservations:
-          cpus: '0.25'
+          cpus: &#039;0.25&#039;
           memory: 256M
 
   db:
@@ -236,7 +286,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: [&quot;CMD-SHELL&quot;, &quot;pg_isready -U ${POSTGRES_USER}&quot;]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -276,7 +326,7 @@ COPY --from=build /app/dist /app
 COPY --from=build /app/node_modules /app/node_modules
 WORKDIR /app
 EXPOSE 3000
-CMD ["index.js"]
+CMD [&quot;index.js&quot;]
 ```
 
 ### 5. Development Workflow Integration
@@ -303,11 +353,11 @@ services:
       - NODE_ENV=development
       - DEBUG=app:*
     ports:
-      - "9229:9229"  # Debug port
+      - &quot;9229:9229&quot;  # Debug port
     command: npm run dev
 ```
 
-### 6. Performance & Resource Management
+### 6. Performance &amp; Resource Management
 
 **Performance optimization:**
 - **Resource limits**: CPU, memory constraints for stability
@@ -322,10 +372,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: &#039;1.0&#039;
           memory: 1G
         reservations:
-          cpus: '0.5'
+          cpus: &#039;0.5&#039;
           memory: 512M
       restart_policy:
         condition: on-failure
@@ -359,7 +409,7 @@ RUN --mount=type=cache,target=/root/.npm \
 # Build-time secrets (BuildKit)
 FROM alpine
 RUN --mount=type=secret,id=api_key \
-    API_KEY=$(cat /run/secrets/api_key) && \
+    API_KEY=$(cat /run/secrets/api_key) &amp;&amp; \
     # Use API_KEY for build process
 ```
 
@@ -369,14 +419,14 @@ RUN --mount=type=secret,id=api_key \
 COPY health-check.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/health-check.sh
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD ["/usr/local/bin/health-check.sh"]
+  CMD [&quot;/usr/local/bin/health-check.sh&quot;]
 ```
 
 ## Code Review Checklist
 
 When reviewing Docker configurations, focus on:
 
-### Dockerfile Optimization & Multi-Stage Builds
+### Dockerfile Optimization &amp; Multi-Stage Builds
 - [ ] Dependencies copied before source code for optimal layer caching
 - [ ] Multi-stage builds separate build and runtime environments
 - [ ] Production stage only includes necessary artifacts
@@ -392,7 +442,7 @@ When reviewing Docker configurations, focus on:
 - [ ] Minimal attack surface (only necessary packages installed)
 - [ ] Health checks implemented for container monitoring
 
-### Docker Compose & Orchestration
+### Docker Compose &amp; Orchestration
 - [ ] Service dependencies properly defined with health checks
 - [ ] Custom networks configured for service isolation
 - [ ] Environment-specific configurations separated (dev/prod)
@@ -400,7 +450,7 @@ When reviewing Docker configurations, focus on:
 - [ ] Resource limits defined to prevent resource exhaustion
 - [ ] Restart policies configured for production resilience
 
-### Image Size & Performance
+### Image Size &amp; Performance
 - [ ] Final image size optimized (avoid unnecessary files/tools)
 - [ ] Build cache optimization implemented
 - [ ] Multi-architecture builds considered if needed
@@ -414,7 +464,7 @@ When reviewing Docker configurations, focus on:
 - [ ] Environment variables properly configured for different stages
 - [ ] Testing containers isolated from production builds
 
-### Networking & Service Discovery
+### Networking &amp; Service Discovery
 - [ ] Port exposure limited to necessary services
 - [ ] Service naming follows conventions for discovery
 - [ ] Network security implemented (internal networks for backend)
@@ -448,7 +498,7 @@ When reviewing Docker configurations, focus on:
 **Root causes**: Volume mounting issues, port configuration, environment mismatch
 **Solutions**: Development-specific targets, proper volume strategy, debug configuration
 
-## Integration & Handoff Guidelines
+## Integration &amp; Handoff Guidelines
 
 **When to recommend other experts:**
 - **Kubernetes orchestration** → kubernetes-expert: Pod management, services, ingress
@@ -463,8 +513,39 @@ When reviewing Docker configurations, focus on:
 - Establish container standards for CI/CD integration
 - Define security baselines for production orchestration
 
-I provide comprehensive Docker containerization expertise with focus on practical optimization, security hardening, and production-ready patterns. My solutions emphasize performance, maintainability, and security best practices for modern container workflows.</pre></div>
+I provide comprehensive Docker containerization expertise with focus on practical optimization, security hardening, and production-ready patterns. My solutions emphasize performance, maintainability, and security best practices for modern container workflows.</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>876</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,64 +4,114 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>accessibility - AICCLI</title>
-  <meta name="description" content="accessibility - Claude Code skill for AICCLI">
+  <meta name="description" content="Audit and improve web accessibility following WCAG 2.1 guidelines. Use when asked to "improve accessibility", "a11y audit", "WCAG compliance", "screen reader su">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / accessibility</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>accessibility</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / accessibility
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>accessibility</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Audit and improve web accessibility following WCAG 2.1 guidelines. Use when asked to "improve accessibility", "a11y audit", "WCAG compliance", "screen reader support", "keyboard navigation", or "make accessible".</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/accessibility</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/accessibility</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/accessibility</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: accessibility
-description: Audit and improve web accessibility following WCAG 2.1 guidelines. Use when asked to "improve accessibility", "a11y audit", "WCAG compliance", "screen reader support", "keyboard navigation", or "make accessible".
+description: Audit and improve web accessibility following WCAG 2.1 guidelines. Use when asked to &quot;improve accessibility&quot;, &quot;a11y audit&quot;, &quot;WCAG compliance&quot;, &quot;screen reader support&quot;, &quot;keyboard navigation&quot;, or &quot;make accessible&quot;.
 license: MIT
 metadata:
   author: web-quality-skills
-  version: "1.0"
+  version: &quot;1.0&quot;
 ---
 
 # Accessibility (a11y)
@@ -94,19 +144,19 @@ Comprehensive accessibility guidelines based on WCAG 2.1 and Lighthouse accessib
 **Images require alt text:**
 ```html
 &lt;!-- ❌ Missing alt --&gt;
-&lt;img src="chart.png"&gt;
+&lt;img src=&quot;chart.png&quot;&gt;
 
 &lt;!-- ✅ Descriptive alt --&gt;
-&lt;img src="chart.png" alt="Bar chart showing 40% increase in Q3 sales"&gt;
+&lt;img src=&quot;chart.png&quot; alt=&quot;Bar chart showing 40% increase in Q3 sales&quot;&gt;
 
 &lt;!-- ✅ Decorative image (empty alt) --&gt;
-&lt;img src="decorative-border.png" alt="" role="presentation"&gt;
+&lt;img src=&quot;decorative-border.png&quot; alt=&quot;&quot; role=&quot;presentation&quot;&gt;
 
 &lt;!-- ✅ Complex image with longer description --&gt;
 &lt;figure&gt;
-  &lt;img src="infographic.png" alt="2024 market trends infographic" 
-       aria-describedby="infographic-desc"&gt;
-  &lt;figcaption id="infographic-desc"&gt;
+  &lt;img src=&quot;infographic.png&quot; alt=&quot;2024 market trends infographic&quot; 
+       aria-describedby=&quot;infographic-desc&quot;&gt;
+  &lt;figcaption id=&quot;infographic-desc&quot;&gt;
     &lt;!-- Detailed description --&gt;
   &lt;/figcaption&gt;
 &lt;/figure&gt;
@@ -118,14 +168,14 @@ Comprehensive accessibility guidelines based on WCAG 2.1 and Lighthouse accessib
 &lt;button&gt;&lt;svg&gt;&lt;!-- menu icon --&gt;&lt;/svg&gt;&lt;/button&gt;
 
 &lt;!-- ✅ Using aria-label --&gt;
-&lt;button aria-label="Open menu"&gt;
-  &lt;svg aria-hidden="true"&gt;&lt;!-- menu icon --&gt;&lt;/svg&gt;
+&lt;button aria-label=&quot;Open menu&quot;&gt;
+  &lt;svg aria-hidden=&quot;true&quot;&gt;&lt;!-- menu icon --&gt;&lt;/svg&gt;
 &lt;/button&gt;
 
 &lt;!-- ✅ Using visually hidden text --&gt;
 &lt;button&gt;
-  &lt;svg aria-hidden="true"&gt;&lt;!-- menu icon --&gt;&lt;/svg&gt;
-  &lt;span class="visually-hidden"&gt;Open menu&lt;/span&gt;
+  &lt;svg aria-hidden=&quot;true&quot;&gt;&lt;!-- menu icon --&gt;&lt;/svg&gt;
+  &lt;span class=&quot;visually-hidden&quot;&gt;Open menu&lt;/span&gt;
 &lt;/button&gt;
 ```
 
@@ -150,7 +200,7 @@ Comprehensive accessibility guidelines based on WCAG 2.1 and Lighthouse accessib
 |-----------|------------|--------------|
 | Normal text (&lt; 18px / &lt; 14px bold) | 4.5:1 | 7:1 |
 | Large text (≥ 18px / ≥ 14px bold) | 3:1 | 4.5:1 |
-| UI components & graphics | 3:1 | 3:1 |
+| UI components &amp; graphics | 3:1 | 3:1 |
 
 ```css
 /* ❌ Low contrast (2.5:1) */
@@ -172,17 +222,17 @@ Comprehensive accessibility guidelines based on WCAG 2.1 and Lighthouse accessib
 }
 ```
 
-**Don't rely on color alone:**
+**Don&#039;t rely on color alone:**
 ```html
 &lt;!-- ❌ Only color indicates error --&gt;
-&lt;input class="error-border"&gt;
+&lt;input class=&quot;error-border&quot;&gt;
 &lt;style&gt;.error-border { border-color: red; }&lt;/style&gt;
 
 &lt;!-- ✅ Color + icon + text --&gt;
-&lt;div class="field-error"&gt;
-  &lt;input aria-invalid="true" aria-describedby="email-error"&gt;
-  &lt;span id="email-error" class="error-message"&gt;
-    &lt;svg aria-hidden="true"&gt;&lt;!-- error icon --&gt;&lt;/svg&gt;
+&lt;div class=&quot;field-error&quot;&gt;
+  &lt;input aria-invalid=&quot;true&quot; aria-describedby=&quot;email-error&quot;&gt;
+  &lt;span id=&quot;email-error&quot; class=&quot;error-message&quot;&gt;
+    &lt;svg aria-hidden=&quot;true&quot;&gt;&lt;!-- error icon --&gt;&lt;/svg&gt;
     Please enter a valid email address
   &lt;/span&gt;
 &lt;/div&gt;
@@ -193,14 +243,14 @@ Comprehensive accessibility guidelines based on WCAG 2.1 and Lighthouse accessib
 ```html
 &lt;!-- Video with captions --&gt;
 &lt;video controls&gt;
-  &lt;source src="video.mp4" type="video/mp4"&gt;
-  &lt;track kind="captions" src="captions.vtt" srclang="en" label="English" default&gt;
-  &lt;track kind="descriptions" src="descriptions.vtt" srclang="en" label="Descriptions"&gt;
+  &lt;source src=&quot;video.mp4&quot; type=&quot;video/mp4&quot;&gt;
+  &lt;track kind=&quot;captions&quot; src=&quot;captions.vtt&quot; srclang=&quot;en&quot; label=&quot;English&quot; default&gt;
+  &lt;track kind=&quot;descriptions&quot; src=&quot;descriptions.vtt&quot; srclang=&quot;en&quot; label=&quot;Descriptions&quot;&gt;
 &lt;/video&gt;
 
 &lt;!-- Audio with transcript --&gt;
 &lt;audio controls&gt;
-  &lt;source src="podcast.mp3" type="audio/mp3"&gt;
+  &lt;source src=&quot;podcast.mp3&quot; type=&quot;audio/mp3&quot;&gt;
 &lt;/audio&gt;
 &lt;details&gt;
   &lt;summary&gt;Transcript&lt;/summary&gt;
@@ -217,12 +267,12 @@ Comprehensive accessibility guidelines based on WCAG 2.1 and Lighthouse accessib
 **All functionality must be keyboard accessible:**
 ```javascript
 // ❌ Only handles click
-element.addEventListener('click', handleAction);
+element.addEventListener(&#039;click&#039;, handleAction);
 
 // ✅ Handles both click and keyboard
-element.addEventListener('click', handleAction);
-element.addEventListener('keydown', (e) =&gt; {
-  if (e.key === 'Enter' || e.key === ' ') {
+element.addEventListener(&#039;click&#039;, handleAction);
+element.addEventListener(&#039;keydown&#039;, (e) =&gt; {
+  if (e.key === &#039;Enter&#039; || e.key === &#039; &#039;) {
     e.preventDefault();
     handleAction();
   }
@@ -234,23 +284,23 @@ element.addEventListener('keydown', (e) =&gt; {
 // Modal focus management
 function openModal(modal) {
   const focusableElements = modal.querySelectorAll(
-    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    &#039;button, [href], input, select, textarea, [tabindex]:not([tabindex=&quot;-1&quot;])&#039;
   );
   const firstElement = focusableElements[0];
   const lastElement = focusableElements[focusableElements.length - 1];
   
   // Trap focus within modal
-  modal.addEventListener('keydown', (e) =&gt; {
-    if (e.key === 'Tab') {
-      if (e.shiftKey && document.activeElement === firstElement) {
+  modal.addEventListener(&#039;keydown&#039;, (e) =&gt; {
+    if (e.key === &#039;Tab&#039;) {
+      if (e.shiftKey &amp;&amp; document.activeElement === firstElement) {
         e.preventDefault();
         lastElement.focus();
-      } else if (!e.shiftKey && document.activeElement === lastElement) {
+      } else if (!e.shiftKey &amp;&amp; document.activeElement === lastElement) {
         e.preventDefault();
         firstElement.focus();
       }
     }
-    if (e.key === 'Escape') {
+    if (e.key === &#039;Escape&#039;) {
       closeModal();
     }
   });
@@ -285,9 +335,9 @@ button:focus-visible {
 
 ```html
 &lt;body&gt;
-  &lt;a href="#main-content" class="skip-link"&gt;Skip to main content&lt;/a&gt;
+  &lt;a href=&quot;#main-content&quot; class=&quot;skip-link&quot;&gt;Skip to main content&lt;/a&gt;
   &lt;header&gt;&lt;!-- navigation --&gt;&lt;/header&gt;
-  &lt;main id="main-content" tabindex="-1"&gt;
+  &lt;main id=&quot;main-content&quot; tabindex=&quot;-1&quot;&gt;
     &lt;!-- main content --&gt;
   &lt;/main&gt;
 &lt;/body&gt;
@@ -315,11 +365,11 @@ button:focus-visible {
 // Allow users to extend time limits
 function showSessionWarning() {
   const modal = createModal({
-    title: 'Session Expiring',
-    content: 'Your session will expire in 2 minutes.',
+    title: &#039;Session Expiring&#039;,
+    content: &#039;Your session will expire in 2 minutes.&#039;,
     actions: [
-      { label: 'Extend session', action: extendSession },
-      { label: 'Log out', action: logout }
+      { label: &#039;Extend session&#039;, action: extendSession },
+      { label: &#039;Log out&#039;, action: logout }
     ],
     timeout: 120000 // 2 minutes to respond
   });
@@ -353,21 +403,21 @@ function showSessionWarning() {
 &lt;html&gt;
 
 &lt;!-- ✅ Language specified --&gt;
-&lt;html lang="en"&gt;
+&lt;html lang=&quot;en&quot;&gt;
 
 &lt;!-- ✅ Language changes within page --&gt;
-&lt;p&gt;The French word for hello is &lt;span lang="fr"&gt;bonjour&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The French word for hello is &lt;span lang=&quot;fr&quot;&gt;bonjour&lt;/span&gt;.&lt;/p&gt;
 ```
 
 ### Consistent navigation (3.2.3)
 
 ```html
 &lt;!-- Navigation should be consistent across pages --&gt;
-&lt;nav aria-label="Main"&gt;
+&lt;nav aria-label=&quot;Main&quot;&gt;
   &lt;ul&gt;
-    &lt;li&gt;&lt;a href="/" aria-current="page"&gt;Home&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a href="/products"&gt;Products&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a href="/about"&gt;About&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;/&quot; aria-current=&quot;page&quot;&gt;Home&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;/products&quot;&gt;Products&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href=&quot;/about&quot;&gt;About&lt;/a&gt;&lt;/li&gt;
   &lt;/ul&gt;
 &lt;/nav&gt;
 ```
@@ -376,24 +426,24 @@ function showSessionWarning() {
 
 ```html
 &lt;!-- ❌ No label association --&gt;
-&lt;input type="email" placeholder="Email"&gt;
+&lt;input type=&quot;email&quot; placeholder=&quot;Email&quot;&gt;
 
 &lt;!-- ✅ Explicit label --&gt;
-&lt;label for="email"&gt;Email address&lt;/label&gt;
-&lt;input type="email" id="email" name="email" 
-       autocomplete="email" required&gt;
+&lt;label for=&quot;email&quot;&gt;Email address&lt;/label&gt;
+&lt;input type=&quot;email&quot; id=&quot;email&quot; name=&quot;email&quot; 
+       autocomplete=&quot;email&quot; required&gt;
 
 &lt;!-- ✅ Implicit label --&gt;
 &lt;label&gt;
   Email address
-  &lt;input type="email" name="email" autocomplete="email" required&gt;
+  &lt;input type=&quot;email&quot; name=&quot;email&quot; autocomplete=&quot;email&quot; required&gt;
 &lt;/label&gt;
 
 &lt;!-- ✅ With instructions --&gt;
-&lt;label for="password"&gt;Password&lt;/label&gt;
-&lt;input type="password" id="password" 
-       aria-describedby="password-requirements"&gt;
-&lt;p id="password-requirements"&gt;
+&lt;label for=&quot;password&quot;&gt;Password&lt;/label&gt;
+&lt;input type=&quot;password&quot; id=&quot;password&quot; 
+       aria-describedby=&quot;password-requirements&quot;&gt;
+&lt;p id=&quot;password-requirements&quot;&gt;
   Must be at least 8 characters with one number.
 &lt;/p&gt;
 ```
@@ -403,12 +453,12 @@ function showSessionWarning() {
 ```html
 &lt;!-- Announce errors to screen readers --&gt;
 &lt;form novalidate&gt;
-  &lt;div class="field" aria-live="polite"&gt;
-    &lt;label for="email"&gt;Email&lt;/label&gt;
-    &lt;input type="email" id="email" 
-           aria-invalid="true"
-           aria-describedby="email-error"&gt;
-    &lt;p id="email-error" class="error" role="alert"&gt;
+  &lt;div class=&quot;field&quot; aria-live=&quot;polite&quot;&gt;
+    &lt;label for=&quot;email&quot;&gt;Email&lt;/label&gt;
+    &lt;input type=&quot;email&quot; id=&quot;email&quot; 
+           aria-invalid=&quot;true&quot;
+           aria-describedby=&quot;email-error&quot;&gt;
+    &lt;p id=&quot;email-error&quot; class=&quot;error&quot; role=&quot;alert&quot;&gt;
       Please enter a valid email address (e.g., name@example.com)
     &lt;/p&gt;
   &lt;/div&gt;
@@ -417,14 +467,14 @@ function showSessionWarning() {
 
 ```javascript
 // Focus first error on submit
-form.addEventListener('submit', (e) =&gt; {
-  const firstError = form.querySelector('[aria-invalid="true"]');
+form.addEventListener(&#039;submit&#039;, (e) =&gt; {
+  const firstError = form.querySelector(&#039;[aria-invalid=&quot;true&quot;]&#039;);
   if (firstError) {
     e.preventDefault();
     firstError.focus();
     
     // Announce error summary
-    const errorSummary = document.getElementById('error-summary');
+    const errorSummary = document.getElementById(&#039;error-summary&#039;);
     errorSummary.textContent = `${errors.length} errors found. Please fix them and try again.`;
     errorSummary.focus();
   }
@@ -439,18 +489,18 @@ form.addEventListener('submit', (e) =&gt; {
 
 ```html
 &lt;!-- ❌ Duplicate IDs --&gt;
-&lt;div id="content"&gt;...&lt;/div&gt;
-&lt;div id="content"&gt;...&lt;/div&gt;
+&lt;div id=&quot;content&quot;&gt;...&lt;/div&gt;
+&lt;div id=&quot;content&quot;&gt;...&lt;/div&gt;
 
 &lt;!-- ❌ Invalid nesting --&gt;
-&lt;a href="/"&gt;&lt;button&gt;Click&lt;/button&gt;&lt;/a&gt;
+&lt;a href=&quot;/&quot;&gt;&lt;button&gt;Click&lt;/button&gt;&lt;/a&gt;
 
 &lt;!-- ✅ Unique IDs --&gt;
-&lt;div id="main-content"&gt;...&lt;/div&gt;
-&lt;div id="sidebar-content"&gt;...&lt;/div&gt;
+&lt;div id=&quot;main-content&quot;&gt;...&lt;/div&gt;
+&lt;div id=&quot;sidebar-content&quot;&gt;...&lt;/div&gt;
 
 &lt;!-- ✅ Proper nesting --&gt;
-&lt;a href="/" class="button-link"&gt;Click&lt;/a&gt;
+&lt;a href=&quot;/&quot; class=&quot;button-link&quot;&gt;Click&lt;/a&gt;
 ```
 
 ### ARIA usage (4.1.2)
@@ -458,31 +508,31 @@ form.addEventListener('submit', (e) =&gt; {
 **Prefer native elements:**
 ```html
 &lt;!-- ❌ ARIA role on div --&gt;
-&lt;div role="button" tabindex="0"&gt;Click me&lt;/div&gt;
+&lt;div role=&quot;button&quot; tabindex=&quot;0&quot;&gt;Click me&lt;/div&gt;
 
 &lt;!-- ✅ Native button --&gt;
 &lt;button&gt;Click me&lt;/button&gt;
 
 &lt;!-- ❌ ARIA checkbox --&gt;
-&lt;div role="checkbox" aria-checked="false"&gt;Option&lt;/div&gt;
+&lt;div role=&quot;checkbox&quot; aria-checked=&quot;false&quot;&gt;Option&lt;/div&gt;
 
 &lt;!-- ✅ Native checkbox --&gt;
-&lt;label&gt;&lt;input type="checkbox"&gt; Option&lt;/label&gt;
+&lt;label&gt;&lt;input type=&quot;checkbox&quot;&gt; Option&lt;/label&gt;
 ```
 
 **When ARIA is needed:**
 ```html
 &lt;!-- Custom tabs component --&gt;
-&lt;div role="tablist" aria-label="Product information"&gt;
-  &lt;button role="tab" id="tab-1" aria-selected="true" 
-          aria-controls="panel-1"&gt;Description&lt;/button&gt;
-  &lt;button role="tab" id="tab-2" aria-selected="false" 
-          aria-controls="panel-2" tabindex="-1"&gt;Reviews&lt;/button&gt;
+&lt;div role=&quot;tablist&quot; aria-label=&quot;Product information&quot;&gt;
+  &lt;button role=&quot;tab&quot; id=&quot;tab-1&quot; aria-selected=&quot;true&quot; 
+          aria-controls=&quot;panel-1&quot;&gt;Description&lt;/button&gt;
+  &lt;button role=&quot;tab&quot; id=&quot;tab-2&quot; aria-selected=&quot;false&quot; 
+          aria-controls=&quot;panel-2&quot; tabindex=&quot;-1&quot;&gt;Reviews&lt;/button&gt;
 &lt;/div&gt;
-&lt;div role="tabpanel" id="panel-1" aria-labelledby="tab-1"&gt;
+&lt;div role=&quot;tabpanel&quot; id=&quot;panel-1&quot; aria-labelledby=&quot;tab-1&quot;&gt;
   &lt;!-- Panel content --&gt;
 &lt;/div&gt;
-&lt;div role="tabpanel" id="panel-2" aria-labelledby="tab-2" hidden&gt;
+&lt;div role=&quot;tabpanel&quot; id=&quot;panel-2&quot; aria-labelledby=&quot;tab-2&quot; hidden&gt;
   &lt;!-- Panel content --&gt;
 &lt;/div&gt;
 ```
@@ -491,21 +541,21 @@ form.addEventListener('submit', (e) =&gt; {
 
 ```html
 &lt;!-- Status updates --&gt;
-&lt;div aria-live="polite" aria-atomic="true" class="status"&gt;
+&lt;div aria-live=&quot;polite&quot; aria-atomic=&quot;true&quot; class=&quot;status&quot;&gt;
   &lt;!-- Content updates announced to screen readers --&gt;
 &lt;/div&gt;
 
 &lt;!-- Urgent alerts --&gt;
-&lt;div role="alert" aria-live="assertive"&gt;
+&lt;div role=&quot;alert&quot; aria-live=&quot;assertive&quot;&gt;
   &lt;!-- Interrupts current announcement --&gt;
 &lt;/div&gt;
 ```
 
 ```javascript
 // Announce dynamic content changes
-function showNotification(message, type = 'polite') {
+function showNotification(message, type = &#039;polite&#039;) {
   const container = document.getElementById(`${type}-announcer`);
-  container.textContent = ''; // Clear first
+  container.textContent = &#039;&#039;; // Clear first
   requestAnimationFrame(() =&gt; {
     container.textContent = message;
   });
@@ -577,8 +627,39 @@ axe https://example.com
 - [WAI-ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
 - [Deque axe Rules](https://dequeuniversity.com/rules/axe/)
 - [Web Quality Audit](../web-quality-audit/SKILL.md)
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>81</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

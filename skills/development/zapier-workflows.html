@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>zapier-workflows - AICCLI</title>
-  <meta name="description" content="zapier-workflows - Claude Code skill for AICCLI">
+  <meta name="description" content="Manage and trigger pre-built Zapier workflows and MCP tool orchestration. Use when user mentions workflows, Zaps, automations, daily digest, research, search, l">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / zapier-workflows</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>zapier-workflows</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / zapier-workflows
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>zapier-workflows</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Manage and trigger pre-built Zapier workflows and MCP tool orchestration. Use when user mentions workflows, Zaps, automations, daily digest, research, search, lead tracking, expenses, or asks to "run" any process. Also handles Perplexity-based research and Google Sheets data tracking.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/zapier-workflows</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/zapier-workflows</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/zapier-workflows</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: zapier-workflows
-description: Manage and trigger pre-built Zapier workflows and MCP tool orchestration. Use when user mentions workflows, Zaps, automations, daily digest, research, search, lead tracking, expenses, or asks to "run" any process. Also handles Perplexity-based research and Google Sheets data tracking.
+description: Manage and trigger pre-built Zapier workflows and MCP tool orchestration. Use when user mentions workflows, Zaps, automations, daily digest, research, search, lead tracking, expenses, or asks to &quot;run&quot; any process. Also handles Perplexity-based research and Google Sheets data tracking.
 ---
 
 # Zapier Workflows Skill
@@ -66,9 +116,9 @@ description: Manage and trigger pre-built Zapier workflows and MCP tool orchestr
 
 **Zapier MCP gives Claude access to 8,000+ individual tools** (every Zapier action), but there are critical limitations:
 
-❌ **No memory** - Claude doesn't remember which tools YOU use or why
-❌ **No context** - Doesn't know when to use specific tools for your workflows
-❌ **Only one-off actions** - Can't trigger your complex, multi-step Zaps
+❌ **No memory** - Claude doesn&#039;t remember which tools YOU use or why
+❌ **No context** - Doesn&#039;t know when to use specific tools for your workflows
+❌ **Only one-off actions** - Can&#039;t trigger your complex, multi-step Zaps
 ❌ **Fresh start every session** - All context lost between conversations
 
 ### The Two Types of Zapier Automation
@@ -80,18 +130,18 @@ description: Manage and trigger pre-built Zapier workflows and MCP tool orchestr
 - **Problem:** 8,000+ choices with no guidance on which to use or when
 
 **2. Multi-Step Zaps (Webhook-Triggered)**
-- Complex workflows you've built in Zapier dashboard
+- Complex workflows you&#039;ve built in Zapier dashboard
 - Multiple actions chained together, pre-optimized
 - Triggered via webhook URL (POST request)
-- **Problem:** Claude can't trigger these - they're not in the MCP
+- **Problem:** Claude can&#039;t trigger these - they&#039;re not in the MCP
 
 ## What This Skill Does
 
 **This skill solves both problems** by giving Claude persistent memory for your Zapier workflows:
 
-✅ **Remembers your MCP tool preferences** - "Use Google Sheets for expenses, Notion for tasks"
-✅ **Knows when/why to use each tool** - "Search with Perplexity when researching, not Google"
-✅ **Triggers multi-step Zaps** - "Run my daily digest" = webhook POST to your complex Zap
+✅ **Remembers your MCP tool preferences** - &quot;Use Google Sheets for expenses, Notion for tasks&quot;
+✅ **Knows when/why to use each tool** - &quot;Search with Perplexity when researching, not Google&quot;
+✅ **Triggers multi-step Zaps** - &quot;Run my daily digest&quot; = webhook POST to your complex Zap
 ✅ **Self-learning** - Claude updates the skill as you teach it, never forgets
 ✅ **Cross-session persistence** - Works across all conversations (global install)
 
@@ -114,7 +164,7 @@ description: Manage and trigger pre-built Zapier workflows and MCP tool orchestr
 - Changes persist forever (global install) or per-project (local install)
 - No manual editing required - just talk to Claude
 
-## Installation & Setup
+## Installation &amp; Setup
 
 ### Installation Location
 
@@ -139,7 +189,7 @@ description: Manage and trigger pre-built Zapier workflows and MCP tool orchestr
 - ✅ Add `.claude/` to your `.gitignore` if installed in a project
 - ✅ Never commit skill files with real webhook URLs to public repos
 - ✅ Regenerate webhook URLs if accidentally exposed
-- ✅ Use Zapier's webhook authentication features when available
+- ✅ Use Zapier&#039;s webhook authentication features when available
 
 **If you need to share this skill:**
 - Remove real webhook URLs first
@@ -157,27 +207,27 @@ description: Manage and trigger pre-built Zapier workflows and MCP tool orchestr
 
 ### Setting Up Zapier MCP
 
-To connect Zapier's MCP tools to Claude Code:
+To connect Zapier&#039;s MCP tools to Claude Code:
 
 1. **Go to Zapier MCP servers:**
    - Visit https://mcp.zapier.com/mcp/servers
    - Login to your Zapier account if prompted
 
 2. **Create a new MCP server:**
-   - Click "New MCP Server" button (top left)
-   - In "MCP Client (required)" dropdown, select **Claude Code**
-   - Give your server a name (e.g., "My Zapier Tools")
+   - Click &quot;New MCP Server&quot; button (top left)
+   - In &quot;MCP Client (required)&quot; dropdown, select **Claude Code**
+   - Give your server a name (e.g., &quot;My Zapier Tools&quot;)
 
 3. **Add tools:**
-   - Click "Add tools" button
+   - Click &quot;Add tools&quot; button
    - Select as many Zapier actions as you want (each becomes an MCP tool)
    - Common tools: Run Zap, Add Row to Google Sheets, Send Email, etc.
 
 4. **Connect to Claude Code:**
-   - Click "Connect" button
-   - You'll see a command like this:
+   - Click &quot;Connect&quot; button
+   - You&#039;ll see a command like this:
    ```bash
-   claude mcp add zapier https://mcp.zapier.com/api/mcp/mcp -t http -H "Authorization: Bearer ZjFmZGJkN..................1NjBhYzc2MDRlYg=="
+   claude mcp add zapier https://mcp.zapier.com/api/mcp/mcp -t http -H &quot;Authorization: Bearer ZjFmZGJkN..................1NjBhYzc2MDRlYg==&quot;
    ```
    - Copy and run this command in your terminal
 
@@ -193,8 +243,8 @@ For pre-built, optimized workflows that you want to trigger on-demand:
 
 1. **In Zapier dashboard:**
    - Create a new Zap
-   - Choose "Webhooks by Zapier" as trigger
-   - Select "Catch Hook"
+   - Choose &quot;Webhooks by Zapier&quot; as trigger
+   - Select &quot;Catch Hook&quot;
    - Copy the webhook URL provided
 
 2. **Build your workflow:**
@@ -228,11 +278,11 @@ When the user teaches you something new or corrects your approach:
 
 3. **Update format:**
    ```markdown
-   User: "Use Apollo instead of Clearbit for company data"
+   User: &quot;Use Apollo instead of Clearbit for company data&quot;
    Claude: [uses Read tool on references/mcp-patterns.md]
            [uses Edit tool to update the preference]
-           "Updated! I'll use Apollo for company enrichment from now on.
-            This change is now permanent in the skill."
+           &quot;Updated! I&#039;ll use Apollo for company enrichment from now on.
+            This change is now permanent in the skill.&quot;
    ```
 
 **What to capture in skill updates:**
@@ -241,7 +291,7 @@ When the user teaches you something new or corrects your approach:
 - ✅ Error handling approaches
 - ✅ Data formatting requirements
 - ✅ New Zaps and their details
-- ❌ One-off requests (don't clutter the skill)
+- ❌ One-off requests (don&#039;t clutter the skill)
 - ❌ Temporary context (use memory instead)
 
 ## Decision Logic
@@ -265,20 +315,20 @@ Use MCP tools when:
 
 ## Execution Pattern
 
-1. **Listen for triggers:** Workflow names, "run", "trigger", "search", "research", etc.
+1. **Listen for triggers:** Workflow names, &quot;run&quot;, &quot;trigger&quot;, &quot;search&quot;, &quot;research&quot;, etc.
 2. **Check references:** Use Read tool on appropriate reference file for details
 3. **Check prerequisites:**
    - **If MCP tools needed but not available:** Provide Zapier MCP setup instructions (see below)
    - **If MCP tools available but not documented:** Trigger tool discovery protocol (see below)
    - **If webhook URL needed but not in references:** Provide webhook extraction instructions (see below)
 4. **Execute:**
-   - **For webhook-triggered Zaps:** Use Bash tool with curl to POST to webhook URL (webhooks are created in Zapier dashboard with "Catch Hook" trigger)
+   - **For webhook-triggered Zaps:** Use Bash tool with curl to POST to webhook URL (webhooks are created in Zapier dashboard with &quot;Catch Hook&quot; trigger)
    - **For MCP tool workflows:** Call the appropriate Zapier MCP tool directly (configured via https://mcp.zapier.com/mcp/servers)
 5. **Confirm:** Tell user what happened in natural language
 6. **Learn:** If user corrects you, use Edit tool to update the skill files
 7. **Suggest pattern saving:** After successful tool use, offer to save the pattern (see below)
 
-## Proactive Pattern Detection & Learning
+## Proactive Pattern Detection &amp; Learning
 
 **CRITICAL:** After you successfully help the user with MCP tools or workflows, proactively suggest saving valuable patterns.
 
@@ -304,14 +354,14 @@ After completing a task using MCP tools, check if this is a pattern worth saving
 After completing the task successfully:
 
 ```
-"That worked well! I noticed I [describe what you did, e.g., 'used Perplexity to research, then saved results to Google Sheets'].
+&quot;That worked well! I noticed I [describe what you did, e.g., &#039;used Perplexity to research, then saved results to Google Sheets&#039;].
 
 Would you like me to save this as a pattern? If you tell me:
 - What trigger words to listen for
 - When/why to use this workflow
 - Any preferences or variations
 
-I'll remember it and do this automatically next time!"
+I&#039;ll remember it and do this automatically next time!&quot;
 ```
 
 ### Document the Pattern
@@ -325,43 +375,43 @@ If user says yes:
    - Step-by-step workflow
    - Parameters/preferences
    - Example
-3. Confirm: "Saved! Next time you [trigger], I'll [workflow]."
+3. Confirm: &quot;Saved! Next time you [trigger], I&#039;ll [workflow].&quot;
 
 **Examples of patterns worth saving:**
-- "Research and document" (Perplexity → summarize → Google Sheets)
-- "Expense tracking" (Extract amount/description → format → add to sheet)
-- "Competitive analysis" (Search competitor → analyze → save insights)
-- "Daily briefing" (Multiple searches → synthesize → deliver)
+- &quot;Research and document&quot; (Perplexity → summarize → Google Sheets)
+- &quot;Expense tracking&quot; (Extract amount/description → format → add to sheet)
+- &quot;Competitive analysis&quot; (Search competitor → analyze → save insights)
+- &quot;Daily briefing&quot; (Multiple searches → synthesize → deliver)
 
-**Don't save:**
+**Don&#039;t save:**
 - One-off requests
 - Highly specific/unique situations
 - Simple single-tool uses (unless user asks)
 
-## Setup Detection & Instructions
+## Setup Detection &amp; Instructions
 
 ### If Zapier MCP Not Detected
 
 When user requests MCP tool functionality but Zapier MCP is not connected, tell them:
 
 ```
-"I don't see the Zapier MCP tools connected. Here's how to set them up:
+&quot;I don&#039;t see the Zapier MCP tools connected. Here&#039;s how to set them up:
 
 1. Go to https://mcp.zapier.com/mcp/servers
 2. Login to your Zapier account
-3. Click 'New MCP Server' (top left)
-4. Select 'Claude Code' in the MCP Client dropdown
-5. Give it a name (e.g., 'My Zapier Tools')
-6. Click 'Add tools' and select the Zapier actions you want
-7. Click 'Connect' and copy the command shown
+3. Click &#039;New MCP Server&#039; (top left)
+4. Select &#039;Claude Code&#039; in the MCP Client dropdown
+5. Give it a name (e.g., &#039;My Zapier Tools&#039;)
+6. Click &#039;Add tools&#039; and select the Zapier actions you want
+7. Click &#039;Connect&#039; and copy the command shown
 8. Run that command in your terminal (it looks like):
-   claude mcp add zapier https://mcp.zapier.com/api/mcp/mcp -t http -H "Authorization: Bearer [your-token]"
+   claude mcp add zapier https://mcp.zapier.com/api/mcp/mcp -t http -H &quot;Authorization: Bearer [your-token]&quot;
 9. Restart Claude Code
 
-Once setup, I'll be able to use those Zapier actions directly!"
+Once setup, I&#039;ll be able to use those Zapier actions directly!&quot;
 ```
 
-### When Zapier MCP Is Connected - Tool Discovery & Documentation
+### When Zapier MCP Is Connected - Tool Discovery &amp; Documentation
 
 **IMPORTANT:** When Zapier MCP is connected (tools starting with `mcp__zapier__` are available), proactively help the user document them with rich context:
 
@@ -371,7 +421,7 @@ Once setup, I'll be able to use those Zapier actions directly!"
 
 2. **Prompt for detailed documentation:**
    ```
-   "I see you have these Zapier MCP tools available:
+   &quot;I see you have these Zapier MCP tools available:
    - mcp__zapier__google_sheets_create_spreadsheet_row
    - mcp__zapier__perplexity_chat_completion
    - [etc.]
@@ -386,7 +436,7 @@ Once setup, I'll be able to use those Zapier actions directly!"
       - What types of requests?
 
    2. WHY should I use this tool vs alternatives?
-      - What's it best for?
+      - What&#039;s it best for?
       - When should I NOT use it?
 
    3. HOW should I use it?
@@ -398,7 +448,7 @@ Once setup, I'll be able to use those Zapier actions directly!"
       - Multi-step sequences?
       - Common combinations with other tools?
 
-   Take your time - the more detail you give me, the better I can serve you!"
+   Take your time - the more detail you give me, the better I can serve you!&quot;
    ```
 
 3. **Document in skill:**
@@ -413,27 +463,27 @@ Once setup, I'll be able to use those Zapier actions directly!"
 
 **When to trigger this:**
 - First time user mentions Zapier or workflows after MCP setup
-- User explicitly asks "what tools do I have?" or "what can you do with Zapier?"
-- When you detect new Zapier MCP tools that aren't documented in `references/mcp-patterns.md`
+- User explicitly asks &quot;what tools do I have?&quot; or &quot;what can you do with Zapier?&quot;
+- When you detect new Zapier MCP tools that aren&#039;t documented in `references/mcp-patterns.md`
 
 ### If User Wants to Add a Webhook-Triggered Zap
 
 When user mentions creating or adding a multi-step Zap for webhook triggering, provide these instructions:
 
 ```
-"To get your webhook URL from an existing Zap:
+&quot;To get your webhook URL from an existing Zap:
 
 1. Go to your Zap in the Zapier dashboard
-2. Make sure the trigger is a 'Webhooks by Zapier' node
-3. In the 'Trigger Event' dropdown, select 'Catch Hook'
-4. Go to the 'Test' tab
-5. Copy the 'Webhook URL' shown
+2. Make sure the trigger is a &#039;Webhooks by Zapier&#039; node
+3. In the &#039;Trigger Event&#039; dropdown, select &#039;Catch Hook&#039;
+4. Go to the &#039;Test&#039; tab
+5. Copy the &#039;Webhook URL&#039; shown
 6. Give me that URL and tell me:
    - What the Zap does (step-by-step)
    - What trigger phrases you want to use
    - Any other details (timing, cost, etc.)
 
-I'll add it to my knowledge so you can trigger it anytime just by asking!"
+I&#039;ll add it to my knowledge so you can trigger it anytime just by asking!&quot;
 ```
 
 ## Quick Reference
@@ -446,39 +496,39 @@ I'll add it to my knowledge so you can trigger it anytime just by asking!"
 
 **Triggering a Zap:**
 ```
-User: "Run my daily digest"
+User: &quot;Run my daily digest&quot;
 Claude: [uses Read tool on references/zaps.md for webhook details]
         [uses Bash tool to trigger webhook with curl POST]
-        "Started your Daily AI Digest. You'll get the report via email
-         in ~3 minutes, with SMS alerts for any high-priority items."
+        &quot;Started your Daily AI Digest. You&#039;ll get the report via email
+         in ~3 minutes, with SMS alerts for any high-priority items.&quot;
 ```
 
 **Using MCP orchestration:**
 ```
-User: "Research the latest on quantum computing"
+User: &quot;Research the latest on quantum computing&quot;
 Claude: [uses Read tool on references/mcp-patterns.md]
         [calls Perplexity Search MCP tool]
         [analyzes results, identifies gaps]
         [calls Perplexity Search again for deeper dive]
-        "Here's what I found... [summary]"
+        &quot;Here&#039;s what I found... [summary]&quot;
 ```
 
 **Learning and updating:**
 ```
-User: "No, when tracking expenses use my 'Personal Budget' sheet, not 'Expenses'"
+User: &quot;No, when tracking expenses use my &#039;Personal Budget&#039; sheet, not &#039;Expenses&#039;&quot;
 Claude: [uses Read tool on references/mcp-patterns.md]
         [uses Edit tool to update the Google Sheets section]
-        "Got it - updated the skill. I'll use 'Personal Budget' sheet
-         for expense tracking from now on."
+        &quot;Got it - updated the skill. I&#039;ll use &#039;Personal Budget&#039; sheet
+         for expense tracking from now on.&quot;
 ```
 
-## FAQ & Troubleshooting
+## FAQ &amp; Troubleshooting
 
-### "Claude isn't detecting my Zapier MCP tools"
+### &quot;Claude isn&#039;t detecting my Zapier MCP tools&quot;
 
 **Check if MCP is connected:**
 - Look for tools starting with `mcp__zapier__` in your available tools
-- Try asking: "What Zapier tools do I have?"
+- Try asking: &quot;What Zapier tools do I have?&quot;
 
 **If not showing up:**
 1. Verify you ran the connection command from https://mcp.zapier.com/mcp/servers
@@ -486,7 +536,7 @@ Claude: [uses Read tool on references/mcp-patterns.md]
 3. Check your Claude Code MCP settings
 4. Verify the authorization token in the command was correct
 
-### "Claude isn't suggesting to save patterns"
+### &quot;Claude isn&#039;t suggesting to save patterns&quot;
 
 **Pattern detection triggers when:**
 - You use 2+ MCP tools in sequence
@@ -494,15 +544,15 @@ Claude: [uses Read tool on references/mcp-patterns.md]
 - It seems repeatable (not a one-off request)
 
 **Try explicitly asking:**
-- "Can you save this as a pattern?"
-- "Remember this workflow for next time"
+- &quot;Can you save this as a pattern?&quot;
+- &quot;Remember this workflow for next time&quot;
 
-### "Webhook URL not triggering my Zap"
+### &quot;Webhook URL not triggering my Zap&quot;
 
 **Common issues:**
 1. **Wrong URL** - Make sure you copied the full URL from Test tab
 2. **Zap not turned on** - Enable the Zap in Zapier dashboard
-3. **Trigger node incorrect** - Must be "Webhooks by Zapier" → "Catch Hook"
+3. **Trigger node incorrect** - Must be &quot;Webhooks by Zapier&quot; → &quot;Catch Hook&quot;
 4. **Firewall/network** - Check if curl command works from terminal first
 
 **Test manually:**
@@ -510,7 +560,7 @@ Claude: [uses Read tool on references/mcp-patterns.md]
 curl -X POST https://hooks.zapier.com/hooks/catch/[your-url]
 ```
 
-### "Claude keeps asking to document tools I already documented"
+### &quot;Claude keeps asking to document tools I already documented&quot;
 
 **Likely causes:**
 - Tools documented but file not saved properly
@@ -522,20 +572,20 @@ curl -X POST https://hooks.zapier.com/hooks/catch/[your-url]
 2. Verify skill location: `~/.claude/skills/` (global) vs `./.claude/skills/` (project)
 3. If project-level, copy to global for cross-project persistence
 
-### "How do I know if the skill is working?"
+### &quot;How do I know if the skill is working?&quot;
 
-**Signs it's working:**
+**Signs it&#039;s working:**
 1. When you mention Zapier/workflows, Claude mentions checking references
 2. Claude asks detailed questions (WHEN/WHY/HOW) about tools
 3. After using tools, Claude suggests saving patterns
 4. Claude successfully triggers your webhooks
 
 **Quick test:**
-1. Ask: "What Zapier tools do I have?"
+1. Ask: &quot;What Zapier tools do I have?&quot;
 2. Add a fake webhook and tell Claude about it
 3. Check if it was added to `references/zaps.md`
 
-### "Skill files getting too large / slow to load"
+### &quot;Skill files getting too large / slow to load&quot;
 
 **If reference files grow too large:**
 - Review and remove outdated/unused patterns
@@ -548,7 +598,7 @@ curl -X POST https://hooks.zapier.com/hooks/catch/[your-url]
 - Avoid documenting one-off workflows
 - Use pattern categories to organize
 
-### "I want to reset the skill to template state"
+### &quot;I want to reset the skill to template state&quot;
 
 **To start fresh:**
 1. Backup your current skill files (if you want to keep anything)
@@ -556,7 +606,7 @@ curl -X POST https://hooks.zapier.com/hooks/catch/[your-url]
 3. Re-clone from GitHub: https://github.com/AlexBoudreaux/claude-zapier-skill
 4. Copy fresh template to `~/.claude/skills/`
 
-### "Can I use this skill without Zapier MCP?"
+### &quot;Can I use this skill without Zapier MCP?&quot;
 
 **Yes!** The skill works with:
 - **Only webhooks** - Trigger multi-step Zaps without MCP
@@ -565,7 +615,7 @@ curl -X POST https://hooks.zapier.com/hooks/catch/[your-url]
 
 Each mode is independent and valuable on its own.
 
-### "Security: I accidentally committed webhook URLs"
+### &quot;Security: I accidentally committed webhook URLs&quot;
 
 **Immediate actions:**
 1. Remove the commit from git history (git rebase, BFG Repo-Cleaner)
@@ -583,9 +633,9 @@ Each mode is independent and valuable on its own.
 
 ## Important Notes
 
-- **Webhooks don't need payloads** - Zaps get their data from Zapier Tables
+- **Webhooks don&#039;t need payloads** - Zaps get their data from Zapier Tables
 - **Always read reference files** before executing - they contain critical details
-- **Update skill files** when learning something new - don't just remember it for this conversation
+- **Update skill files** when learning something new - don&#039;t just remember it for this conversation
 
 ## Claude Code Tools Used
 
@@ -595,8 +645,39 @@ This skill uses the following Claude Code tools:
 - **Edit** - To update skill files with new workflows, patterns, or preferences
 - **Bash** - To trigger Zapier webhooks using curl POST requests
 - **MCP Tools** - To call Perplexity Search, Google Sheets, and other integrations
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>111</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

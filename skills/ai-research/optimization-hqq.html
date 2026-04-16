@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>optimization-hqq - AICCLI</title>
-  <meta name="description" content="optimization-hqq - Claude Code skill for AICCLI">
+  <meta name="description" content="Half-Quadratic Quantization for LLMs without calibration data. Use when quantizing models to 4/3/2-bit precision without needing calibration datasets, for fast ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / optimization-hqq</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>optimization-hqq</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / optimization-hqq
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>optimization-hqq</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Half-Quadratic Quantization for LLMs without calibration data. Use when quantizing models to 4/3/2-bit precision without needing calibration datasets, for fast quantization workflows, or when deploying with vLLM or HuggingFace Transformers.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/optimization-hqq</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/optimization-hqq</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/optimization-hqq</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: hqq-quantization
 description: Half-Quadratic Quantization for LLMs without calibration data. Use when quantizing models to 4/3/2-bit precision without needing calibration datasets, for fast quantization workflows, or when deploying with vLLM or HuggingFace Transformers.
 version: 1.0.0
@@ -140,9 +190,9 @@ quantization_config = HqqConfig(
 
 # Load and quantize
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-3.1-8B",
+    &quot;meta-llama/Llama-3.1-8B&quot;,
     quantization_config=quantization_config,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
 
 # Model is quantized and ready to use
@@ -173,12 +223,12 @@ config_2bit = BaseQuantizeConfig(
 
 # Mixed precision per layer type
 layer_configs = {
-    "self_attn.q_proj": BaseQuantizeConfig(nbits=4, group_size=64),
-    "self_attn.k_proj": BaseQuantizeConfig(nbits=4, group_size=64),
-    "self_attn.v_proj": BaseQuantizeConfig(nbits=4, group_size=64),
-    "mlp.gate_proj": BaseQuantizeConfig(nbits=2, group_size=32),
-    "mlp.up_proj": BaseQuantizeConfig(nbits=2, group_size=32),
-    "mlp.down_proj": BaseQuantizeConfig(nbits=4, group_size=64),
+    &quot;self_attn.q_proj&quot;: BaseQuantizeConfig(nbits=4, group_size=64),
+    &quot;self_attn.k_proj&quot;: BaseQuantizeConfig(nbits=4, group_size=64),
+    &quot;self_attn.v_proj&quot;: BaseQuantizeConfig(nbits=4, group_size=64),
+    &quot;mlp.gate_proj&quot;: BaseQuantizeConfig(nbits=2, group_size=32),
+    &quot;mlp.up_proj&quot;: BaseQuantizeConfig(nbits=2, group_size=32),
+    &quot;mlp.down_proj&quot;: BaseQuantizeConfig(nbits=4, group_size=64),
 }
 ```
 
@@ -212,20 +262,20 @@ from hqq.core.quantize import HQQLinear
 
 # Available backends
 backends = [
-    "pytorch",          # Pure PyTorch (default)
-    "pytorch_compile",  # torch.compile optimized
-    "aten",            # Custom CUDA kernels
-    "torchao_int4",    # TorchAO int4 matmul
-    "gemlite",         # GemLite CUDA kernels
-    "bitblas",         # BitBlas optimized
-    "marlin",          # Marlin 4-bit kernels
+    &quot;pytorch&quot;,          # Pure PyTorch (default)
+    &quot;pytorch_compile&quot;,  # torch.compile optimized
+    &quot;aten&quot;,            # Custom CUDA kernels
+    &quot;torchao_int4&quot;,    # TorchAO int4 matmul
+    &quot;gemlite&quot;,         # GemLite CUDA kernels
+    &quot;bitblas&quot;,         # BitBlas optimized
+    &quot;marlin&quot;,          # Marlin 4-bit kernels
 ]
 
 # Set backend globally
-HQQLinear.set_backend("torchao_int4")
+HQQLinear.set_backend(&quot;torchao_int4&quot;)
 
 # Or per layer
-hqq_layer.set_backend("marlin")
+hqq_layer.set_backend(&quot;marlin&quot;)
 ```
 
 **Backend selection guide:**
@@ -247,13 +297,13 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Load HQQ-quantized model from Hub
 model = AutoModelForCausalLM.from_pretrained(
-    "mobiuslabsgmbh/Llama-3.1-8B-HQQ-4bit",
-    device_map="auto"
+    &quot;mobiuslabsgmbh/Llama-3.1-8B-HQQ-4bit&quot;,
+    device_map=&quot;auto&quot;
 )
-tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B")
+tokenizer = AutoTokenizer.from_pretrained(&quot;meta-llama/Llama-3.1-8B&quot;)
 
 # Use normally
-inputs = tokenizer("Hello, world!", return_tensors="pt").to(model.device)
+inputs = tokenizer(&quot;Hello, world!&quot;, return_tensors=&quot;pt&quot;).to(model.device)
 outputs = model.generate(**inputs, max_new_tokens=50)
 ```
 
@@ -265,16 +315,16 @@ from transformers import AutoModelForCausalLM, HqqConfig
 # Quantize
 config = HqqConfig(nbits=4, group_size=64)
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-3.1-8B",
+    &quot;meta-llama/Llama-3.1-8B&quot;,
     quantization_config=config,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
 
 # Save quantized model
-model.save_pretrained("./llama-8b-hqq-4bit")
+model.save_pretrained(&quot;./llama-8b-hqq-4bit&quot;)
 
 # Push to Hub
-model.push_to_hub("my-org/Llama-3.1-8B-HQQ-4bit")
+model.push_to_hub(&quot;my-org/Llama-3.1-8B-HQQ-4bit&quot;)
 ```
 
 ### Mixed precision quantization
@@ -289,8 +339,8 @@ config = HqqConfig(
     # Attention layers: higher precision
     # MLP layers: lower precision for memory savings
     dynamic_config={
-        "attn": {"nbits": 4, "group_size": 64},
-        "mlp": {"nbits": 2, "group_size": 32}
+        &quot;attn&quot;: {&quot;nbits&quot;: 4, &quot;group_size&quot;: 64},
+        &quot;mlp&quot;: {&quot;nbits&quot;: 2, &quot;group_size&quot;: 32}
     }
 )
 ```
@@ -304,14 +354,14 @@ from vllm import LLM, SamplingParams
 
 # Load HQQ-quantized model
 llm = LLM(
-    model="mobiuslabsgmbh/Llama-3.1-8B-HQQ-4bit",
-    quantization="hqq",
-    dtype="float16"
+    model=&quot;mobiuslabsgmbh/Llama-3.1-8B-HQQ-4bit&quot;,
+    quantization=&quot;hqq&quot;,
+    dtype=&quot;float16&quot;
 )
 
 # Generate
 sampling_params = SamplingParams(temperature=0.7, max_tokens=100)
-outputs = llm.generate(["What is machine learning?"], sampling_params)
+outputs = llm.generate([&quot;What is machine learning?&quot;], sampling_params)
 ```
 
 ### vLLM with custom HQQ config
@@ -320,11 +370,11 @@ outputs = llm.generate(["What is machine learning?"], sampling_params)
 from vllm import LLM
 
 llm = LLM(
-    model="meta-llama/Llama-3.1-8B",
-    quantization="hqq",
+    model=&quot;meta-llama/Llama-3.1-8B&quot;,
+    quantization=&quot;hqq&quot;,
     quantization_config={
-        "nbits": 4,
-        "group_size": 64
+        &quot;nbits&quot;: 4,
+        &quot;group_size&quot;: 64
     }
 )
 ```
@@ -340,19 +390,19 @@ from peft import LoraConfig, get_peft_model
 # Load quantized model
 quant_config = HqqConfig(nbits=4, group_size=64)
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-3.1-8B",
+    &quot;meta-llama/Llama-3.1-8B&quot;,
     quantization_config=quant_config,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
 
 # Apply LoRA
 lora_config = LoraConfig(
     r=16,
     lora_alpha=32,
-    target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+    target_modules=[&quot;q_proj&quot;, &quot;k_proj&quot;, &quot;v_proj&quot;, &quot;o_proj&quot;],
     lora_dropout=0.05,
-    bias="none",
-    task_type="CAUSAL_LM"
+    bias=&quot;none&quot;,
+    task_type=&quot;CAUSAL_LM&quot;
 )
 
 model = get_peft_model(model, lora_config)
@@ -366,14 +416,14 @@ model = get_peft_model(model, lora_config)
 from transformers import TrainingArguments, Trainer
 
 training_args = TrainingArguments(
-    output_dir="./hqq-lora-output",
+    output_dir=&quot;./hqq-lora-output&quot;,
     per_device_train_batch_size=4,
     gradient_accumulation_steps=4,
     learning_rate=2e-4,
     num_train_epochs=3,
     fp16=True,
     logging_steps=10,
-    save_strategy="epoch"
+    save_strategy=&quot;epoch&quot;
 )
 
 trainer = Trainer(
@@ -398,21 +448,21 @@ config = HqqConfig(nbits=4, group_size=64)
 
 # 2. Load and quantize (no calibration needed!)
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-3.1-8B",
+    &quot;meta-llama/Llama-3.1-8B&quot;,
     quantization_config=config,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
-tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B")
+tokenizer = AutoTokenizer.from_pretrained(&quot;meta-llama/Llama-3.1-8B&quot;)
 
 # 3. Verify quality
-prompt = "The capital of France is"
-inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+prompt = &quot;The capital of France is&quot;
+inputs = tokenizer(prompt, return_tensors=&quot;pt&quot;).to(model.device)
 outputs = model.generate(**inputs, max_new_tokens=20)
 print(tokenizer.decode(outputs[0]))
 
 # 4. Save
-model.save_pretrained("./llama-8b-hqq")
-tokenizer.save_pretrained("./llama-8b-hqq")
+model.save_pretrained(&quot;./llama-8b-hqq&quot;)
+tokenizer.save_pretrained(&quot;./llama-8b-hqq&quot;)
 ```
 
 ### Workflow 2: Optimize for inference speed
@@ -424,13 +474,13 @@ from transformers import AutoModelForCausalLM, HqqConfig
 # 1. Quantize with optimal backend
 config = HqqConfig(nbits=4, group_size=64)
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-3.1-8B",
+    &quot;meta-llama/Llama-3.1-8B&quot;,
     quantization_config=config,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
 
 # 2. Set fast backend
-HQQLinear.set_backend("marlin")  # or "torchao_int4"
+HQQLinear.set_backend(&quot;marlin&quot;)  # or &quot;torchao_int4&quot;
 
 # 3. Compile for additional speedup
 import torch
@@ -438,11 +488,11 @@ model = torch.compile(model)
 
 # 4. Benchmark
 import time
-inputs = tokenizer("Hello", return_tensors="pt").to(model.device)
+inputs = tokenizer(&quot;Hello&quot;, return_tensors=&quot;pt&quot;).to(model.device)
 start = time.time()
 for _ in range(10):
     model.generate(**inputs, max_new_tokens=100)
-print(f"Avg time: {(time.time() - start) / 10:.2f}s")
+print(f&quot;Avg time: {(time.time() - start) / 10:.2f}s&quot;)
 ```
 
 ## Best practices
@@ -462,9 +512,9 @@ print(f"Avg time: {(time.time() - start) / 10:.2f}s")
 from hqq.models.hf.base import AutoHQQHFModel
 
 model = AutoHQQHFModel.from_pretrained(
-    "meta-llama/Llama-3.1-8B",
+    &quot;meta-llama/Llama-3.1-8B&quot;,
     quantization_config=config,
-    device_map="sequential"  # Load layers sequentially
+    device_map=&quot;sequential&quot;  # Load layers sequentially
 )
 ```
 
@@ -472,10 +522,10 @@ model = AutoHQQHFModel.from_pretrained(
 ```python
 # Switch to optimized backend
 from hqq.core.quantize import HQQLinear
-HQQLinear.set_backend("marlin")  # Requires Ampere+ GPU
+HQQLinear.set_backend(&quot;marlin&quot;)  # Requires Ampere+ GPU
 
 # Or compile
-model = torch.compile(model, mode="reduce-overhead")
+model = torch.compile(model, mode=&quot;reduce-overhead&quot;)
 ```
 
 **Poor quality at 2-bit:**
@@ -500,8 +550,46 @@ config = BaseQuantizeConfig(
 - **HuggingFace Models**: https://huggingface.co/mobiuslabsgmbh
 - **Version**: 0.2.0+
 - **License**: Apache 2.0
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Quantization</span><span class="tag">HQQ</span><span class="tag">Optimization</span><span class="tag">Memory Efficiency</span><span class="tag">Inference</span><span class="tag">Model Compression</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>13</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

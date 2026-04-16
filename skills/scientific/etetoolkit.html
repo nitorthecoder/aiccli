@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>etetoolkit - AICCLI</title>
-  <meta name="description" content="etetoolkit - Claude Code skill for AICCLI">
+  <meta name="description" content=""Phylogenetic tree toolkit (ETE). Tree manipulation (Newick/NHX), evolutionary event detection, orthology/paralogy, NCBI taxonomy, visualization (PDF/SVG), for ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / etetoolkit</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>etetoolkit</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / etetoolkit
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>etetoolkit</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Phylogenetic tree toolkit (ETE). Tree manipulation (Newick/NHX), evolutionary event detection, orthology/paralogy, NCBI taxonomy, visualization (PDF/SVG), for phylogenomics."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/etetoolkit</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/etetoolkit</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/etetoolkit</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: etetoolkit
-description: "Phylogenetic tree toolkit (ETE). Tree manipulation (Newick/NHX), evolutionary event detection, orthology/paralogy, NCBI taxonomy, visualization (PDF/SVG), for phylogenomics."
+description: &quot;Phylogenetic tree toolkit (ETE). Tree manipulation (Newick/NHX), evolutionary event detection, orthology/paralogy, NCBI taxonomy, visualization (PDF/SVG), for phylogenomics.&quot;
 ---
 
 # ETE Toolkit Skill
@@ -84,14 +134,14 @@ Load, manipulate, and analyze hierarchical tree structures with support for:
 from ete3 import Tree
 
 # Load tree from file
-tree = Tree("tree.nw", format=1)
+tree = Tree(&quot;tree.nw&quot;, format=1)
 
 # Basic statistics
-print(f"Leaves: {len(tree)}")
-print(f"Total nodes: {len(list(tree.traverse()))}")
+print(f&quot;Leaves: {len(tree)}&quot;)
+print(f&quot;Total nodes: {len(list(tree.traverse()))}&quot;)
 
 # Prune to taxa of interest
-taxa_to_keep = ["species1", "species2", "species3"]
+taxa_to_keep = [&quot;species1&quot;, &quot;species2&quot;, &quot;species3&quot;]
 tree.prune(taxa_to_keep, preserve_branch_length=True)
 
 # Midpoint root
@@ -99,7 +149,7 @@ midpoint = tree.get_midpoint_outgroup()
 tree.set_outgroup(midpoint)
 
 # Save modified tree
-tree.write(outfile="rooted_tree.nw")
+tree.write(outfile=&quot;rooted_tree.nw&quot;)
 ```
 
 Use `scripts/tree_operations.py` for command-line tree manipulation:
@@ -115,7 +165,7 @@ python scripts/tree_operations.py convert tree.nw output.nw --in-format 0 --out-
 python scripts/tree_operations.py reroot tree.nw rooted.nw --midpoint
 
 # Prune to specific taxa
-python scripts/tree_operations.py prune tree.nw pruned.nw --keep-taxa "sp1,sp2,sp3"
+python scripts/tree_operations.py prune tree.nw pruned.nw --keep-taxa &quot;sp1,sp2,sp3&quot;
 
 # Show ASCII visualization
 python scripts/tree_operations.py ascii tree.nw
@@ -137,11 +187,11 @@ Analyze gene trees with evolutionary event detection:
 from ete3 import PhyloTree
 
 # Load gene tree with alignment
-tree = PhyloTree("gene_tree.nw", alignment="alignment.fasta")
+tree = PhyloTree(&quot;gene_tree.nw&quot;, alignment=&quot;alignment.fasta&quot;)
 
 # Set species naming function
 def get_species(gene_name):
-    return gene_name.split("_")[0]
+    return gene_name.split(&quot;_&quot;)[0]
 
 tree.set_species_naming_function(get_species)
 
@@ -150,32 +200,32 @@ events = tree.get_descendant_evol_events()
 
 # Analyze events
 for node in tree.traverse():
-    if hasattr(node, "evoltype"):
-        if node.evoltype == "D":
-            print(f"Duplication at {node.name}")
-        elif node.evoltype == "S":
-            print(f"Speciation at {node.name}")
+    if hasattr(node, &quot;evoltype&quot;):
+        if node.evoltype == &quot;D&quot;:
+            print(f&quot;Duplication at {node.name}&quot;)
+        elif node.evoltype == &quot;S&quot;:
+            print(f&quot;Speciation at {node.name}&quot;)
 
 # Extract ortholog groups
 ortho_groups = tree.get_speciation_trees()
 for i, ortho_tree in enumerate(ortho_groups):
-    ortho_tree.write(outfile=f"ortholog_group_{i}.nw")
+    ortho_tree.write(outfile=f&quot;ortholog_group_{i}.nw&quot;)
 ```
 
 **Finding orthologs and paralogs:**
 
 ```python
 # Find orthologs to query gene
-query = tree & "species1_gene1"
+query = tree &amp; &quot;species1_gene1&quot;
 
 orthologs = []
 paralogs = []
 
 for event in events:
     if query in event.in_seqs:
-        if event.etype == "S":
+        if event.etype == &quot;S&quot;:
             orthologs.extend([s for s in event.out_seqs if s != query])
-        elif event.etype == "D":
+        elif event.etype == &quot;D&quot;:
             paralogs.extend([s for s in event.out_seqs if s != query])
 ```
 
@@ -197,7 +247,7 @@ from ete3 import NCBITaxa
 ncbi = NCBITaxa()
 
 # Build tree from species names
-species = ["Homo sapiens", "Pan troglodytes", "Mus musculus"]
+species = [&quot;Homo sapiens&quot;, &quot;Pan troglodytes&quot;, &quot;Mus musculus&quot;]
 name2taxid = ncbi.get_name_translator(species)
 taxids = [name2taxid[sp][0] for sp in species]
 
@@ -206,8 +256,8 @@ tree = ncbi.get_topology(taxids)
 
 # Annotate nodes with taxonomy info
 for node in tree.traverse():
-    if hasattr(node, "sci_name"):
-        print(f"{node.sci_name} - Rank: {node.rank} - TaxID: {node.taxid}")
+    if hasattr(node, &quot;sci_name&quot;):
+        print(f&quot;{node.sci_name} - Rank: {node.rank} - TaxID: {node.taxid}&quot;)
 ```
 
 **Annotating existing trees:**
@@ -224,8 +274,8 @@ for leaf in tree:
     names = ncbi.get_taxid_translator(lineage)
 
     # Add to node
-    leaf.add_feature("taxid", taxid)
-    leaf.add_feature("lineage", [names[t] for t in lineage])
+    leaf.add_feature(&quot;taxid&quot;, taxid)
+    leaf.add_feature(&quot;lineage&quot;, [names[t] for t in lineage])
 ```
 
 ### 4. Tree Visualization
@@ -244,7 +294,7 @@ Create publication-quality tree visualizations:
 ```python
 from ete3 import Tree, TreeStyle, NodeStyle
 
-tree = Tree("tree.nw")
+tree = Tree(&quot;tree.nw&quot;)
 
 # Configure tree style
 ts = TreeStyle()
@@ -257,21 +307,21 @@ for node in tree.traverse():
     nstyle = NodeStyle()
 
     if node.is_leaf():
-        nstyle["fgcolor"] = "blue"
-        nstyle["size"] = 8
+        nstyle[&quot;fgcolor&quot;] = &quot;blue&quot;
+        nstyle[&quot;size&quot;] = 8
     else:
         # Color by support
         if node.support &gt; 0.9:
-            nstyle["fgcolor"] = "darkgreen"
+            nstyle[&quot;fgcolor&quot;] = &quot;darkgreen&quot;
         else:
-            nstyle["fgcolor"] = "red"
-        nstyle["size"] = 5
+            nstyle[&quot;fgcolor&quot;] = &quot;red&quot;
+        nstyle[&quot;size&quot;] = 5
 
     node.set_style(nstyle)
 
 # Render to file
-tree.render("tree.pdf", tree_style=ts)
-tree.render("tree.png", w=800, h=600, units="px", dpi=300)
+tree.render(&quot;tree.pdf&quot;, tree_style=ts)
+tree.render(&quot;tree.png&quot;, w=800, h=600, units=&quot;px&quot;, dpi=300)
 ```
 
 Use `scripts/quick_visualize.py` for rapid visualization:
@@ -287,7 +337,7 @@ python scripts/quick_visualize.py tree.nw output.pdf --mode c --color-by-support
 python scripts/quick_visualize.py tree.nw output.png --width 1200 --height 800 --units px --dpi 300
 
 # Custom title and styling
-python scripts/quick_visualize.py tree.nw output.pdf --title "Species Phylogeny" --show-support
+python scripts/quick_visualize.py tree.nw output.pdf --title &quot;Species Phylogeny&quot; --show-support
 ```
 
 **Advanced visualization with faces:**
@@ -295,29 +345,29 @@ python scripts/quick_visualize.py tree.nw output.pdf --title "Species Phylogeny"
 ```python
 from ete3 import Tree, TreeStyle, TextFace, CircleFace
 
-tree = Tree("tree.nw")
+tree = Tree(&quot;tree.nw&quot;)
 
 # Add features to nodes
 for leaf in tree:
-    leaf.add_feature("habitat", "marine" if "fish" in leaf.name else "land")
+    leaf.add_feature(&quot;habitat&quot;, &quot;marine&quot; if &quot;fish&quot; in leaf.name else &quot;land&quot;)
 
 # Layout function
 def layout(node):
     if node.is_leaf():
         # Add colored circle
-        color = "blue" if node.habitat == "marine" else "green"
+        color = &quot;blue&quot; if node.habitat == &quot;marine&quot; else &quot;green&quot;
         circle = CircleFace(radius=5, color=color)
-        node.add_face(circle, column=0, position="aligned")
+        node.add_face(circle, column=0, position=&quot;aligned&quot;)
 
         # Add label
         label = TextFace(node.name, fsize=10)
-        node.add_face(label, column=1, position="aligned")
+        node.add_face(label, column=1, position=&quot;aligned&quot;)
 
 ts = TreeStyle()
 ts.layout_fn = layout
 ts.show_leaf_name = False
 
-tree.render("annotated_tree.pdf", tree_style=ts)
+tree.render(&quot;annotated_tree.pdf&quot;, tree_style=ts)
 ```
 
 ### 5. Clustering Analysis
@@ -336,12 +386,12 @@ Analyze hierarchical clustering results with data integration:
 from ete3 import ClusterTree
 
 # Load tree with data matrix
-matrix = """#Names\tSample1\tSample2\tSample3
+matrix = &quot;&quot;&quot;#Names\tSample1\tSample2\tSample3
 Gene1\t1.5\t2.3\t0.8
 Gene2\t0.9\t1.1\t1.8
-Gene3\t2.1\t2.5\t0.5"""
+Gene3\t2.1\t2.5\t0.5&quot;&quot;&quot;
 
-tree = ClusterTree("((Gene1,Gene2),Gene3);", text_array=matrix)
+tree = ClusterTree(&quot;((Gene1,Gene2),Gene3);&quot;, text_array=matrix)
 
 # Evaluate cluster quality
 for node in tree.traverse():
@@ -349,12 +399,12 @@ for node in tree.traverse():
         silhouette = node.get_silhouette()
         dunn = node.get_dunn()
 
-        print(f"Cluster: {node.name}")
-        print(f"  Silhouette: {silhouette:.3f}")
-        print(f"  Dunn index: {dunn:.3f}")
+        print(f&quot;Cluster: {node.name}&quot;)
+        print(f&quot;  Silhouette: {silhouette:.3f}&quot;)
+        print(f&quot;  Dunn index: {dunn:.3f}&quot;)
 
 # Visualize with heatmap
-tree.show("heatmap")
+tree.show(&quot;heatmap&quot;)
 ```
 
 ### 6. Tree Comparison
@@ -372,22 +422,22 @@ Quantify topological differences between trees:
 ```python
 from ete3 import Tree
 
-tree1 = Tree("tree1.nw")
-tree2 = Tree("tree2.nw")
+tree1 = Tree(&quot;tree1.nw&quot;)
+tree2 = Tree(&quot;tree2.nw&quot;)
 
 # Calculate RF distance
 rf, max_rf, common_leaves, parts_t1, parts_t2 = tree1.robinson_foulds(tree2)
 
-print(f"RF distance: {rf}/{max_rf}")
-print(f"Normalized RF: {rf/max_rf:.3f}")
-print(f"Common leaves: {len(common_leaves)}")
+print(f&quot;RF distance: {rf}/{max_rf}&quot;)
+print(f&quot;Normalized RF: {rf/max_rf:.3f}&quot;)
+print(f&quot;Common leaves: {len(common_leaves)}&quot;)
 
 # Find unique partitions
 unique_t1 = parts_t1 - parts_t2
 unique_t2 = parts_t2 - parts_t1
 
-print(f"Unique to tree1: {len(unique_t1)}")
-print(f"Unique to tree2: {len(unique_t2)}")
+print(f&quot;Unique to tree1: {len(unique_t1)}&quot;)
+print(f&quot;Unique to tree2: {len(unique_t2)}&quot;)
 ```
 
 **Compare multiple trees:**
@@ -395,7 +445,7 @@ print(f"Unique to tree2: {len(unique_t2)}")
 ```python
 import numpy as np
 
-trees = [Tree(f"tree{i}.nw") for i in range(4)]
+trees = [Tree(f&quot;tree{i}.nw&quot;) for i in range(4)]
 
 # Create distance matrix
 n = len(trees)
@@ -453,10 +503,10 @@ Complete workflow from gene tree to ortholog identification:
 from ete3 import PhyloTree, NCBITaxa
 
 # 1. Load gene tree with alignment
-tree = PhyloTree("gene_tree.nw", alignment="alignment.fasta")
+tree = PhyloTree(&quot;gene_tree.nw&quot;, alignment=&quot;alignment.fasta&quot;)
 
 # 2. Configure species naming
-tree.set_species_naming_function(lambda x: x.split("_")[0])
+tree.set_species_naming_function(lambda x: x.split(&quot;_&quot;)[0])
 
 # 3. Detect evolutionary events
 tree.get_descendant_evol_events()
@@ -467,14 +517,14 @@ for leaf in tree:
     if leaf.species in species_to_taxid:
         taxid = species_to_taxid[leaf.species]
         lineage = ncbi.get_lineage(taxid)
-        leaf.add_feature("lineage", lineage)
+        leaf.add_feature(&quot;lineage&quot;, lineage)
 
 # 5. Extract ortholog groups
 ortho_groups = tree.get_speciation_trees()
 
 # 6. Save and visualize
 for i, ortho in enumerate(ortho_groups):
-    ortho.write(outfile=f"ortho_{i}.nw")
+    ortho.write(outfile=f&quot;ortho_{i}.nw&quot;)
 ```
 
 ### Use Case 2: Tree Preprocessing and Formatting
@@ -502,13 +552,13 @@ Create styled visualizations:
 ```python
 from ete3 import Tree, TreeStyle, NodeStyle, TextFace
 
-tree = Tree("tree.nw")
+tree = Tree(&quot;tree.nw&quot;)
 
 # Define clade colors
 clade_colors = {
-    "Mammals": "red",
-    "Birds": "blue",
-    "Fish": "green"
+    &quot;Mammals&quot;: &quot;red&quot;,
+    &quot;Birds&quot;: &quot;blue&quot;,
+    &quot;Fish&quot;: &quot;green&quot;
 }
 
 def layout(node):
@@ -517,22 +567,22 @@ def layout(node):
         for clade, color in clade_colors.items():
             if clade in node.name:
                 nstyle = NodeStyle()
-                nstyle["fgcolor"] = color
-                nstyle["size"] = 8
+                nstyle[&quot;fgcolor&quot;] = color
+                nstyle[&quot;size&quot;] = 8
                 node.set_style(nstyle)
     else:
         # Add support values
         if node.support &gt; 0.95:
-            support = TextFace(f"{node.support:.2f}", fsize=8)
-            node.add_face(support, column=0, position="branch-top")
+            support = TextFace(f&quot;{node.support:.2f}&quot;, fsize=8)
+            node.add_face(support, column=0, position=&quot;branch-top&quot;)
 
 ts = TreeStyle()
 ts.layout_fn = layout
 ts.show_scale = True
 
 # Render for publication
-tree.render("figure.pdf", w=200, units="mm", tree_style=ts)
-tree.render("figure.svg", tree_style=ts)  # Editable vector
+tree.render(&quot;figure.pdf&quot;, w=200, units=&quot;mm&quot;, tree_style=ts)
+tree.render(&quot;figure.svg&quot;, tree_style=ts)  # Editable vector
 ```
 
 ### Use Case 4: Automated Tree Analysis
@@ -543,11 +593,11 @@ Process multiple trees systematically:
 from ete3 import Tree
 import os
 
-input_dir = "trees"
-output_dir = "processed"
+input_dir = &quot;trees&quot;
+output_dir = &quot;processed&quot;
 
 for filename in os.listdir(input_dir):
-    if filename.endswith(".nw"):
+    if filename.endswith(&quot;.nw&quot;):
         tree = Tree(os.path.join(input_dir, filename))
 
         # Standardize: midpoint root, resolve polytomies
@@ -557,12 +607,12 @@ for filename in os.listdir(input_dir):
 
         # Filter low support branches
         for node in tree.traverse():
-            if hasattr(node, 'support') and node.support &lt; 0.5:
+            if hasattr(node, &#039;support&#039;) and node.support &lt; 0.5:
                 if not node.is_leaf() and not node.is_root():
                     node.delete()
 
         # Save processed tree
-        output_file = os.path.join(output_dir, f"processed_{filename}")
+        output_file = os.path.join(output_dir, f&quot;processed_{filename}&quot;)
         tree.write(outfile=output_file)
 ```
 
@@ -592,7 +642,7 @@ Load these references when detailed information is needed:
 **Import errors:**
 
 ```bash
-# If "ModuleNotFoundError: No module named 'ete3'"
+# If &quot;ModuleNotFoundError: No module named &#039;ete3&#039;&quot;
 uv pip install ete3
 
 # For GUI and rendering issues
@@ -650,14 +700,14 @@ ETE supports multiple Newick format specifications (0-100):
 Specify format when reading/writing:
 
 ```python
-tree = Tree("tree.nw", format=1)
-tree.write(outfile="output.nw", format=5)
+tree = Tree(&quot;tree.nw&quot;, format=1)
+tree.write(outfile=&quot;output.nw&quot;, format=5)
 ```
 
 NHX (New Hampshire eXtended) format preserves custom features:
 
 ```python
-tree.write(outfile="tree.nhx", features=["habitat", "temperature", "depth"])
+tree.write(outfile=&quot;tree.nhx&quot;, features=[&quot;habitat&quot;, &quot;temperature&quot;, &quot;depth&quot;])
 ```
 
 ## Best Practices
@@ -670,10 +720,41 @@ tree.write(outfile="tree.nhx", features=["habitat", "temperature", "depth"])
 6. **Vector formats for publication**: Use PDF or SVG for publication figures (scalable, editable)
 7. **Interactive testing**: Use `tree.show()` to test visualizations before rendering to file
 8. **PhyloTree for phylogenetics**: Use PhyloTree class for gene trees and evolutionary analysis
-9. **Copy method selection**: "newick" for speed, "cpickle" for full fidelity, "deepcopy" for complex objects
+9. **Copy method selection**: &quot;newick&quot; for speed, &quot;cpickle&quot; for full fidelity, &quot;deepcopy&quot; for complex objects
 10. **NCBI query caching**: Store NCBI taxonomy query results to avoid repeated database access
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>7</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

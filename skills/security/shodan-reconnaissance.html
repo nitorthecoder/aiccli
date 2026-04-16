@@ -4,63 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>shodan-reconnaissance - AICCLI</title>
-  <meta name="description" content="shodan-reconnaissance - Claude Code skill for AICCLI">
+  <meta name="description" content="This skill should be used when the user asks to "search for exposed devices on the internet," "perform Shodan reconnaissance," "find vulnerable services using S">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / shodan-reconnaissance</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>shodan-reconnaissance</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">security</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / security / shodan-reconnaissance
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>shodan-reconnaissance</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">security</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">This skill should be used when the user asks to "search for exposed devices on the internet," "perform Shodan reconnaissance," "find vulnerable services using Shodan," "scan IP ranges with Shodan," or "discover IoT devices and open ports." It provides comprehensive guidance for using Shodan's search engine, CLI, and API for penetration testing reconnaissance.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/shodan-reconnaissance</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/shodan-reconnaissance</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/shodan-reconnaissance</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: Shodan Reconnaissance and Pentesting
-description: This skill should be used when the user asks to "search for exposed devices on the internet," "perform Shodan reconnaissance," "find vulnerable services using Shodan," "scan IP ranges with Shodan," or "discover IoT devices and open ports." It provides comprehensive guidance for using Shodan's search engine, CLI, and API for penetration testing reconnaissance.
+description: This skill should be used when the user asks to &quot;search for exposed devices on the internet,&quot; &quot;perform Shodan reconnaissance,&quot; &quot;find vulnerable services using Shodan,&quot; &quot;scan IP ranges with Shodan,&quot; or &quot;discover IoT devices and open ports.&quot; It provides comprehensive guidance for using Shodan&#039;s search engine, CLI, and API for penetration testing reconnaissance.
 metadata:
   author: zebbern
-  version: "1.1"
+  version: &quot;1.1&quot;
 ---
 
 # Shodan Reconnaissance and Pentesting
@@ -170,7 +220,7 @@ shodan search --fields ip_str,port,os smb
 shodan search product:mongodb
 
 # Search with multiple filters
-shodan search product:nginx country:US city:"New York"
+shodan search product:nginx country:US city:&quot;New York&quot;
 ```
 
 #### Count Results
@@ -186,13 +236,13 @@ shodan count openssh 7
 #### Download Results
 ```bash
 # Download 1000 results (default)
-shodan download results.json.gz "apache country:US"
+shodan download results.json.gz &quot;apache country:US&quot;
 
 # Download specific number of results
-shodan download --limit 5000 results.json.gz "nginx"
+shodan download --limit 5000 results.json.gz &quot;nginx&quot;
 
 # Download all available results
-shodan download --limit -1 all_results.json.gz "query"
+shodan download --limit -1 all_results.json.gz &quot;query&quot;
 ```
 
 #### Parse Downloaded Data
@@ -221,8 +271,8 @@ asn:AS15169                 # Autonomous System Number
 #### Geographic Filters
 ```
 country:US                  # Two-letter country code
-country:"United States"     # Full country name
-city:"San Francisco"        # City name
+country:&quot;United States&quot;     # Full country name
+city:&quot;San Francisco&quot;        # City name
 state:CA                    # State/region
 postal:94102                # Postal/ZIP code
 geo:37.7,-122.4             # Lat/long coordinates
@@ -230,17 +280,17 @@ geo:37.7,-122.4             # Lat/long coordinates
 
 #### Organization Filters
 ```
-org:"Google"                # Organization name
-isp:"Comcast"               # ISP name
+org:&quot;Google&quot;                # Organization name
+isp:&quot;Comcast&quot;               # ISP name
 ```
 
 #### Service/Product Filters
 ```
 product:nginx               # Software product
 version:1.14.0              # Software version
-os:"Windows Server 2019"    # Operating system
-http.title:"Dashboard"      # HTTP page title
-http.html:"login"           # HTML content
+os:&quot;Windows Server 2019&quot;    # Operating system
+http.title:&quot;Dashboard&quot;      # HTTP page title
+http.html:&quot;login&quot;           # HTML content
 http.status:200             # HTTP status code
 ssl.cert.subject.cn:*.example.com  # SSL certificate
 ssl:true                    # Has SSL enabled
@@ -320,33 +370,33 @@ shodan stats --facets country,org -O stats.csv apache
 #### Direct API Calls
 ```bash
 # Get API info
-curl -s "https://api.shodan.io/api-info?key=YOUR_KEY" | jq
+curl -s &quot;https://api.shodan.io/api-info?key=YOUR_KEY&quot; | jq
 
 # Host lookup
-curl -s "https://api.shodan.io/shodan/host/1.1.1.1?key=YOUR_KEY" | jq
+curl -s &quot;https://api.shodan.io/shodan/host/1.1.1.1?key=YOUR_KEY&quot; | jq
 
 # Search query
-curl -s "https://api.shodan.io/shodan/host/search?key=YOUR_KEY&query=apache" | jq
+curl -s &quot;https://api.shodan.io/shodan/host/search?key=YOUR_KEY&amp;query=apache&quot; | jq
 ```
 
 #### Python Library
 ```python
 import shodan
 
-api = shodan.Shodan('YOUR_API_KEY')
+api = shodan.Shodan(&#039;YOUR_API_KEY&#039;)
 
 # Search
-results = api.search('apache')
-print(f'Results found: {results["total"]}')
-for result in results['matches']:
-    print(f'IP: {result["ip_str"]}')
+results = api.search(&#039;apache&#039;)
+print(f&#039;Results found: {results[&quot;total&quot;]}&#039;)
+for result in results[&#039;matches&#039;]:
+    print(f&#039;IP: {result[&quot;ip_str&quot;]}&#039;)
 
 # Host lookup
-host = api.host('1.1.1.1')
-print(f'IP: {host["ip_str"]}')
-print(f'Organization: {host.get("org", "n/a")}')
-for item in host['data']:
-    print(f'Port: {item["port"]}')
+host = api.host(&#039;1.1.1.1&#039;)
+print(f&#039;IP: {host[&quot;ip_str&quot;]}&#039;)
+print(f&#039;Organization: {host.get(&quot;org&quot;, &quot;n/a&quot;)}&#039;)
+for item in host[&#039;data&#039;]:
+    print(f&#039;Port: {item[&quot;port&quot;]}&#039;)
 ```
 
 ## Quick Reference
@@ -377,14 +427,14 @@ for item in host['data']:
 | MongoDB databases | `product:mongodb` |
 | Redis servers | `product:redis` |
 | Elasticsearch | `product:elastic port:9200` |
-| Default passwords | `"default password"` |
+| Default passwords | `&quot;default password&quot;` |
 | Vulnerable RDP | `port:3389 vuln:CVE-2019-0708` |
 | Industrial systems | `port:502 modbus` |
 | Cisco devices | `product:cisco` |
 | Open VNC | `port:5900 authentication disabled` |
 | Exposed FTP | `port:21 anonymous` |
 | WordPress sites | `http.component:wordpress` |
-| Printers | `"HP-ChaiSOE" port:80` |
+| Printers | `&quot;HP-ChaiSOE&quot; port:80` |
 | Cameras (RTSP) | `port:554 has_screenshot:true` |
 | Jenkins servers | `X-Jenkins port:8080` |
 | Docker APIs | `port:2375 product:docker` |
@@ -393,12 +443,12 @@ for item in host['data']:
 
 | Scenario | Query |
 |---------|-------|
-| Target org recon | `org:"Company Name"` |
+| Target org recon | `org:&quot;Company Name&quot;` |
 | Domain enumeration | `hostname:example.com` |
 | Network range scan | `net:192.168.0.0/24` |
 | SSL cert search | `ssl.cert.subject.cn:*.target.com` |
 | Vulnerable servers | `vuln:CVE-2021-44228 country:US` |
-| Exposed admin panels | `http.title:"admin" port:443` |
+| Exposed admin panels | `http.title:&quot;admin&quot; port:443` |
 | Database exposure | `port:3306,5432,27017,6379` |
 
 ### Credit System
@@ -437,13 +487,13 @@ for item in host['data']:
 ### Example 1: Organization Reconnaissance
 ```bash
 # Find all hosts belonging to target organization
-shodan search 'org:"Target Company"'
+shodan search &#039;org:&quot;Target Company&quot;&#039;
 
 # Get statistics on their infrastructure
-shodan stats --facets port,product,country 'org:"Target Company"'
+shodan stats --facets port,product,country &#039;org:&quot;Target Company&quot;&#039;
 
 # Download detailed data
-shodan download target_data.json.gz 'org:"Target Company"'
+shodan download target_data.json.gz &#039;org:&quot;Target Company&quot;&#039;
 
 # Parse for specific info
 shodan parse --fields ip_str,port,product target_data.json.gz
@@ -452,40 +502,40 @@ shodan parse --fields ip_str,port,product target_data.json.gz
 ### Example 2: Vulnerable Service Discovery
 ```bash
 # Find hosts vulnerable to BlueKeep (RDP CVE)
-shodan search 'vuln:CVE-2019-0708 country:US'
+shodan search &#039;vuln:CVE-2019-0708 country:US&#039;
 
 # Find exposed Elasticsearch with no auth
-shodan search 'product:elastic port:9200 -authentication'
+shodan search &#039;product:elastic port:9200 -authentication&#039;
 
 # Find Log4j vulnerable systems
-shodan search 'vuln:CVE-2021-44228'
+shodan search &#039;vuln:CVE-2021-44228&#039;
 ```
 
 ### Example 3: IoT Device Discovery
 ```bash
 # Find exposed webcams
-shodan search 'webcam has_screenshot:true country:US'
+shodan search &#039;webcam has_screenshot:true country:US&#039;
 
 # Find industrial control systems
-shodan search 'port:502 product:modbus'
+shodan search &#039;port:502 product:modbus&#039;
 
 # Find exposed printers
-shodan search '"HP-ChaiSOE" port:80'
+shodan search &#039;&quot;HP-ChaiSOE&quot; port:80&#039;
 
 # Find smart home devices
-shodan search 'product:nest'
+shodan search &#039;product:nest&#039;
 ```
 
 ### Example 4: SSL/TLS Certificate Analysis
 ```bash
 # Find hosts with specific SSL cert
-shodan search 'ssl.cert.subject.cn:*.example.com'
+shodan search &#039;ssl.cert.subject.cn:*.example.com&#039;
 
 # Find expired certificates
-shodan search 'ssl.cert.expired:true org:"Company"'
+shodan search &#039;ssl.cert.expired:true org:&quot;Company&quot;&#039;
 
 # Find self-signed certificates
-shodan search 'ssl.cert.issuer.cn:self-signed'
+shodan search &#039;ssl.cert.issuer.cn:self-signed&#039;
 ```
 
 ### Example 5: Python Automation Script
@@ -494,58 +544,58 @@ shodan search 'ssl.cert.issuer.cn:self-signed'
 import shodan
 import json
 
-API_KEY = 'YOUR_API_KEY'
+API_KEY = &#039;YOUR_API_KEY&#039;
 api = shodan.Shodan(API_KEY)
 
 def recon_organization(org_name):
-    """Perform reconnaissance on an organization"""
+    &quot;&quot;&quot;Perform reconnaissance on an organization&quot;&quot;&quot;
     try:
         # Search for organization
-        query = f'org:"{org_name}"'
+        query = f&#039;org:&quot;{org_name}&quot;&#039;
         results = api.search(query)
         
-        print(f"[*] Found {results['total']} hosts for {org_name}")
+        print(f&quot;[*] Found {results[&#039;total&#039;]} hosts for {org_name}&quot;)
         
         # Collect unique IPs and ports
         hosts = {}
-        for result in results['matches']:
-            ip = result['ip_str']
-            port = result['port']
-            product = result.get('product', 'unknown')
+        for result in results[&#039;matches&#039;]:
+            ip = result[&#039;ip_str&#039;]
+            port = result[&#039;port&#039;]
+            product = result.get(&#039;product&#039;, &#039;unknown&#039;)
             
             if ip not in hosts:
                 hosts[ip] = []
-            hosts[ip].append({'port': port, 'product': product})
+            hosts[ip].append({&#039;port&#039;: port, &#039;product&#039;: product})
         
         # Output findings
         for ip, services in hosts.items():
-            print(f"\n[+] {ip}")
+            print(f&quot;\n[+] {ip}&quot;)
             for svc in services:
-                print(f"    - {svc['port']}/tcp ({svc['product']})")
+                print(f&quot;    - {svc[&#039;port&#039;]}/tcp ({svc[&#039;product&#039;]})&quot;)
         
         return hosts
         
     except shodan.APIError as e:
-        print(f"Error: {e}")
+        print(f&quot;Error: {e}&quot;)
         return None
 
-if __name__ == '__main__':
-    recon_organization("Target Company")
+if __name__ == &#039;__main__&#039;:
+    recon_organization(&quot;Target Company&quot;)
 ```
 
 ### Example 6: Network Range Assessment
 ```bash
 # Scan a /24 network range
-shodan search 'net:192.168.1.0/24'
+shodan search &#039;net:192.168.1.0/24&#039;
 
 # Get port distribution
-shodan stats --facets port 'net:192.168.1.0/24'
+shodan stats --facets port &#039;net:192.168.1.0/24&#039;
 
 # Find specific vulnerabilities in range
-shodan search 'net:192.168.1.0/24 vuln:CVE-2021-44228'
+shodan search &#039;net:192.168.1.0/24 vuln:CVE-2021-44228&#039;
 
 # Export all data for range
-shodan download network_scan.json.gz 'net:192.168.1.0/24'
+shodan download network_scan.json.gz &#039;net:192.168.1.0/24&#039;
 ```
 
 ## Troubleshooting
@@ -556,10 +606,41 @@ shodan download network_scan.json.gz 'net:192.168.1.0/24'
 | Query Credits Exhausted | Monthly credits consumed | Use credit-free queries (no filters), wait for reset, or upgrade |
 | Host Recently Crawled | Cannot re-scan IP within 24h | Use `shodan host IP` for existing data, or wait 24 hours |
 | Rate Limit Exceeded | &gt;1 request/second | Add `time.sleep(1)` between API requests |
-| Empty Search Results | Too specific or syntax error | Use quotes for phrases: `'org:"Company Name"'`; broaden criteria |
-| Downloaded File Won't Parse | Corrupted or wrong format | Verify with `gunzip -t file.gz`, re-download with `--limit` |
-</pre></div>
+| Empty Search Results | Too specific or syntax error | Use quotes for phrases: `&#039;org:&quot;Company Name&quot;&#039;`; broaden criteria |
+| Downloaded File Won&#039;t Parse | Corrupted or wrong format | Verify with `gunzip -t file.gz`, re-download with `--limit` |
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>23</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

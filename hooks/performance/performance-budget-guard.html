@@ -4,85 +4,166 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>performance-budget-guard - AICCLI</title>
-  <meta name="description" content="performance-budget-guard - Claude Code hook for AICCLI">
+  <meta name="description" content="Monitor bundle size and Core Web Vitals metrics during development, blocking deployments that exceed performance budgets with detailed reports. Automatically an">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../hook.html">Hook</a> / performance-budget-guard</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>performance-budget-guard</h1>
-      <div class="meta">
-        <span class="meta-item">Hook</span>
-        <span class="meta-item">performance</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">hooks</a> / performance / performance-budget-guard
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🪝</div>
+      <div class="title">
+        <h1>performance-budget-guard</h1>
+        <div class="meta">
+          <span class="badge type">Hook</span>
+          <span class="badge">performance</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>{
-  "description": "Monitor bundle size and Core Web Vitals metrics during development, blocking deployments that exceed performance budgets with detailed reports. Automatically analyzes Next.js build output, checks bundle sizes against predefined budgets, and provides optimization recommendations. Hook triggers on PostToolUse for build-related operations and file changes that could affect performance.",
-  "hooks": {
-    "PostToolUse": [
+    </div>
+
+    <p class="desc">Monitor bundle size and Core Web Vitals metrics during development, blocking deployments that exceed performance budgets with detailed reports. Automatically analyzes Next.js build output, checks bundle sizes against predefined budgets, and provides optimization recommendations. Hook triggers on PostToolUse for build-related operations and file changes that could affect performance.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install hooks/performance-budget-guard</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install hooks/performance-budget-guard</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install hooks/performance-budget-guard</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>{
+  &quot;description&quot;: &quot;Monitor bundle size and Core Web Vitals metrics during development, blocking deployments that exceed performance budgets with detailed reports. Automatically analyzes Next.js build output, checks bundle sizes against predefined budgets, and provides optimization recommendations. Hook triggers on PostToolUse for build-related operations and file changes that could affect performance.&quot;,
+  &quot;hooks&quot;: {
+    &quot;PostToolUse&quot;: [
       {
-        "matcher": "Bash",
-        "hooks": [
+        &quot;matcher&quot;: &quot;Bash&quot;,
+        &quot;hooks&quot;: [
           {
-            "type": "command",
-            "command": "bash -c 'input=$(cat); COMMAND=$(echo \"$input\" | jq -r \".tool_input.command // empty\"); SUCCESS=$(echo \"$input\" | jq -r \".tool_response.success // false\"); if [ \"$SUCCESS\" = \"true\" ] && [[ \"$COMMAND\" =~ (npm\\ run\\ build|next\\ build|vercel\\ build|yarn\\ build) ]]; then echo \"📊 Performance Budget Guard: Analyzing build output...\"; if [ -d \".next\" ]; then BUNDLE_SIZE=$(find .next/static/chunks -name \"*.js\" -exec stat -f%z {} + 2&gt;/dev/null | awk \"{total += \\$1} END {print total}\"); BUNDLE_SIZE_KB=$((BUNDLE_SIZE / 1024)); BUDGET_LIMIT=350; echo \"📦 Total bundle size: ${BUNDLE_SIZE_KB}KB\"; if [ $BUNDLE_SIZE_KB -gt $BUDGET_LIMIT ]; then echo \"🚨 PERFORMANCE BUDGET EXCEEDED!\"; echo \"Current bundle size: ${BUNDLE_SIZE_KB}KB\"; echo \"Budget limit: ${BUDGET_LIMIT}KB\"; echo \"Overage: $((BUNDLE_SIZE_KB - BUDGET_LIMIT))KB\"; echo \"\" &gt;&2; echo \"⚠️ Performance budget exceeded by $((BUNDLE_SIZE_KB - BUDGET_LIMIT))KB!\" &gt;&2; echo \"\" &gt;&2; echo \"📋 Bundle Analysis:\" &gt;&2; find .next/static/chunks -name \"*.js\" -exec ls -lah {} + 2&gt;/dev/null | sort -k5 -hr | head -5 &gt;&2; echo \"\" &gt;&2; echo \"💡 Optimization recommendations:\" &gt;&2; echo \"• Use dynamic imports for large components\" &gt;&2; echo \"• Implement code splitting with next/dynamic\" &gt;&2; echo \"• Check for duplicate dependencies\" &gt;&2; echo \"• Optimize third-party libraries\" &gt;&2; echo \"• Run: npm run analyze for detailed bundle analysis\" &gt;&2; exit 2; else echo \"✅ Bundle size within budget: ${BUNDLE_SIZE_KB}KB / ${BUDGET_LIMIT}KB\"; REMAINING=$((BUDGET_LIMIT - BUNDLE_SIZE_KB)); echo \"🎯 Remaining budget: ${REMAINING}KB\"; if [ $REMAINING -lt 50 ]; then echo \"⚠️ Warning: Less than 50KB remaining in performance budget\"; fi; fi; else echo \"❌ No .next build directory found. Run build first.\"; fi; else echo \"ℹ️ Performance check skipped (not a build command or failed build)\"; fi'",
-            "timeout": 30
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;bash -c &#039;input=$(cat); COMMAND=$(echo \&quot;$input\&quot; | jq -r \&quot;.tool_input.command // empty\&quot;); SUCCESS=$(echo \&quot;$input\&quot; | jq -r \&quot;.tool_response.success // false\&quot;); if [ \&quot;$SUCCESS\&quot; = \&quot;true\&quot; ] &amp;&amp; [[ \&quot;$COMMAND\&quot; =~ (npm\\ run\\ build|next\\ build|vercel\\ build|yarn\\ build) ]]; then echo \&quot;📊 Performance Budget Guard: Analyzing build output...\&quot;; if [ -d \&quot;.next\&quot; ]; then BUNDLE_SIZE=$(find .next/static/chunks -name \&quot;*.js\&quot; -exec stat -f%z {} + 2&gt;/dev/null | awk \&quot;{total += \\$1} END {print total}\&quot;); BUNDLE_SIZE_KB=$((BUNDLE_SIZE / 1024)); BUDGET_LIMIT=350; echo \&quot;📦 Total bundle size: ${BUNDLE_SIZE_KB}KB\&quot;; if [ $BUNDLE_SIZE_KB -gt $BUDGET_LIMIT ]; then echo \&quot;🚨 PERFORMANCE BUDGET EXCEEDED!\&quot;; echo \&quot;Current bundle size: ${BUNDLE_SIZE_KB}KB\&quot;; echo \&quot;Budget limit: ${BUDGET_LIMIT}KB\&quot;; echo \&quot;Overage: $((BUNDLE_SIZE_KB - BUDGET_LIMIT))KB\&quot;; echo \&quot;\&quot; &gt;&amp;2; echo \&quot;⚠️ Performance budget exceeded by $((BUNDLE_SIZE_KB - BUDGET_LIMIT))KB!\&quot; &gt;&amp;2; echo \&quot;\&quot; &gt;&amp;2; echo \&quot;📋 Bundle Analysis:\&quot; &gt;&amp;2; find .next/static/chunks -name \&quot;*.js\&quot; -exec ls -lah {} + 2&gt;/dev/null | sort -k5 -hr | head -5 &gt;&amp;2; echo \&quot;\&quot; &gt;&amp;2; echo \&quot;💡 Optimization recommendations:\&quot; &gt;&amp;2; echo \&quot;• Use dynamic imports for large components\&quot; &gt;&amp;2; echo \&quot;• Implement code splitting with next/dynamic\&quot; &gt;&amp;2; echo \&quot;• Check for duplicate dependencies\&quot; &gt;&amp;2; echo \&quot;• Optimize third-party libraries\&quot; &gt;&amp;2; echo \&quot;• Run: npm run analyze for detailed bundle analysis\&quot; &gt;&amp;2; exit 2; else echo \&quot;✅ Bundle size within budget: ${BUNDLE_SIZE_KB}KB / ${BUDGET_LIMIT}KB\&quot;; REMAINING=$((BUDGET_LIMIT - BUNDLE_SIZE_KB)); echo \&quot;🎯 Remaining budget: ${REMAINING}KB\&quot;; if [ $REMAINING -lt 50 ]; then echo \&quot;⚠️ Warning: Less than 50KB remaining in performance budget\&quot;; fi; fi; else echo \&quot;❌ No .next build directory found. Run build first.\&quot;; fi; else echo \&quot;ℹ️ Performance check skipped (not a build command or failed build)\&quot;; fi&#039;&quot;,
+            &quot;timeout&quot;: 30
           }
         ]
       },
       {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
+        &quot;matcher&quot;: &quot;Write|Edit|MultiEdit&quot;,
+        &quot;hooks&quot;: [
           {
-            "type": "command",
-            "command": "bash -c 'input=$(cat); FILE_PATH=$(echo \"$input\" | jq -r \".tool_input.file_path // empty\"); SUCCESS=$(echo \"$input\" | jq -r \".tool_response.success // false\"); if [ \"$SUCCESS\" = \"true\" ] && [[ \"$FILE_PATH\" =~ \\.(js|jsx|ts|tsx)$ ]] && [[ ! \"$FILE_PATH\" =~ node_modules ]]; then echo \"🔍 Performance Guard: Checking code changes in $FILE_PATH...\"; if [ -f \"$FILE_PATH\" ]; then FILE_SIZE=$(stat -f%z \"$FILE_PATH\" 2&gt;/dev/null || stat -c%s \"$FILE_PATH\" 2&gt;/dev/null); FILE_SIZE_KB=$((FILE_SIZE / 1024)); if [ $FILE_SIZE_KB -gt 100 ]; then echo \"⚠️ Large file detected: ${FILE_SIZE_KB}KB\"; echo \"💡 Consider splitting large components or lazy loading\"; fi; IMPORTS_COUNT=$(grep -c \"^import\" \"$FILE_PATH\" 2&gt;/dev/null || echo \"0\"); if [ $IMPORTS_COUNT -gt 15 ]; then echo \"📦 Many imports detected: $IMPORTS_COUNT imports\"; echo \"💡 Consider consolidating imports or tree-shaking unused code\"; fi; if grep -q \"import.*\\*.*from\" \"$FILE_PATH\" 2&gt;/dev/null; then echo \"🚨 Wildcard import detected in $FILE_PATH\"; echo \"💡 Use specific imports instead of wildcard imports for better tree-shaking\"; fi; if grep -q \"moment\" \"$FILE_PATH\" 2&gt;/dev/null; then echo \"📅 Moment.js usage detected\"; echo \"💡 Consider using date-fns or native Date for smaller bundle size\"; fi; if grep -q \"lodash\" \"$FILE_PATH\" 2&gt;/dev/null && ! grep -q \"lodash/\" \"$FILE_PATH\" 2&gt;/dev/null; then echo \"🔧 Full Lodash import detected\"; echo \"💡 Use specific Lodash functions: import debounce from \\\"lodash/debounce\\\"\"; fi; echo \"✅ Performance check completed for $FILE_PATH\"; else echo \"❌ File $FILE_PATH not found\"; fi; else echo \"ℹ️ Performance check skipped (not a JavaScript/TypeScript file or failed operation)\"; fi'",
-            "timeout": 15
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;bash -c &#039;input=$(cat); FILE_PATH=$(echo \&quot;$input\&quot; | jq -r \&quot;.tool_input.file_path // empty\&quot;); SUCCESS=$(echo \&quot;$input\&quot; | jq -r \&quot;.tool_response.success // false\&quot;); if [ \&quot;$SUCCESS\&quot; = \&quot;true\&quot; ] &amp;&amp; [[ \&quot;$FILE_PATH\&quot; =~ \\.(js|jsx|ts|tsx)$ ]] &amp;&amp; [[ ! \&quot;$FILE_PATH\&quot; =~ node_modules ]]; then echo \&quot;🔍 Performance Guard: Checking code changes in $FILE_PATH...\&quot;; if [ -f \&quot;$FILE_PATH\&quot; ]; then FILE_SIZE=$(stat -f%z \&quot;$FILE_PATH\&quot; 2&gt;/dev/null || stat -c%s \&quot;$FILE_PATH\&quot; 2&gt;/dev/null); FILE_SIZE_KB=$((FILE_SIZE / 1024)); if [ $FILE_SIZE_KB -gt 100 ]; then echo \&quot;⚠️ Large file detected: ${FILE_SIZE_KB}KB\&quot;; echo \&quot;💡 Consider splitting large components or lazy loading\&quot;; fi; IMPORTS_COUNT=$(grep -c \&quot;^import\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null || echo \&quot;0\&quot;); if [ $IMPORTS_COUNT -gt 15 ]; then echo \&quot;📦 Many imports detected: $IMPORTS_COUNT imports\&quot;; echo \&quot;💡 Consider consolidating imports or tree-shaking unused code\&quot;; fi; if grep -q \&quot;import.*\\*.*from\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;🚨 Wildcard import detected in $FILE_PATH\&quot;; echo \&quot;💡 Use specific imports instead of wildcard imports for better tree-shaking\&quot;; fi; if grep -q \&quot;moment\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;📅 Moment.js usage detected\&quot;; echo \&quot;💡 Consider using date-fns or native Date for smaller bundle size\&quot;; fi; if grep -q \&quot;lodash\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null &amp;&amp; ! grep -q \&quot;lodash/\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;🔧 Full Lodash import detected\&quot;; echo \&quot;💡 Use specific Lodash functions: import debounce from \\\&quot;lodash/debounce\\\&quot;\&quot;; fi; echo \&quot;✅ Performance check completed for $FILE_PATH\&quot;; else echo \&quot;❌ File $FILE_PATH not found\&quot;; fi; else echo \&quot;ℹ️ Performance check skipped (not a JavaScript/TypeScript file or failed operation)\&quot;; fi&#039;&quot;,
+            &quot;timeout&quot;: 15
           }
         ]
       }
     ]
   }
-}</pre></div>
+}</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>264</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

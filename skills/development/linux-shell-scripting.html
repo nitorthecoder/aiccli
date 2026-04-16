@@ -4,63 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>linux-shell-scripting - AICCLI</title>
-  <meta name="description" content="linux-shell-scripting - Claude Code skill for AICCLI">
+  <meta name="description" content="This skill should be used when the user asks to "create bash scripts", "automate Linux tasks", "monitor system resources", "backup files", "manage users", or "w">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / linux-shell-scripting</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>linux-shell-scripting</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / linux-shell-scripting
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>linux-shell-scripting</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">This skill should be used when the user asks to "create bash scripts", "automate Linux tasks", "monitor system resources", "backup files", "manage users", or "write production shell scripts". It provides ready-to-use shell script templates for system administration.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/linux-shell-scripting</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/linux-shell-scripting</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/linux-shell-scripting</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: Linux Production Shell Scripts
-description: This skill should be used when the user asks to "create bash scripts", "automate Linux tasks", "monitor system resources", "backup files", "manage users", or "write production shell scripts". It provides ready-to-use shell script templates for system administration.
+description: This skill should be used when the user asks to &quot;create bash scripts&quot;, &quot;automate Linux tasks&quot;, &quot;monitor system resources&quot;, &quot;backup files&quot;, &quot;manage users&quot;, or &quot;write production shell scripts&quot;. It provides ready-to-use shell script templates for system administration.
 metadata:
   author: zebbern
-  version: "1.1"
+  version: &quot;1.1&quot;
 ---
 
 # Linux Production Shell Scripts
@@ -95,52 +145,52 @@ Provide production-ready shell script templates for common Linux system administ
 **Basic Directory Backup**
 ```bash
 #!/bin/bash
-backup_dir="/path/to/backup"
-source_dir="/path/to/source"
+backup_dir=&quot;/path/to/backup&quot;
+source_dir=&quot;/path/to/source&quot;
 
 # Create a timestamped backup of the source directory
-tar -czf "$backup_dir/backup_$(date +%Y%m%d_%H%M%S).tar.gz" "$source_dir"
-echo "Backup completed: backup_$(date +%Y%m%d_%H%M%S).tar.gz"
+tar -czf &quot;$backup_dir/backup_$(date +%Y%m%d_%H%M%S).tar.gz&quot; &quot;$source_dir&quot;
+echo &quot;Backup completed: backup_$(date +%Y%m%d_%H%M%S).tar.gz&quot;
 ```
 
 **Remote Server Backup**
 ```bash
 #!/bin/bash
-source_dir="/path/to/source"
-remote_server="user@remoteserver:/path/to/backup"
+source_dir=&quot;/path/to/source&quot;
+remote_server=&quot;user@remoteserver:/path/to/backup&quot;
 
 # Backup files/directories to a remote server using rsync
-rsync -avz --progress "$source_dir" "$remote_server"
-echo "Files backed up to remote server."
+rsync -avz --progress &quot;$source_dir&quot; &quot;$remote_server&quot;
+echo &quot;Files backed up to remote server.&quot;
 ```
 
 **Backup Rotation Script**
 ```bash
 #!/bin/bash
-backup_dir="/path/to/backups"
+backup_dir=&quot;/path/to/backups&quot;
 max_backups=5
 
 # Rotate backups by deleting the oldest if more than max_backups
-while [ $(ls -1 "$backup_dir" | wc -l) -gt "$max_backups" ]; do
-    oldest_backup=$(ls -1t "$backup_dir" | tail -n 1)
-    rm -r "$backup_dir/$oldest_backup"
-    echo "Removed old backup: $oldest_backup"
+while [ $(ls -1 &quot;$backup_dir&quot; | wc -l) -gt &quot;$max_backups&quot; ]; do
+    oldest_backup=$(ls -1t &quot;$backup_dir&quot; | tail -n 1)
+    rm -r &quot;$backup_dir/$oldest_backup&quot;
+    echo &quot;Removed old backup: $oldest_backup&quot;
 done
-echo "Backup rotation completed."
+echo &quot;Backup rotation completed.&quot;
 ```
 
 **Database Backup Script**
 ```bash
 #!/bin/bash
-database_name="your_database"
-db_user="username"
-db_pass="password"
-output_file="database_backup_$(date +%Y%m%d).sql"
+database_name=&quot;your_database&quot;
+db_user=&quot;username&quot;
+db_pass=&quot;password&quot;
+output_file=&quot;database_backup_$(date +%Y%m%d).sql&quot;
 
 # Perform database backup using mysqldump
-mysqldump -u "$db_user" -p"$db_pass" "$database_name" &gt; "$output_file"
-gzip "$output_file"
-echo "Database backup created: $output_file.gz"
+mysqldump -u &quot;$db_user&quot; -p&quot;$db_pass&quot; &quot;$database_name&quot; &gt; &quot;$output_file&quot;
+gzip &quot;$output_file&quot;
+echo &quot;Database backup created: $output_file.gz&quot;
 ```
 
 ### Phase 2: System Monitoring Scripts
@@ -151,12 +201,12 @@ echo "Database backup created: $output_file.gz"
 threshold=90
 
 # Monitor CPU usage and trigger alert if threshold exceeded
-cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | cut -d. -f1)
+cpu_usage=$(top -bn1 | grep &quot;Cpu(s)&quot; | awk &#039;{print $2}&#039; | cut -d. -f1)
 
-if [ "$cpu_usage" -gt "$threshold" ]; then
-    echo "ALERT: High CPU usage detected: $cpu_usage%"
+if [ &quot;$cpu_usage&quot; -gt &quot;$threshold&quot; ]; then
+    echo &quot;ALERT: High CPU usage detected: $cpu_usage%&quot;
     # Add notification logic (email, slack, etc.)
-    # mail -s "CPU Alert" admin@example.com &lt;&lt;&lt; "CPU usage: $cpu_usage%"
+    # mail -s &quot;CPU Alert&quot; admin@example.com &lt;&lt;&lt; &quot;CPU usage: $cpu_usage%&quot;
 fi
 ```
 
@@ -164,13 +214,13 @@ fi
 ```bash
 #!/bin/bash
 threshold=90
-partition="/dev/sda1"
+partition=&quot;/dev/sda1&quot;
 
 # Monitor disk usage and trigger alert if threshold exceeded
-disk_usage=$(df -h | grep "$partition" | awk '{print $5}' | cut -d% -f1)
+disk_usage=$(df -h | grep &quot;$partition&quot; | awk &#039;{print $5}&#039; | cut -d% -f1)
 
-if [ "$disk_usage" -gt "$threshold" ]; then
-    echo "ALERT: High disk usage detected: $disk_usage%"
+if [ &quot;$disk_usage&quot; -gt &quot;$threshold&quot; ]; then
+    echo &quot;ALERT: High disk usage detected: $disk_usage%&quot;
     # Add alert/notification logic here
 fi
 ```
@@ -178,42 +228,42 @@ fi
 **CPU Usage Logger**
 ```bash
 #!/bin/bash
-output_file="cpu_usage_log.txt"
+output_file=&quot;cpu_usage_log.txt&quot;
 
 # Log current CPU usage to a file with timestamp
-timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-cpu_usage=$(top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | cut -d. -f1)
-echo "$timestamp - CPU Usage: $cpu_usage%" &gt;&gt; "$output_file"
-echo "CPU usage logged."
+timestamp=$(date &#039;+%Y-%m-%d %H:%M:%S&#039;)
+cpu_usage=$(top -bn1 | grep &#039;Cpu(s)&#039; | awk &#039;{print $2}&#039; | cut -d. -f1)
+echo &quot;$timestamp - CPU Usage: $cpu_usage%&quot; &gt;&gt; &quot;$output_file&quot;
+echo &quot;CPU usage logged.&quot;
 ```
 
 **System Health Check**
 ```bash
 #!/bin/bash
-output_file="system_health_check.txt"
+output_file=&quot;system_health_check.txt&quot;
 
 # Perform system health check and save results to a file
 {
-    echo "System Health Check - $(date)"
-    echo "================================"
-    echo ""
-    echo "Uptime:"
+    echo &quot;System Health Check - $(date)&quot;
+    echo &quot;================================&quot;
+    echo &quot;&quot;
+    echo &quot;Uptime:&quot;
     uptime
-    echo ""
-    echo "Load Average:"
+    echo &quot;&quot;
+    echo &quot;Load Average:&quot;
     cat /proc/loadavg
-    echo ""
-    echo "Memory Usage:"
+    echo &quot;&quot;
+    echo &quot;Memory Usage:&quot;
     free -h
-    echo ""
-    echo "Disk Usage:"
+    echo &quot;&quot;
+    echo &quot;Disk Usage:&quot;
     df -h
-    echo ""
-    echo "Top Processes:"
+    echo &quot;&quot;
+    echo &quot;Top Processes:&quot;
     ps aux --sort=-%cpu | head -10
-} &gt; "$output_file"
+} &gt; &quot;$output_file&quot;
 
-echo "System health check saved to $output_file"
+echo &quot;System health check saved to $output_file&quot;
 ```
 
 ### Phase 3: User Management Scripts
@@ -221,37 +271,37 @@ echo "System health check saved to $output_file"
 **User Account Creation**
 ```bash
 #!/bin/bash
-username="newuser"
+username=&quot;newuser&quot;
 
 # Check if user exists; if not, create new user
-if id "$username" &&gt;/dev/null; then
-    echo "User $username already exists."
+if id &quot;$username&quot; &amp;&gt;/dev/null; then
+    echo &quot;User $username already exists.&quot;
 else
-    useradd -m -s /bin/bash "$username"
-    echo "User $username created."
+    useradd -m -s /bin/bash &quot;$username&quot;
+    echo &quot;User $username created.&quot;
     
     # Set password interactively
-    passwd "$username"
+    passwd &quot;$username&quot;
 fi
 ```
 
 **Password Expiry Checker**
 ```bash
 #!/bin/bash
-output_file="password_expiry_report.txt"
+output_file=&quot;password_expiry_report.txt&quot;
 
 # Check password expiry for users with bash shell
-echo "Password Expiry Report - $(date)" &gt; "$output_file"
-echo "=================================" &gt;&gt; "$output_file"
+echo &quot;Password Expiry Report - $(date)&quot; &gt; &quot;$output_file&quot;
+echo &quot;=================================&quot; &gt;&gt; &quot;$output_file&quot;
 
-IFS=$'\n'
-for user in $(grep "/bin/bash" /etc/passwd | cut -d: -f1); do
-    password_expires=$(chage -l "$user" 2&gt;/dev/null | grep "Password expires" | awk -F: '{print $2}')
-    echo "User: $user - Password Expires: $password_expires" &gt;&gt; "$output_file"
+IFS=$&#039;\n&#039;
+for user in $(grep &quot;/bin/bash&quot; /etc/passwd | cut -d: -f1); do
+    password_expires=$(chage -l &quot;$user&quot; 2&gt;/dev/null | grep &quot;Password expires&quot; | awk -F: &#039;{print $2}&#039;)
+    echo &quot;User: $user - Password Expires: $password_expires&quot; &gt;&gt; &quot;$output_file&quot;
 done
 unset IFS
 
-echo "Password expiry report saved to $output_file"
+echo &quot;Password expiry report saved to $output_file&quot;
 ```
 
 ### Phase 4: Security Scripts
@@ -262,30 +312,30 @@ echo "Password expiry report saved to $output_file"
 length=${1:-16}
 
 # Generate a random password
-password=$(openssl rand -base64 48 | tr -dc 'a-zA-Z0-9!@#$%^&*' | head -c"$length")
-echo "Generated password: $password"
+password=$(openssl rand -base64 48 | tr -dc &#039;a-zA-Z0-9!@#$%^&amp;*&#039; | head -c&quot;$length&quot;)
+echo &quot;Generated password: $password&quot;
 ```
 
 **File Encryption Script**
 ```bash
 #!/bin/bash
-file="$1"
-action="${2:-encrypt}"
+file=&quot;$1&quot;
+action=&quot;${2:-encrypt}&quot;
 
-if [ -z "$file" ]; then
-    echo "Usage: $0 &lt;file&gt; [encrypt|decrypt]"
+if [ -z &quot;$file&quot; ]; then
+    echo &quot;Usage: $0 &lt;file&gt; [encrypt|decrypt]&quot;
     exit 1
 fi
 
-if [ "$action" == "encrypt" ]; then
+if [ &quot;$action&quot; == &quot;encrypt&quot; ]; then
     # Encrypt file using AES-256-CBC
-    openssl enc -aes-256-cbc -salt -pbkdf2 -in "$file" -out "$file.enc"
-    echo "File encrypted: $file.enc"
-elif [ "$action" == "decrypt" ]; then
+    openssl enc -aes-256-cbc -salt -pbkdf2 -in &quot;$file&quot; -out &quot;$file.enc&quot;
+    echo &quot;File encrypted: $file.enc&quot;
+elif [ &quot;$action&quot; == &quot;decrypt&quot; ]; then
     # Decrypt file
-    output_file="${file%.enc}"
-    openssl enc -aes-256-cbc -d -pbkdf2 -in "$file" -out "$output_file"
-    echo "File decrypted: $output_file"
+    output_file=&quot;${file%.enc}&quot;
+    openssl enc -aes-256-cbc -d -pbkdf2 -in &quot;$file&quot; -out &quot;$output_file&quot;
+    echo &quot;File decrypted: $output_file&quot;
 fi
 ```
 
@@ -294,31 +344,31 @@ fi
 **Error Log Extractor**
 ```bash
 #!/bin/bash
-logfile="${1:-/var/log/syslog}"
-output_file="error_log_$(date +%Y%m%d).txt"
+logfile=&quot;${1:-/var/log/syslog}&quot;
+output_file=&quot;error_log_$(date +%Y%m%d).txt&quot;
 
-# Extract lines with "ERROR" from the log file
-grep -i "error\|fail\|critical" "$logfile" &gt; "$output_file"
-echo "Error log created: $output_file"
-echo "Total errors found: $(wc -l &lt; "$output_file")"
+# Extract lines with &quot;ERROR&quot; from the log file
+grep -i &quot;error\|fail\|critical&quot; &quot;$logfile&quot; &gt; &quot;$output_file&quot;
+echo &quot;Error log created: $output_file&quot;
+echo &quot;Total errors found: $(wc -l &lt; &quot;$output_file&quot;)&quot;
 ```
 
 **Web Server Log Analyzer**
 ```bash
 #!/bin/bash
-log_file="${1:-/var/log/apache2/access.log}"
+log_file=&quot;${1:-/var/log/apache2/access.log}&quot;
 
-echo "Web Server Log Analysis"
-echo "========================"
-echo ""
-echo "Top 10 IP Addresses:"
-awk '{print $1}' "$log_file" | sort | uniq -c | sort -rn | head -10
-echo ""
-echo "Top 10 Requested URLs:"
-awk '{print $7}' "$log_file" | sort | uniq -c | sort -rn | head -10
-echo ""
-echo "HTTP Status Code Distribution:"
-awk '{print $9}' "$log_file" | sort | uniq -c | sort -rn
+echo &quot;Web Server Log Analysis&quot;
+echo &quot;========================&quot;
+echo &quot;&quot;
+echo &quot;Top 10 IP Addresses:&quot;
+awk &#039;{print $1}&#039; &quot;$log_file&quot; | sort | uniq -c | sort -rn | head -10
+echo &quot;&quot;
+echo &quot;Top 10 Requested URLs:&quot;
+awk &#039;{print $7}&#039; &quot;$log_file&quot; | sort | uniq -c | sort -rn | head -10
+echo &quot;&quot;
+echo &quot;HTTP Status Code Distribution:&quot;
+awk &#039;{print $9}&#039; &quot;$log_file&quot; | sort | uniq -c | sort -rn
 ```
 
 ### Phase 6: Network Scripts
@@ -326,16 +376,16 @@ awk '{print $9}' "$log_file" | sort | uniq -c | sort -rn
 **Network Connectivity Checker**
 ```bash
 #!/bin/bash
-hosts=("8.8.8.8" "1.1.1.1" "google.com")
+hosts=(&quot;8.8.8.8&quot; &quot;1.1.1.1&quot; &quot;google.com&quot;)
 
-echo "Network Connectivity Check"
-echo "=========================="
+echo &quot;Network Connectivity Check&quot;
+echo &quot;==========================&quot;
 
-for host in "${hosts[@]}"; do
-    if ping -c 1 -W 2 "$host" &&gt;/dev/null; then
-        echo "[UP] $host is reachable"
+for host in &quot;${hosts[@]}&quot;; do
+    if ping -c 1 -W 2 &quot;$host&quot; &amp;&gt;/dev/null; then
+        echo &quot;[UP] $host is reachable&quot;
     else
-        echo "[DOWN] $host is unreachable"
+        echo &quot;[DOWN] $host is unreachable&quot;
     fi
 done
 ```
@@ -343,16 +393,16 @@ done
 **Website Uptime Checker**
 ```bash
 #!/bin/bash
-websites=("https://google.com" "https://github.com")
-log_file="uptime_log.txt"
+websites=(&quot;https://google.com&quot; &quot;https://github.com&quot;)
+log_file=&quot;uptime_log.txt&quot;
 
-echo "Website Uptime Check - $(date)" &gt;&gt; "$log_file"
+echo &quot;Website Uptime Check - $(date)&quot; &gt;&gt; &quot;$log_file&quot;
 
-for website in "${websites[@]}"; do
-    if curl --output /dev/null --silent --head --fail --max-time 10 "$website"; then
-        echo "[UP] $website is accessible" | tee -a "$log_file"
+for website in &quot;${websites[@]}&quot;; do
+    if curl --output /dev/null --silent --head --fail --max-time 10 &quot;$website&quot;; then
+        echo &quot;[UP] $website is accessible&quot; | tee -a &quot;$log_file&quot;
     else
-        echo "[DOWN] $website is inaccessible" | tee -a "$log_file"
+        echo &quot;[DOWN] $website is inaccessible&quot; | tee -a &quot;$log_file&quot;
     fi
 done
 ```
@@ -360,14 +410,14 @@ done
 **Network Interface Info**
 ```bash
 #!/bin/bash
-interface="${1:-eth0}"
+interface=&quot;${1:-eth0}&quot;
 
-echo "Network Interface Information: $interface"
-echo "========================================="
-ip addr show "$interface" 2&gt;/dev/null || ifconfig "$interface" 2&gt;/dev/null
-echo ""
-echo "Routing Table:"
-ip route | grep "$interface"
+echo &quot;Network Interface Information: $interface&quot;
+echo &quot;=========================================&quot;
+ip addr show &quot;$interface&quot; 2&gt;/dev/null || ifconfig &quot;$interface&quot; 2&gt;/dev/null
+echo &quot;&quot;
+echo &quot;Routing Table:&quot;
+ip route | grep &quot;$interface&quot;
 ```
 
 ### Phase 7: Automation Scripts
@@ -375,47 +425,47 @@ ip route | grep "$interface"
 **Automated Package Installation**
 ```bash
 #!/bin/bash
-packages=("vim" "htop" "curl" "wget" "git")
+packages=(&quot;vim&quot; &quot;htop&quot; &quot;curl&quot; &quot;wget&quot; &quot;git&quot;)
 
-echo "Installing packages..."
+echo &quot;Installing packages...&quot;
 
-for package in "${packages[@]}"; do
-    if dpkg -l | grep -q "^ii  $package"; then
-        echo "[SKIP] $package is already installed"
+for package in &quot;${packages[@]}&quot;; do
+    if dpkg -l | grep -q &quot;^ii  $package&quot;; then
+        echo &quot;[SKIP] $package is already installed&quot;
     else
-        sudo apt-get install -y "$package"
-        echo "[INSTALLED] $package"
+        sudo apt-get install -y &quot;$package&quot;
+        echo &quot;[INSTALLED] $package&quot;
     fi
 done
 
-echo "Package installation completed."
+echo &quot;Package installation completed.&quot;
 ```
 
 **Task Scheduler (Cron Setup)**
 ```bash
 #!/bin/bash
-scheduled_task="/path/to/your_script.sh"
-schedule_time="0 2 * * *"  # Run at 2 AM daily
+scheduled_task=&quot;/path/to/your_script.sh&quot;
+schedule_time=&quot;0 2 * * *&quot;  # Run at 2 AM daily
 
 # Add task to crontab
-(crontab -l 2&gt;/dev/null; echo "$schedule_time $scheduled_task") | crontab -
-echo "Task scheduled: $schedule_time $scheduled_task"
+(crontab -l 2&gt;/dev/null; echo &quot;$schedule_time $scheduled_task&quot;) | crontab -
+echo &quot;Task scheduled: $schedule_time $scheduled_task&quot;
 ```
 
 **Service Restart Script**
 ```bash
 #!/bin/bash
-service_name="${1:-apache2}"
+service_name=&quot;${1:-apache2}&quot;
 
 # Restart a specified service
-if systemctl is-active --quiet "$service_name"; then
-    echo "Restarting $service_name..."
-    sudo systemctl restart "$service_name"
-    echo "Service $service_name restarted."
+if systemctl is-active --quiet &quot;$service_name&quot;; then
+    echo &quot;Restarting $service_name...&quot;
+    sudo systemctl restart &quot;$service_name&quot;
+    echo &quot;Service $service_name restarted.&quot;
 else
-    echo "Service $service_name is not running. Starting..."
-    sudo systemctl start "$service_name"
-    echo "Service $service_name started."
+    echo &quot;Service $service_name is not running. Starting...&quot;
+    sudo systemctl start &quot;$service_name&quot;
+    echo &quot;Service $service_name started.&quot;
 fi
 ```
 
@@ -424,40 +474,40 @@ fi
 **Directory Synchronization**
 ```bash
 #!/bin/bash
-source_dir="/path/to/source"
-destination_dir="/path/to/destination"
+source_dir=&quot;/path/to/source&quot;
+destination_dir=&quot;/path/to/destination&quot;
 
 # Synchronize directories using rsync
-rsync -avz --delete "$source_dir/" "$destination_dir/"
-echo "Directories synchronized successfully."
+rsync -avz --delete &quot;$source_dir/&quot; &quot;$destination_dir/&quot;
+echo &quot;Directories synchronized successfully.&quot;
 ```
 
 **Data Cleanup Script**
 ```bash
 #!/bin/bash
-directory="${1:-/tmp}"
-days="${2:-7}"
+directory=&quot;${1:-/tmp}&quot;
+days=&quot;${2:-7}&quot;
 
-echo "Cleaning files older than $days days in $directory"
+echo &quot;Cleaning files older than $days days in $directory&quot;
 
 # Remove files older than specified days
-find "$directory" -type f -mtime +"$days" -exec rm -v {} \;
-echo "Cleanup completed."
+find &quot;$directory&quot; -type f -mtime +&quot;$days&quot; -exec rm -v {} \;
+echo &quot;Cleanup completed.&quot;
 ```
 
 **Folder Size Checker**
 ```bash
 #!/bin/bash
-folder_path="${1:-.}"
+folder_path=&quot;${1:-.}&quot;
 
-echo "Folder Size Analysis: $folder_path"
-echo "===================================="
+echo &quot;Folder Size Analysis: $folder_path&quot;
+echo &quot;====================================&quot;
 
 # Display sizes of subdirectories sorted by size
-du -sh "$folder_path"/* 2&gt;/dev/null | sort -rh | head -20
-echo ""
-echo "Total size:"
-du -sh "$folder_path"
+du -sh &quot;$folder_path&quot;/* 2&gt;/dev/null | sort -rh | head -20
+echo &quot;&quot;
+echo &quot;Total size:&quot;
+du -sh &quot;$folder_path&quot;
 ```
 
 ### Phase 9: System Information
@@ -465,33 +515,33 @@ du -sh "$folder_path"
 **System Info Collector**
 ```bash
 #!/bin/bash
-output_file="system_info_$(hostname)_$(date +%Y%m%d).txt"
+output_file=&quot;system_info_$(hostname)_$(date +%Y%m%d).txt&quot;
 
 {
-    echo "System Information Report"
-    echo "Generated: $(date)"
-    echo "========================="
-    echo ""
-    echo "Hostname: $(hostname)"
-    echo "OS: $(uname -a)"
-    echo ""
-    echo "CPU Info:"
-    lscpu | grep -E "Model name|CPU\(s\)|Thread"
-    echo ""
-    echo "Memory:"
+    echo &quot;System Information Report&quot;
+    echo &quot;Generated: $(date)&quot;
+    echo &quot;=========================&quot;
+    echo &quot;&quot;
+    echo &quot;Hostname: $(hostname)&quot;
+    echo &quot;OS: $(uname -a)&quot;
+    echo &quot;&quot;
+    echo &quot;CPU Info:&quot;
+    lscpu | grep -E &quot;Model name|CPU\(s\)|Thread&quot;
+    echo &quot;&quot;
+    echo &quot;Memory:&quot;
     free -h
-    echo ""
-    echo "Disk Space:"
+    echo &quot;&quot;
+    echo &quot;Disk Space:&quot;
     df -h
-    echo ""
-    echo "Network Interfaces:"
+    echo &quot;&quot;
+    echo &quot;Network Interfaces:&quot;
     ip -br addr
-    echo ""
-    echo "Logged In Users:"
+    echo &quot;&quot;
+    echo &quot;Logged In Users:&quot;
     who
-} &gt; "$output_file"
+} &gt; &quot;$output_file&quot;
 
-echo "System info saved to $output_file"
+echo &quot;System info saved to $output_file&quot;
 ```
 
 ### Phase 10: Git and Development
@@ -499,32 +549,32 @@ echo "System info saved to $output_file"
 **Git Repository Updater**
 ```bash
 #!/bin/bash
-git_repos=("/path/to/repo1" "/path/to/repo2")
+git_repos=(&quot;/path/to/repo1&quot; &quot;/path/to/repo2&quot;)
 
-for repo in "${git_repos[@]}"; do
-    if [ -d "$repo/.git" ]; then
-        echo "Updating repository: $repo"
-        cd "$repo"
+for repo in &quot;${git_repos[@]}&quot;; do
+    if [ -d &quot;$repo/.git&quot; ]; then
+        echo &quot;Updating repository: $repo&quot;
+        cd &quot;$repo&quot;
         git fetch --all
-        git pull origin "$(git branch --show-current)"
-        echo "Updated: $repo"
+        git pull origin &quot;$(git branch --show-current)&quot;
+        echo &quot;Updated: $repo&quot;
     else
-        echo "Not a git repository: $repo"
+        echo &quot;Not a git repository: $repo&quot;
     fi
 done
 
-echo "All repositories updated."
+echo &quot;All repositories updated.&quot;
 ```
 
 **Remote Script Execution**
 ```bash
 #!/bin/bash
-remote_server="${1:-user@remote-server}"
-remote_script="${2:-/path/to/remote/script.sh}"
+remote_server=&quot;${1:-user@remote-server}&quot;
+remote_script=&quot;${2:-/path/to/remote/script.sh}&quot;
 
 # Execute a script on a remote server via SSH
-ssh "$remote_server" "bash -s" &lt; "$remote_script"
-echo "Remote script executed on $remote_server"
+ssh &quot;$remote_server&quot; &quot;bash -s&quot; &lt; &quot;$remote_script&quot;
+echo &quot;Remote script executed on $remote_server&quot;
 ```
 
 ## Quick Reference
@@ -537,7 +587,7 @@ echo "Remote script executed on $remote_server"
 | `$(date +%Y%m%d)` | Date formatting |
 | `$((expression))` | Arithmetic |
 | `${var:-default}` | Default value |
-| `"$@"` | All arguments |
+| `&quot;$@&quot;` | All arguments |
 
 ### Useful Commands
 
@@ -545,7 +595,7 @@ echo "Remote script executed on $remote_server"
 |---------|---------|
 | `chmod +x script.sh` | Make executable |
 | `./script.sh` | Run script |
-| `nohup ./script.sh &` | Run in background |
+| `nohup ./script.sh &amp;` | Run in background |
 | `crontab -e` | Edit cron jobs |
 | `source script.sh` | Run in current shell |
 
@@ -559,8 +609,39 @@ Minute(0-59) Hour(0-23) Day(1-31) Month(1-12) Weekday(0-7, 0/7=Sun)
 - Quote variables to handle spaces properly
 - Many scripts require root/sudo privileges
 - Use `bash -x script.sh` for debugging
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>93</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

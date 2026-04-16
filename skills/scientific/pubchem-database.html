@@ -4,67 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>pubchem-database - AICCLI</title>
-  <meta name="description" content="pubchem-database - Claude Code skill for AICCLI">
+  <meta name="description" content=""Query PubChem via PUG-REST API/PubChemPy (110M+ compounds). Search by name/CID/SMILES, retrieve properties, similarity/substructure searches, bioactivity, for ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / pubchem-database</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>pubchem-database</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / pubchem-database
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>pubchem-database</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Query PubChem via PUG-REST API/PubChemPy (110M+ compounds). Search by name/CID/SMILES, retrieve properties, similarity/substructure searches, bioactivity, for cheminformatics."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pubchem-database</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/pubchem-database</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/pubchem-database</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: pubchem-database
-description: "Query PubChem via PUG-REST API/PubChemPy (110M+ compounds). Search by name/CID/SMILES, retrieve properties, similarity/substructure searches, bioactivity, for cheminformatics."
+description: &quot;Query PubChem via PUG-REST API/PubChemPy (110M+ compounds). Search by name/CID/SMILES, retrieve properties, similarity/substructure searches, bioactivity, for cheminformatics.&quot;
 ---
 
 # PubChem Database
 
 ## Overview
 
-PubChem is the world's largest freely available chemical database with 110M+ compounds and 270M+ bioactivities. Query chemical structures by name, CID, or SMILES, retrieve molecular properties, perform similarity and substructure searches, access bioactivity data using PUG-REST API and PubChemPy.
+PubChem is the world&#039;s largest freely available chemical database with 110M+ compounds and 270M+ bioactivities. Query chemical structures by name, CID, or SMILES, retrieve molecular properties, perform similarity and substructure searches, access bioactivity data using PUG-REST API and PubChemPy.
 
 ## When to Use This Skill
 
@@ -86,7 +136,7 @@ Search for compounds using multiple identifier types:
 **By Chemical Name**:
 ```python
 import pubchempy as pcp
-compounds = pcp.get_compounds('aspirin', 'name')
+compounds = pcp.get_compounds(&#039;aspirin&#039;, &#039;name&#039;)
 compound = compounds[0]
 ```
 
@@ -97,17 +147,17 @@ compound = pcp.Compound.from_cid(2244)  # Aspirin
 
 **By SMILES**:
 ```python
-compound = pcp.get_compounds('CC(=O)OC1=CC=CC=C1C(=O)O', 'smiles')[0]
+compound = pcp.get_compounds(&#039;CC(=O)OC1=CC=CC=C1C(=O)O&#039;, &#039;smiles&#039;)[0]
 ```
 
 **By InChI**:
 ```python
-compound = pcp.get_compounds('InChI=1S/C9H8O4/...', 'inchi')[0]
+compound = pcp.get_compounds(&#039;InChI=1S/C9H8O4/...&#039;, &#039;inchi&#039;)[0]
 ```
 
 **By Molecular Formula**:
 ```python
-compounds = pcp.get_compounds('C9H8O4', 'formula')
+compounds = pcp.get_compounds(&#039;C9H8O4&#039;, &#039;formula&#039;)
 # Returns all compounds matching this formula
 ```
 
@@ -120,7 +170,7 @@ Retrieve molecular properties for compounds using either high-level or low-level
 import pubchempy as pcp
 
 # Get compound object with all properties
-compound = pcp.get_compounds('caffeine', 'name')[0]
+compound = pcp.get_compounds(&#039;caffeine&#039;, &#039;name&#039;)[0]
 
 # Access individual properties
 molecular_formula = compound.molecular_formula
@@ -136,9 +186,9 @@ tpsa = compound.tpsa    # Topological polar surface area
 ```python
 # Request only specific properties
 properties = pcp.get_properties(
-    ['MolecularFormula', 'MolecularWeight', 'CanonicalSMILES', 'XLogP'],
-    'aspirin',
-    'name'
+    [&#039;MolecularFormula&#039;, &#039;MolecularWeight&#039;, &#039;CanonicalSMILES&#039;, &#039;XLogP&#039;],
+    &#039;aspirin&#039;,
+    &#039;name&#039;
 )
 # Returns list of dictionaries
 ```
@@ -147,14 +197,14 @@ properties = pcp.get_properties(
 ```python
 import pandas as pd
 
-compound_names = ['aspirin', 'ibuprofen', 'paracetamol']
+compound_names = [&#039;aspirin&#039;, &#039;ibuprofen&#039;, &#039;paracetamol&#039;]
 all_properties = []
 
 for name in compound_names:
     props = pcp.get_properties(
-        ['MolecularFormula', 'MolecularWeight', 'XLogP'],
+        [&#039;MolecularFormula&#039;, &#039;MolecularWeight&#039;, &#039;XLogP&#039;],
         name,
-        'name'
+        &#039;name&#039;
     )
     all_properties.extend(props)
 
@@ -171,22 +221,22 @@ Find structurally similar compounds using Tanimoto similarity:
 import pubchempy as pcp
 
 # Start with a query compound
-query_compound = pcp.get_compounds('gefitinib', 'name')[0]
+query_compound = pcp.get_compounds(&#039;gefitinib&#039;, &#039;name&#039;)[0]
 query_smiles = query_compound.canonical_smiles
 
 # Perform similarity search
 similar_compounds = pcp.get_compounds(
     query_smiles,
-    'smiles',
-    searchtype='similarity',
+    &#039;smiles&#039;,
+    searchtype=&#039;similarity&#039;,
     Threshold=85,  # Similarity threshold (0-100)
     MaxRecords=50
 )
 
 # Process results
 for compound in similar_compounds[:10]:
-    print(f"CID {compound.cid}: {compound.iupac_name}")
-    print(f"  MW: {compound.molecular_weight}")
+    print(f&quot;CID {compound.cid}: {compound.iupac_name}&quot;)
+    print(f&quot;  MW: {compound.molecular_weight}&quot;)
 ```
 
 **Note**: Similarity searches are asynchronous for large queries and may take 15-30 seconds to complete. PubChemPy handles the asynchronous pattern automatically.
@@ -199,16 +249,16 @@ Find compounds containing a specific structural motif:
 import pubchempy as pcp
 
 # Search for compounds containing pyridine ring
-pyridine_smiles = 'c1ccncc1'
+pyridine_smiles = &#039;c1ccncc1&#039;
 
 matches = pcp.get_compounds(
     pyridine_smiles,
-    'smiles',
-    searchtype='substructure',
+    &#039;smiles&#039;,
+    searchtype=&#039;substructure&#039;,
     MaxRecords=100
 )
 
-print(f"Found {len(matches)} compounds containing pyridine")
+print(f&quot;Found {len(matches)} compounds containing pyridine&quot;)
 ```
 
 **Common Substructures**:
@@ -224,7 +274,7 @@ Convert between different chemical structure formats:
 ```python
 import pubchempy as pcp
 
-compound = pcp.get_compounds('aspirin', 'name')[0]
+compound = pcp.get_compounds(&#039;aspirin&#039;, &#039;name&#039;)[0]
 
 # Convert to different formats
 smiles = compound.canonical_smiles
@@ -233,8 +283,8 @@ inchikey = compound.inchikey
 cid = compound.cid
 
 # Download structure files
-pcp.download('SDF', 'aspirin', 'name', 'aspirin.sdf', overwrite=True)
-pcp.download('JSON', '2244', 'cid', 'aspirin.json', overwrite=True)
+pcp.download(&#039;SDF&#039;, &#039;aspirin&#039;, &#039;name&#039;, &#039;aspirin.sdf&#039;, overwrite=True)
+pcp.download(&#039;JSON&#039;, &#039;2244&#039;, &#039;cid&#039;, &#039;aspirin.json&#039;, overwrite=True)
 ```
 
 ### 6. Structure Visualization
@@ -245,16 +295,16 @@ Generate 2D structure images:
 import pubchempy as pcp
 
 # Download compound structure as PNG
-pcp.download('PNG', 'caffeine', 'name', 'caffeine.png', overwrite=True)
+pcp.download(&#039;PNG&#039;, &#039;caffeine&#039;, &#039;name&#039;, &#039;caffeine.png&#039;, overwrite=True)
 
 # Using direct URL (via requests)
 import requests
 
 cid = 2244  # Aspirin
-url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/PNG?image_size=large"
+url = f&quot;https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/PNG?image_size=large&quot;
 response = requests.get(url)
 
-with open('structure.png', 'wb') as f:
+with open(&#039;structure.png&#039;, &#039;wb&#039;) as f:
     f.write(response.content)
 ```
 
@@ -265,15 +315,15 @@ Get all known names and synonyms for a compound:
 ```python
 import pubchempy as pcp
 
-synonyms_data = pcp.get_synonyms('aspirin', 'name')
+synonyms_data = pcp.get_synonyms(&#039;aspirin&#039;, &#039;name&#039;)
 
 if synonyms_data:
-    cid = synonyms_data[0]['CID']
-    synonyms = synonyms_data[0]['Synonym']
+    cid = synonyms_data[0][&#039;CID&#039;]
+    synonyms = synonyms_data[0][&#039;Synonym&#039;]
 
-    print(f"CID {cid} has {len(synonyms)} synonyms:")
+    print(f&quot;CID {cid} has {len(synonyms)} synonyms:&quot;)
     for syn in synonyms[:10]:  # First 10
-        print(f"  - {syn}")
+        print(f&quot;  - {syn}&quot;)
 ```
 
 ### 8. Bioactivity Data Access
@@ -286,15 +336,15 @@ import json
 
 # Get bioassay summary for a compound
 cid = 2244  # Aspirin
-url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/assaysummary/JSON"
+url = f&quot;https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/assaysummary/JSON&quot;
 
 response = requests.get(url)
 if response.status_code == 200:
     data = response.json()
     # Process bioassay information
-    table = data.get('Table', {})
-    rows = table.get('Row', [])
-    print(f"Found {len(rows)} bioassay records")
+    table = data.get(&#039;Table&#039;, {})
+    rows = table.get(&#039;Row&#039;, [])
+    print(f&quot;Found {len(rows)} bioassay records&quot;)
 ```
 
 **For more complex bioactivity queries**, use the `scripts/bioactivity_query.py` helper script which provides:
@@ -311,7 +361,7 @@ Access detailed compound information through PUG-View:
 import requests
 
 cid = 2244
-url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/{cid}/JSON"
+url = f&quot;https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/{cid}/JSON&quot;
 
 response = requests.get(url)
 if response.status_code == 200:
@@ -329,7 +379,7 @@ if response.status_code == 200:
 **Get Specific Section**:
 ```python
 # Get only drug information
-url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/{cid}/JSON?heading=Drug and Medication Information"
+url = f&quot;https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/{cid}/JSON?heading=Drug and Medication Information&quot;
 ```
 
 ## Installation Requirements
@@ -377,10 +427,10 @@ Provides utility functions for searching and retrieving compound information:
 from scripts.compound_search import search_by_name, get_compound_properties
 
 # Search for a compound
-compounds = search_by_name('ibuprofen')
+compounds = search_by_name(&#039;ibuprofen&#039;)
 
 # Get specific properties
-props = get_compound_properties('aspirin', 'name', ['MolecularWeight', 'XLogP'])
+props = get_compound_properties(&#039;aspirin&#039;, &#039;name&#039;, [&#039;MolecularWeight&#039;, &#039;XLogP&#039;])
 ```
 
 ### scripts/bioactivity_query.py
@@ -404,8 +454,8 @@ from scripts.bioactivity_query import get_bioassay_summary, summarize_bioactivit
 
 # Get bioactivity summary
 summary = summarize_bioactivities(2244)  # Aspirin
-print(f"Total assays: {summary['total_assays']}")
-print(f"Active: {summary['active']}, Inactive: {summary['inactive']}")
+print(f&quot;Total assays: {summary[&#039;total_assays&#039;]}&quot;)
+print(f&quot;Active: {summary[&#039;active&#039;]}, Inactive: {summary[&#039;inactive&#039;]}&quot;)
 ```
 
 ## API Rate Limits and Best Practices
@@ -430,15 +480,15 @@ print(f"Active: {summary['active']}, Inactive: {summary['inactive']}")
 from pubchempy import BadRequestError, NotFoundError, TimeoutError
 
 try:
-    compound = pcp.get_compounds('query', 'name')[0]
+    compound = pcp.get_compounds(&#039;query&#039;, &#039;name&#039;)[0]
 except NotFoundError:
-    print("Compound not found")
+    print(&quot;Compound not found&quot;)
 except BadRequestError:
-    print("Invalid request format")
+    print(&quot;Invalid request format&quot;)
 except TimeoutError:
-    print("Request timed out - try reducing scope")
+    print(&quot;Request timed out - try reducing scope&quot;)
 except IndexError:
-    print("No results returned")
+    print(&quot;No results returned&quot;)
 ```
 
 ## Common Workflows
@@ -451,42 +501,42 @@ Convert between different chemical identifiers:
 import pubchempy as pcp
 
 # Start with any identifier type
-compound = pcp.get_compounds('caffeine', 'name')[0]
+compound = pcp.get_compounds(&#039;caffeine&#039;, &#039;name&#039;)[0]
 
 # Extract all identifier formats
 identifiers = {
-    'CID': compound.cid,
-    'Name': compound.iupac_name,
-    'SMILES': compound.canonical_smiles,
-    'InChI': compound.inchi,
-    'InChIKey': compound.inchikey,
-    'Formula': compound.molecular_formula
+    &#039;CID&#039;: compound.cid,
+    &#039;Name&#039;: compound.iupac_name,
+    &#039;SMILES&#039;: compound.canonical_smiles,
+    &#039;InChI&#039;: compound.inchi,
+    &#039;InChIKey&#039;: compound.inchikey,
+    &#039;Formula&#039;: compound.molecular_formula
 }
 ```
 
 ### Workflow 2: Drug-Like Property Screening
 
-Screen compounds using Lipinski's Rule of Five:
+Screen compounds using Lipinski&#039;s Rule of Five:
 
 ```python
 import pubchempy as pcp
 
 def check_drug_likeness(compound_name):
-    compound = pcp.get_compounds(compound_name, 'name')[0]
+    compound = pcp.get_compounds(compound_name, &#039;name&#039;)[0]
 
-    # Lipinski's Rule of Five
+    # Lipinski&#039;s Rule of Five
     rules = {
-        'MW &lt;= 500': compound.molecular_weight &lt;= 500,
-        'LogP &lt;= 5': compound.xlogp &lt;= 5 if compound.xlogp else None,
-        'HBD &lt;= 5': compound.h_bond_donor_count &lt;= 5,
-        'HBA &lt;= 10': compound.h_bond_acceptor_count &lt;= 10
+        &#039;MW &lt;= 500&#039;: compound.molecular_weight &lt;= 500,
+        &#039;LogP &lt;= 5&#039;: compound.xlogp &lt;= 5 if compound.xlogp else None,
+        &#039;HBD &lt;= 5&#039;: compound.h_bond_donor_count &lt;= 5,
+        &#039;HBA &lt;= 10&#039;: compound.h_bond_acceptor_count &lt;= 10
     }
 
     violations = sum(1 for v in rules.values() if v is False)
     return rules, violations
 
-rules, violations = check_drug_likeness('aspirin')
-print(f"Lipinski violations: {violations}")
+rules, violations = check_drug_likeness(&#039;aspirin&#039;)
+print(f&quot;Lipinski violations: {violations}&quot;)
 ```
 
 ### Workflow 3: Finding Similar Drug Candidates
@@ -497,14 +547,14 @@ Identify structurally similar compounds to a known drug:
 import pubchempy as pcp
 
 # Start with known drug
-reference_drug = pcp.get_compounds('imatinib', 'name')[0]
+reference_drug = pcp.get_compounds(&#039;imatinib&#039;, &#039;name&#039;)[0]
 reference_smiles = reference_drug.canonical_smiles
 
 # Find similar compounds
 similar = pcp.get_compounds(
     reference_smiles,
-    'smiles',
-    searchtype='similarity',
+    &#039;smiles&#039;,
+    searchtype=&#039;similarity&#039;,
     Threshold=85,
     MaxRecords=20
 )
@@ -516,7 +566,7 @@ for comp in similar:
         if comp.xlogp and -1 &lt;= comp.xlogp &lt;= 5:
             candidates.append(comp)
 
-print(f"Found {len(candidates)} drug-like candidates")
+print(f&quot;Found {len(candidates)} drug-like candidates&quot;)
 ```
 
 ### Workflow 4: Batch Compound Property Comparison
@@ -527,24 +577,24 @@ Compare properties across multiple compounds:
 import pubchempy as pcp
 import pandas as pd
 
-compound_list = ['aspirin', 'ibuprofen', 'naproxen', 'celecoxib']
+compound_list = [&#039;aspirin&#039;, &#039;ibuprofen&#039;, &#039;naproxen&#039;, &#039;celecoxib&#039;]
 
 properties_list = []
 for name in compound_list:
     try:
-        compound = pcp.get_compounds(name, 'name')[0]
+        compound = pcp.get_compounds(name, &#039;name&#039;)[0]
         properties_list.append({
-            'Name': name,
-            'CID': compound.cid,
-            'Formula': compound.molecular_formula,
-            'MW': compound.molecular_weight,
-            'LogP': compound.xlogp,
-            'TPSA': compound.tpsa,
-            'HBD': compound.h_bond_donor_count,
-            'HBA': compound.h_bond_acceptor_count
+            &#039;Name&#039;: name,
+            &#039;CID&#039;: compound.cid,
+            &#039;Formula&#039;: compound.molecular_formula,
+            &#039;MW&#039;: compound.molecular_weight,
+            &#039;LogP&#039;: compound.xlogp,
+            &#039;TPSA&#039;: compound.tpsa,
+            &#039;HBD&#039;: compound.h_bond_donor_count,
+            &#039;HBA&#039;: compound.h_bond_acceptor_count
         })
     except Exception as e:
-        print(f"Error processing {name}: {e}")
+        print(f&quot;Error processing {name}: {e}&quot;)
 
 df = pd.DataFrame(properties_list)
 print(df.to_string(index=False))
@@ -558,13 +608,13 @@ Screen for compounds containing specific pharmacophores:
 import pubchempy as pcp
 
 # Define pharmacophore (e.g., sulfonamide group)
-pharmacophore_smiles = 'S(=O)(=O)N'
+pharmacophore_smiles = &#039;S(=O)(=O)N&#039;
 
 # Search for compounds containing this substructure
 hits = pcp.get_compounds(
     pharmacophore_smiles,
-    'smiles',
-    searchtype='substructure',
+    &#039;smiles&#039;,
+    searchtype=&#039;substructure&#039;,
     MaxRecords=100
 )
 
@@ -574,7 +624,7 @@ filtered_hits = [
     if comp.molecular_weight and comp.molecular_weight &lt; 500
 ]
 
-print(f"Found {len(filtered_hits)} compounds with desired substructure")
+print(f&quot;Found {len(filtered_hits)} compounds with desired substructure&quot;)
 ```
 
 ## Reference Documentation
@@ -623,8 +673,39 @@ For detailed API documentation, including complete property lists, URL patterns,
 - PUG-REST Tutorial: https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest-tutorial
 - PubChemPy Documentation: https://pubchempy.readthedocs.io/
 - PubChemPy GitHub: https://github.com/mcs07/PubChemPy
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>6</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

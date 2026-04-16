@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>fine-tuning-peft - AICCLI</title>
-  <meta name="description" content="fine-tuning-peft - Claude Code skill for AICCLI">
+  <meta name="description" content="Parameter-efficient fine-tuning for LLMs using LoRA, QLoRA, and 25+ methods. Use when fine-tuning large models (7B-70B) with limited GPU memory, when you need t">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / fine-tuning-peft</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>fine-tuning-peft</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / fine-tuning-peft
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>fine-tuning-peft</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Parameter-efficient fine-tuning for LLMs using LoRA, QLoRA, and 25+ methods. Use when fine-tuning large models (7B-70B) with limited GPU memory, when you need to train <1% of parameters with minimal accuracy loss, or for multi-adapter serving. HuggingFace's official library integrated with transformers ecosystem.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/fine-tuning-peft</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/fine-tuning-peft</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/fine-tuning-peft</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: peft-fine-tuning
-description: Parameter-efficient fine-tuning for LLMs using LoRA, QLoRA, and 25+ methods. Use when fine-tuning large models (7B-70B) with limited GPU memory, when you need to train &lt;1% of parameters with minimal accuracy loss, or for multi-adapter serving. HuggingFace's official library integrated with transformers ecosystem.
+description: Parameter-efficient fine-tuning for LLMs using LoRA, QLoRA, and 25+ methods. Use when fine-tuning large models (7B-70B) with limited GPU memory, when you need to train &lt;1% of parameters with minimal accuracy loss, or for multi-adapter serving. HuggingFace&#039;s official library integrated with transformers ecosystem.
 version: 1.0.0
 author: Orchestra Research
 license: MIT
@@ -110,8 +160,8 @@ from peft import get_peft_model, LoraConfig, TaskType
 from datasets import load_dataset
 
 # Load base model
-model_name = "meta-llama/Llama-3.1-8B"
-model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
+model_name = &quot;meta-llama/Llama-3.1-8B&quot;
+model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=&quot;auto&quot;, device_map=&quot;auto&quot;)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 tokenizer.pad_token = tokenizer.eos_token
 
@@ -121,8 +171,8 @@ lora_config = LoraConfig(
     r=16,                          # Rank (8-64, higher = more capacity)
     lora_alpha=32,                 # Scaling factor (typically 2*r)
     lora_dropout=0.05,             # Dropout for regularization
-    target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],  # Attention layers
-    bias="none"                    # Don't train biases
+    target_modules=[&quot;q_proj&quot;, &quot;v_proj&quot;, &quot;k_proj&quot;, &quot;o_proj&quot;],  # Attention layers
+    bias=&quot;none&quot;                    # Don&#039;t train biases
 )
 
 # Apply LoRA
@@ -131,39 +181,39 @@ model.print_trainable_parameters()
 # Output: trainable params: 13,631,488 || all params: 8,043,307,008 || trainable%: 0.17%
 
 # Prepare dataset
-dataset = load_dataset("databricks/databricks-dolly-15k", split="train")
+dataset = load_dataset(&quot;databricks/databricks-dolly-15k&quot;, split=&quot;train&quot;)
 
 def tokenize(example):
-    text = f"### Instruction:\n{example['instruction']}\n\n### Response:\n{example['response']}"
-    return tokenizer(text, truncation=True, max_length=512, padding="max_length")
+    text = f&quot;### Instruction:\n{example[&#039;instruction&#039;]}\n\n### Response:\n{example[&#039;response&#039;]}&quot;
+    return tokenizer(text, truncation=True, max_length=512, padding=&quot;max_length&quot;)
 
 tokenized = dataset.map(tokenize, remove_columns=dataset.column_names)
 
 # Training
 training_args = TrainingArguments(
-    output_dir="./lora-llama",
+    output_dir=&quot;./lora-llama&quot;,
     num_train_epochs=3,
     per_device_train_batch_size=4,
     gradient_accumulation_steps=4,
     learning_rate=2e-4,
     fp16=True,
     logging_steps=10,
-    save_strategy="epoch"
+    save_strategy=&quot;epoch&quot;
 )
 
 trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=tokenized,
-    data_collator=lambda data: {"input_ids": torch.stack([f["input_ids"] for f in data]),
-                                 "attention_mask": torch.stack([f["attention_mask"] for f in data]),
-                                 "labels": torch.stack([f["input_ids"] for f in data])}
+    data_collator=lambda data: {&quot;input_ids&quot;: torch.stack([f[&quot;input_ids&quot;] for f in data]),
+                                 &quot;attention_mask&quot;: torch.stack([f[&quot;attention_mask&quot;] for f in data]),
+                                 &quot;labels&quot;: torch.stack([f[&quot;input_ids&quot;] for f in data])}
 )
 
 trainer.train()
 
 # Save adapter only (6MB vs 16GB)
-model.save_pretrained("./lora-llama-adapter")
+model.save_pretrained(&quot;./lora-llama-adapter&quot;)
 ```
 
 ### QLoRA fine-tuning (memory-efficient)
@@ -175,16 +225,16 @@ from peft import get_peft_model, LoraConfig, prepare_model_for_kbit_training
 # 4-bit quantization config
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",           # NormalFloat4 (best for LLMs)
-    bnb_4bit_compute_dtype="bfloat16",   # Compute in bf16
+    bnb_4bit_quant_type=&quot;nf4&quot;,           # NormalFloat4 (best for LLMs)
+    bnb_4bit_compute_dtype=&quot;bfloat16&quot;,   # Compute in bf16
     bnb_4bit_use_double_quant=True       # Nested quantization
 )
 
 # Load quantized model
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-3.1-70B",
+    &quot;meta-llama/Llama-3.1-70B&quot;,
     quantization_config=bnb_config,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
 
 # Prepare for training (enables gradient checkpointing)
@@ -195,9 +245,9 @@ lora_config = LoraConfig(
     r=64,                              # Higher rank for 70B
     lora_alpha=128,
     lora_dropout=0.1,
-    target_modules=["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
-    bias="none",
-    task_type="CAUSAL_LM"
+    target_modules=[&quot;q_proj&quot;, &quot;v_proj&quot;, &quot;k_proj&quot;, &quot;o_proj&quot;, &quot;gate_proj&quot;, &quot;up_proj&quot;, &quot;down_proj&quot;],
+    bias=&quot;none&quot;,
+    task_type=&quot;CAUSAL_LM&quot;
 )
 
 model = get_peft_model(model, lora_config)
@@ -229,19 +279,19 @@ LoraConfig(r=16, lora_alpha=64)  # Aggressive (higher learning rate effect)
 
 ```python
 # Llama / Mistral / Qwen
-target_modules = ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+target_modules = [&quot;q_proj&quot;, &quot;v_proj&quot;, &quot;k_proj&quot;, &quot;o_proj&quot;, &quot;gate_proj&quot;, &quot;up_proj&quot;, &quot;down_proj&quot;]
 
 # GPT-2 / GPT-Neo
-target_modules = ["c_attn", "c_proj", "c_fc"]
+target_modules = [&quot;c_attn&quot;, &quot;c_proj&quot;, &quot;c_fc&quot;]
 
 # Falcon
-target_modules = ["query_key_value", "dense", "dense_h_to_4h", "dense_4h_to_h"]
+target_modules = [&quot;query_key_value&quot;, &quot;dense&quot;, &quot;dense_h_to_4h&quot;, &quot;dense_4h_to_h&quot;]
 
 # BLOOM
-target_modules = ["query_key_value", "dense", "dense_h_to_4h", "dense_4h_to_h"]
+target_modules = [&quot;query_key_value&quot;, &quot;dense&quot;, &quot;dense_h_to_4h&quot;, &quot;dense_4h_to_h&quot;]
 
 # Auto-detect all linear layers
-target_modules = "all-linear"  # PEFT 0.6.0+
+target_modules = &quot;all-linear&quot;  # PEFT 0.6.0+
 ```
 
 ## Loading and merging adapters
@@ -253,13 +303,13 @@ from peft import PeftModel, AutoPeftModelForCausalLM
 from transformers import AutoModelForCausalLM
 
 # Option 1: Load with PeftModel
-base_model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.1-8B")
-model = PeftModel.from_pretrained(base_model, "./lora-llama-adapter")
+base_model = AutoModelForCausalLM.from_pretrained(&quot;meta-llama/Llama-3.1-8B&quot;)
+model = PeftModel.from_pretrained(base_model, &quot;./lora-llama-adapter&quot;)
 
 # Option 2: Load directly (recommended)
 model = AutoPeftModelForCausalLM.from_pretrained(
-    "./lora-llama-adapter",
-    device_map="auto"
+    &quot;./lora-llama-adapter&quot;,
+    device_map=&quot;auto&quot;
 )
 ```
 
@@ -270,11 +320,11 @@ model = AutoPeftModelForCausalLM.from_pretrained(
 merged_model = model.merge_and_unload()
 
 # Save merged model
-merged_model.save_pretrained("./llama-merged")
-tokenizer.save_pretrained("./llama-merged")
+merged_model.save_pretrained(&quot;./llama-merged&quot;)
+tokenizer.save_pretrained(&quot;./llama-merged&quot;)
 
 # Push to Hub
-merged_model.push_to_hub("username/llama-finetuned")
+merged_model.push_to_hub(&quot;username/llama-finetuned&quot;)
 ```
 
 ### Multi-adapter serving
@@ -283,17 +333,17 @@ merged_model.push_to_hub("username/llama-finetuned")
 from peft import PeftModel
 
 # Load base with first adapter
-model = AutoPeftModelForCausalLM.from_pretrained("./adapter-task1")
+model = AutoPeftModelForCausalLM.from_pretrained(&quot;./adapter-task1&quot;)
 
 # Load additional adapters
-model.load_adapter("./adapter-task2", adapter_name="task2")
-model.load_adapter("./adapter-task3", adapter_name="task3")
+model.load_adapter(&quot;./adapter-task2&quot;, adapter_name=&quot;task2&quot;)
+model.load_adapter(&quot;./adapter-task3&quot;, adapter_name=&quot;task3&quot;)
 
 # Switch between adapters at runtime
-model.set_adapter("task1")  # Use task1 adapter
+model.set_adapter(&quot;task1&quot;)  # Use task1 adapter
 output1 = model.generate(**inputs)
 
-model.set_adapter("task2")  # Switch to task2
+model.set_adapter(&quot;task2&quot;)  # Switch to task2
 output2 = model.generate(**inputs)
 
 # Disable adapters (use base model)
@@ -319,8 +369,8 @@ with model.disable_adapter():
 from peft import IA3Config
 
 ia3_config = IA3Config(
-    target_modules=["q_proj", "v_proj", "k_proj", "down_proj"],
-    feedforward_modules=["down_proj"]
+    target_modules=[&quot;q_proj&quot;, &quot;v_proj&quot;, &quot;k_proj&quot;, &quot;down_proj&quot;],
+    feedforward_modules=[&quot;down_proj&quot;]
 )
 model = get_peft_model(model, ia3_config)
 # Trains only 0.01% of parameters!
@@ -332,7 +382,7 @@ model = get_peft_model(model, ia3_config)
 from peft import PrefixTuningConfig
 
 prefix_config = PrefixTuningConfig(
-    task_type="CAUSAL_LM",
+    task_type=&quot;CAUSAL_LM&quot;,
     num_virtual_tokens=20,      # Prepended tokens
     prefix_projection=True       # Use MLP projection
 )
@@ -347,11 +397,11 @@ model = get_peft_model(model, prefix_config)
 from trl import SFTTrainer, SFTConfig
 from peft import LoraConfig
 
-lora_config = LoraConfig(r=16, lora_alpha=32, target_modules="all-linear")
+lora_config = LoraConfig(r=16, lora_alpha=32, target_modules=&quot;all-linear&quot;)
 
 trainer = SFTTrainer(
     model=model,
-    args=SFTConfig(output_dir="./output", max_seq_length=512),
+    args=SFTConfig(output_dir=&quot;./output&quot;, max_seq_length=512),
     train_dataset=dataset,
     peft_config=lora_config,  # Pass LoRA config directly
 )
@@ -381,12 +431,12 @@ from vllm import LLM
 from vllm.lora.request import LoRARequest
 
 # Load base model with LoRA support
-llm = LLM(model="meta-llama/Llama-3.1-8B", enable_lora=True)
+llm = LLM(model=&quot;meta-llama/Llama-3.1-8B&quot;, enable_lora=True)
 
 # Serve with adapter
 outputs = llm.generate(
     prompts,
-    lora_request=LoRARequest("adapter1", 1, "./lora-adapter")
+    lora_request=LoRARequest(&quot;adapter1&quot;, 1, &quot;./lora-adapter&quot;)
 )
 ```
 
@@ -432,7 +482,7 @@ TrainingArguments(
 
 # Solution 3: Use QLoRA
 from transformers import BitsAndBytesConfig
-bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4")
+bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type=&quot;nf4&quot;)
 ```
 
 ### Adapter not applying
@@ -455,7 +505,7 @@ model.train()
 LoraConfig(r=32, lora_alpha=64)
 
 # Target more modules
-target_modules = "all-linear"
+target_modules = &quot;all-linear&quot;
 
 # Use more training data and epochs
 TrainingArguments(num_train_epochs=5)
@@ -486,8 +536,46 @@ TrainingArguments(learning_rate=1e-4)
 - **LoRA Paper**: arXiv:2106.09685
 - **QLoRA Paper**: arXiv:2305.14314
 - **Models**: https://huggingface.co/models?library=peft
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Fine-Tuning</span><span class="tag">PEFT</span><span class="tag">LoRA</span><span class="tag">QLoRA</span><span class="tag">Parameter-Efficient</span><span class="tag">Adapters</span><span class="tag">Low-Rank</span><span class="tag">Memory Optimization</span><span class="tag">Multi-Adapter</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>44</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

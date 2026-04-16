@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>datamol - AICCLI</title>
-  <meta name="description" content="datamol - Claude Code skill for AICCLI">
+  <meta name="description" content=""Pythonic wrapper around RDKit with simplified interface and sensible defaults. Preferred for standard drug discovery: SMILES parsing, standardization, descript">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / datamol</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>datamol</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / datamol
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>datamol</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Pythonic wrapper around RDKit with simplified interface and sensible defaults. Preferred for standard drug discovery: SMILES parsing, standardization, descriptors, fingerprints, clustering, 3D conformers, parallel processing. Returns native rdkit.Chem.Mol objects. For advanced control or custom parameters, use rdkit directly."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/datamol</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/datamol</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/datamol</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: datamol
-description: "Pythonic wrapper around RDKit with simplified interface and sensible defaults. Preferred for standard drug discovery: SMILES parsing, standardization, descriptors, fingerprints, clustering, 3D conformers, parallel processing. Returns native rdkit.Chem.Mol objects. For advanced control or custom parameters, use rdkit directly."
+description: &quot;Pythonic wrapper around RDKit with simplified interface and sensible defaults. Preferred for standard drug discovery: SMILES parsing, standardization, descriptors, fingerprints, clustering, 3D conformers, parallel processing. Returns native rdkit.Chem.Mol objects. For advanced control or custom parameters, use rdkit directly.&quot;
 ---
 
 # Datamol Cheminformatics Skill
@@ -100,16 +150,16 @@ import datamol as dm
 import datamol as dm
 
 # Single molecule
-mol = dm.to_mol("CCO")  # Ethanol
+mol = dm.to_mol(&quot;CCO&quot;)  # Ethanol
 
 # From list of SMILES
-smiles_list = ["CCO", "c1ccccc1", "CC(=O)O"]
+smiles_list = [&quot;CCO&quot;, &quot;c1ccccc1&quot;, &quot;CC(=O)O&quot;]
 mols = [dm.to_mol(smi) for smi in smiles_list]
 
 # Error handling
-mol = dm.to_mol("invalid_smiles")  # Returns None
+mol = dm.to_mol(&quot;invalid_smiles&quot;)  # Returns None
 if mol is None:
-    print("Failed to parse SMILES")
+    print(&quot;Failed to parse SMILES&quot;)
 ```
 
 **Converting molecules to SMILES**:
@@ -150,43 +200,43 @@ Refer to `references/io_module.md` for comprehensive I/O documentation.
 **Reading files**:
 ```python
 # SDF files (most common in chemistry)
-df = dm.read_sdf("compounds.sdf", mol_column='mol')
+df = dm.read_sdf(&quot;compounds.sdf&quot;, mol_column=&#039;mol&#039;)
 
 # SMILES files
-df = dm.read_smi("molecules.smi", smiles_column='smiles', mol_column='mol')
+df = dm.read_smi(&quot;molecules.smi&quot;, smiles_column=&#039;smiles&#039;, mol_column=&#039;mol&#039;)
 
 # CSV with SMILES column
-df = dm.read_csv("data.csv", smiles_column="SMILES", mol_column="mol")
+df = dm.read_csv(&quot;data.csv&quot;, smiles_column=&quot;SMILES&quot;, mol_column=&quot;mol&quot;)
 
 # Excel files
-df = dm.read_excel("compounds.xlsx", sheet_name=0, mol_column="mol")
+df = dm.read_excel(&quot;compounds.xlsx&quot;, sheet_name=0, mol_column=&quot;mol&quot;)
 
 # Universal reader (auto-detects format)
-df = dm.open_df("file.sdf")  # Works with .sdf, .csv, .xlsx, .parquet, .json
+df = dm.open_df(&quot;file.sdf&quot;)  # Works with .sdf, .csv, .xlsx, .parquet, .json
 ```
 
 **Writing files**:
 ```python
 # Save as SDF
-dm.to_sdf(mols, "output.sdf")
+dm.to_sdf(mols, &quot;output.sdf&quot;)
 # Or from DataFrame
-dm.to_sdf(df, "output.sdf", mol_column="mol")
+dm.to_sdf(df, &quot;output.sdf&quot;, mol_column=&quot;mol&quot;)
 
 # Save as SMILES file
-dm.to_smi(mols, "output.smi")
+dm.to_smi(mols, &quot;output.smi&quot;)
 
 # Excel with rendered molecule images
-dm.to_xlsx(df, "output.xlsx", mol_columns=["mol"])
+dm.to_xlsx(df, &quot;output.xlsx&quot;, mol_columns=[&quot;mol&quot;])
 ```
 
 **Remote file support** (S3, GCS, HTTP):
 ```python
 # Read from cloud storage
-df = dm.read_sdf("s3://bucket/compounds.sdf")
-df = dm.read_csv("https://example.com/data.csv")
+df = dm.read_sdf(&quot;s3://bucket/compounds.sdf&quot;)
+df = dm.read_csv(&quot;https://example.com/data.csv&quot;)
 
 # Write to cloud storage
-dm.to_sdf(mols, "s3://bucket/output.sdf")
+dm.to_sdf(mols, &quot;s3://bucket/output.sdf&quot;)
 ```
 
 ### 3. Molecular Descriptors and Properties
@@ -197,8 +247,8 @@ Refer to `references/descriptors_viz.md` for detailed descriptor documentation.
 ```python
 # Get standard descriptor set
 descriptors = dm.descriptors.compute_many_descriptors(mol)
-# Returns: {'mw': 46.07, 'logp': -0.03, 'hbd': 1, 'hba': 1,
-#           'tpsa': 20.23, 'n_aromatic_atoms': 0, ...}
+# Returns: {&#039;mw&#039;: 46.07, &#039;logp&#039;: -0.03, &#039;hbd&#039;: 1, &#039;hba&#039;: 1,
+#           &#039;tpsa&#039;: 20.23, &#039;n_aromatic_atoms&#039;: 0, ...}
 ```
 
 **Batch descriptor computation** (recommended for datasets):
@@ -225,16 +275,16 @@ n_unspec = dm.descriptors.n_stereo_centers_unspecified(mol)
 n_rigid = dm.descriptors.n_rigid_bonds(mol)
 ```
 
-**Drug-likeness filtering (Lipinski's Rule of Five)**:
+**Drug-likeness filtering (Lipinski&#039;s Rule of Five)**:
 ```python
 # Filter compounds
 def is_druglike(mol):
     desc = dm.descriptors.compute_many_descriptors(mol)
     return (
-        desc['mw'] &lt;= 500 and
-        desc['logp'] &lt;= 5 and
-        desc['hbd'] &lt;= 5 and
-        desc['hba'] &lt;= 10
+        desc[&#039;mw&#039;] &lt;= 500 and
+        desc[&#039;logp&#039;] &lt;= 5 and
+        desc[&#039;hbd&#039;] &lt;= 5 and
+        desc[&#039;hba&#039;] &lt;= 10
     )
 
 druglike_mols = [mol for mol in mols if is_druglike(mol)]
@@ -245,12 +295,12 @@ druglike_mols = [mol for mol in mols if is_druglike(mol)]
 **Generating fingerprints**:
 ```python
 # ECFP (Extended Connectivity Fingerprint, default)
-fp = dm.to_fp(mol, fp_type='ecfp', radius=2, n_bits=2048)
+fp = dm.to_fp(mol, fp_type=&#039;ecfp&#039;, radius=2, n_bits=2048)
 
 # Other fingerprint types
-fp_maccs = dm.to_fp(mol, fp_type='maccs')
-fp_topological = dm.to_fp(mol, fp_type='topological')
-fp_atompair = dm.to_fp(mol, fp_type='atompair')
+fp_maccs = dm.to_fp(mol, fp_type=&#039;maccs&#039;)
+fp_topological = dm.to_fp(mol, fp_type=&#039;topological&#039;)
+fp_atompair = dm.to_fp(mol, fp_type=&#039;atompair&#039;)
 ```
 
 **Similarity calculations**:
@@ -282,7 +332,7 @@ clusters = dm.cluster_mols(
 
 # Each cluster is a list of molecule indices
 for i, cluster in enumerate(clusters):
-    print(f"Cluster {i}: {len(cluster)} molecules")
+    print(f&quot;Cluster {i}: {len(cluster)} molecules&quot;)
     cluster_mols = [mols[idx] for idx in cluster]
 ```
 
@@ -364,7 +414,7 @@ Refer to `references/fragments_scaffolds.md` for fragmentation details.
 ```python
 # Fragment molecule
 fragments = dm.fragment.brics(mol)
-# Returns: set of fragment SMILES with attachment points like '[1*]CCN'
+# Returns: set of fragment SMILES with attachment points like &#039;[1*]CCN&#039;
 ```
 
 **RECAP fragmentation** (11 bond types):
@@ -404,7 +454,7 @@ mol_3d = dm.conformers.generate(
     n_confs=50,           # Number to generate (auto if None)
     rms_cutoff=0.5,       # Filter similar conformers (Ångströms)
     minimize_energy=True,  # Minimize with UFF force field
-    method='ETKDGv3'      # Embedding method (recommended)
+    method=&#039;ETKDGv3&#039;      # Embedding method (recommended)
 )
 
 # Access conformers
@@ -433,7 +483,7 @@ sasa_values = dm.conformers.sasa(mol_3d, n_jobs=-1)
 
 # Access SASA from conformer properties
 conf = mol_3d.GetConformer(0)
-sasa = conf.GetDoubleProp('rdkit_free_sasa')
+sasa = conf.GetDoubleProp(&#039;rdkit_free_sasa&#039;)
 ```
 
 ### 9. Visualization
@@ -451,10 +501,10 @@ dm.viz.to_image(
 )
 
 # Save to file
-dm.viz.to_image(mols, outfile="molecules.png")
+dm.viz.to_image(mols, outfile=&quot;molecules.png&quot;)
 
 # SVG for publications
-dm.viz.to_image(mols, outfile="molecules.svg", use_svg=True)
+dm.viz.to_image(mols, outfile=&quot;molecules.svg&quot;, use_svg=True)
 ```
 
 **Aligned visualization** (for SAR analysis):
@@ -498,11 +548,11 @@ Refer to `references/reactions_data.md` for reactions documentation.
 from rdkit.Chem import rdChemReactions
 
 # Define reaction from SMARTS
-rxn_smarts = '[C:1](=[O:2])[OH:3]&gt;&gt;[C:1](=[O:2])[Cl:3]'
+rxn_smarts = &#039;[C:1](=[O:2])[OH:3]&gt;&gt;[C:1](=[O:2])[Cl:3]&#039;
 rxn = rdChemReactions.ReactionFromSmarts(rxn_smarts)
 
 # Apply to molecule
-reactant = dm.to_mol("CC(=O)O")  # Acetic acid
+reactant = dm.to_mol(&quot;CC(=O)O&quot;)  # Acetic acid
 product = dm.reactions.apply_reaction(
     rxn,
     (reactant,),
@@ -523,7 +573,7 @@ for mol in reactant_mols:
         if prod is not None:
             products.append(prod)
     except Exception as e:
-        print(f"Reaction failed: {e}")
+        print(f&quot;Reaction failed: {e}&quot;)
 ```
 
 ## Parallelization
@@ -551,31 +601,31 @@ import datamol as dm
 import pandas as pd
 
 # 1. Load molecules
-df = dm.read_sdf("compounds.sdf")
+df = dm.read_sdf(&quot;compounds.sdf&quot;)
 
 # 2. Standardize
-df['mol'] = df['mol'].apply(lambda m: dm.standardize_mol(m) if m else None)
-df = df[df['mol'].notna()]  # Remove failed molecules
+df[&#039;mol&#039;] = df[&#039;mol&#039;].apply(lambda m: dm.standardize_mol(m) if m else None)
+df = df[df[&#039;mol&#039;].notna()]  # Remove failed molecules
 
 # 3. Compute descriptors
 desc_df = dm.descriptors.batch_compute_many_descriptors(
-    df['mol'].tolist(),
+    df[&#039;mol&#039;].tolist(),
     n_jobs=-1,
     progress=True
 )
 
 # 4. Filter by drug-likeness
 druglike = (
-    (desc_df['mw'] &lt;= 500) &
-    (desc_df['logp'] &lt;= 5) &
-    (desc_df['hbd'] &lt;= 5) &
-    (desc_df['hba'] &lt;= 10)
+    (desc_df[&#039;mw&#039;] &lt;= 500) &amp;
+    (desc_df[&#039;logp&#039;] &lt;= 5) &amp;
+    (desc_df[&#039;hbd&#039;] &lt;= 5) &amp;
+    (desc_df[&#039;hba&#039;] &lt;= 10)
 )
 filtered_df = df[druglike]
 
 # 5. Cluster and select diverse subset
 diverse_mols = dm.pick_diverse(
-    filtered_df['mol'].tolist(),
+    filtered_df[&#039;mol&#039;].tolist(),
     npick=100
 )
 
@@ -583,7 +633,7 @@ diverse_mols = dm.pick_diverse(
 dm.viz.to_image(
     diverse_mols,
     legends=[dm.to_smiles(m) for m in diverse_mols],
-    outfile="diverse_compounds.png",
+    outfile=&quot;diverse_compounds.png&quot;,
     n_cols=10
 )
 ```
@@ -597,22 +647,22 @@ scaffold_smiles = [dm.to_smiles(s) for s in scaffolds]
 
 # Create DataFrame with activities
 sar_df = pd.DataFrame({
-    'mol': mols,
-    'scaffold': scaffold_smiles,
-    'activity': activities  # User-provided activity data
+    &#039;mol&#039;: mols,
+    &#039;scaffold&#039;: scaffold_smiles,
+    &#039;activity&#039;: activities  # User-provided activity data
 })
 
 # Analyze each scaffold series
-for scaffold, group in sar_df.groupby('scaffold'):
+for scaffold, group in sar_df.groupby(&#039;scaffold&#039;):
     if len(group) &gt;= 3:  # Need multiple examples
-        print(f"\nScaffold: {scaffold}")
-        print(f"Count: {len(group)}")
-        print(f"Activity range: {group['activity'].min():.2f} - {group['activity'].max():.2f}")
+        print(f&quot;\nScaffold: {scaffold}&quot;)
+        print(f&quot;Count: {len(group)}&quot;)
+        print(f&quot;Activity range: {group[&#039;activity&#039;].min():.2f} - {group[&#039;activity&#039;].max():.2f}&quot;)
 
         # Visualize with activities as legends
         dm.viz.to_image(
-            group['mol'].tolist(),
-            legends=[f"Activity: {act:.2f}" for act in group['activity']],
+            group[&#039;mol&#039;].tolist(),
+            legends=[f&quot;Activity: {act:.2f}&quot; for act in group[&#039;activity&#039;]],
             align=True  # Align by common substructure
         )
 ```
@@ -642,8 +692,8 @@ top_scores = [similarities[i] for i in top_indices]
 # 5. Visualize hits
 dm.viz.to_image(
     top_hits[:20],
-    legends=[f"Sim: {score:.3f}" for score in top_scores[:20]],
-    outfile="screening_hits.png"
+    legends=[f&quot;Sim: {score:.3f}&quot; for score in top_scores[:20]],
+    outfile=&quot;screening_hits.png&quot;
 )
 ```
 
@@ -679,7 +729,7 @@ For detailed API documentation, consult these reference files:
 
 4. **Leverage fsspec** for cloud storage:
    ```python
-   df = dm.read_sdf("s3://bucket/compounds.sdf")
+   df = dm.read_sdf(&quot;s3://bucket/compounds.sdf&quot;)
    ```
 
 5. **Use appropriate fingerprints** for similarity:
@@ -706,7 +756,7 @@ def safe_to_mol(smiles):
             mol = dm.standardize_mol(mol)
         return mol
     except Exception as e:
-        print(f"Failed to process {smiles}: {e}")
+        print(f&quot;Failed to process {smiles}: {e}&quot;)
         return None
 
 # Safe batch processing
@@ -755,8 +805,39 @@ predictions = model.predict(X_test)
 - **Datamol Documentation**: https://docs.datamol.io/
 - **RDKit Documentation**: https://www.rdkit.org/docs/
 - **GitHub Repository**: https://github.com/datamol-io/datamol
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>5</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

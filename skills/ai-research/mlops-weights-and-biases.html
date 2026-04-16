@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mlops-weights-and-biases - AICCLI</title>
-  <meta name="description" content="mlops-weights-and-biases - Claude Code skill for AICCLI">
+  <meta name="description" content="Track ML experiments with automatic logging, visualize training in real-time, optimize hyperparameters with sweeps, and manage model registry with W&B - collabo">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / mlops-weights-and-biases</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>mlops-weights-and-biases</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / mlops-weights-and-biases
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>mlops-weights-and-biases</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Track ML experiments with automatic logging, visualize training in real-time, optimize hyperparameters with sweeps, and manage model registry with W&B - collaborative MLOps platform</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/mlops-weights-and-biases</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/mlops-weights-and-biases</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/mlops-weights-and-biases</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: weights-and-biases
-description: Track ML experiments with automatic logging, visualize training in real-time, optimize hyperparameters with sweeps, and manage model registry with W&B - collaborative MLOps platform
+description: Track ML experiments with automatic logging, visualize training in real-time, optimize hyperparameters with sweeps, and manage model registry with W&amp;B - collaborative MLOps platform
 version: 1.0.0
 author: Orchestra Research
 license: MIT
@@ -65,11 +115,11 @@ tags: [MLOps, Weights And Biases, WandB, Experiment Tracking, Hyperparameter Tun
 dependencies: [wandb]
 ---
 
-# Weights & Biases: ML Experiment Tracking & MLOps
+# Weights &amp; Biases: ML Experiment Tracking &amp; MLOps
 
 ## When to Use This Skill
 
-Use Weights & Biases (W&B) when you need to:
+Use Weights &amp; Biases (W&amp;B) when you need to:
 - **Track ML experiments** with automatic metric logging
 - **Visualize training** in real-time dashboards
 - **Compare runs** across hyperparameters and configurations
@@ -83,7 +133,7 @@ Use Weights & Biases (W&B) when you need to:
 ## Installation
 
 ```bash
-# Install W&B
+# Install W&amp;B
 pip install wandb
 
 # Login (creates API key)
@@ -102,12 +152,12 @@ import wandb
 
 # Initialize a run
 run = wandb.init(
-    project="my-project",
+    project=&quot;my-project&quot;,
     config={
-        "learning_rate": 0.001,
-        "epochs": 10,
-        "batch_size": 32,
-        "architecture": "ResNet50"
+        &quot;learning_rate&quot;: 0.001,
+        &quot;epochs&quot;: 10,
+        &quot;batch_size&quot;: 32,
+        &quot;architecture&quot;: &quot;ResNet50&quot;
     }
 )
 
@@ -119,11 +169,11 @@ for epoch in range(run.config.epochs):
 
     # Log metrics
     wandb.log({
-        "epoch": epoch,
-        "train/loss": train_loss,
-        "val/loss": val_loss,
-        "train/accuracy": train_acc,
-        "val/accuracy": val_acc
+        &quot;epoch&quot;: epoch,
+        &quot;train/loss&quot;: train_loss,
+        &quot;val/loss&quot;: val_loss,
+        &quot;train/accuracy&quot;: train_acc,
+        &quot;val/accuracy&quot;: val_acc
     })
 
 # Finish the run
@@ -137,9 +187,9 @@ import torch
 import wandb
 
 # Initialize
-wandb.init(project="pytorch-demo", config={
-    "lr": 0.001,
-    "epochs": 10
+wandb.init(project=&quot;pytorch-demo&quot;, config={
+    &quot;lr&quot;: 0.001,
+    &quot;epochs&quot;: 10
 })
 
 # Access config
@@ -160,14 +210,14 @@ for epoch in range(config.epochs):
         # Log every 100 batches
         if batch_idx % 100 == 0:
             wandb.log({
-                "loss": loss.item(),
-                "epoch": epoch,
-                "batch": batch_idx
+                &quot;loss&quot;: loss.item(),
+                &quot;epoch&quot;: epoch,
+                &quot;batch&quot;: batch_idx
             })
 
 # Save model
-torch.save(model.state_dict(), "model.pth")
-wandb.save("model.pth")  # Upload to W&B
+torch.save(model.state_dict(), &quot;model.pth&quot;)
+wandb.save(&quot;model.pth&quot;)  # Upload to W&amp;B
 
 wandb.finish()
 ```
@@ -182,15 +232,15 @@ wandb.finish()
 ```python
 # Create/use project
 run = wandb.init(
-    project="image-classification",
-    name="resnet50-experiment-1",  # Optional run name
-    tags=["baseline", "resnet"],    # Organize with tags
-    notes="First baseline run"      # Add notes
+    project=&quot;image-classification&quot;,
+    name=&quot;resnet50-experiment-1&quot;,  # Optional run name
+    tags=[&quot;baseline&quot;, &quot;resnet&quot;],    # Organize with tags
+    notes=&quot;First baseline run&quot;      # Add notes
 )
 
 # Each run has unique ID
-print(f"Run ID: {run.id}")
-print(f"Run URL: {run.url}")
+print(f&quot;Run ID: {run.id}&quot;)
+print(f&quot;Run URL: {run.url}&quot;)
 ```
 
 ### 2. Configuration Tracking
@@ -200,21 +250,21 @@ Track hyperparameters automatically:
 ```python
 config = {
     # Model architecture
-    "model": "ResNet50",
-    "pretrained": True,
+    &quot;model&quot;: &quot;ResNet50&quot;,
+    &quot;pretrained&quot;: True,
 
     # Training params
-    "learning_rate": 0.001,
-    "batch_size": 32,
-    "epochs": 50,
-    "optimizer": "Adam",
+    &quot;learning_rate&quot;: 0.001,
+    &quot;batch_size&quot;: 32,
+    &quot;epochs&quot;: 50,
+    &quot;optimizer&quot;: &quot;Adam&quot;,
 
     # Data params
-    "dataset": "ImageNet",
-    "augmentation": "standard"
+    &quot;dataset&quot;: &quot;ImageNet&quot;,
+    &quot;augmentation&quot;: &quot;standard&quot;
 }
 
-wandb.init(project="my-project", config=config)
+wandb.init(project=&quot;my-project&quot;, config=config)
 
 # Access config during training
 lr = wandb.config.learning_rate
@@ -225,30 +275,30 @@ batch_size = wandb.config.batch_size
 
 ```python
 # Log scalars
-wandb.log({"loss": 0.5, "accuracy": 0.92})
+wandb.log({&quot;loss&quot;: 0.5, &quot;accuracy&quot;: 0.92})
 
 # Log multiple metrics
 wandb.log({
-    "train/loss": train_loss,
-    "train/accuracy": train_acc,
-    "val/loss": val_loss,
-    "val/accuracy": val_acc,
-    "learning_rate": current_lr,
-    "epoch": epoch
+    &quot;train/loss&quot;: train_loss,
+    &quot;train/accuracy&quot;: train_acc,
+    &quot;val/loss&quot;: val_loss,
+    &quot;val/accuracy&quot;: val_acc,
+    &quot;learning_rate&quot;: current_lr,
+    &quot;epoch&quot;: epoch
 })
 
 # Log with custom x-axis
-wandb.log({"loss": loss}, step=global_step)
+wandb.log({&quot;loss&quot;: loss}, step=global_step)
 
 # Log media (images, audio, video)
-wandb.log({"examples": [wandb.Image(img) for img in images]})
+wandb.log({&quot;examples&quot;: [wandb.Image(img) for img in images]})
 
 # Log histograms
-wandb.log({"gradients": wandb.Histogram(gradients)})
+wandb.log({&quot;gradients&quot;: wandb.Histogram(gradients)})
 
 # Log tables
-table = wandb.Table(columns=["id", "prediction", "ground_truth"])
-wandb.log({"predictions": table})
+table = wandb.Table(columns=[&quot;id&quot;, &quot;prediction&quot;, &quot;ground_truth&quot;])
+wandb.log({&quot;predictions&quot;: table})
 ```
 
 ### 4. Model Checkpointing
@@ -259,20 +309,20 @@ import wandb
 
 # Save model checkpoint
 checkpoint = {
-    'epoch': epoch,
-    'model_state_dict': model.state_dict(),
-    'optimizer_state_dict': optimizer.state_dict(),
-    'loss': loss,
+    &#039;epoch&#039;: epoch,
+    &#039;model_state_dict&#039;: model.state_dict(),
+    &#039;optimizer_state_dict&#039;: optimizer.state_dict(),
+    &#039;loss&#039;: loss,
 }
 
-torch.save(checkpoint, 'checkpoint.pth')
+torch.save(checkpoint, &#039;checkpoint.pth&#039;)
 
-# Upload to W&B
-wandb.save('checkpoint.pth')
+# Upload to W&amp;B
+wandb.save(&#039;checkpoint.pth&#039;)
 
 # Or use Artifacts (recommended)
-artifact = wandb.Artifact('model', type='model')
-artifact.add_file('checkpoint.pth')
+artifact = wandb.Artifact(&#039;model&#039;, type=&#039;model&#039;)
+artifact.add_file(&#039;checkpoint.pth&#039;)
 wandb.log_artifact(artifact)
 ```
 
@@ -284,33 +334,33 @@ Automatically search for optimal hyperparameters.
 
 ```python
 sweep_config = {
-    'method': 'bayes',  # or 'grid', 'random'
-    'metric': {
-        'name': 'val/accuracy',
-        'goal': 'maximize'
+    &#039;method&#039;: &#039;bayes&#039;,  # or &#039;grid&#039;, &#039;random&#039;
+    &#039;metric&#039;: {
+        &#039;name&#039;: &#039;val/accuracy&#039;,
+        &#039;goal&#039;: &#039;maximize&#039;
     },
-    'parameters': {
-        'learning_rate': {
-            'distribution': 'log_uniform',
-            'min': 1e-5,
-            'max': 1e-1
+    &#039;parameters&#039;: {
+        &#039;learning_rate&#039;: {
+            &#039;distribution&#039;: &#039;log_uniform&#039;,
+            &#039;min&#039;: 1e-5,
+            &#039;max&#039;: 1e-1
         },
-        'batch_size': {
-            'values': [16, 32, 64, 128]
+        &#039;batch_size&#039;: {
+            &#039;values&#039;: [16, 32, 64, 128]
         },
-        'optimizer': {
-            'values': ['adam', 'sgd', 'rmsprop']
+        &#039;optimizer&#039;: {
+            &#039;values&#039;: [&#039;adam&#039;, &#039;sgd&#039;, &#039;rmsprop&#039;]
         },
-        'dropout': {
-            'distribution': 'uniform',
-            'min': 0.1,
-            'max': 0.5
+        &#039;dropout&#039;: {
+            &#039;distribution&#039;: &#039;uniform&#039;,
+            &#039;min&#039;: 0.1,
+            &#039;max&#039;: 0.5
         }
     }
 }
 
 # Initialize sweep
-sweep_id = wandb.sweep(sweep_config, project="my-project")
+sweep_id = wandb.sweep(sweep_config, project=&quot;my-project&quot;)
 ```
 
 ### Define Training Function
@@ -336,8 +386,8 @@ def train():
 
         # Log metrics
         wandb.log({
-            "train/loss": train_loss,
-            "val/accuracy": val_acc
+            &quot;train/loss&quot;: train_loss,
+            &quot;val/accuracy&quot;: val_acc
         })
 
 # Run sweep
@@ -349,28 +399,28 @@ wandb.agent(sweep_id, function=train, count=50)  # Run 50 trials
 ```python
 # Grid search - exhaustive
 sweep_config = {
-    'method': 'grid',
-    'parameters': {
-        'lr': {'values': [0.001, 0.01, 0.1]},
-        'batch_size': {'values': [16, 32, 64]}
+    &#039;method&#039;: &#039;grid&#039;,
+    &#039;parameters&#039;: {
+        &#039;lr&#039;: {&#039;values&#039;: [0.001, 0.01, 0.1]},
+        &#039;batch_size&#039;: {&#039;values&#039;: [16, 32, 64]}
     }
 }
 
 # Random search
 sweep_config = {
-    'method': 'random',
-    'parameters': {
-        'lr': {'distribution': 'uniform', 'min': 0.0001, 'max': 0.1},
-        'dropout': {'distribution': 'uniform', 'min': 0.1, 'max': 0.5}
+    &#039;method&#039;: &#039;random&#039;,
+    &#039;parameters&#039;: {
+        &#039;lr&#039;: {&#039;distribution&#039;: &#039;uniform&#039;, &#039;min&#039;: 0.0001, &#039;max&#039;: 0.1},
+        &#039;dropout&#039;: {&#039;distribution&#039;: &#039;uniform&#039;, &#039;min&#039;: 0.1, &#039;max&#039;: 0.5}
     }
 }
 
 # Bayesian optimization (recommended)
 sweep_config = {
-    'method': 'bayes',
-    'metric': {'name': 'val/loss', 'goal': 'minimize'},
-    'parameters': {
-        'lr': {'distribution': 'log_uniform', 'min': 1e-5, 'max': 1e-1}
+    &#039;method&#039;: &#039;bayes&#039;,
+    &#039;metric&#039;: {&#039;name&#039;: &#039;val/loss&#039;, &#039;goal&#039;: &#039;minimize&#039;},
+    &#039;parameters&#039;: {
+        &#039;lr&#039;: {&#039;distribution&#039;: &#039;log_uniform&#039;, &#039;min&#039;: 1e-5, &#039;max&#039;: 1e-1}
     }
 }
 ```
@@ -384,15 +434,15 @@ Track datasets, models, and other files with lineage.
 ```python
 # Create artifact
 artifact = wandb.Artifact(
-    name='training-dataset',
-    type='dataset',
-    description='ImageNet training split',
-    metadata={'size': '1.2M images', 'split': 'train'}
+    name=&#039;training-dataset&#039;,
+    type=&#039;dataset&#039;,
+    description=&#039;ImageNet training split&#039;,
+    metadata={&#039;size&#039;: &#039;1.2M images&#039;, &#039;split&#039;: &#039;train&#039;}
 )
 
 # Add files
-artifact.add_file('data/train.csv')
-artifact.add_dir('data/images/')
+artifact.add_file(&#039;data/train.csv&#039;)
+artifact.add_dir(&#039;data/images/&#039;)
 
 # Log artifact
 wandb.log_artifact(artifact)
@@ -402,14 +452,14 @@ wandb.log_artifact(artifact)
 
 ```python
 # Download and use artifact
-run = wandb.init(project="my-project")
+run = wandb.init(project=&quot;my-project&quot;)
 
 # Download artifact
-artifact = run.use_artifact('training-dataset:latest')
+artifact = run.use_artifact(&#039;training-dataset:latest&#039;)
 artifact_dir = artifact.download()
 
 # Use the data
-data = load_data(f"{artifact_dir}/train.csv")
+data = load_data(f&quot;{artifact_dir}/train.csv&quot;)
 ```
 
 ### Model Registry
@@ -417,16 +467,16 @@ data = load_data(f"{artifact_dir}/train.csv")
 ```python
 # Log model as artifact
 model_artifact = wandb.Artifact(
-    name='resnet50-model',
-    type='model',
-    metadata={'architecture': 'ResNet50', 'accuracy': 0.95}
+    name=&#039;resnet50-model&#039;,
+    type=&#039;model&#039;,
+    metadata={&#039;architecture&#039;: &#039;ResNet50&#039;, &#039;accuracy&#039;: 0.95}
 )
 
-model_artifact.add_file('model.pth')
-wandb.log_artifact(model_artifact, aliases=['best', 'production'])
+model_artifact.add_file(&#039;model.pth&#039;)
+wandb.log_artifact(model_artifact, aliases=[&#039;best&#039;, &#039;production&#039;])
 
 # Link to model registry
-run.link_artifact(model_artifact, 'model-registry/production-models')
+run.link_artifact(model_artifact, &#039;model-registry/production-models&#039;)
 ```
 
 ## Integration Examples
@@ -437,19 +487,19 @@ run.link_artifact(model_artifact, 'model-registry/production-models')
 from transformers import Trainer, TrainingArguments
 import wandb
 
-# Initialize W&B
-wandb.init(project="hf-transformers")
+# Initialize W&amp;B
+wandb.init(project=&quot;hf-transformers&quot;)
 
-# Training arguments with W&B
+# Training arguments with W&amp;B
 training_args = TrainingArguments(
-    output_dir="./results",
-    report_to="wandb",  # Enable W&B logging
-    run_name="bert-finetuning",
+    output_dir=&quot;./results&quot;,
+    report_to=&quot;wandb&quot;,  # Enable W&amp;B logging
+    run_name=&quot;bert-finetuning&quot;,
     logging_steps=100,
     save_steps=500
 )
 
-# Trainer automatically logs to W&B
+# Trainer automatically logs to W&amp;B
 trainer = Trainer(
     model=model,
     args=training_args,
@@ -467,9 +517,9 @@ from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import WandbLogger
 import wandb
 
-# Create W&B logger
+# Create W&amp;B logger
 wandb_logger = WandbLogger(
-    project="lightning-demo",
+    project=&quot;lightning-demo&quot;,
     log_model=True  # Log model checkpoints
 )
 
@@ -489,7 +539,7 @@ import wandb
 from wandb.keras import WandbCallback
 
 # Initialize
-wandb.init(project="keras-demo")
+wandb.init(project=&quot;keras-demo&quot;)
 
 # Add callback
 model.fit(
@@ -500,7 +550,7 @@ model.fit(
 )
 ```
 
-## Visualization & Analysis
+## Visualization &amp; Analysis
 
 ### Custom Charts
 
@@ -510,10 +560,10 @@ import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots()
 ax.plot(x, y)
-wandb.log({"custom_plot": wandb.Image(fig)})
+wandb.log({&quot;custom_plot&quot;: wandb.Image(fig)})
 
 # Log confusion matrix
-wandb.log({"conf_mat": wandb.plot.confusion_matrix(
+wandb.log({&quot;conf_mat&quot;: wandb.plot.confusion_matrix(
     probs=None,
     y_true=ground_truth,
     preds=predictions,
@@ -523,7 +573,7 @@ wandb.log({"conf_mat": wandb.plot.confusion_matrix(
 
 ### Reports
 
-Create shareable reports in W&B UI:
+Create shareable reports in W&amp;B UI:
 - Combine runs, charts, and text
 - Markdown support
 - Embeddable visualizations
@@ -535,10 +585,10 @@ Create shareable reports in W&B UI:
 
 ```python
 wandb.init(
-    project="my-project",
-    tags=["baseline", "resnet50", "imagenet"],
-    group="resnet-experiments",  # Group related runs
-    job_type="train"             # Type of job
+    project=&quot;my-project&quot;,
+    tags=[&quot;baseline&quot;, &quot;resnet50&quot;, &quot;imagenet&quot;],
+    group=&quot;resnet-experiments&quot;,  # Group related runs
+    job_type=&quot;train&quot;             # Type of job
 )
 ```
 
@@ -547,18 +597,18 @@ wandb.init(
 ```python
 # Log system metrics
 wandb.log({
-    "gpu/util": gpu_utilization,
-    "gpu/memory": gpu_memory_used,
-    "cpu/util": cpu_utilization
+    &quot;gpu/util&quot;: gpu_utilization,
+    &quot;gpu/memory&quot;: gpu_memory_used,
+    &quot;cpu/util&quot;: cpu_utilization
 })
 
 # Log code version
-wandb.log({"git_commit": git_commit_hash})
+wandb.log({&quot;git_commit&quot;: git_commit_hash})
 
 # Log data splits
 wandb.log({
-    "data/train_size": len(train_dataset),
-    "data/val_size": len(val_dataset)
+    &quot;data/train_size&quot;: len(train_dataset),
+    &quot;data/val_size&quot;: len(val_dataset)
 })
 ```
 
@@ -567,28 +617,28 @@ wandb.log({
 ```python
 # ✅ Good: Descriptive run names
 wandb.init(
-    project="nlp-classification",
-    name="bert-base-lr0.001-bs32-epoch10"
+    project=&quot;nlp-classification&quot;,
+    name=&quot;bert-base-lr0.001-bs32-epoch10&quot;
 )
 
 # ❌ Bad: Generic names
-wandb.init(project="nlp", name="run1")
+wandb.init(project=&quot;nlp&quot;, name=&quot;run1&quot;)
 ```
 
 ### 4. Save Important Artifacts
 
 ```python
 # Save final model
-artifact = wandb.Artifact('final-model', type='model')
-artifact.add_file('model.pth')
+artifact = wandb.Artifact(&#039;final-model&#039;, type=&#039;model&#039;)
+artifact.add_file(&#039;model.pth&#039;)
 wandb.log_artifact(artifact)
 
 # Save predictions for analysis
 predictions_table = wandb.Table(
-    columns=["id", "input", "prediction", "ground_truth"],
+    columns=[&quot;id&quot;, &quot;input&quot;, &quot;prediction&quot;, &quot;ground_truth&quot;],
     data=predictions_data
 )
-wandb.log({"predictions": predictions_table})
+wandb.log({&quot;predictions&quot;: predictions_table})
 ```
 
 ### 5. Use Offline Mode for Unstable Connections
@@ -597,9 +647,9 @@ wandb.log({"predictions": predictions_table})
 import os
 
 # Enable offline mode
-os.environ["WANDB_MODE"] = "offline"
+os.environ[&quot;WANDB_MODE&quot;] = &quot;offline&quot;
 
-wandb.init(project="my-project")
+wandb.init(project=&quot;my-project&quot;)
 # ... your code ...
 
 # Sync later
@@ -612,8 +662,8 @@ wandb.init(project="my-project")
 
 ```python
 # Runs are automatically shareable via URL
-run = wandb.init(project="team-project")
-print(f"Share this URL: {run.url}")
+run = wandb.init(project=&quot;team-project&quot;)
+print(f&quot;Share this URL: {run.url}&quot;)
 ```
 
 ### Team Projects
@@ -645,8 +695,46 @@ print(f"Share this URL: {run.url}")
 - `references/integrations.md` - Framework-specific examples
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">MLOps</span><span class="tag">Weights And Biases</span><span class="tag">WandB</span><span class="tag">Experiment Tracking</span><span class="tag">Hyperparameter Tuning</span><span class="tag">Model Registry</span><span class="tag">Collaboration</span><span class="tag">Real-Time Visualization</span><span class="tag">PyTorch</span><span class="tag">TensorFlow</span><span class="tag">HuggingFace</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>34</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

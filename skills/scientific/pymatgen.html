@@ -4,67 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>pymatgen - AICCLI</title>
-  <meta name="description" content="pymatgen - Claude Code skill for AICCLI">
+  <meta name="description" content=""Materials science toolkit. Crystal structures (CIF, POSCAR), phase diagrams, band structure, DOS, Materials Project integration, format conversion, for computa">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / pymatgen</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>pymatgen</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / pymatgen
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>pymatgen</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Materials science toolkit. Crystal structures (CIF, POSCAR), phase diagrams, band structure, DOS, Materials Project integration, format conversion, for computational materials science."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pymatgen</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/pymatgen</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/pymatgen</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: pymatgen
-description: "Materials science toolkit. Crystal structures (CIF, POSCAR), phase diagrams, band structure, DOS, Materials Project integration, format conversion, for computational materials science."
+description: &quot;Materials science toolkit. Crystal structures (CIF, POSCAR), phase diagrams, band structure, DOS, Materials Project integration, format conversion, for computational materials science.&quot;
 ---
 
 # Pymatgen - Python Materials Genomics
 
 ## Overview
 
-Pymatgen is a comprehensive Python library for materials analysis that powers the Materials Project. Create, analyze, and manipulate crystal structures and molecules, compute phase diagrams and thermodynamic properties, analyze electronic structure (band structures, DOS), generate surfaces and interfaces, and access Materials Project's database of computed materials. Supports 100+ file formats from various computational codes.
+Pymatgen is a comprehensive Python library for materials analysis that powers the Materials Project. Create, analyze, and manipulate crystal structures and molecules, compute phase diagrams and thermodynamic properties, analyze electronic structure (band structures, DOS), generate surfaces and interfaces, and access Materials Project&#039;s database of computed materials. Supports 100+ file formats from various computational codes.
 
 ## When to Use This Skill
 
@@ -102,26 +152,26 @@ uv pip install pymatgen[vis]       # Visualization tools
 from pymatgen.core import Structure, Lattice
 
 # Read structure from file (automatic format detection)
-struct = Structure.from_file("POSCAR")
+struct = Structure.from_file(&quot;POSCAR&quot;)
 
 # Create structure from scratch
 lattice = Lattice.cubic(3.84)
-struct = Structure(lattice, ["Si", "Si"], [[0,0,0], [0.25,0.25,0.25]])
+struct = Structure(lattice, [&quot;Si&quot;, &quot;Si&quot;], [[0,0,0], [0.25,0.25,0.25]])
 
 # Write to different format
-struct.to(filename="structure.cif")
+struct.to(filename=&quot;structure.cif&quot;)
 
 # Basic properties
-print(f"Formula: {struct.composition.reduced_formula}")
-print(f"Space group: {struct.get_space_group_info()}")
-print(f"Density: {struct.density:.2f} g/cm³")
+print(f&quot;Formula: {struct.composition.reduced_formula}&quot;)
+print(f&quot;Space group: {struct.get_space_group_info()}&quot;)
+print(f&quot;Density: {struct.density:.2f} g/cm³&quot;)
 ```
 
 ### Materials Project Integration
 
 ```bash
 # Set up API key
-export MP_API_KEY="your_api_key_here"
+export MP_API_KEY=&quot;your_api_key_here&quot;
 ```
 
 ```python
@@ -129,11 +179,11 @@ from mp_api.client import MPRester
 
 with MPRester() as mpr:
     # Get structure by material ID
-    struct = mpr.get_structure_by_material_id("mp-149")
+    struct = mpr.get_structure_by_material_id(&quot;mp-149&quot;)
 
     # Search for materials
     materials = mpr.materials.summary.search(
-        formula="Fe2O3",
+        formula=&quot;Fe2O3&quot;,
         energy_above_hull=(0, 0.05)
     )
 ```
@@ -147,9 +197,9 @@ Create structures using various methods and perform transformations.
 **From files:**
 ```python
 # Automatic format detection
-struct = Structure.from_file("structure.cif")
-struct = Structure.from_file("POSCAR")
-mol = Molecule.from_file("molecule.xyz")
+struct = Structure.from_file(&quot;structure.cif&quot;)
+struct = Structure.from_file(&quot;POSCAR&quot;)
+mol = Molecule.from_file(&quot;molecule.xyz&quot;)
 ```
 
 **From scratch:**
@@ -160,13 +210,13 @@ from pymatgen.core import Structure, Lattice
 lattice = Lattice.from_parameters(a=3.84, b=3.84, c=3.84,
                                   alpha=120, beta=90, gamma=60)
 coords = [[0, 0, 0], [0.75, 0.5, 0.75]]
-struct = Structure(lattice, ["Si", "Si"], coords)
+struct = Structure(lattice, [&quot;Si&quot;, &quot;Si&quot;], coords)
 
 # From space group
 struct = Structure.from_spacegroup(
-    "Fm-3m",
+    &quot;Fm-3m&quot;,
     Lattice.cubic(3.5),
-    ["Si"],
+    [&quot;Si&quot;],
     [[0, 0, 0]]
 )
 ```
@@ -184,7 +234,7 @@ trans = SupercellTransformation([[2,0,0],[0,2,0],[0,0,2]])
 supercell = trans.apply_transformation(struct)
 
 # Substitute elements
-trans = SubstitutionTransformation({"Fe": "Mn"})
+trans = SubstitutionTransformation({&quot;Fe&quot;: &quot;Mn&quot;})
 new_struct = trans.apply_transformation(struct)
 
 # Get primitive cell
@@ -201,12 +251,12 @@ Convert between 100+ file formats with automatic format detection.
 **Using convenience methods:**
 ```python
 # Read any format
-struct = Structure.from_file("input_file")
+struct = Structure.from_file(&quot;input_file&quot;)
 
 # Write to any format
-struct.to(filename="output.cif")
-struct.to(filename="POSCAR")
-struct.to(filename="output.xyz")
+struct.to(filename=&quot;output.cif&quot;)
+struct.to(filename=&quot;POSCAR&quot;)
+struct.to(filename=&quot;output.xyz&quot;)
 ```
 
 **Using the conversion script:**
@@ -231,9 +281,9 @@ from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 sga = SpacegroupAnalyzer(struct)
 
 # Get space group information
-print(f"Space group: {sga.get_space_group_symbol()}")
-print(f"Number: {sga.get_space_group_number()}")
-print(f"Crystal system: {sga.get_crystal_system()}")
+print(f&quot;Space group: {sga.get_space_group_symbol()}&quot;)
+print(f&quot;Number: {sga.get_space_group_number()}&quot;)
+print(f&quot;Crystal system: {sga.get_crystal_system()}&quot;)
 
 # Get conventional/primitive cells
 conventional = sga.get_conventional_standard_structure()
@@ -247,10 +297,10 @@ from pymatgen.analysis.local_env import CrystalNN
 cnn = CrystalNN()
 neighbors = cnn.get_nn_info(struct, n=0)  # Neighbors of site 0
 
-print(f"Coordination number: {len(neighbors)}")
+print(f&quot;Coordination number: {len(neighbors)}&quot;)
 for neighbor in neighbors:
-    site = struct[neighbor['site_index']]
-    print(f"  {site.species_string} at {neighbor['weight']:.3f} Å")
+    site = struct[neighbor[&#039;site_index&#039;]]
+    print(f&quot;  {site.species_string} at {neighbor[&#039;weight&#039;]:.3f} Å&quot;)
 ```
 
 **Using the analysis script:**
@@ -275,25 +325,25 @@ from pymatgen.analysis.phase_diagram import PhaseDiagram, PDPlotter
 
 # Get entries from Materials Project
 with MPRester() as mpr:
-    entries = mpr.get_entries_in_chemsys("Li-Fe-O")
+    entries = mpr.get_entries_in_chemsys(&quot;Li-Fe-O&quot;)
 
 # Build phase diagram
 pd = PhaseDiagram(entries)
 
 # Check stability
 from pymatgen.core import Composition
-comp = Composition("LiFeO2")
+comp = Composition(&quot;LiFeO2&quot;)
 
 # Find entry for composition
 for entry in entries:
     if entry.composition.reduced_formula == comp.reduced_formula:
         e_above_hull = pd.get_e_above_hull(entry)
-        print(f"Energy above hull: {e_above_hull:.4f} eV/atom")
+        print(f&quot;Energy above hull: {e_above_hull:.4f} eV/atom&quot;)
 
         if e_above_hull &gt; 0.001:
             # Get decomposition
             decomp = pd.get_decomposition(comp)
-            print("Decomposes to:", decomp)
+            print(&quot;Decomposes to:&quot;, decomp)
 
 # Plot
 plotter = PDPlotter(pd)
@@ -306,7 +356,7 @@ plotter.show()
 python scripts/phase_diagram_generator.py Li-Fe-O --output li_fe_o.png
 
 # Analyze specific composition
-python scripts/phase_diagram_generator.py Li-Fe-O --analyze "LiFeO2" --show
+python scripts/phase_diagram_generator.py Li-Fe-O --analyze &quot;LiFeO2&quot; --show
 ```
 
 **Reference:** See `references/analysis_modules.md` (Phase Diagrams section) and `references/transformations_workflows.md` (Workflow 2) for detailed examples.
@@ -321,18 +371,18 @@ from pymatgen.io.vasp import Vasprun
 from pymatgen.electronic_structure.plotter import BSPlotter
 
 # Read from VASP calculation
-vasprun = Vasprun("vasprun.xml")
+vasprun = Vasprun(&quot;vasprun.xml&quot;)
 bs = vasprun.get_band_structure()
 
 # Analyze
 band_gap = bs.get_band_gap()
-print(f"Band gap: {band_gap['energy']:.3f} eV")
-print(f"Direct: {band_gap['direct']}")
-print(f"Is metal: {bs.is_metal()}")
+print(f&quot;Band gap: {band_gap[&#039;energy&#039;]:.3f} eV&quot;)
+print(f&quot;Direct: {band_gap[&#039;direct&#039;]}&quot;)
+print(f&quot;Is metal: {bs.is_metal()}&quot;)
 
 # Plot
 plotter = BSPlotter(bs)
-plotter.save_plot("band_structure.png")
+plotter.save_plot(&quot;band_structure.png&quot;)
 ```
 
 **Density of states:**
@@ -344,11 +394,11 @@ dos = vasprun.complete_dos
 # Get element-projected DOS
 element_dos = dos.get_element_dos()
 for element, element_dos_obj in element_dos.items():
-    print(f"{element}: {element_dos_obj.get_gap():.3f} eV")
+    print(f&quot;{element}: {element_dos_obj.get_gap():.3f} eV&quot;)
 
 # Plot
 plotter = DosPlotter()
-plotter.add_dos("Total DOS", dos)
+plotter.add_dos(&quot;Total DOS&quot;, dos)
 plotter.show()
 ```
 
@@ -375,7 +425,7 @@ slabs = slabgen.get_slabs()
 
 # Write slabs
 for i, slab in enumerate(slabs):
-    slab.to(filename=f"slab_{i}.cif")
+    slab.to(filename=f&quot;slab_{i}.cif&quot;)
 ```
 
 **Wulff shape construction:**
@@ -390,8 +440,8 @@ surface_energies = {
 }
 
 wulff = WulffShape(struct.lattice, surface_energies)
-print(f"Surface area: {wulff.surface_area:.2f} Ų")
-print(f"Volume: {wulff.volume:.2f} ų")
+print(f&quot;Surface area: {wulff.surface_area:.2f} Ų&quot;)
+print(f&quot;Volume: {wulff.volume:.2f} ų&quot;)
 
 wulff.show()
 ```
@@ -405,13 +455,13 @@ asf = AdsorbateSiteFinder(slab)
 
 # Find sites
 ads_sites = asf.find_adsorption_sites()
-print(f"On-top sites: {len(ads_sites['ontop'])}")
-print(f"Bridge sites: {len(ads_sites['bridge'])}")
-print(f"Hollow sites: {len(ads_sites['hollow'])}")
+print(f&quot;On-top sites: {len(ads_sites[&#039;ontop&#039;])}&quot;)
+print(f&quot;Bridge sites: {len(ads_sites[&#039;bridge&#039;])}&quot;)
+print(f&quot;Hollow sites: {len(ads_sites[&#039;hollow&#039;])}&quot;)
 
 # Add adsorbate
-adsorbate = Molecule("O", [[0, 0, 0]])
-ads_struct = asf.add_adsorbate(adsorbate, ads_sites["ontop"][0])
+adsorbate = Molecule(&quot;O&quot;, [[0, 0, 0]])
+ads_struct = asf.add_adsorbate(adsorbate, ads_sites[&quot;ontop&quot;][0])
 ```
 
 **Reference:** See `references/analysis_modules.md` (Surface and Interface section) and `references/transformations_workflows.md` (Workflows 3 and 9).
@@ -422,7 +472,7 @@ Programmatically access the Materials Project database.
 
 **Setup:**
 1. Get API key from https://next-gen.materialsproject.org/
-2. Set environment variable: `export MP_API_KEY="your_key_here"`
+2. Set environment variable: `export MP_API_KEY=&quot;your_key_here&quot;`
 
 **Search and retrieve:**
 ```python
@@ -430,26 +480,26 @@ from mp_api.client import MPRester
 
 with MPRester() as mpr:
     # Search by formula
-    materials = mpr.materials.summary.search(formula="Fe2O3")
+    materials = mpr.materials.summary.search(formula=&quot;Fe2O3&quot;)
 
     # Search by chemical system
-    materials = mpr.materials.summary.search(chemsys="Li-Fe-O")
+    materials = mpr.materials.summary.search(chemsys=&quot;Li-Fe-O&quot;)
 
     # Filter by properties
     materials = mpr.materials.summary.search(
-        chemsys="Li-Fe-O",
+        chemsys=&quot;Li-Fe-O&quot;,
         energy_above_hull=(0, 0.05),  # Stable/metastable
         band_gap=(1.0, 3.0)            # Semiconducting
     )
 
     # Get structure
-    struct = mpr.get_structure_by_material_id("mp-149")
+    struct = mpr.get_structure_by_material_id(&quot;mp-149&quot;)
 
     # Get band structure
-    bs = mpr.get_bandstructure_by_material_id("mp-149")
+    bs = mpr.get_bandstructure_by_material_id(&quot;mp-149&quot;)
 
     # Get entries for phase diagram
-    entries = mpr.get_entries_in_chemsys("Li-Fe-O")
+    entries = mpr.get_entries_in_chemsys(&quot;Li-Fe-O&quot;)
 ```
 
 **Reference:** See `references/materials_project_api.md` for comprehensive API documentation and examples.
@@ -464,19 +514,19 @@ from pymatgen.io.vasp.sets import MPRelaxSet, MPStaticSet, MPNonSCFSet
 
 # Relaxation
 relax = MPRelaxSet(struct)
-relax.write_input("./relax_calc")
+relax.write_input(&quot;./relax_calc&quot;)
 
 # Static calculation
 static = MPStaticSet(struct)
-static.write_input("./static_calc")
+static.write_input(&quot;./static_calc&quot;)
 
 # Band structure (non-self-consistent)
-nscf = MPNonSCFSet(struct, mode="line")
-nscf.write_input("./bandstructure_calc")
+nscf = MPNonSCFSet(struct, mode=&quot;line&quot;)
+nscf.write_input(&quot;./bandstructure_calc&quot;)
 
 # Custom parameters
-custom = MPRelaxSet(struct, user_incar_settings={"ENCUT": 600})
-custom.write_input("./custom_calc")
+custom = MPRelaxSet(struct, user_incar_settings={&quot;ENCUT&quot;: 600})
+custom.write_input(&quot;./custom_calc&quot;)
 ```
 
 **Other codes:**
@@ -486,17 +536,17 @@ from pymatgen.io.gaussian import GaussianInput
 
 gin = GaussianInput(
     mol,
-    functional="B3LYP",
-    basis_set="6-31G(d)",
-    route_parameters={"Opt": None}
+    functional=&quot;B3LYP&quot;,
+    basis_set=&quot;6-31G(d)&quot;,
+    route_parameters={&quot;Opt&quot;: None}
 )
-gin.write_file("input.gjf")
+gin.write_file(&quot;input.gjf&quot;)
 
 # Quantum ESPRESSO
 from pymatgen.io.pwscf import PWInput
 
-pwin = PWInput(struct, control={"calculation": "scf"})
-pwin.write_file("pw.in")
+pwin = PWInput(struct, control={&quot;calculation&quot;: &quot;scf&quot;})
+pwin.write_file(&quot;pw.in&quot;)
 ```
 
 **Reference:** See `references/io_formats.md` (Electronic Structure Code I/O section) and `references/transformations_workflows.md` for workflow examples.
@@ -512,7 +562,7 @@ pattern = xrd.get_pattern(struct)
 
 # Get peaks
 for peak in pattern.hkls:
-    print(f"2θ = {peak['2theta']:.2f}°, hkl = {peak['hkl']}")
+    print(f&quot;2θ = {peak[&#039;2theta&#039;]:.2f}°, hkl = {peak[&#039;hkl&#039;]}&quot;)
 
 pattern.plot()
 ```
@@ -524,9 +574,9 @@ from pymatgen.analysis.elasticity import ElasticTensor
 # From elastic tensor matrix
 elastic_tensor = ElasticTensor.from_voigt(matrix)
 
-print(f"Bulk modulus: {elastic_tensor.k_voigt:.1f} GPa")
-print(f"Shear modulus: {elastic_tensor.g_voigt:.1f} GPa")
-print(f"Young's modulus: {elastic_tensor.y_mod:.1f} GPa")
+print(f&quot;Bulk modulus: {elastic_tensor.k_voigt:.1f} GPa&quot;)
+print(f&quot;Shear modulus: {elastic_tensor.g_voigt:.1f} GPa&quot;)
+print(f&quot;Young&#039;s modulus: {elastic_tensor.y_mod:.1f} GPa&quot;)
 ```
 
 **Magnetic ordering:**
@@ -534,11 +584,11 @@ print(f"Young's modulus: {elastic_tensor.y_mod:.1f} GPa")
 from pymatgen.transformations.advanced_transformations import MagOrderingTransformation
 
 # Enumerate magnetic orderings
-trans = MagOrderingTransformation({"Fe": 5.0})
+trans = MagOrderingTransformation({&quot;Fe&quot;: 5.0})
 mag_structs = trans.apply_transformation(struct, return_ranked_list=True)
 
 # Get lowest energy magnetic structure
-lowest_energy_struct = mag_structs[0]['structure']
+lowest_energy_struct = mag_structs[0][&#039;structure&#039;]
 ```
 
 **Reference:** See `references/analysis_modules.md` for comprehensive analysis module documentation.
@@ -559,7 +609,7 @@ Executable Python scripts for common tasks:
 
 - **`phase_diagram_generator.py`**: Generate phase diagrams from Materials Project
   - Stability analysis and thermodynamic properties
-  - Usage: `python scripts/phase_diagram_generator.py Li-Fe-O --analyze "LiFeO2"`
+  - Usage: `python scripts/phase_diagram_generator.py Li-Fe-O --analyze &quot;LiFeO2&quot;`
 
 All scripts include detailed help: `python scripts/script_name.py --help`
 
@@ -584,16 +634,16 @@ from pymatgen.transformations.standard_transformations import SubstitutionTransf
 from pymatgen.io.vasp.sets import MPRelaxSet
 
 # Generate doped structures
-base_struct = Structure.from_file("POSCAR")
-dopants = ["Mn", "Co", "Ni", "Cu"]
+base_struct = Structure.from_file(&quot;POSCAR&quot;)
+dopants = [&quot;Mn&quot;, &quot;Co&quot;, &quot;Ni&quot;, &quot;Cu&quot;]
 
 for dopant in dopants:
-    trans = SubstitutionTransformation({"Fe": dopant})
+    trans = SubstitutionTransformation({&quot;Fe&quot;: dopant})
     doped_struct = trans.apply_transformation(base_struct)
 
     # Generate VASP inputs
     vasp_input = MPRelaxSet(doped_struct)
-    vasp_input.write_input(f"./calcs/Fe_{dopant}")
+    vasp_input.write_input(f&quot;./calcs/Fe_{dopant}&quot;)
 ```
 
 ### Band Structure Calculation Workflow
@@ -601,20 +651,20 @@ for dopant in dopants:
 ```python
 # 1. Relaxation
 relax = MPRelaxSet(struct)
-relax.write_input("./1_relax")
+relax.write_input(&quot;./1_relax&quot;)
 
 # 2. Static (after relaxation)
-relaxed = Structure.from_file("1_relax/CONTCAR")
+relaxed = Structure.from_file(&quot;1_relax/CONTCAR&quot;)
 static = MPStaticSet(relaxed)
-static.write_input("./2_static")
+static.write_input(&quot;./2_static&quot;)
 
 # 3. Band structure (non-self-consistent)
-nscf = MPNonSCFSet(relaxed, mode="line")
-nscf.write_input("./3_bandstructure")
+nscf = MPNonSCFSet(relaxed, mode=&quot;line&quot;)
+nscf.write_input(&quot;./3_bandstructure&quot;)
 
 # 4. Analysis
 from pymatgen.io.vasp import Vasprun
-vasprun = Vasprun("3_bandstructure/vasprun.xml")
+vasprun = Vasprun(&quot;3_bandstructure/vasprun.xml&quot;)
 bs = vasprun.get_band_structure()
 bs.get_band_gap()
 ```
@@ -623,17 +673,17 @@ bs.get_band_gap()
 
 ```python
 # 1. Get bulk energy
-bulk_vasprun = Vasprun("bulk/vasprun.xml")
+bulk_vasprun = Vasprun(&quot;bulk/vasprun.xml&quot;)
 bulk_E_per_atom = bulk_vasprun.final_energy / len(bulk)
 
 # 2. Generate and calculate slabs
 slabgen = SlabGenerator(bulk, (1,1,1), 10, 15)
 slab = slabgen.get_slabs()[0]
 
-MPRelaxSet(slab).write_input("./slab_calc")
+MPRelaxSet(slab).write_input(&quot;./slab_calc&quot;)
 
 # 3. Calculate surface energy (after calculation)
-slab_vasprun = Vasprun("slab_calc/vasprun.xml")
+slab_vasprun = Vasprun(&quot;slab_calc/vasprun.xml&quot;)
 E_surf = (slab_vasprun.final_energy - len(slab) * bulk_E_per_atom) / (2 * slab.surface_area)
 E_surf *= 16.021766  # Convert eV/Ų to J/m²
 ```
@@ -645,7 +695,7 @@ E_surf *= 16.021766  # Convert eV/Ų to J/m²
 ### Structure Handling
 
 1. **Use automatic format detection**: `Structure.from_file()` handles most formats
-2. **Prefer immutable structures**: Use `IStructure` when structure shouldn't change
+2. **Prefer immutable structures**: Use `IStructure` when structure shouldn&#039;t change
 3. **Check symmetry**: Use `SpacegroupAnalyzer` to reduce to primitive cell
 4. **Validate structures**: Check for overlapping atoms or unreasonable bond lengths
 
@@ -708,13 +758,13 @@ uv pip install pymatgen[analysis,vis]
 
 **API key not found**: Set MP_API_KEY environment variable
 ```bash
-export MP_API_KEY="your_key_here"
+export MP_API_KEY=&quot;your_key_here&quot;
 ```
 
 **Structure read failures**: Check file format and syntax
 ```python
 # Try explicit format specification
-struct = Structure.from_file("file.txt", fmt="cif")
+struct = Structure.from_file(&quot;file.txt&quot;, fmt=&quot;cif&quot;)
 ```
 
 **Symmetry analysis fails**: Structure may have numerical precision issues
@@ -740,8 +790,39 @@ Requirements:
 - Python 3.10 or higher
 - pymatgen &gt;= 2023.x
 - mp-api (for Materials Project access)
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>7</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>optimization-bitsandbytes - AICCLI</title>
-  <meta name="description" content="optimization-bitsandbytes - Claude Code skill for AICCLI">
+  <meta name="description" content="Quantizes LLMs to 8-bit or 4-bit for 50-75% memory reduction with minimal accuracy loss. Use when GPU memory is limited, need to fit larger models, or want fast">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / optimization-bitsandbytes</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>optimization-bitsandbytes</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / optimization-bitsandbytes
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>optimization-bitsandbytes</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Quantizes LLMs to 8-bit or 4-bit for 50-75% memory reduction with minimal accuracy loss. Use when GPU memory is limited, need to fit larger models, or want faster inference. Supports INT8, NF4, FP4 formats, QLoRA training, and 8-bit optimizers. Works with HuggingFace Transformers.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/optimization-bitsandbytes</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/optimization-bitsandbytes</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/optimization-bitsandbytes</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: quantizing-models-bitsandbytes
 description: Quantizes LLMs to 8-bit or 4-bit for 50-75% memory reduction with minimal accuracy loss. Use when GPU memory is limited, need to fit larger models, or want faster inference. Supports INT8, NF4, FP4 formats, QLoRA training, and 8-bit optimizers. Works with HuggingFace Transformers.
 version: 1.0.0
@@ -82,9 +132,9 @@ from transformers import AutoModelForCausalLM, BitsAndBytesConfig
 
 config = BitsAndBytesConfig(load_in_8bit=True)
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-2-7b-hf",
+    &quot;meta-llama/Llama-2-7b-hf&quot;,
     quantization_config=config,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
 
 # Memory: 14GB → 7GB
@@ -97,9 +147,9 @@ config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.float16
 )
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-2-7b-hf",
+    &quot;meta-llama/Llama-2-7b-hf&quot;,
     quantization_config=config,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
 
 # Memory: 14GB → 3.5GB
@@ -162,7 +212,7 @@ For 4-bit (maximum memory savings):
 config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_compute_dtype=torch.float16,  # Compute in FP16
-    bnb_4bit_quant_type="nf4",  # NormalFloat4 (recommended)
+    bnb_4bit_quant_type=&quot;nf4&quot;,  # NormalFloat4 (recommended)
     bnb_4bit_use_double_quant=True  # Nested quantization
 )
 ```
@@ -173,22 +223,22 @@ config = BitsAndBytesConfig(
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-2-13b-hf",
+    &quot;meta-llama/Llama-2-13b-hf&quot;,
     quantization_config=config,
-    device_map="auto",  # Automatic device placement
+    device_map=&quot;auto&quot;,  # Automatic device placement
     torch_dtype=torch.float16
 )
 
-tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-13b-hf")
+tokenizer = AutoTokenizer.from_pretrained(&quot;meta-llama/Llama-2-13b-hf&quot;)
 
 # Test inference
-inputs = tokenizer("Hello, how are you?", return_tensors="pt").to("cuda")
+inputs = tokenizer(&quot;Hello, how are you?&quot;, return_tensors=&quot;pt&quot;).to(&quot;cuda&quot;)
 outputs = model.generate(**inputs, max_length=50)
 print(tokenizer.decode(outputs[0]))
 
 # Check memory
 import torch
-print(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f}GB")
+print(f&quot;Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f}GB&quot;)
 ```
 
 ### Workflow 2: Fine-tune with QLoRA (4-bit training)
@@ -220,14 +270,14 @@ import torch
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
     bnb_4bit_compute_dtype=torch.float16,
-    bnb_4bit_quant_type="nf4",
+    bnb_4bit_quant_type=&quot;nf4&quot;,
     bnb_4bit_use_double_quant=True
 )
 
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-2-7b-hf",
+    &quot;meta-llama/Llama-2-7b-hf&quot;,
     quantization_config=bnb_config,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
 ```
 
@@ -243,10 +293,10 @@ model = prepare_model_for_kbit_training(model)
 lora_config = LoraConfig(
     r=16,  # LoRA rank
     lora_alpha=32,  # LoRA alpha
-    target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+    target_modules=[&quot;q_proj&quot;, &quot;k_proj&quot;, &quot;v_proj&quot;, &quot;o_proj&quot;],
     lora_dropout=0.05,
-    bias="none",
-    task_type="CAUSAL_LM"
+    bias=&quot;none&quot;,
+    task_type=&quot;CAUSAL_LM&quot;
 )
 
 # Add LoRA adapters
@@ -261,14 +311,14 @@ model.print_trainable_parameters()
 from transformers import Trainer, TrainingArguments
 
 training_args = TrainingArguments(
-    output_dir="./qlora-output",
+    output_dir=&quot;./qlora-output&quot;,
     per_device_train_batch_size=4,
     gradient_accumulation_steps=4,
     num_train_epochs=3,
     learning_rate=2e-4,
     fp16=True,
     logging_steps=10,
-    save_strategy="epoch"
+    save_strategy=&quot;epoch&quot;
 )
 
 trainer = Trainer(
@@ -281,7 +331,7 @@ trainer = Trainer(
 trainer.train()
 
 # Save LoRA adapters (only ~20MB)
-model.save_pretrained("./qlora-adapters")
+model.save_pretrained(&quot;./qlora-adapters&quot;)
 ```
 
 ### Workflow 3: 8-bit optimizer for memory-efficient training
@@ -302,12 +352,12 @@ import bitsandbytes as bnb
 from transformers import Trainer, TrainingArguments
 
 # Instead of torch.optim.AdamW
-model = AutoModelForCausalLM.from_pretrained("model-name")
+model = AutoModelForCausalLM.from_pretrained(&quot;model-name&quot;)
 
 training_args = TrainingArguments(
-    output_dir="./output",
+    output_dir=&quot;./output&quot;,
     per_device_train_batch_size=8,
-    optim="paged_adamw_8bit",  # 8-bit optimizer
+    optim=&quot;paged_adamw_8bit&quot;,  # 8-bit optimizer
     learning_rate=5e-5
 )
 
@@ -364,7 +414,7 @@ before = torch.cuda.memory_allocated()
 optimizer.step()
 
 after = torch.cuda.memory_allocated()
-print(f"Memory used: {(after-before)/1e9:.2f}GB")
+print(f&quot;Memory used: {(after-before)/1e9:.2f}GB&quot;)
 ```
 
 ## When to use vs alternatives
@@ -400,10 +450,10 @@ pip install bitsandbytes --no-cache-dir
 Use CPU offload for large models:
 ```python
 model = AutoModelForCausalLM.from_pretrained(
-    "model-name",
+    &quot;model-name&quot;,
     quantization_config=config,
-    device_map="auto",
-    max_memory={0: "20GB", "cpu": "30GB"}  # Offload to CPU
+    device_map=&quot;auto&quot;,
+    max_memory={0: &quot;20GB&quot;, &quot;cpu&quot;: &quot;30GB&quot;}  # Offload to CPU
 )
 ```
 
@@ -419,7 +469,7 @@ Or use NF4 with double quantization:
 ```python
 config = BitsAndBytesConfig(
     load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",  # Better than fp4
+    bnb_4bit_quant_type=&quot;nf4&quot;,  # Better than fp4
     bnb_4bit_use_double_quant=True  # Extra accuracy
 )
 ```
@@ -429,10 +479,10 @@ config = BitsAndBytesConfig(
 Enable CPU offload:
 ```python
 model = AutoModelForCausalLM.from_pretrained(
-    "model-name",
+    &quot;model-name&quot;,
     quantization_config=config,
-    device_map="auto",
-    offload_folder="offload",  # Disk offload
+    device_map=&quot;auto&quot;,
+    offload_folder=&quot;offload&quot;,  # Disk offload
     offload_state_dict=True
 )
 ```
@@ -461,13 +511,51 @@ model = AutoModelForCausalLM.from_pretrained(
 
 - GitHub: https://github.com/bitsandbytes-foundation/bitsandbytes
 - HuggingFace docs: https://huggingface.co/docs/transformers/quantization/bitsandbytes
-- QLoRA paper: "QLoRA: Efficient Finetuning of Quantized LLMs" (2023)
-- LLM.int8() paper: "LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale" (2022)
+- QLoRA paper: &quot;QLoRA: Efficient Finetuning of Quantized LLMs&quot; (2023)
+- LLM.int8() paper: &quot;LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale&quot; (2022)
 
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Optimization</span><span class="tag">Bitsandbytes</span><span class="tag">Quantization</span><span class="tag">8-Bit</span><span class="tag">4-Bit</span><span class="tag">Memory Optimization</span><span class="tag">QLoRA</span><span class="tag">NF4</span><span class="tag">INT8</span><span class="tag">HuggingFace</span><span class="tag">Efficient Inference</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>14</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

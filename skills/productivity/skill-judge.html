@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>skill-judge - AICCLI</title>
-  <meta name="description" content="skill-judge - Claude Code skill for AICCLI">
+  <meta name="description" content="Evaluate Agent Skill design quality against official specifications and best practices. Use when reviewing, auditing, or improving SKILL.md files and skill pack">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / skill-judge</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>skill-judge</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">productivity</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / productivity / skill-judge
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>skill-judge</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">productivity</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Evaluate Agent Skill design quality against official specifications and best practices. Use when reviewing, auditing, or improving SKILL.md files and skill packages. Provides multi-dimensional scoring and actionable improvement suggestions.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/skill-judge</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/skill-judge</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/skill-judge</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: skill-judge
 description: Evaluate Agent Skill design quality against official specifications and best practices. Use when reviewing, auditing, or improving SKILL.md files and skill packages. Provides multi-dimensional scoring and actionable improvement suggestions.
 ---
@@ -86,18 +136,18 @@ Cost: $0
 Timeline: Instant
 ```
 
-This is the paradigm shift from "training AI" to "educating AI" — like a hot-swappable LoRA adapter that requires no training. You edit a Markdown file in natural language, and the model's behavior changes.
+This is the paradigm shift from &quot;training AI&quot; to &quot;educating AI&quot; — like a hot-swappable LoRA adapter that requires no training. You edit a Markdown file in natural language, and the model&#039;s behavior changes.
 
 ### The Core Formula
 
 &gt; **Good Skill = Expert-only Knowledge − What Claude Already Knows**
 
-A Skill's value is measured by its **knowledge delta** — the gap between what it provides and what the model already knows.
+A Skill&#039;s value is measured by its **knowledge delta** — the gap between what it provides and what the model already knows.
 
 - **Expert-only knowledge**: Decision trees, trade-offs, edge cases, anti-patterns, domain-specific thinking frameworks — things that take years of experience to accumulate
 - **What Claude already knows**: Basic concepts, standard library usage, common programming patterns, general best practices
 
-When a Skill explains "what is PDF" or "how to write a for-loop", it's compressing knowledge Claude already has. This is **token waste** — context window is a public resource shared with system prompts, conversation history, other Skills, and user requests.
+When a Skill explains &quot;what is PDF&quot; or &quot;how to write a for-loop&quot;, it&#039;s compressing knowledge Claude already has. This is **token waste** — context window is a public resource shared with system prompts, conversation history, other Skills, and user requests.
 
 ### Tool vs Skill
 
@@ -106,7 +156,7 @@ When a Skill explains "what is PDF" or "how to write a for-loop", it's compressi
 | **Tool** | What model CAN do | Execute actions | bash, read_file, write_file, WebSearch |
 | **Skill** | What model KNOWS how to do | Guide decisions | PDF processing, MCP building, frontend design |
 
-Tools define capability boundaries — without bash tool, model can't execute commands.
+Tools define capability boundaries — without bash tool, model can&#039;t execute commands.
 Skills inject knowledge — without frontend-design Skill, model produces generic UI.
 
 **The equation**:
@@ -122,7 +172,7 @@ When evaluating, categorize each section:
 
 | Type | Definition | Treatment |
 |------|------------|-----------|
-| **Expert** | Claude genuinely doesn't know this | Must keep — this is the Skill's value |
+| **Expert** | Claude genuinely doesn&#039;t know this | Must keep — this is the Skill&#039;s value |
 | **Activation** | Claude knows but may not think of | Keep if brief — serves as reminder |
 | **Redundant** | Claude definitely knows this | Should delete — wastes tokens |
 
@@ -144,22 +194,22 @@ The most important dimension. Does the Skill add genuine expert knowledge?
 | 16-20 | Pure knowledge delta — every paragraph earns its tokens |
 
 **Red flags** (instant score ≤5):
-- "What is [basic concept]" sections
+- &quot;What is [basic concept]&quot; sections
 - Step-by-step tutorials for standard operations
 - Explaining how to use common libraries
-- Generic best practices ("write clean code", "handle errors")
+- Generic best practices (&quot;write clean code&quot;, &quot;handle errors&quot;)
 - Definitions of industry-standard terms
 
 **Green flags** (indicators of high knowledge delta):
-- Decision trees for non-obvious choices ("when X fails, try Y because Z")
-- Trade-offs only an expert would know ("A is faster but B handles edge case C")
+- Decision trees for non-obvious choices (&quot;when X fails, try Y because Z&quot;)
+- Trade-offs only an expert would know (&quot;A is faster but B handles edge case C&quot;)
 - Edge cases from real-world experience
-- "NEVER do X because [non-obvious reason]"
+- &quot;NEVER do X because [non-obvious reason]&quot;
 - Domain-specific thinking frameworks
 
 **Evaluation questions**:
-1. For each section, ask: "Does Claude already know this?"
-2. If explaining something, ask: "Is this explaining TO Claude or FOR Claude?"
+1. For each section, ask: &quot;Does Claude already know this?&quot;
+2. If explaining something, ask: &quot;Is this explaining TO Claude or FOR Claude?&quot;
 3. Count paragraphs that are Expert vs Activation vs Redundant
 
 ---
@@ -168,32 +218,32 @@ The most important dimension. Does the Skill add genuine expert knowledge?
 
 Does the Skill transfer expert **thinking patterns** along with **necessary domain-specific procedures**?
 
-The difference between experts and novices isn't "knowing how to operate" — it's "how to think about the problem." But thinking patterns alone aren't enough when Claude lacks domain-specific procedural knowledge.
+The difference between experts and novices isn&#039;t &quot;knowing how to operate&quot; — it&#039;s &quot;how to think about the problem.&quot; But thinking patterns alone aren&#039;t enough when Claude lacks domain-specific procedural knowledge.
 
 **Key distinction**:
 | Type | Example | Value |
 |------|---------|-------|
-| **Thinking patterns** | "Before designing, ask: What makes this memorable?" | High — shapes decision-making |
-| **Domain-specific procedures** | "OOXML workflow: unpack → edit XML → validate → pack" | High — Claude may not know this |
-| **Generic procedures** | "Step 1: Open file, Step 2: Edit, Step 3: Save" | Low — Claude already knows |
+| **Thinking patterns** | &quot;Before designing, ask: What makes this memorable?&quot; | High — shapes decision-making |
+| **Domain-specific procedures** | &quot;OOXML workflow: unpack → edit XML → validate → pack&quot; | High — Claude may not know this |
+| **Generic procedures** | &quot;Step 1: Open file, Step 2: Edit, Step 3: Save&quot; | Low — Claude already knows |
 
 | Score | Criteria |
 |-------|----------|
 | 0-3 | Only generic procedures Claude already knows |
 | 4-7 | Has domain procedures but lacks thinking frameworks |
 | 8-11 | Good balance: thinking patterns + domain-specific workflows |
-| 12-15 | Expert-level: shapes thinking AND provides procedures Claude wouldn't know |
+| 12-15 | Expert-level: shapes thinking AND provides procedures Claude wouldn&#039;t know |
 
 **What counts as valuable procedures**:
-- Workflows Claude hasn't been trained on (new tools, proprietary systems)
-- Correct ordering that's non-obvious (e.g., "validate BEFORE packing, not after")
-- Critical steps that are easy to miss (e.g., "MUST recalculate formulas after editing")
-- Domain-specific sequences (e.g., MCP server's 4-phase development process)
+- Workflows Claude hasn&#039;t been trained on (new tools, proprietary systems)
+- Correct ordering that&#039;s non-obvious (e.g., &quot;validate BEFORE packing, not after&quot;)
+- Critical steps that are easy to miss (e.g., &quot;MUST recalculate formulas after editing&quot;)
+- Domain-specific sequences (e.g., MCP server&#039;s 4-phase development process)
 
 **What counts as redundant procedures**:
 - Generic file operations (open, read, write, save)
 - Standard programming patterns (loops, conditionals, error handling)
-- Common library usage that's well-documented
+- Common library usage that&#039;s well-documented
 
 **Expert thinking patterns look like**:
 ```markdown
@@ -205,7 +255,7 @@ Before [action], ask yourself:
 
 **Valuable domain procedures look like**:
 ```markdown
-### Redlining Workflow (Claude wouldn't know this sequence)
+### Redlining Workflow (Claude wouldn&#039;t know this sequence)
 1. Convert to markdown: `pandoc --track-changes=all`
 2. Map text to XML: grep for text in document.xml
 3. Implement changes in batches of 3-10
@@ -222,7 +272,7 @@ Step 4: Save and test
 
 **The test**:
 1. Does it tell Claude WHAT to think about? (thinking patterns)
-2. Does it tell Claude HOW to do things it wouldn't know? (domain procedures)
+2. Does it tell Claude HOW to do things it wouldn&#039;t know? (domain procedures)
 
 A good Skill provides both when needed.
 
@@ -232,14 +282,14 @@ A good Skill provides both when needed.
 
 Does the Skill have effective NEVER lists?
 
-**Why this matters**: Half of expert knowledge is knowing what NOT to do. A senior designer sees purple gradient on white background and instinctively cringes — "too AI-generated." This intuition for "what absolutely not to do" comes from stepping on countless landmines.
+**Why this matters**: Half of expert knowledge is knowing what NOT to do. A senior designer sees purple gradient on white background and instinctively cringes — &quot;too AI-generated.&quot; This intuition for &quot;what absolutely not to do&quot; comes from stepping on countless landmines.
 
-Claude hasn't stepped on these landmines. It doesn't know Inter font is overused, doesn't know purple gradients are the signature of AI-generated content. Good Skills must explicitly state these "absolute don'ts."
+Claude hasn&#039;t stepped on these landmines. It doesn&#039;t know Inter font is overused, doesn&#039;t know purple gradients are the signature of AI-generated content. Good Skills must explicitly state these &quot;absolute don&#039;ts.&quot;
 
 | Score | Criteria |
 |-------|----------|
 | 0-3 | No anti-patterns mentioned |
-| 4-7 | Generic warnings ("avoid errors", "be careful", "consider edge cases") |
+| 4-7 | Generic warnings (&quot;avoid errors&quot;, &quot;be careful&quot;, &quot;consider edge cases&quot;) |
 | 8-11 | Specific NEVER list with some reasoning |
 | 12-15 | Expert-grade anti-patterns with WHY — things only experience teaches |
 
@@ -256,10 +306,10 @@ NEVER use generic AI-generated aesthetics like:
 ```markdown
 Avoid making mistakes.
 Be careful with edge cases.
-Don't write bad code.
+Don&#039;t write bad code.
 ```
 
-**The test**: Would an expert read the anti-pattern list and say "yes, I learned this the hard way"? Or would they say "this is obvious to everyone"?
+**The test**: Would an expert read the anti-pattern list and say &quot;yes, I learned this the hard way&quot;? Or would they say &quot;this is obvious to everyone&quot;?
 
 ---
 
@@ -289,13 +339,13 @@ Does the Skill follow official format requirements? **Special focus on descripti
 │  User Request → Agent sees ALL skill descriptions → Decides which  │
 │                 (only descriptions, not bodies!)     to activate    │
 │                                                                     │
-│  If description doesn't match → Skill NEVER gets loaded            │
+│  If description doesn&#039;t match → Skill NEVER gets loaded            │
 │  If description is vague → Skill might not trigger when it should  │
 │  If description lacks keywords → Skill is invisible to the Agent   │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-**The brutal truth**: A Skill with perfect content but poor description is **useless** — it will never be activated. The description is the **only chance** to tell the Agent "use me in these situations."
+**The brutal truth**: A Skill with perfect content but poor description is **useless** — it will never be activated. The description is the **only chance** to tell the Agent &quot;use me in these situations.&quot;
 
 ---
 
@@ -307,31 +357,31 @@ Does the Skill follow official format requirements? **Special focus on descripti
 
 **Excellent description** (all three elements):
 ```yaml
-description: "Comprehensive document creation, editing, and analysis with support
+description: &quot;Comprehensive document creation, editing, and analysis with support
 for tracked changes, comments, formatting preservation, and text extraction.
 When Claude needs to work with professional documents (.docx files) for:
 (1) Creating new documents, (2) Modifying or editing content,
-(3) Working with tracked changes, (4) Adding comments, or any other document tasks"
+(3) Working with tracked changes, (4) Adding comments, or any other document tasks&quot;
 ```
 
 Analysis:
 - WHAT: creation, editing, analysis, tracked changes, comments
-- WHEN: "When Claude needs to work with... for: (1)... (2)... (3)..."
+- WHEN: &quot;When Claude needs to work with... for: (1)... (2)... (3)...&quot;
 - KEYWORDS: .docx files, tracked changes, professional documents
 
 **Poor description** (missing elements):
 ```yaml
-description: "处理文档相关功能"
+description: &quot;处理文档相关功能&quot;
 ```
 
 Problems:
-- WHAT: vague ("文档相关功能" — what specifically?)
+- WHAT: vague (&quot;文档相关功能&quot; — what specifically?)
 - WHEN: missing (when should Agent use this?)
-- KEYWORDS: missing (no ".docx", no specific scenarios)
+- KEYWORDS: missing (no &quot;.docx&quot;, no specific scenarios)
 
 **Another poor example**:
 ```yaml
-description: "A helpful skill for various tasks"
+description: &quot;A helpful skill for various tasks&quot;
 ```
 
 This is useless — Agent has no idea when to activate it.
@@ -339,11 +389,11 @@ This is useless — Agent has no idea when to activate it.
 ---
 
 **Description quality checklist**:
-- [ ] Lists specific capabilities (not just "helps with X")
-- [ ] Includes explicit trigger scenarios ("Use when...", "When user asks for...")
+- [ ] Lists specific capabilities (not just &quot;helps with X&quot;)
+- [ ] Includes explicit trigger scenarios (&quot;Use when...&quot;, &quot;When user asks for...&quot;)
 - [ ] Contains searchable keywords (file extensions, domain terms, action verbs)
 - [ ] Specific enough that Agent knows EXACTLY when to use it
-- [ ] Includes scenarios where this skill MUST be used (not just "can be used")
+- [ ] Includes scenarios where this skill MUST be used (not just &quot;can be used&quot;)
 
 ---
 
@@ -371,7 +421,7 @@ Layer 3: Resources (loaded on demand)
 | 0-5 | Everything dumped in SKILL.md (&gt;500 lines, no structure) |
 | 6-10 | Has references but unclear when to load them |
 | 11-13 | Good layering with MANDATORY triggers present |
-| 14-15 | Perfect: decision trees + explicit triggers + "Do NOT Load" guidance |
+| 14-15 | Perfect: decision trees + explicit triggers + &quot;Do NOT Load&quot; guidance |
 
 **For Skills WITH references directory**, check Loading Trigger Quality:
 
@@ -380,13 +430,13 @@ Layer 3: Resources (loaded on demand)
 | Poor | References listed at end, no loading guidance |
 | Mediocre | Some triggers but not embedded in workflow |
 | Good | MANDATORY triggers in workflow steps |
-| Excellent | Scenario detection + conditional triggers + "Do NOT Load" |
+| Excellent | Scenario detection + conditional triggers + &quot;Do NOT Load&quot; |
 
 **The loading problem**:
 ```
 Loading too little ◄─────────────────────────────────► Loading too much
 - References sit unused                    - Wastes context space
-- Agent doesn't know when to load          - Irrelevant info dilutes key content
+- Agent doesn&#039;t know when to load          - Irrelevant info dilutes key content
 - Knowledge is there but never accessed    - Unnecessary token overhead
 ```
 
@@ -415,7 +465,7 @@ Loading too little ◄───────────────────�
 
 ### D6: Freedom Calibration (15 points)
 
-Is the level of specificity appropriate for the task's fragility?
+Is the level of specificity appropriate for the task&#039;s fragility?
 
 Different tasks need different levels of constraint. This is about matching freedom to fragility.
 
@@ -452,11 +502,11 @@ Review priority:
 **Low freedom** (specific scripts, exact steps):
 ```markdown
 **MANDATORY**: Use exact script in `scripts/create-doc.py`
-Parameters: --title "X" --author "Y"
+Parameters: --title &quot;X&quot; --author &quot;Y&quot;
 Do NOT modify the script.
 ```
 
-**The test**: Ask "if Agent makes a mistake, what's the consequence?"
+**The test**: Ask &quot;if Agent makes a mistake, what&#039;s the consequence?&quot;
 - High consequence → Low freedom
 - Low consequence → High freedom
 
@@ -536,15 +586,15 @@ Consider edge cases.
 
 ## NEVER Do When Evaluating
 
-- **NEVER** give high scores just because it "looks professional" or is well-formatted
+- **NEVER** give high scores just because it &quot;looks professional&quot; or is well-formatted
 - **NEVER** ignore token waste — every redundant paragraph should result in deduction
 - **NEVER** let length impress you — a 43-line Skill can outperform a 500-line Skill
 - **NEVER** skip mentally testing the decision trees — do they actually lead to correct choices?
-- **NEVER** forgive explaining basics with "but it provides helpful context"
-- **NEVER** overlook missing anti-patterns — if there's no NEVER list, that's a significant gap
+- **NEVER** forgive explaining basics with &quot;but it provides helpful context&quot;
+- **NEVER** overlook missing anti-patterns — if there&#039;s no NEVER list, that&#039;s a significant gap
 - **NEVER** assume all procedures are valuable — distinguish domain-specific from generic
 - **NEVER** undervalue the description field — poor description = skill never gets used
-- **NEVER** put "when to use" info only in the body — Agent only sees description before loading
+- **NEVER** put &quot;when to use&quot; info only in the body — Agent only sees description before loading
 
 ---
 
@@ -553,10 +603,10 @@ Consider edge cases.
 ### Step 1: First Pass — Knowledge Delta Scan
 
 Read SKILL.md completely and for each section ask:
-&gt; "Does Claude already know this?"
+&gt; &quot;Does Claude already know this?&quot;
 
 Mark each section as:
-- **[E] Expert**: Claude genuinely doesn't know this — value-add
+- **[E] Expert**: Claude genuinely doesn&#039;t know this — value-add
 - **[A] Activation**: Claude knows but brief reminder is useful — acceptable
 - **[R] Redundant**: Claude definitely knows this — should be deleted
 
@@ -582,7 +632,7 @@ For each of the 8 dimensions:
 2. Assign score with one-line justification
 3. Note specific improvements if score &lt; max
 
-### Step 4: Calculate Total & Grade
+### Step 4: Calculate Total &amp; Grade
 
 ```
 Total = D1 + D2 + D3 + D4 + D5 + D6 + D7 + D8
@@ -624,7 +674,7 @@ Max = 120 points
 | D8: Practical Usability | X | 15 | |
 
 ## Critical Issues
-[List must-fix problems that significantly impact the Skill's effectiveness]
+[List must-fix problems that significantly impact the Skill&#039;s effectiveness]
 
 ## Top 3 Improvements
 1. [Highest impact improvement with specific guidance]
@@ -633,7 +683,7 @@ Max = 120 points
 
 ## Detailed Analysis
 [For each dimension scoring below 80%, provide:
-- What's missing or problematic
+- What&#039;s missing or problematic
 - Specific examples from the Skill
 - Concrete suggestions for improvement]
 ```
@@ -645,7 +695,7 @@ Max = 120 points
 ### Pattern 1: The Tutorial
 ```
 Symptom: Explains what PDF is, how Python works, basic library usage
-Root cause: Author assumes Skill should "teach" the model
+Root cause: Author assumes Skill should &quot;teach&quot; the model
 Fix: Claude already knows this. Delete all basic explanations.
      Focus on expert decisions, trade-offs, and anti-patterns.
 ```
@@ -662,24 +712,24 @@ Fix: Core routing and decision trees in SKILL.md (&lt;300 lines ideal)
 ```
 Symptom: References directory exists but files are never loaded
 Root cause: No explicit loading triggers
-Fix: Add "MANDATORY - READ ENTIRE FILE" at workflow decision points
-     Add "Do NOT Load" to prevent over-loading
+Fix: Add &quot;MANDATORY - READ ENTIRE FILE&quot; at workflow decision points
+     Add &quot;Do NOT Load&quot; to prevent over-loading
 ```
 
 ### Pattern 4: The Checkbox Procedure
 ```
 Symptom: Step 1, Step 2, Step 3... mechanical procedures
 Root cause: Author thinks in procedures, not thinking frameworks
-Fix: Transform into "Before doing X, ask yourself..."
+Fix: Transform into &quot;Before doing X, ask yourself...&quot;
      Focus on decision principles, not operation sequences
 ```
 
 ### Pattern 5: The Vague Warning
 ```
-Symptom: "Be careful", "avoid errors", "consider edge cases"
-Root cause: Author knows things can go wrong but hasn't articulated specifics
+Symptom: &quot;Be careful&quot;, &quot;avoid errors&quot;, &quot;consider edge cases&quot;
+Root cause: Author knows things can go wrong but hasn&#039;t articulated specifics
 Fix: Specific NEVER list with concrete examples and non-obvious reasons
-     "NEVER use X because [specific problem that takes experience to learn]"
+     &quot;NEVER use X because [specific problem that takes experience to learn]&quot;
 ```
 
 ### Pattern 6: The Invisible Skill
@@ -687,17 +737,17 @@ Fix: Specific NEVER list with concrete examples and non-obvious reasons
 Symptom: Great content but skill rarely gets activated
 Root cause: Description is vague, missing keywords, or lacks trigger scenarios
 Fix: Description must answer WHAT, WHEN, and include KEYWORDS
-     "Use when..." + specific scenarios + searchable terms
+     &quot;Use when...&quot; + specific scenarios + searchable terms
 
 Example fix:
-BAD:  "Helps with document tasks"
-GOOD: "Create, edit, and analyze .docx files. Use when working with
-       Word documents, tracked changes, or professional document formatting."
+BAD:  &quot;Helps with document tasks&quot;
+GOOD: &quot;Create, edit, and analyze .docx files. Use when working with
+       Word documents, tracked changes, or professional document formatting.&quot;
 ```
 
 ### Pattern 7: The Wrong Location
 ```
-Symptom: "When to use this Skill" section in body, not in description
+Symptom: &quot;When to use this Skill&quot; section in body, not in description
 Root cause: Misunderstanding of three-layer loading
 Fix: Move all triggering information to description field
      Body is only loaded AFTER triggering decision is made
@@ -729,7 +779,7 @@ Fix: High freedom for creative (principles, not steps)
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  KNOWLEDGE DELTA (most important):                                      │
-│    [ ] No "What is X" explanations for basic concepts                   │
+│    [ ] No &quot;What is X&quot; explanations for basic concepts                   │
 │    [ ] No step-by-step tutorials for standard operations                │
 │    [ ] Has decision trees for non-obvious choices                       │
 │    [ ] Has trade-offs only experts would know                           │
@@ -737,8 +787,8 @@ Fix: High freedom for creative (principles, not steps)
 │                                                                         │
 │  MINDSET + PROCEDURES:                                                  │
 │    [ ] Transfers thinking patterns (how to think about problems)        │
-│    [ ] Has "Before doing X, ask yourself..." frameworks                 │
-│    [ ] Includes domain-specific procedures Claude wouldn't know         │
+│    [ ] Has &quot;Before doing X, ask yourself...&quot; frameworks                 │
+│    [ ] Includes domain-specific procedures Claude wouldn&#039;t know         │
 │    [ ] Distinguishes valuable procedures from generic ones              │
 │                                                                         │
 │  ANTI-PATTERNS:                                                         │
@@ -758,7 +808,7 @@ Fix: High freedom for creative (principles, not steps)
 │    [ ] SKILL.md &lt; 500 lines (ideal &lt; 300)                               │
 │    [ ] Heavy content in references/                                     │
 │    [ ] Loading triggers embedded in workflow                            │
-│    [ ] Has "Do NOT Load" for preventing over-loading                    │
+│    [ ] Has &quot;Do NOT Load&quot; for preventing over-loading                    │
 │                                                                         │
 │  FREEDOM:                                                               │
 │    [ ] Creative tasks → High freedom (principles)                       │
@@ -779,15 +829,15 @@ Fix: High freedom for creative (principles, not steps)
 
 When evaluating any Skill, always return to this fundamental question:
 
-&gt; **"Would an expert in this domain, looking at this Skill, say:**
-&gt; **'Yes, this captures knowledge that took me years to learn'?"**
+&gt; **&quot;Would an expert in this domain, looking at this Skill, say:**
+&gt; **&#039;Yes, this captures knowledge that took me years to learn&#039;?&quot;**
 
 If the answer is yes → the Skill has genuine value.
-If the answer is no → it's compressing what Claude already knows.
+If the answer is no → it&#039;s compressing what Claude already knows.
 
-The best Skills are **compressed expert brains** — they take a designer's 10 years of aesthetic accumulation and compress it into 43 lines, or a document expert's operational experience into a 200-line decision tree.
+The best Skills are **compressed expert brains** — they take a designer&#039;s 10 years of aesthetic accumulation and compress it into 43 lines, or a document expert&#039;s operational experience into a 200-line decision tree.
 
-What gets compressed must be things Claude doesn't have. Otherwise, it's garbage compression.
+What gets compressed must be things Claude doesn&#039;t have. Otherwise, it&#039;s garbage compression.
 
 ---
 
@@ -795,9 +845,9 @@ What gets compressed must be things Claude doesn't have. Otherwise, it's garbage
 
 This Skill (skill-judge) should itself pass evaluation:
 
-- **Knowledge Delta**: Provides specific evaluation criteria Claude wouldn't generate on its own
+- **Knowledge Delta**: Provides specific evaluation criteria Claude wouldn&#039;t generate on its own
 - **Mindset**: Shapes how to think about Skill quality, not just checklist items
-- **Anti-Patterns**: "NEVER Do When Evaluating" section with specific don'ts
+- **Anti-Patterns**: &quot;NEVER Do When Evaluating&quot; section with specific don&#039;ts
 - **Specification**: Valid frontmatter with comprehensive description
 - **Progressive Disclosure**: Self-contained, no external references needed
 - **Freedom**: Medium freedom appropriate for evaluation task
@@ -807,8 +857,39 @@ This Skill (skill-judge) should itself pass evaluation:
 
 
 Evaluate this Skill against itself as a calibration exercise.
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>43</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

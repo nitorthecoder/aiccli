@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>blockrun - AICCLI</title>
-  <meta name="description" content="blockrun - Claude Code skill for AICCLI">
+  <meta name="description" content="Use when user needs capabilities Claude lacks (image generation, real-time X/Twitter data) or explicitly requests external models ("blockrun", "use grok", "use ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / blockrun</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>blockrun</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">web-development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / web-development / blockrun
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>blockrun</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">web-development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Use when user needs capabilities Claude lacks (image generation, real-time X/Twitter data) or explicitly requests external models ("blockrun", "use grok", "use gpt", "dall-e", "deepseek")</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/blockrun</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/blockrun</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/blockrun</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: blockrun
-description: Use when user needs capabilities Claude lacks (image generation, real-time X/Twitter data) or explicitly requests external models ("blockrun", "use grok", "use gpt", "dall-e", "deepseek")
+description: Use when user needs capabilities Claude lacks (image generation, real-time X/Twitter data) or explicitly requests external models (&quot;blockrun&quot;, &quot;use grok&quot;, &quot;use gpt&quot;, &quot;dall-e&quot;, &quot;deepseek&quot;)
 allowed-tools: Read, Bash(python:*), Bash(python3:*), Bash(pip:*), Bash(source:*)
 ---
 
@@ -65,7 +115,7 @@ allowed-tools: Read, Bash(python:*), Bash(python3:*), Bash(pip:*), Bash(source:*
 
 **BlockRun works with Claude Code and Google Antigravity.**
 
-You can't generate images. You have no real-time X/Twitter access. BlockRun gives you these capabilities.
+You can&#039;t generate images. You have no real-time X/Twitter access. BlockRun gives you these capabilities.
 
 ## Philosophy
 
@@ -82,34 +132,34 @@ You have a wallet. When you need a capability you lack, you pay for it autonomou
 
 ## Budget Control (Optional)
 
-If the user specifies a budget (e.g., "use at most $1"), track spending and stop when budget is reached:
+If the user specifies a budget (e.g., &quot;use at most $1&quot;), track spending and stop when budget is reached:
 
 ```python
 from blockrun_llm import setup_agent_wallet
 
 client = setup_agent_wallet()
-budget = 1.0  # User's budget
+budget = 1.0  # User&#039;s budget
 
 # Before each call, check if within budget
 spending = client.get_spending()
-if spending['total_usd'] &gt;= budget:
-    print(f"Budget reached: ${spending['total_usd']:.4f} spent")
+if spending[&#039;total_usd&#039;] &gt;= budget:
+    print(f&quot;Budget reached: ${spending[&#039;total_usd&#039;]:.4f} spent&quot;)
     # Stop making calls
 else:
-    response = client.chat("openai/gpt-5.2", "Hello!")
+    response = client.chat(&quot;openai/gpt-5.2&quot;, &quot;Hello!&quot;)
 
 # At the end, report spending
 spending = client.get_spending()
-print(f"💰 Total spent: ${spending['total_usd']:.4f} across {spending['calls']} calls")
+print(f&quot;💰 Total spent: ${spending[&#039;total_usd&#039;]:.4f} across {spending[&#039;calls&#039;]} calls&quot;)
 ```
 
 ## When to Use
 
 | Trigger | Your Action |
 |---------|-------------|
-| User explicitly requests ("blockrun second opinion with GPT on...", "use grok to check...", "generate image with dall-e") | Execute via BlockRun |
-| User needs something you can't do (images, live X data) | Suggest BlockRun, wait for confirmation |
-| You can handle the task fine | Do it yourself, don't mention BlockRun |
+| User explicitly requests (&quot;blockrun second opinion with GPT on...&quot;, &quot;use grok to check...&quot;, &quot;generate image with dall-e&quot;) | Execute via BlockRun |
+| User needs something you can&#039;t do (images, live X data) | Suggest BlockRun, wait for confirmation |
+| You can handle the task fine | Do it yourself, don&#039;t mention BlockRun |
 
 ## Example User Prompts
 
@@ -117,15 +167,15 @@ Users will say things like:
 
 | User Says | What You Do |
 |-----------|-------------|
-| "blockrun generate an image of a sunset" | Call DALL-E via ImageClient |
-| "use grok to check what's trending on X" | Call Grok with `search=True` |
-| "blockrun GPT review this code" | Call GPT-5.2 via LLMClient |
-| "what's the latest news about AI agents?" | Suggest Grok (you lack real-time data) |
-| "generate a logo for my startup" | Suggest DALL-E (you can't generate images) |
-| "blockrun check my balance" | Show wallet balance via `get_balance()` |
-| "blockrun deepseek summarize this file" | Call DeepSeek for cost savings |
+| &quot;blockrun generate an image of a sunset&quot; | Call DALL-E via ImageClient |
+| &quot;use grok to check what&#039;s trending on X&quot; | Call Grok with `search=True` |
+| &quot;blockrun GPT review this code&quot; | Call GPT-5.2 via LLMClient |
+| &quot;what&#039;s the latest news about AI agents?&quot; | Suggest Grok (you lack real-time data) |
+| &quot;generate a logo for my startup&quot; | Suggest DALL-E (you can&#039;t generate images) |
+| &quot;blockrun check my balance&quot; | Show wallet balance via `get_balance()` |
+| &quot;blockrun deepseek summarize this file&quot; | Call DeepSeek for cost savings |
 
-## Wallet & Balance
+## Wallet &amp; Balance
 
 Use `setup_agent_wallet()` to auto-create a wallet and get a client. This shows the QR code and welcome message on first use.
 
@@ -136,11 +186,11 @@ from blockrun_llm import setup_agent_wallet
 client = setup_agent_wallet()  # Auto-creates wallet, shows QR if new
 ```
 
-**Check balance (when user asks "show balance", "check wallet", etc.):**
+**Check balance (when user asks &quot;show balance&quot;, &quot;check wallet&quot;, etc.):**
 ```python
 balance = client.get_balance()  # On-chain USDC balance
-print(f"Balance: ${balance:.2f} USDC")
-print(f"Wallet: {client.get_wallet_address()}")
+print(f&quot;Balance: ${balance:.2f} USDC&quot;)
+print(f&quot;Wallet: {client.get_wallet_address()}&quot;)
 ```
 
 **Show QR code for funding:**
@@ -160,12 +210,12 @@ print(generate_wallet_qr_ascii(get_wallet_address()))
 from blockrun_llm import setup_agent_wallet
 
 client = setup_agent_wallet()  # Auto-creates wallet if needed
-response = client.chat("openai/gpt-5.2", "What is 2+2?")
+response = client.chat(&quot;openai/gpt-5.2&quot;, &quot;What is 2+2?&quot;)
 print(response)
 
 # Check spending
 spending = client.get_spending()
-print(f"Spent ${spending['total_usd']:.4f}")
+print(f&quot;Spent ${spending[&#039;total_usd&#039;]:.4f}&quot;)
 ```
 
 ### Real-time X/Twitter Search (xAI Live Search)
@@ -179,8 +229,8 @@ client = setup_agent_wallet()
 
 # Simple: Enable live search with search=True
 response = client.chat(
-    "xai/grok-3",
-    "What are the latest posts from @blockrunai on X?",
+    &quot;xai/grok-3&quot;,
+    &quot;What are the latest posts from @blockrunai on X?&quot;,
     search=True  # Enables real-time X/Twitter search
 )
 print(response)
@@ -194,19 +244,19 @@ from blockrun_llm import setup_agent_wallet
 client = setup_agent_wallet()
 
 response = client.chat(
-    "xai/grok-3",
-    "Analyze @blockrunai's recent content and engagement",
+    &quot;xai/grok-3&quot;,
+    &quot;Analyze @blockrunai&#039;s recent content and engagement&quot;,
     search_parameters={
-        "mode": "on",
-        "sources": [
+        &quot;mode&quot;: &quot;on&quot;,
+        &quot;sources&quot;: [
             {
-                "type": "x",
-                "included_x_handles": ["blockrunai"],
-                "post_favorite_count": 5
+                &quot;type&quot;: &quot;x&quot;,
+                &quot;included_x_handles&quot;: [&quot;blockrunai&quot;],
+                &quot;post_favorite_count&quot;: 5
             }
         ],
-        "max_search_results": 20,
-        "return_citations": True
+        &quot;max_search_results&quot;: 20,
+        &quot;return_citations&quot;: True
     }
 )
 print(response)
@@ -217,26 +267,26 @@ print(response)
 from blockrun_llm import ImageClient
 
 client = ImageClient()
-result = client.generate("A cute cat wearing a space helmet")
+result = client.generate(&quot;A cute cat wearing a space helmet&quot;)
 print(result.data[0].url)
 ```
 
 ## xAI Live Search Reference
 
-Live Search is xAI's real-time data API. Cost: **$0.025 per source** (default 10 sources = ~$0.26).
+Live Search is xAI&#039;s real-time data API. Cost: **$0.025 per source** (default 10 sources = ~$0.26).
 
 To reduce costs, set `max_search_results` to a lower value:
 ```python
 # Only use 5 sources (~$0.13)
-response = client.chat("xai/grok-3", "What's trending?",
-    search_parameters={"mode": "on", "max_search_results": 5})
+response = client.chat(&quot;xai/grok-3&quot;, &quot;What&#039;s trending?&quot;,
+    search_parameters={&quot;mode&quot;: &quot;on&quot;, &quot;max_search_results&quot;: 5})
 ```
 
 ### Search Parameters
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `mode` | string | "auto" | "off", "auto", or "on" |
+| `mode` | string | &quot;auto&quot; | &quot;off&quot;, &quot;auto&quot;, or &quot;on&quot; |
 | `sources` | array | web,news,x | Data sources to query |
 | `return_citations` | bool | true | Include source URLs |
 | `from_date` | string | - | Start date (YYYY-MM-DD) |
@@ -248,30 +298,30 @@ response = client.chat("xai/grok-3", "What's trending?",
 **X/Twitter Source:**
 ```python
 {
-    "type": "x",
-    "included_x_handles": ["handle1", "handle2"],  # Max 10
-    "excluded_x_handles": ["spam_account"],        # Max 10
-    "post_favorite_count": 100,  # Min likes threshold
-    "post_view_count": 1000      # Min views threshold
+    &quot;type&quot;: &quot;x&quot;,
+    &quot;included_x_handles&quot;: [&quot;handle1&quot;, &quot;handle2&quot;],  # Max 10
+    &quot;excluded_x_handles&quot;: [&quot;spam_account&quot;],        # Max 10
+    &quot;post_favorite_count&quot;: 100,  # Min likes threshold
+    &quot;post_view_count&quot;: 1000      # Min views threshold
 }
 ```
 
 **Web Source:**
 ```python
 {
-    "type": "web",
-    "country": "US",  # ISO alpha-2 code
-    "allowed_websites": ["example.com"],  # Max 5
-    "safe_search": True
+    &quot;type&quot;: &quot;web&quot;,
+    &quot;country&quot;: &quot;US&quot;,  # ISO alpha-2 code
+    &quot;allowed_websites&quot;: [&quot;example.com&quot;],  # Max 5
+    &quot;safe_search&quot;: True
 }
 ```
 
 **News Source:**
 ```python
 {
-    "type": "news",
-    "country": "US",
-    "excluded_websites": ["tabloid.com"]  # Max 5
+    &quot;type&quot;: &quot;news&quot;,
+    &quot;country&quot;: &quot;US&quot;,
+    &quot;excluded_websites&quot;: [&quot;tabloid.com&quot;]  # Max 5
 }
 ```
 
@@ -310,7 +360,7 @@ All LLM costs are per million tokens (M = 1,000,000 tokens).
 
 **Typical costs:** A 500-word prompt (~750 tokens) to GPT-5.2 costs ~$0.001 input. A 1000-word response (~1500 tokens) costs ~$0.02 output.
 
-## Setup & Funding
+## Setup &amp; Funding
 
 **Wallet location:** `$HOME/.blockrun/.session` (e.g., `/Users/username/.blockrun/.session`)
 
@@ -320,8 +370,8 @@ All LLM costs are per million tokens (M = 1,000,000 tokens).
 ```python
 from blockrun_llm import setup_agent_wallet
 client = setup_agent_wallet()
-print(f"Wallet: {client.get_wallet_address()}")
-print(f"Balance: ${client.get_balance():.2f} USDC")
+print(f&quot;Wallet: {client.get_wallet_address()}&quot;)
+print(f&quot;Balance: ${client.get_balance():.2f} USDC&quot;)
 ```
 3. Fund wallet with $1-5 USDC on Base network
 
@@ -333,10 +383,10 @@ print(generate_wallet_qr_ascii(get_wallet_address()))
 
 ## Troubleshooting
 
-**"Grok says it has no real-time access"**
+**&quot;Grok says it has no real-time access&quot;**
 → You forgot to enable Live Search. Add `search=True`:
 ```python
-response = client.chat("xai/grok-3", "What's trending?", search=True)
+response = client.chat(&quot;xai/grok-3&quot;, &quot;What&#039;s trending?&quot;, search=True)
 ```
 
 **Module not found**
@@ -347,8 +397,39 @@ response = client.chat("xai/grok-3", "What's trending?", search=True)
 ```bash
 pip install --upgrade blockrun-llm
 ```
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>28</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

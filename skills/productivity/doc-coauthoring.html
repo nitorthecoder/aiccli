@@ -4,78 +4,128 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>doc-coauthoring - AICCLI</title>
-  <meta name="description" content="doc-coauthoring - Claude Code skill for AICCLI">
+  <meta name="description" content="Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs,">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / doc-coauthoring</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>doc-coauthoring</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">productivity</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / productivity / doc-coauthoring
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>doc-coauthoring</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">productivity</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/doc-coauthoring</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/doc-coauthoring</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/doc-coauthoring</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: doc-coauthoring
 description: Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This workflow helps users efficiently transfer context, refine content through iteration, and verify the doc works for readers. Trigger when user mentions writing docs, creating proposals, drafting specs, or similar documentation tasks.
 ---
 
 # Doc Co-Authoring Workflow
 
-This skill provides a structured workflow for guiding users through collaborative document creation. Act as an active guide, walking users through three stages: Context Gathering, Refinement & Structure, and Reader Testing.
+This skill provides a structured workflow for guiding users through collaborative document creation. Act as an active guide, walking users through three stages: Context Gathering, Refinement &amp; Structure, and Reader Testing.
 
 ## When to Offer This Workflow
 
 **Trigger conditions:**
-- User mentions writing documentation: "write a doc", "draft a proposal", "create a spec", "write up"
-- User mentions specific doc types: "PRD", "design doc", "decision doc", "RFC"
+- User mentions writing documentation: &quot;write a doc&quot;, &quot;draft a proposal&quot;, &quot;create a spec&quot;, &quot;write up&quot;
+- User mentions specific doc types: &quot;PRD&quot;, &quot;design doc&quot;, &quot;decision doc&quot;, &quot;RFC&quot;
 - User seems to be starting a substantial writing task
 
 **Initial offer:**
 Offer the user a structured workflow for co-authoring the document. Explain the three stages:
 
 1. **Context Gathering**: User provides all relevant context while Claude asks clarifying questions
-2. **Refinement & Structure**: Iteratively build each section through brainstorming and editing
+2. **Refinement &amp; Structure**: Iteratively build each section through brainstorming and editing
 3. **Reader Testing**: Test the doc with a fresh Claude (no context) to catch blind spots before others read it
 
 Explain that this approach helps ensure the doc works well when others read it (including when they paste it into Claude). Ask if they want to try this workflow or prefer to work freeform.
@@ -91,8 +141,8 @@ If user declines, work freeform. If user accepts, proceed to Stage 1.
 Start by asking the user for meta-context about the document:
 
 1. What type of document is this? (e.g., technical spec, decision doc, proposal)
-2. Who's the primary audience?
-3. What's the desired impact when someone reads this?
+2. Who&#039;s the primary audience?
+3. What&#039;s the desired impact when someone reads this?
 4. Is there a template or specific format to follow?
 5. Any other constraints or context to know?
 
@@ -106,14 +156,14 @@ Inform them they can answer in shorthand or dump information however works best 
 **If user mentions editing an existing shared document:**
 - Use the appropriate integration to read the current state
 - Check for images without alt-text
-- If images exist without alt-text, explain that when others use Claude to understand the doc, Claude won't be able to see them. Ask if they want alt-text generated. If so, request they paste each image into chat for descriptive alt-text generation.
+- If images exist without alt-text, explain that when others use Claude to understand the doc, Claude won&#039;t be able to see them. Ask if they want alt-text generated. If so, request they paste each image into chat for descriptive alt-text generation.
 
 ### Info Dumping
 
 Once initial questions are answered, encourage the user to dump all the context they have. Request information such as:
 - Background on the project/problem
 - Related team discussions or shared documents
-- Why alternative solutions aren't being used
+- Why alternative solutions aren&#039;t being used
 - Organizational context (team dynamics, past incidents, politics)
 - Timeline pressures or constraints
 - Technical architecture or dependencies
@@ -128,7 +178,7 @@ Advise them not to worry about organizing it - just get it all out. Offer multip
 
 **If no integrations are detected and in Claude.ai or Claude app:** Suggest they can enable connectors in their Claude settings to allow pulling context from messaging apps and document storage directly.
 
-Inform them clarifying questions will be asked once they've done their initial dump.
+Inform them clarifying questions will be asked once they&#039;ve done their initial dump.
 
 **During context gathering:**
 
@@ -140,25 +190,25 @@ Inform them clarifying questions will be asked once they've done their initial d
   - Ask if connected tools should be searched to learn more
   - Wait for user confirmation before searching
 
-- As user provides context, track what's being learned and what's still unclear
+- As user provides context, track what&#039;s being learned and what&#039;s still unclear
 
 **Asking clarifying questions:**
 
-When user signals they've done their initial dump (or after substantial context provided), ask clarifying questions to ensure understanding:
+When user signals they&#039;ve done their initial dump (or after substantial context provided), ask clarifying questions to ensure understanding:
 
 Generate 5-10 numbered questions based on gaps in the context.
 
-Inform them they can use shorthand to answer (e.g., "1: yes, 2: see #channel, 3: no because backwards compat"), link to more docs, point to channels to read, or just keep info-dumping. Whatever's most efficient for them.
+Inform them they can use shorthand to answer (e.g., &quot;1: yes, 2: see #channel, 3: no because backwards compat&quot;), link to more docs, point to channels to read, or just keep info-dumping. Whatever&#039;s most efficient for them.
 
 **Exit condition:**
 Sufficient context has been gathered when questions show understanding - when edge cases and trade-offs can be asked about without needing basics explained.
 
 **Transition:**
-Ask if there's any more context they want to provide at this stage, or if it's time to move on to drafting the document.
+Ask if there&#039;s any more context they want to provide at this stage, or if it&#039;s time to move on to drafting the document.
 
 If user wants to add more, let them. When ready, proceed to Stage 2.
 
-## Stage 2: Refinement & Structure
+## Stage 2: Refinement &amp; Structure
 
 **Goal:** Build the document section by section through brainstorming, curation, and iterative refinement.
 
@@ -175,11 +225,11 @@ Start with whichever section has the most unknowns (usually the core decision/pr
 **Section ordering:**
 
 If the document structure is clear:
-Ask which section they'd like to start with.
+Ask which section they&#039;d like to start with.
 
-Suggest starting with whichever section has the most unknowns. For decision docs, that's usually the core proposal. For specs, it's typically the technical approach. Summary sections are best left for last.
+Suggest starting with whichever section has the most unknowns. For decision docs, that&#039;s usually the core proposal. For specs, it&#039;s typically the technical approach. Summary sections are best left for last.
 
-If user doesn't know what sections they need:
+If user doesn&#039;t know what sections they need:
 Based on the type of document and template, suggest 3-5 sections appropriate for the doc type.
 
 Ask if this structure works, or if they want to adjust it.
@@ -193,9 +243,9 @@ Use `create_file` to create an artifact. This gives both Claude and the user a s
 
 Inform them that the initial structure with placeholders for all sections will be created.
 
-Create artifact with all section headers and brief placeholder text like "[To be written]" or "[Content here]".
+Create artifact with all section headers and brief placeholder text like &quot;[To be written]&quot; or &quot;[Content here]&quot;.
 
-Provide the scaffold link and indicate it's time to fill in each section.
+Provide the scaffold link and indicate it&#039;s time to fill in each section.
 
 **If no access to artifacts:**
 Create a markdown file in the working directory. Name it appropriately (e.g., `decision-doc.md`, `technical-spec.md`).
@@ -204,7 +254,7 @@ Inform them that the initial structure with placeholders for all sections will b
 
 Create file with all section headers and placeholder text.
 
-Confirm the filename has been created and indicate it's time to fill in each section.
+Confirm the filename has been created and indicate it&#039;s time to fill in each section.
 
 **For each section:**
 
@@ -214,11 +264,11 @@ Announce work will begin on the [SECTION NAME] section. Ask 5-10 clarifying ques
 
 Generate 5-10 specific questions based on context and section purpose.
 
-Inform them they can answer in shorthand or just indicate what's important to cover.
+Inform them they can answer in shorthand or just indicate what&#039;s important to cover.
 
 ### Step 2: Brainstorming
 
-For the [SECTION NAME] section, brainstorm [5-20] things that might be included, depending on the section's complexity. Look for:
+For the [SECTION NAME] section, brainstorm [5-20] things that might be included, depending on the section&#039;s complexity. Look for:
 - Context shared that might have been forgotten
 - Angles or considerations not yet mentioned
 
@@ -229,22 +279,22 @@ Generate 5-20 numbered options based on section complexity. At the end, offer to
 Ask which points should be kept, removed, or combined. Request brief justifications to help learn priorities for the next sections.
 
 Provide examples:
-- "Keep 1,4,7,9"
-- "Remove 3 (duplicates 1)"
-- "Remove 6 (audience already knows this)"
-- "Combine 11 and 12"
+- &quot;Keep 1,4,7,9&quot;
+- &quot;Remove 3 (duplicates 1)&quot;
+- &quot;Remove 6 (audience already knows this)&quot;
+- &quot;Combine 11 and 12&quot;
 
-**If user gives freeform feedback** (e.g., "looks good" or "I like most of it but...") instead of numbered selections, extract their preferences and proceed. Parse what they want kept/removed/changed and apply it.
+**If user gives freeform feedback** (e.g., &quot;looks good&quot; or &quot;I like most of it but...&quot;) instead of numbered selections, extract their preferences and proceed. Parse what they want kept/removed/changed and apply it.
 
 ### Step 4: Gap Check
 
-Based on what they've selected, ask if there's anything important missing for the [SECTION NAME] section.
+Based on what they&#039;ve selected, ask if there&#039;s anything important missing for the [SECTION NAME] section.
 
 ### Step 5: Drafting
 
 Use `str_replace` to replace the placeholder text for this section with the actual drafted content.
 
-Announce the [SECTION NAME] section will be drafted now based on what they've selected.
+Announce the [SECTION NAME] section will be drafted now based on what they&#039;ve selected.
 
 **If using artifacts:**
 After drafting, provide a link to the artifact.
@@ -257,7 +307,7 @@ After drafting, confirm completion.
 Inform them the [SECTION NAME] section has been drafted in [filename]. Ask them to read through it and indicate what to change. Note that being specific helps learning for the next sections.
 
 **Key instruction for user (include when drafting the first section):**
-Provide a note: Instead of editing the doc directly, ask them to indicate what to change. This helps learning of their style for future sections. For example: "Remove the X bullet - already covered by Y" or "Make the third paragraph more concise".
+Provide a note: Instead of editing the doc directly, ask them to indicate what to change. This helps learning of their style for future sections. For example: &quot;Remove the X bullet - already covered by Y&quot; or &quot;Make the third paragraph more concise&quot;.
 
 ### Step 6: Iterative Refinement
 
@@ -282,7 +332,7 @@ When section is done, confirm [SECTION NAME] is complete. Ask if ready to move t
 As approaching completion (80%+ of sections done), announce intention to re-read the entire document and check for:
 - Flow and consistency across sections
 - Redundancy or contradictions
-- Anything that feels like "slop" or generic filler
+- Anything that feels like &quot;slop&quot; or generic filler
 - Whether every sentence carries weight
 
 Read entire document and provide feedback.
@@ -371,9 +421,9 @@ Check if Reader Claude gives correct answers or misinterprets anything.
 ### Step 3: Additional Checks
 
 Also ask Reader Claude:
-- "What in this doc might be ambiguous or unclear to readers?"
-- "What knowledge or context does this doc assume readers already have?"
-- "Are there any internal contradictions or inconsistencies?"
+- &quot;What in this doc might be ambiguous or unclear to readers?&quot;
+- &quot;What knowledge or context does this doc assume readers already have?&quot;
+- &quot;Are there any internal contradictions or inconsistencies?&quot;
 
 ### Step 4: Iterate Based on Results
 
@@ -385,7 +435,7 @@ Loop back to refinement for any problematic sections.
 
 ### Exit Condition (Both Approaches)
 
-When Reader Claude consistently answers questions correctly and doesn't surface new gaps or ambiguities, the doc is ready.
+When Reader Claude consistently answers questions correctly and doesn&#039;t surface new gaps or ambiguities, the doc is ready.
 
 ## Final Review
 
@@ -409,7 +459,7 @@ Announce document completion. Provide a few final tips:
 **Tone:**
 - Be direct and procedural
 - Explain rationale briefly when it affects user behavior
-- Don't try to "sell" the approach - just execute it
+- Don&#039;t try to &quot;sell&quot; the approach - just execute it
 
 **Handling Deviations:**
 - If user wants to skip a stage: Ask if they want to skip this and write freeform
@@ -418,20 +468,51 @@ Announce document completion. Provide a few final tips:
 
 **Context Management:**
 - Throughout, if context is missing on something mentioned, proactively ask
-- Don't let gaps accumulate - address them as they come up
+- Don&#039;t let gaps accumulate - address them as they come up
 
 **Artifact Management:**
 - Use `create_file` for drafting full sections
 - Use `str_replace` for all edits
 - Provide artifact link after every change
-- Never use artifacts for brainstorming lists - that's just conversation
+- Never use artifacts for brainstorming lists - that&#039;s just conversation
 
 **Quality over Speed:**
-- Don't rush through stages
+- Don&#039;t rush through stages
 - Each iteration should make meaningful improvements
 - The goal is a document that actually works for readers
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>85</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

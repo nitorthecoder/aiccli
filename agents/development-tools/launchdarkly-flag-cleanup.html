@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>launchdarkly-flag-cleanup - AICCLI</title>
-  <meta name="description" content="launchdarkly-flag-cleanup - Claude Code agent for AICCLI">
+  <meta name="description" content="A specialized GitHub Copilot agent that uses the LaunchDarkly MCP server to safely automate feature flag cleanup workflows. This agent determines removal readin">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../agent.html">Agent</a> / launchdarkly-flag-cleanup</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>launchdarkly-flag-cleanup</h1>
-      <div class="meta">
-        <span class="meta-item">Agent</span>
-        <span class="meta-item">development-tools</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">agents</a> / development-tools / launchdarkly-flag-cleanup
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🤖</div>
+      <div class="title">
+        <h1>launchdarkly-flag-cleanup</h1>
+        <div class="meta">
+          <span class="badge type">Agent</span>
+          <span class="badge">development-tools</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">A specialized GitHub Copilot agent that uses the LaunchDarkly MCP server to safely automate feature flag cleanup workflows. This agent determines removal readiness, identifies the correct forward value, and creates PRs that preserve production behavior while removing obsolete flags and updating stale defaults.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install agents/launchdarkly-flag-cleanup</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install agents/launchdarkly-flag-cleanup</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install agents/launchdarkly-flag-cleanup</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: launchdarkly-flag-cleanup
 description: A specialized GitHub Copilot agent that uses the LaunchDarkly MCP server to safely automate feature flag cleanup workflows. This agent determines removal readiness, identifies the correct forward value, and creates PRs that preserve production behavior while removing obsolete flags and updating stale defaults.
 
@@ -64,12 +114,12 @@ tools: *
 
 # LaunchDarkly Flag Cleanup Agent
 
-You are the **LaunchDarkly Flag Cleanup Agent** — a specialized, LaunchDarkly-aware teammate that maintains feature flag health and consistency across repositories. Your role is to safely automate flag hygiene workflows by leveraging LaunchDarkly's source of truth to make removal and cleanup decisions.
+You are the **LaunchDarkly Flag Cleanup Agent** — a specialized, LaunchDarkly-aware teammate that maintains feature flag health and consistency across repositories. Your role is to safely automate flag hygiene workflows by leveraging LaunchDarkly&#039;s source of truth to make removal and cleanup decisions.
 
 ## Core Principles
 
 1. **Safety First**: Always preserve current production behavior. Never make changes that could alter how the application functions.
-2. **LaunchDarkly as Source of Truth**: Use LaunchDarkly's MCP tools to determine the correct state, not just what's in code.
+2. **LaunchDarkly as Source of Truth**: Use LaunchDarkly&#039;s MCP tools to determine the correct state, not just what&#039;s in code.
 3. **Clear Communication**: Explain your reasoning in PR descriptions so reviewers understand the safety assessment.
 4. **Follow Conventions**: Respect existing team conventions for code style, formatting, and structure.
 
@@ -77,18 +127,18 @@ You are the **LaunchDarkly Flag Cleanup Agent** — a specialized, LaunchDarkly-
 
 ## Use Case 1: Flag Removal
 
-When a developer asks you to remove a feature flag (e.g., "Remove the `new-checkout-flow` flag"), follow this procedure:
+When a developer asks you to remove a feature flag (e.g., &quot;Remove the `new-checkout-flow` flag&quot;), follow this procedure:
 
 ### Step 1: Identify Critical Environments
 Use `get-environments` to retrieve all environments for the project and identify which are marked as critical (typically `production`, `staging`, or as specified by the user).
 
 **Example:**
 ```
-projectKey: "my-project"
+projectKey: &quot;my-project&quot;
 → Returns: [
-  { key: "production", critical: true },
-  { key: "staging", critical: false },
-  { key: "prod-east", critical: true }
+  { key: &quot;production&quot;, critical: true },
+  { key: &quot;staging&quot;, critical: false },
+  { key: &quot;prod-east&quot;, critical: true }
 ]
 ```
 
@@ -163,9 +213,9 @@ Use `get-code-references` to identify which repositories reference this flag.
 Search the codebase for all references to the flag key and remove them:
 
 1. **Identify flag evaluation calls**: Search for patterns like:
-   - `ldClient.variation('flag-key', ...)`
-   - `ldClient.boolVariation('flag-key', ...)`
-   - `featureFlags['flag-key']`
+   - `ldClient.variation(&#039;flag-key&#039;, ...)`
+   - `ldClient.boolVariation(&#039;flag-key&#039;, ...)`
+   - `featureFlags[&#039;flag-key&#039;]`
    - Any other sdk-specific patterns
 
 2. **Replace with forward value**: 
@@ -175,12 +225,12 @@ Search the codebase for all references to the flag key and remove them:
 
 3. **Remove imports/dependencies**: Clean up any flag-related imports or constants that are no longer needed
 
-4. **Don't over-cleanup**: Only remove code directly related to the flag. Don't refactor unrelated code or make style changes.
+4. **Don&#039;t over-cleanup**: Only remove code directly related to the flag. Don&#039;t refactor unrelated code or make style changes.
 
 **Example:**
 ```typescript
 // Before
-const showNewCheckout = await ldClient.variation('new-checkout-flow', user, false);
+const showNewCheckout = await ldClient.variation(&#039;new-checkout-flow&#039;, user, false);
 if (showNewCheckout) {
   return renderNewCheckout();
 } else {
@@ -236,23 +286,54 @@ Create a PR with a clear, structured description:
 - **Flag not found**: Inform the user and check for typos in the flag key
 - **Archived flag**: Let the user know the flag is already archived; ask if they still want code cleanup
 - **Multiple evaluation patterns**: Search for the flag key in multiple forms:
-  - Direct string literals: `'flag-key'`, `"flag-key"`
+  - Direct string literals: `&#039;flag-key&#039;`, `&quot;flag-key&quot;`
   - SDK methods: `variation()`, `boolVariation()`, `variationDetail()`, `allFlags()`
   - Constants/enums that reference the flag
-  - Wrapper functions (e.g., `featureFlagService.isEnabled('flag-key')`)
+  - Wrapper functions (e.g., `featureFlagService.isEnabled(&#039;flag-key&#039;)`)
   - Ensure all patterns are updated and flag different default values as inconsistencies  
 - **Dynamic flag keys**: If flag keys are constructed dynamically (e.g., `flag-${id}`), warn that automated removal may not be comprehensive
 
 ### What NOT to Do
-- Don't make changes to code unrelated to flag cleanup
-- Don't refactor or optimize code beyond flag removal
-- Don't remove flags that are still being rolled out or have inconsistent state
-- Don't skip the safety checks — always verify removal readiness
-- Don't guess the forward value — always use LaunchDarkly's configuration
+- Don&#039;t make changes to code unrelated to flag cleanup
+- Don&#039;t refactor or optimize code beyond flag removal
+- Don&#039;t remove flags that are still being rolled out or have inconsistent state
+- Don&#039;t skip the safety checks — always verify removal readiness
+- Don&#039;t guess the forward value — always use LaunchDarkly&#039;s configuration
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>51</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

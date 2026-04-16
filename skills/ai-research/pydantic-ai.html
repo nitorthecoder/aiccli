@@ -4,64 +4,114 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>pydantic-ai - AICCLI</title>
-  <meta name="description" content="pydantic-ai - Claude Code skill for AICCLI">
+  <meta name="description" content=""Build production-ready AI agents with PydanticAI — type-safe tool use, structured outputs, dependency injection, and multi-model support."">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / pydantic-ai</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>pydantic-ai</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / pydantic-ai
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>pydantic-ai</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by suhaibjanjua</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Build production-ready AI agents with PydanticAI — type-safe tool use, structured outputs, dependency injection, and multi-model support."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pydantic-ai</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/pydantic-ai</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/pydantic-ai</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: pydantic-ai
-description: "Build production-ready AI agents with PydanticAI — type-safe tool use, structured outputs, dependency injection, and multi-model support."
+description: &quot;Build production-ready AI agents with PydanticAI — type-safe tool use, structured outputs, dependency injection, and multi-model support.&quot;
 category: ai-agents
 risk: safe
 source: community
-date_added: "2026-03-18"
+date_added: &quot;2026-03-18&quot;
 author: suhaibjanjua
 tags: [pydantic-ai, ai-agents, llm, openai, anthropic, gemini, tool-use, structured-output, python]
 tools: [claude, cursor, gemini]
@@ -89,11 +139,11 @@ PydanticAI is a Python agent framework from the Pydantic team that brings the sa
 pip install pydantic-ai
 
 # Install extras for specific providers
-pip install 'pydantic-ai[openai]'       # OpenAI / Azure OpenAI
-pip install 'pydantic-ai[anthropic]'    # Anthropic Claude
-pip install 'pydantic-ai[gemini]'       # Google Gemini
-pip install 'pydantic-ai[groq]'         # Groq
-pip install 'pydantic-ai[vertexai]'     # Google Vertex AI
+pip install &#039;pydantic-ai[openai]&#039;       # OpenAI / Azure OpenAI
+pip install &#039;pydantic-ai[anthropic]&#039;    # Anthropic Claude
+pip install &#039;pydantic-ai[gemini]&#039;       # Google Gemini
+pip install &#039;pydantic-ai[groq]&#039;         # Groq
+pip install &#039;pydantic-ai[vertexai]&#039;     # Google Vertex AI
 ```
 
 ### Step 2: A Minimal Agent
@@ -103,12 +153,12 @@ from pydantic_ai import Agent
 
 # Simple agent — returns a plain string
 agent = Agent(
-    'anthropic:claude-sonnet-4-6',
-    system_prompt='You are a helpful assistant. Be concise.',
+    &#039;anthropic:claude-sonnet-4-6&#039;,
+    system_prompt=&#039;You are a helpful assistant. Be concise.&#039;,
 )
 
-result = agent.run_sync('What is the capital of Japan?')
-print(result.data)  # "Tokyo"
+result = agent.run_sync(&#039;What is the capital of Japan?&#039;)
+print(result.data)  # &quot;Tokyo&quot;
 print(result.usage())  # Usage(requests=1, request_tokens=..., response_tokens=...)
 ```
 
@@ -126,15 +176,15 @@ class MovieReview(BaseModel):
     recommended: bool
 
 agent = Agent(
-    'openai:gpt-4o',
+    &#039;openai:gpt-4o&#039;,
     result_type=MovieReview,
-    system_prompt='You are a film critic. Return structured reviews.',
+    system_prompt=&#039;You are a film critic. Return structured reviews.&#039;,
 )
 
-result = agent.run_sync('Review Inception (2010)')
+result = agent.run_sync(&#039;Review Inception (2010)&#039;)
 review = result.data  # Fully typed MovieReview instance
-print(f"{review.title} ({review.year}): {review.rating}/10")
-print(f"Recommended: {review.recommended}")
+print(f&quot;{review.title} ({review.year}): {review.rating}/10&quot;)
+print(f&quot;Recommended: {review.recommended}&quot;)
 ```
 
 ### Step 4: Tool Use
@@ -152,24 +202,24 @@ class WeatherReport(BaseModel):
     condition: str
 
 weather_agent = Agent(
-    'anthropic:claude-sonnet-4-6',
+    &#039;anthropic:claude-sonnet-4-6&#039;,
     result_type=WeatherReport,
-    system_prompt='Get current weather for the requested city.',
+    system_prompt=&#039;Get current weather for the requested city.&#039;,
 )
 
 @weather_agent.tool
 async def get_temperature(ctx: RunContext, city: str) -&gt; dict:
-    """Fetch the current temperature for a city from the weather API."""
+    &quot;&quot;&quot;Fetch the current temperature for a city from the weather API.&quot;&quot;&quot;
     async with httpx.AsyncClient() as client:
-        r = await client.get(f'https://wttr.in/{city}?format=j1')
+        r = await client.get(f&#039;https://wttr.in/{city}?format=j1&#039;)
         data = r.json()
         return {
-            'temp_c': float(data['current_condition'][0]['temp_C']),
-            'description': data['current_condition'][0]['weatherDesc'][0]['value'],
+            &#039;temp_c&#039;: float(data[&#039;current_condition&#039;][0][&#039;temp_C&#039;]),
+            &#039;description&#039;: data[&#039;current_condition&#039;][0][&#039;weatherDesc&#039;][0][&#039;value&#039;],
         }
 
 import asyncio
-result = asyncio.run(weather_agent.run('What is the weather in Tokyo?'))
+result = asyncio.run(weather_agent.run(&#039;What is the weather in Tokyo?&#039;))
 print(result.data)
 ```
 
@@ -192,20 +242,20 @@ class SupportResponse(BaseModel):
     escalate: bool
 
 support_agent = Agent(
-    'openai:gpt-4o-mini',
+    &#039;openai:gpt-4o-mini&#039;,
     deps_type=Deps,
     result_type=SupportResponse,
-    system_prompt='You are a support agent. Use the tools to help customers.',
+    system_prompt=&#039;You are a support agent. Use the tools to help customers.&#039;,
 )
 
 @support_agent.tool
 async def get_order_history(ctx: RunContext[Deps]) -&gt; list[dict]:
-    """Fetch recent orders for the current user."""
+    &quot;&quot;&quot;Fetch recent orders for the current user.&quot;&quot;&quot;
     return await ctx.deps.db.get_orders(ctx.deps.user_id, limit=5)
 
 @support_agent.tool
 async def create_refund(ctx: RunContext[Deps], order_id: str, reason: str) -&gt; dict:
-    """Initiate a refund for a specific order."""
+    &quot;&quot;&quot;Initiate a refund for a specific order.&quot;&quot;&quot;
     return await ctx.deps.db.create_refund(order_id, reason, ctx.deps.user_id)
 
 # Usage
@@ -226,10 +276,10 @@ def test_support_agent_escalates():
     with support_agent.override(model=TestModel()):
         # TestModel returns a minimal valid response matching result_type
         result = support_agent.run_sync(
-            'I want to cancel my account',
-            deps=Deps(db=FakeDb(), user_id='user-123'),
+            &#039;I want to cancel my account&#039;,
+            deps=Deps(db=FakeDb(), user_id=&#039;user-123&#039;),
         )
-    # Test the structure, not the LLM's exact words
+    # Test the structure, not the LLM&#039;s exact words
     assert isinstance(result.data, SupportResponse)
     assert isinstance(result.data.escalate, bool)
 ```
@@ -240,10 +290,10 @@ def test_support_agent_escalates():
 from pydantic_ai.models.function import FunctionModel, ModelContext
 
 def my_model(messages, info):
-    return ModelResponse(parts=[TextPart('Always this response')])
+    return ModelResponse(parts=[TextPart(&#039;Always this response&#039;)])
 
 with agent.override(model=FunctionModel(my_model)):
-    result = agent.run_sync('anything')
+    result = agent.run_sync(&#039;anything&#039;)
 ```
 
 ### Step 7: Streaming Responses
@@ -252,14 +302,14 @@ with agent.override(model=FunctionModel(my_model)):
 import asyncio
 from pydantic_ai import Agent
 
-agent = Agent('anthropic:claude-sonnet-4-6')
+agent = Agent(&#039;anthropic:claude-sonnet-4-6&#039;)
 
 async def stream_response():
-    async with agent.run_stream('Write a haiku about Python') as result:
+    async with agent.run_stream(&#039;Write a haiku about Python&#039;) as result:
         async for chunk in result.stream_text():
-            print(chunk, end='', flush=True)
+            print(chunk, end=&#039;&#039;, flush=True)
     print()  # newline
-    print(f"Total tokens: {result.usage()}")
+    print(f&quot;Total tokens: {result.usage()}&quot;)
 
 asyncio.run(stream_response())
 ```
@@ -270,15 +320,15 @@ asyncio.run(stream_response())
 from pydantic_ai import Agent
 from pydantic_ai.messages import ModelMessagesTypeAdapter
 
-agent = Agent('openai:gpt-4o', system_prompt='You are a helpful assistant.')
+agent = Agent(&#039;openai:gpt-4o&#039;, system_prompt=&#039;You are a helpful assistant.&#039;)
 
 # First turn
-result1 = agent.run_sync('My name is Alice.')
+result1 = agent.run_sync(&#039;My name is Alice.&#039;)
 history = result1.all_messages()
 
 # Second turn — passes conversation history
-result2 = agent.run_sync('What is my name?', message_history=history)
-print(result2.data)  # "Your name is Alice."
+result2 = agent.run_sync(&#039;What is my name?&#039;, message_history=history)
+print(result2.data)  # &quot;Your name is Alice.&quot;
 ```
 
 ## Examples
@@ -291,23 +341,23 @@ from pydantic_ai import Agent
 from typing import Literal
 
 class CodeReview(BaseModel):
-    quality: Literal['excellent', 'good', 'needs_work', 'poor']
+    quality: Literal[&#039;excellent&#039;, &#039;good&#039;, &#039;needs_work&#039;, &#039;poor&#039;]
     issues: list[str] = Field(default_factory=list)
     suggestions: list[str] = Field(default_factory=list)
     approved: bool
 
 code_review_agent = Agent(
-    'anthropic:claude-sonnet-4-6',
+    &#039;anthropic:claude-sonnet-4-6&#039;,
     result_type=CodeReview,
-    system_prompt="""
+    system_prompt=&quot;&quot;&quot;
     You are a senior engineer performing code review.
     Evaluate code quality, identify issues, and provide actionable suggestions.
     Set approved=True only for good or excellent quality code with no security issues.
-    """,
+    &quot;&quot;&quot;,
 )
 
 def review_code(diff: str) -&gt; CodeReview:
-    result = code_review_agent.run_sync(f"Review this code:\n\n{diff}")
+    result = code_review_agent.run_sync(f&quot;Review this code:\n\n{diff}&quot;)
     return result.data
 ```
 
@@ -320,18 +370,18 @@ from pydantic import BaseModel, field_validator
 class StrictJson(BaseModel):
     value: int
 
-    @field_validator('value')
+    @field_validator(&#039;value&#039;)
     def must_be_positive(cls, v):
         if v &lt;= 0:
-            raise ValueError('value must be positive')
+            raise ValueError(&#039;value must be positive&#039;)
         return v
 
-agent = Agent('openai:gpt-4o-mini', result_type=StrictJson)
+agent = Agent(&#039;openai:gpt-4o-mini&#039;, result_type=StrictJson)
 
 @agent.result_validator
 async def validate_result(ctx, result: StrictJson) -&gt; StrictJson:
     if result.value &gt; 1000:
-        raise ModelRetry('Value must be under 1000. Try again with a smaller number.')
+        raise ModelRetry(&#039;Value must be under 1000. Try again with a smaller number.&#039;)
     return result
 ```
 
@@ -350,18 +400,18 @@ class BlogPost(BaseModel):
     body: str
     meta_description: str
 
-researcher = Agent('openai:gpt-4o', result_type=ResearchSummary)
-writer = Agent('anthropic:claude-sonnet-4-6', result_type=BlogPost)
+researcher = Agent(&#039;openai:gpt-4o&#039;, result_type=ResearchSummary)
+writer = Agent(&#039;anthropic:claude-sonnet-4-6&#039;, result_type=BlogPost)
 
 async def research_and_write(topic: str) -&gt; BlogPost:
     # Stage 1: research
-    research = await researcher.run(f'Research the topic: {topic}')
+    research = await researcher.run(f&#039;Research the topic: {topic}&#039;)
 
     # Stage 2: write based on research
     post = await writer.run(
-        f'Write a blog post about: {topic}\n\nResearch:\n' +
-        '\n'.join(f'- {p}' for p in research.data.key_points) +
-        f'\n\nConclusion: {research.data.conclusion}'
+        f&#039;Write a blog post about: {topic}\n\nResearch:\n&#039; +
+        &#039;\n&#039;.join(f&#039;- {p}&#039; for p in research.data.key_points) +
+        f&#039;\n\nConclusion: {research.data.conclusion}&#039;
     )
     return post.data
 ```
@@ -373,11 +423,11 @@ async def research_and_write(topic: str) -&gt; BlogPost:
 - ✅ Use `TestModel` in unit tests — never hit a real LLM in CI
 - ✅ Add `@agent.result_validator` for business-logic checks beyond Pydantic validation
 - ✅ Use `run_stream` for long outputs in user-facing applications to show progressive results
-- ❌ Don't put secrets (API keys) in `Agent()` arguments — use environment variables
-- ❌ Don't share a single `Agent` instance across async tasks if deps differ — create per-request instances or use `agent.run()` with per-call `deps`
-- ❌ Don't catch `ValidationError` broadly — let PydanticAI retry with `ModelRetry` for recoverable LLM output errors
+- ❌ Don&#039;t put secrets (API keys) in `Agent()` arguments — use environment variables
+- ❌ Don&#039;t share a single `Agent` instance across async tasks if deps differ — create per-request instances or use `agent.run()` with per-call `deps`
+- ❌ Don&#039;t catch `ValidationError` broadly — let PydanticAI retry with `ModelRetry` for recoverable LLM output errors
 
-## Security & Safety Notes
+## Security &amp; Safety Notes
 
 - Set API keys via environment variables (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.) — never hardcode them.
 - Validate all tool inputs before passing to external systems — use Pydantic models or manual checks.
@@ -397,7 +447,7 @@ async def research_and_write(topic: str) -&gt; BlogPost:
   **Solution:** Pass `deps=` when calling `agent.run()` or `agent.run_sync()`. Dependencies are not set globally.
 
 - **Problem:** `asyncio.run()` error when calling `agent.run()` inside FastAPI
-  **Solution:** Use `await agent.run()` directly in async FastAPI route handlers — don't wrap in `asyncio.run()`.
+  **Solution:** Use `await agent.run()` directly in async FastAPI route handlers — don&#039;t wrap in `asyncio.run()`.
 
 ## Related Skills
 
@@ -405,8 +455,46 @@ async def research_and_write(topic: str) -&gt; BlogPost:
 - `@llm-application-dev-ai-assistant` — General LLM application development patterns
 - `@fastapi-templates` — Serving PydanticAI agents via FastAPI endpoints
 - `@agent-orchestration-multi-agent-optimize` — Orchestrating multiple PydanticAI agents
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">pydantic-ai</span><span class="tag">ai-agents</span><span class="tag">llm</span><span class="tag">openai</span><span class="tag">anthropic</span><span class="tag">gemini</span><span class="tag">tool-use</span><span class="tag">structured-output</span><span class="tag">python</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>0</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

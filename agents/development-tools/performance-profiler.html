@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>performance-profiler - AICCLI</title>
-  <meta name="description" content="performance-profiler - Claude Code agent for AICCLI">
+  <meta name="description" content="Performance analysis and optimization specialist. Use PROACTIVELY for performance bottlenecks, memory leaks, load testing, optimization strategies, and system p">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../agent.html">Agent</a> / performance-profiler</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>performance-profiler</h1>
-      <div class="meta">
-        <span class="meta-item">Agent</span>
-        <span class="meta-item">development-tools</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">agents</a> / development-tools / performance-profiler
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🤖</div>
+      <div class="title">
+        <h1>performance-profiler</h1>
+        <div class="meta">
+          <span class="badge type">Agent</span>
+          <span class="badge">development-tools</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Performance analysis and optimization specialist. Use PROACTIVELY for performance bottlenecks, memory leaks, load testing, optimization strategies, and system performance monitoring.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install agents/performance-profiler</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install agents/performance-profiler</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install agents/performance-profiler</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: performance-profiler
 description: Performance analysis and optimization specialist. Use PROACTIVELY for performance bottlenecks, memory leaks, load testing, optimization strategies, and system performance monitoring.
 tools: Read, Write, Edit, Bash
@@ -85,18 +135,18 @@ You are a performance profiler specializing in application performance analysis,
 ### 1. Node.js Performance Profiling
 ```javascript
 // performance-profiler/node-profiler.js
-const fs = require('fs');
-const path = require('path');
-const { performance, PerformanceObserver } = require('perf_hooks');
-const v8Profiler = require('v8-profiler-next');
-const memwatch = require('@airbnb/node-memwatch');
+const fs = require(&#039;fs&#039;);
+const path = require(&#039;path&#039;);
+const { performance, PerformanceObserver } = require(&#039;perf_hooks&#039;);
+const v8Profiler = require(&#039;v8-profiler-next&#039;);
+const memwatch = require(&#039;@airbnb/node-memwatch&#039;);
 
 class NodePerformanceProfiler {
   constructor(options = {}) {
     this.options = {
       cpuSamplingInterval: 1000,
       memoryThreshold: 50 * 1024 * 1024, // 50MB
-      reportDirectory: './performance-reports',
+      reportDirectory: &#039;./performance-reports&#039;,
       ...options
     };
     
@@ -115,7 +165,7 @@ class NodePerformanceProfiler {
     // HTTP request performance
     const httpObserver = new PerformanceObserver((list) =&gt; {
       list.getEntries().forEach((entry) =&gt; {
-        if (entry.entryType === 'measure') {
+        if (entry.entryType === &#039;measure&#039;) {
           this.metrics.httpRequests.push({
             name: entry.name,
             duration: entry.duration,
@@ -125,7 +175,7 @@ class NodePerformanceProfiler {
         }
       });
     });
-    httpObserver.observe({ entryTypes: ['measure'] });
+    httpObserver.observe({ entryTypes: [&#039;measure&#039;] });
 
     // Function performance
     const functionObserver = new PerformanceObserver((list) =&gt; {
@@ -135,18 +185,18 @@ class NodePerformanceProfiler {
         }
       });
     });
-    functionObserver.observe({ entryTypes: ['function'] });
+    functionObserver.observe({ entryTypes: [&#039;function&#039;] });
   }
 
   setupMemoryMonitoring() {
     // Memory leak detection
-    memwatch.on('leak', (info) =&gt; {
-      console.error('Memory leak detected:', info);
+    memwatch.on(&#039;leak&#039;, (info) =&gt; {
+      console.error(&#039;Memory leak detected:&#039;, info);
       this.generateMemorySnapshot();
     });
 
     // Garbage collection monitoring
-    memwatch.on('stats', (stats) =&gt; {
+    memwatch.on(&#039;stats&#039;, (stats) =&gt; {
       this.metrics.memoryUsage.push({
         ...stats,
         timestamp: new Date().toISOString(),
@@ -158,16 +208,16 @@ class NodePerformanceProfiler {
   }
 
   startCPUProfiling(duration = 30000) {
-    console.log('Starting CPU profiling...');
-    v8Profiler.startProfiling('CPU_PROFILE', true);
+    console.log(&#039;Starting CPU profiling...&#039;);
+    v8Profiler.startProfiling(&#039;CPU_PROFILE&#039;, true);
     
     setTimeout(() =&gt; {
-      const profile = v8Profiler.stopProfiling('CPU_PROFILE');
+      const profile = v8Profiler.stopProfiling(&#039;CPU_PROFILE&#039;);
       const reportPath = path.join(this.options.reportDirectory, `cpu-profile-${Date.now()}.cpuprofile`);
       
       profile.export((error, result) =&gt; {
         if (error) {
-          console.error('CPU profile export error:', error);
+          console.error(&#039;CPU profile export error:&#039;, error);
           return;
         }
         
@@ -186,7 +236,7 @@ class NodePerformanceProfiler {
     function traverseNodes(node, depth = 0) {
       if (node.hitCount &gt; 0) {
         hotFunctions.push({
-          functionName: node.callFrame.functionName || 'anonymous',
+          functionName: node.callFrame.functionName || &#039;anonymous&#039;,
           url: node.callFrame.url,
           lineNumber: node.callFrame.lineNumber,
           hitCount: node.hitCount,
@@ -204,7 +254,7 @@ class NodePerformanceProfiler {
     // Sort by hit count and self time
     hotFunctions.sort((a, b) =&gt; (b.hitCount * b.selfTime) - (a.hitCount * a.selfTime));
     
-    console.log('\nTop CPU consuming functions:');
+    console.log(&#039;\nTop CPU consuming functions:&#039;);
     hotFunctions.slice(0, 10).forEach((func, index) =&gt; {
       console.log(`${index + 1}. ${func.functionName} (${func.hitCount} hits, ${func.selfTime}ms)`);
     });
@@ -213,7 +263,7 @@ class NodePerformanceProfiler {
   }
 
   measureEventLoopDelay() {
-    const { monitorEventLoopDelay } = require('perf_hooks');
+    const { monitorEventLoopDelay } = require(&#039;perf_hooks&#039;);
     const histogram = monitorEventLoopDelay({ resolution: 20 });
     
     histogram.enable();
@@ -244,7 +294,7 @@ class NodePerformanceProfiler {
     
     snapshot.export((error, result) =&gt; {
       if (error) {
-        console.error('Memory snapshot export error:', error);
+        console.error(&#039;Memory snapshot export error:&#039;, error);
         return;
       }
       
@@ -292,7 +342,7 @@ class NodePerformanceProfiler {
     const reportPath = path.join(this.options.reportDirectory, `performance-report-${Date.now()}.json`);
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
     
-    console.log('\nPerformance Report Generated:');
+    console.log(&#039;\nPerformance Report Generated:&#039;);
     console.log(`- Report saved to: ${reportPath}`);
     console.log(`- Average memory usage: ${(report.summary.averageMemoryUsage / 1024 / 1024).toFixed(2)} MB`);
     console.log(`- Average response time: ${report.summary.averageResponseTime.toFixed(2)} ms`);
@@ -327,7 +377,7 @@ class NodePerformanceProfiler {
     const trend = ((last - first) / first) * 100;
     
     return {
-      trend: trend &gt; 0 ? 'increasing' : 'decreasing',
+      trend: trend &gt; 0 ? &#039;increasing&#039; : &#039;decreasing&#039;,
       percentage: Math.abs(trend).toFixed(2),
       concerning: Math.abs(trend) &gt; 20
     };
@@ -340,10 +390,10 @@ class NodePerformanceProfiler {
     const avgMemory = this.calculateAverageMemory();
     if (avgMemory &gt; this.options.memoryThreshold) {
       recommendations.push({
-        category: 'memory',
-        severity: 'high',
-        issue: 'High memory usage detected',
-        recommendation: 'Consider implementing memory pooling or reducing object creation'
+        category: &#039;memory&#039;,
+        severity: &#039;high&#039;,
+        issue: &#039;High memory usage detected&#039;,
+        recommendation: &#039;Consider implementing memory pooling or reducing object creation&#039;
       });
     }
     
@@ -351,10 +401,10 @@ class NodePerformanceProfiler {
     const avgResponseTime = this.calculateAverageResponseTime();
     if (avgResponseTime &gt; 500) {
       recommendations.push({
-        category: 'performance',
-        severity: 'medium',
-        issue: 'Slow average response time',
-        recommendation: 'Optimize database queries and add caching layers'
+        category: &#039;performance&#039;,
+        severity: &#039;medium&#039;,
+        issue: &#039;Slow average response time&#039;,
+        recommendation: &#039;Optimize database queries and add caching layers&#039;
       });
     }
     
@@ -363,10 +413,10 @@ class NodePerformanceProfiler {
     const highDelays = recentDelays.filter(delay =&gt; delay.mean &gt; 10);
     if (highDelays.length &gt; 5) {
       recommendations.push({
-        category: 'concurrency',
-        severity: 'high',
-        issue: 'Frequent event loop delays',
-        recommendation: 'Review blocking operations and consider worker threads'
+        category: &#039;concurrency&#039;,
+        severity: &#039;high&#039;,
+        issue: &#039;Frequent event loop delays&#039;,
+        recommendation: &#039;Review blocking operations and consider worker threads&#039;
       });
     }
     
@@ -376,7 +426,7 @@ class NodePerformanceProfiler {
 
 // Usage example
 const profiler = new NodePerformanceProfiler({
-  reportDirectory: './performance-reports'
+  reportDirectory: &#039;./performance-reports&#039;
 });
 
 // Start comprehensive monitoring
@@ -384,8 +434,8 @@ profiler.measureEventLoopDelay();
 profiler.startCPUProfiling(60000); // 60 second CPU profile
 
 // Instrument critical functions
-const originalFunction = require('./your-module').criticalFunction;
-const instrumentedFunction = profiler.instrumentFunction(originalFunction, 'criticalFunction');
+const originalFunction = require(&#039;./your-module&#039;).criticalFunction;
+const instrumentedFunction = profiler.instrumentFunction(originalFunction, &#039;criticalFunction&#039;);
 
 module.exports = { NodePerformanceProfiler };
 ```
@@ -406,7 +456,7 @@ class FrontendPerformanceProfiler {
   }
 
   initialize() {
-    if (typeof window === 'undefined') return;
+    if (typeof window === &#039;undefined&#039;) return;
     
     this.measureCoreWebVitals();
     this.observeResourceTimings();
@@ -424,7 +474,7 @@ class FrontendPerformanceProfiler {
         element: lastEntry.element,
         timestamp: new Date().toISOString()
       };
-    }).observe({ entryTypes: ['largest-contentful-paint'] });
+    }).observe({ entryTypes: [&#039;largest-contentful-paint&#039;] });
 
     // First Input Delay (FID)
     new PerformanceObserver((list) =&gt; {
@@ -433,7 +483,7 @@ class FrontendPerformanceProfiler {
         value: firstInput.processingStart - firstInput.startTime,
         timestamp: new Date().toISOString()
       };
-    }).observe({ entryTypes: ['first-input'] });
+    }).observe({ entryTypes: [&#039;first-input&#039;] });
 
     // Cumulative Layout Shift (CLS)
     let clsValue = 0;
@@ -447,19 +497,19 @@ class FrontendPerformanceProfiler {
         value: clsValue,
         timestamp: new Date().toISOString()
       };
-    }).observe({ entryTypes: ['layout-shift'] });
+    }).observe({ entryTypes: [&#039;layout-shift&#039;] });
 
     // First Contentful Paint (FCP)
     new PerformanceObserver((list) =&gt; {
       const entries = list.getEntries();
-      const fcp = entries.find(entry =&gt; entry.name === 'first-contentful-paint');
+      const fcp = entries.find(entry =&gt; entry.name === &#039;first-contentful-paint&#039;);
       if (fcp) {
         this.metrics.coreWebVitals.fcp = {
           value: fcp.startTime,
           timestamp: new Date().toISOString()
         };
       }
-    }).observe({ entryTypes: ['paint'] });
+    }).observe({ entryTypes: [&#039;paint&#039;] });
   }
 
   observeResourceTimings() {
@@ -478,7 +528,7 @@ class FrontendPerformanceProfiler {
           timestamp: new Date().toISOString()
         });
       });
-    }).observe({ entryTypes: ['resource'] });
+    }).observe({ entryTypes: [&#039;resource&#039;] });
   }
 
   observeUserTimings() {
@@ -492,11 +542,11 @@ class FrontendPerformanceProfiler {
           timestamp: new Date().toISOString()
         });
       });
-    }).observe({ entryTypes: ['mark', 'measure'] });
+    }).observe({ entryTypes: [&#039;mark&#039;, &#039;measure&#039;] });
   }
 
   measureNavigationTiming() {
-    if (window.performance && window.performance.timing) {
+    if (window.performance &amp;&amp; window.performance.timing) {
       const timing = window.performance.timing;
       this.metrics.navigationTiming = {
         pageLoadTime: timing.loadEventEnd - timing.navigationStart,
@@ -513,7 +563,7 @@ class FrontendPerformanceProfiler {
 
   measureRuntimePerformance() {
     // Memory usage (if available)
-    if (window.performance && window.performance.memory) {
+    if (window.performance &amp;&amp; window.performance.memory) {
       return {
         usedJSHeapSize: window.performance.memory.usedJSHeapSize,
         totalJSHeapSize: window.performance.memory.totalJSHeapSize,
@@ -525,8 +575,8 @@ class FrontendPerformanceProfiler {
   }
 
   analyzeBundleSize() {
-    const scripts = Array.from(document.querySelectorAll('script[src]'));
-    const stylesheets = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+    const scripts = Array.from(document.querySelectorAll(&#039;script[src]&#039;));
+    const stylesheets = Array.from(document.querySelectorAll(&#039;link[rel=&quot;stylesheet&quot;]&#039;));
     
     const analysis = {
       scripts: scripts.map(script =&gt; ({
@@ -544,15 +594,15 @@ class FrontendPerformanceProfiler {
     // Generate recommendations
     if (scripts.length &gt; 10) {
       analysis.recommendations.push({
-        type: 'bundle-optimization',
-        message: 'Consider bundling and minifying JavaScript files'
+        type: &#039;bundle-optimization&#039;,
+        message: &#039;Consider bundling and minifying JavaScript files&#039;
       });
     }
 
     scripts.forEach(script =&gt; {
-      if (!script.async && !script.defer) {
+      if (!script.async &amp;&amp; !script.defer) {
         analysis.recommendations.push({
-          type: 'script-loading',
+          type: &#039;script-loading&#039;,
           message: `Consider adding async/defer to: ${script.src}`
         });
       }
@@ -580,7 +630,7 @@ class FrontendPerformanceProfiler {
       recommendations: this.generateOptimizationRecommendations()
     };
 
-    console.log('Frontend Performance Report:', report);
+    console.log(&#039;Frontend Performance Report:&#039;, report);
     return report;
   }
 
@@ -589,43 +639,43 @@ class FrontendPerformanceProfiler {
     const vitals = this.metrics.coreWebVitals;
 
     // LCP recommendations
-    if (vitals.lcp && vitals.lcp.value &gt; 2500) {
+    if (vitals.lcp &amp;&amp; vitals.lcp.value &gt; 2500) {
       recommendations.push({
-        metric: 'LCP',
-        issue: 'Slow Largest Contentful Paint',
+        metric: &#039;LCP&#039;,
+        issue: &#039;Slow Largest Contentful Paint&#039;,
         recommendations: [
-          'Optimize server response times',
-          'Remove render-blocking resources',
-          'Optimize images and use modern formats',
-          'Consider lazy loading for below-fold content'
+          &#039;Optimize server response times&#039;,
+          &#039;Remove render-blocking resources&#039;,
+          &#039;Optimize images and use modern formats&#039;,
+          &#039;Consider lazy loading for below-fold content&#039;
         ]
       });
     }
 
     // FID recommendations
-    if (vitals.fid && vitals.fid.value &gt; 100) {
+    if (vitals.fid &amp;&amp; vitals.fid.value &gt; 100) {
       recommendations.push({
-        metric: 'FID',
-        issue: 'High First Input Delay',
+        metric: &#039;FID&#039;,
+        issue: &#039;High First Input Delay&#039;,
         recommendations: [
-          'Reduce JavaScript execution time',
-          'Break up long tasks',
-          'Use web workers for heavy computations',
-          'Remove unused JavaScript'
+          &#039;Reduce JavaScript execution time&#039;,
+          &#039;Break up long tasks&#039;,
+          &#039;Use web workers for heavy computations&#039;,
+          &#039;Remove unused JavaScript&#039;
         ]
       });
     }
 
     // CLS recommendations
-    if (vitals.cls && vitals.cls.value &gt; 0.1) {
+    if (vitals.cls &amp;&amp; vitals.cls.value &gt; 0.1) {
       recommendations.push({
-        metric: 'CLS',
-        issue: 'High Cumulative Layout Shift',
+        metric: &#039;CLS&#039;,
+        issue: &#039;High Cumulative Layout Shift&#039;,
         recommendations: [
-          'Include size attributes on images and videos',
-          'Reserve space for ad slots',
-          'Avoid inserting content above existing content',
-          'Use CSS transform animations instead of layout changes'
+          &#039;Include size attributes on images and videos&#039;,
+          &#039;Reserve space for ad slots&#039;,
+          &#039;Avoid inserting content above existing content&#039;,
+          &#039;Use CSS transform animations instead of layout changes&#039;
         ]
       });
     }
@@ -638,7 +688,7 @@ class FrontendPerformanceProfiler {
 const frontendProfiler = new FrontendPerformanceProfiler();
 
 // Generate report after page load
-window.addEventListener('load', () =&gt; {
+window.addEventListener(&#039;load&#039;, () =&gt; {
   setTimeout(() =&gt; {
     frontendProfiler.generatePerformanceReport();
   }, 2000);
@@ -677,10 +727,10 @@ SELECT
     idx_tup_fetch,
     idx_scan,
     CASE 
-        WHEN idx_scan = 0 THEN 'Never Used'
-        WHEN idx_scan &lt; 50 THEN 'Rarely Used'
-        WHEN idx_scan &lt; 1000 THEN 'Moderately Used'
-        ELSE 'Frequently Used'
+        WHEN idx_scan = 0 THEN &#039;Never Used&#039;
+        WHEN idx_scan &lt; 50 THEN &#039;Rarely Used&#039;
+        WHEN idx_scan &lt; 1000 THEN &#039;Moderately Used&#039;
+        ELSE &#039;Frequently Used&#039;
     END as usage_level,
     pg_size_pretty(pg_relation_size(indexrelid)) as index_size
 FROM pg_stat_user_indexes
@@ -744,12 +794,12 @@ SELECT
     short_desc
 FROM pg_settings 
 WHERE name IN (
-    'shared_buffers',
-    'effective_cache_size',
-    'work_mem',
-    'maintenance_work_mem',
-    'checkpoint_segments',
-    'wal_buffers'
+    &#039;shared_buffers&#039;,
+    &#039;effective_cache_size&#039;,
+    &#039;work_mem&#039;,
+    &#039;maintenance_work_mem&#039;,
+    &#039;checkpoint_segments&#039;,
+    &#039;wal_buffers&#039;
 );
 
 -- 7. Query Plan Analysis Function
@@ -774,11 +824,11 @@ BEGIN
         pss.mean_time,
         100.0 * pss.shared_blks_hit / NULLIF(pss.shared_blks_hit + pss.shared_blks_read, 0),
         CASE 
-            WHEN pss.mean_time &gt; 1000 THEN 'CRITICAL: Very slow query'
-            WHEN pss.mean_time &gt; 500 THEN 'WARNING: Slow query'
+            WHEN pss.mean_time &gt; 1000 THEN &#039;CRITICAL: Very slow query&#039;
+            WHEN pss.mean_time &gt; 500 THEN &#039;WARNING: Slow query&#039;
             WHEN 100.0 * pss.shared_blks_hit / NULLIF(pss.shared_blks_hit + pss.shared_blks_read, 0) &lt; 90 
-                THEN 'LOW_CACHE_HIT: Poor buffer cache utilization'
-            ELSE 'REVIEW: Monitor for optimization'
+                THEN &#039;LOW_CACHE_HIT: Poor buffer cache utilization&#039;
+            ELSE &#039;REVIEW: Monitor for optimization&#039;
         END
     FROM pg_stat_statements pss
     WHERE pss.mean_time &gt;= min_mean_time_ms
@@ -852,8 +902,39 @@ Your performance analysis should always include:
 4. **Monitoring Setup** - Continuous performance tracking
 5. **Regression Prevention** - Performance testing in CI/CD
 
-Focus on measurable improvements and provide specific optimization techniques for each identified bottleneck.</pre></div>
+Focus on measurable improvements and provide specific optimization techniques for each identified bottleneck.</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>1330</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

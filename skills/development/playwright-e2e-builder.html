@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>playwright-e2e-builder - AICCLI</title>
-  <meta name="description" content="playwright-e2e-builder - Claude Code skill for AICCLI">
+  <meta name="description" content="Plan and build comprehensive Playwright E2E test suites with Page Object Model, authentication state persistence, custom fixtures, visual regression, and CI int">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / playwright-e2e-builder</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>playwright-e2e-builder</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / playwright-e2e-builder
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>playwright-e2e-builder</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Plan and build comprehensive Playwright E2E test suites with Page Object Model, authentication state persistence, custom fixtures, visual regression, and CI integration. Uses interview-driven planning to clarify critical user flows, auth strategy, test data approach, and parallelization before writing any tests.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/playwright-e2e-builder</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/playwright-e2e-builder</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/playwright-e2e-builder</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: playwright-e2e-builder
 description: Plan and build comprehensive Playwright E2E test suites with Page Object Model, authentication state persistence, custom fixtures, visual regression, and CI integration. Uses interview-driven planning to clarify critical user flows, auth strategy, test data approach, and parallelization before writing any tests.
 tags: [playwright, e2e, testing, automation, typescript, ci, visual-regression]
@@ -95,7 +145,7 @@ Enter plan mode. Before writing any tests, explore the existing project:
 ### CI/CD
 - Check for existing CI config (`.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`)
 - Look for Docker or docker-compose setup (useful for consistent test environments)
-- Check if there's a staging/preview environment URL pattern
+- Check if there&#039;s a staging/preview environment URL pattern
 
 ## Phase 2: Interview (AskUserQuestion)
 
@@ -104,81 +154,81 @@ Use AskUserQuestion to clarify requirements. Ask in rounds.
 ### Round 1: Scope and critical flows
 
 ```
-Question: "What are the critical user flows to test?"
-Header: "Flows"
+Question: &quot;What are the critical user flows to test?&quot;
+Header: &quot;Flows&quot;
 multiSelect: true
 Options:
-  - "Authentication (signup, login, logout, password reset)" — Core auth flows
-  - "Core CRUD (create, read, update, delete main resources)" — Primary data operations
-  - "Checkout/payments (cart, billing, confirmation)" — E-commerce or payment flows
-  - "Dashboard/admin (data views, filters, exports)" — Admin panel interactions
+  - &quot;Authentication (signup, login, logout, password reset)&quot; — Core auth flows
+  - &quot;Core CRUD (create, read, update, delete main resources)&quot; — Primary data operations
+  - &quot;Checkout/payments (cart, billing, confirmation)&quot; — E-commerce or payment flows
+  - &quot;Dashboard/admin (data views, filters, exports)&quot; — Admin panel interactions
 ```
 
 ```
-Question: "How many pages/routes does the application have approximately?"
-Header: "App size"
+Question: &quot;How many pages/routes does the application have approximately?&quot;
+Header: &quot;App size&quot;
 Options:
-  - "Small (&lt; 10 routes)" — Landing page, auth, a few feature pages
-  - "Medium (10-30 routes)" — Multiple feature areas, settings, profiles
-  - "Large (30+ routes)" — Complex app with many sections and user roles
+  - &quot;Small (&lt; 10 routes)&quot; — Landing page, auth, a few feature pages
+  - &quot;Medium (10-30 routes)&quot; — Multiple feature areas, settings, profiles
+  - &quot;Large (30+ routes)&quot; — Complex app with many sections and user roles
 ```
 
 ### Round 2: Authentication strategy for tests
 
 ```
-Question: "How does your app handle authentication?"
-Header: "Auth type"
+Question: &quot;How does your app handle authentication?&quot;
+Header: &quot;Auth type&quot;
 Options:
-  - "Cookie/session based (Recommended)" — Server sets httpOnly cookies after login
-  - "JWT in localStorage" — Token stored in browser localStorage
-  - "OAuth/SSO (Google, GitHub, etc.)" — Third-party auth provider redirect flow
-  - "No auth (public app)" — No login required
+  - &quot;Cookie/session based (Recommended)&quot; — Server sets httpOnly cookies after login
+  - &quot;JWT in localStorage&quot; — Token stored in browser localStorage
+  - &quot;OAuth/SSO (Google, GitHub, etc.)&quot; — Third-party auth provider redirect flow
+  - &quot;No auth (public app)&quot; — No login required
 
-Question: "How should tests authenticate?"
-Header: "Test auth"
+Question: &quot;How should tests authenticate?&quot;
+Header: &quot;Test auth&quot;
 Options:
-  - "Login via UI once, reuse state (Recommended)" — storageState pattern: login in setup, share cookies across tests
-  - "API login in beforeEach" — Call auth API directly before each test, skip UI login
-  - "Seed auth token in fixtures" — Inject pre-generated tokens, no login flow needed
-  - "Test login UI every time" — Actually test the login form in each test suite
+  - &quot;Login via UI once, reuse state (Recommended)&quot; — storageState pattern: login in setup, share cookies across tests
+  - &quot;API login in beforeEach&quot; — Call auth API directly before each test, skip UI login
+  - &quot;Seed auth token in fixtures&quot; — Inject pre-generated tokens, no login flow needed
+  - &quot;Test login UI every time&quot; — Actually test the login form in each test suite
 ```
 
 ### Round 3: Test data and environment
 
 ```
-Question: "How should test data be managed?"
-Header: "Test data"
+Question: &quot;How should test data be managed?&quot;
+Header: &quot;Test data&quot;
 Options:
-  - "API seeding in fixtures (Recommended)" — Call API endpoints to create/clean test data before each test
-  - "Database seeding (direct SQL)" — Run SQL scripts or ORM commands to populate test database
-  - "Shared test environment (pre-populated)" — Tests run against a persistent staging environment with existing data
-  - "Mock API responses" — Intercept network requests and return mock data
+  - &quot;API seeding in fixtures (Recommended)&quot; — Call API endpoints to create/clean test data before each test
+  - &quot;Database seeding (direct SQL)&quot; — Run SQL scripts or ORM commands to populate test database
+  - &quot;Shared test environment (pre-populated)&quot; — Tests run against a persistent staging environment with existing data
+  - &quot;Mock API responses&quot; — Intercept network requests and return mock data
 
-Question: "What environment do E2E tests run against?"
-Header: "Environment"
+Question: &quot;What environment do E2E tests run against?&quot;
+Header: &quot;Environment&quot;
 Options:
-  - "Local dev server (Recommended)" — Start dev server before tests, run against localhost
-  - "Preview/staging URL" — Run against a deployed preview or staging environment
-  - "Docker Compose stack" — Full stack in containers, tests run outside or inside
+  - &quot;Local dev server (Recommended)&quot; — Start dev server before tests, run against localhost
+  - &quot;Preview/staging URL&quot; — Run against a deployed preview or staging environment
+  - &quot;Docker Compose stack&quot; — Full stack in containers, tests run outside or inside
 ```
 
 ### Round 4: CI and parallelization
 
 ```
-Question: "How should tests run in CI?"
-Header: "CI"
+Question: &quot;How should tests run in CI?&quot;
+Header: &quot;CI&quot;
 Options:
-  - "GitHub Actions (Recommended)" — Native Playwright support with sharding
-  - "GitLab CI" — Docker-based runners with Playwright image
-  - "Local only (no CI yet)" — Just local test runs for now
-  - "Other CI (Jenkins, CircleCI)" — Custom CI configuration
+  - &quot;GitHub Actions (Recommended)&quot; — Native Playwright support with sharding
+  - &quot;GitLab CI&quot; — Docker-based runners with Playwright image
+  - &quot;Local only (no CI yet)&quot; — Just local test runs for now
+  - &quot;Other CI (Jenkins, CircleCI)&quot; — Custom CI configuration
 
-Question: "Do you need visual regression testing?"
-Header: "Visual"
+Question: &quot;Do you need visual regression testing?&quot;
+Header: &quot;Visual&quot;
 Options:
-  - "No — functional tests only (Recommended)" — Assert behavior, not pixels
-  - "Yes — screenshot comparisons" — Capture and compare page screenshots
-  - "Yes — component screenshots" — Capture specific components, not full pages
+  - &quot;No — functional tests only (Recommended)&quot; — Assert behavior, not pixels
+  - &quot;Yes — screenshot comparisons&quot; — Capture and compare page screenshots
+  - &quot;Yes — component screenshots&quot; — Capture specific components, not full pages
 ```
 
 ## Phase 3: Plan (ExitPlanMode)
@@ -202,60 +252,60 @@ After approval, implement following this order:
 ### Step 1: Playwright config
 
 ```typescript
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from &#039;@playwright/test&#039;;
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: &#039;./e2e&#039;,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI
-    ? [['html', { open: 'never' }], ['github']]
-    : [['html', { open: 'on-failure' }]],
+    ? [[&#039;html&#039;, { open: &#039;never&#039; }], [&#039;github&#039;]]
+    : [[&#039;html&#039;, { open: &#039;on-failure&#039; }]],
 
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'on-first-retry',
+    baseURL: process.env.BASE_URL || &#039;http://localhost:3000&#039;,
+    trace: &#039;on-first-retry&#039;,
+    screenshot: &#039;only-on-failure&#039;,
+    video: &#039;on-first-retry&#039;,
   },
 
   projects: [
     // Auth setup — runs before all tests
     {
-      name: 'setup',
+      name: &#039;setup&#039;,
       testMatch: /.*\.setup\.ts/,
     },
     {
-      name: 'chromium',
+      name: &#039;chromium&#039;,
       use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'e2e/.auth/user.json',
+        ...devices[&#039;Desktop Chrome&#039;],
+        storageState: &#039;e2e/.auth/user.json&#039;,
       },
-      dependencies: ['setup'],
+      dependencies: [&#039;setup&#039;],
     },
     {
-      name: 'firefox',
+      name: &#039;firefox&#039;,
       use: {
-        ...devices['Desktop Firefox'],
-        storageState: 'e2e/.auth/user.json',
+        ...devices[&#039;Desktop Firefox&#039;],
+        storageState: &#039;e2e/.auth/user.json&#039;,
       },
-      dependencies: ['setup'],
+      dependencies: [&#039;setup&#039;],
     },
     {
-      name: 'mobile',
+      name: &#039;mobile&#039;,
       use: {
-        ...devices['iPhone 14'],
-        storageState: 'e2e/.auth/user.json',
+        ...devices[&#039;iPhone 14&#039;],
+        storageState: &#039;e2e/.auth/user.json&#039;,
       },
-      dependencies: ['setup'],
+      dependencies: [&#039;setup&#039;],
     },
   ],
 
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
+    command: &#039;npm run dev&#039;,
+    url: &#039;http://localhost:3000&#039;,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
@@ -266,22 +316,22 @@ export default defineConfig({
 
 ```typescript
 // e2e/auth.setup.ts
-import { test as setup, expect } from '@playwright/test';
+import { test as setup, expect } from &#039;@playwright/test&#039;;
 
-const authFile = 'e2e/.auth/user.json';
+const authFile = &#039;e2e/.auth/user.json&#039;;
 
-setup('authenticate', async ({ page }) =&gt; {
+setup(&#039;authenticate&#039;, async ({ page }) =&gt; {
   // Navigate to login page
-  await page.goto('/login');
+  await page.goto(&#039;/login&#039;);
 
   // Fill login form
-  await page.getByLabel('Email').fill(process.env.TEST_USER_EMAIL || 'test@example.com');
-  await page.getByLabel('Password').fill(process.env.TEST_USER_PASSWORD || 'testpassword');
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.getByLabel(&#039;Email&#039;).fill(process.env.TEST_USER_EMAIL || &#039;test@example.com&#039;);
+  await page.getByLabel(&#039;Password&#039;).fill(process.env.TEST_USER_PASSWORD || &#039;testpassword&#039;);
+  await page.getByRole(&#039;button&#039;, { name: &#039;Sign in&#039; }).click();
 
   // Wait for auth to complete — adjust selector to your app
-  await page.waitForURL('/dashboard');
-  await expect(page.getByRole('navigation')).toBeVisible();
+  await page.waitForURL(&#039;/dashboard&#039;);
+  await expect(page.getByRole(&#039;navigation&#039;)).toBeVisible();
 
   // Save signed-in state
   await page.context().storageState({ path: authFile });
@@ -292,9 +342,9 @@ setup('authenticate', async ({ page }) =&gt; {
 
 ```typescript
 // e2e/fixtures.ts
-import { test as base, expect } from '@playwright/test';
-import { LoginPage } from './pages/login-page';
-import { DashboardPage } from './pages/dashboard-page';
+import { test as base, expect } from &#039;@playwright/test&#039;;
+import { LoginPage } from &#039;./pages/login-page&#039;;
+import { DashboardPage } from &#039;./pages/dashboard-page&#039;;
 
 // API client for test data seeding
 class ApiClient {
@@ -302,9 +352,9 @@ class ApiClient {
 
   async createResource(data: Record&lt;string, unknown&gt;) {
     const response = await fetch(`${this.baseURL}/api/resources`, {
-      method: 'POST',
+      method: &#039;POST&#039;,
       headers: {
-        'Content-Type': 'application/json',
+        &#039;Content-Type&#039;: &#039;application/json&#039;,
         ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
       },
       body: JSON.stringify(data),
@@ -315,7 +365,7 @@ class ApiClient {
 
   async deleteResource(id: string) {
     await fetch(`${this.baseURL}/api/resources/${id}`, {
-      method: 'DELETE',
+      method: &#039;DELETE&#039;,
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
     });
   }
@@ -349,7 +399,7 @@ export { expect };
 
 ```typescript
 // e2e/pages/login-page.ts
-import { type Page, type Locator, expect } from '@playwright/test';
+import { type Page, type Locator, expect } from &#039;@playwright/test&#039;;
 
 export class LoginPage {
   readonly emailInput: Locator;
@@ -358,14 +408,14 @@ export class LoginPage {
   readonly errorMessage: Locator;
 
   constructor(private page: Page) {
-    this.emailInput = page.getByLabel('Email');
-    this.passwordInput = page.getByLabel('Password');
-    this.submitButton = page.getByRole('button', { name: 'Sign in' });
-    this.errorMessage = page.getByRole('alert');
+    this.emailInput = page.getByLabel(&#039;Email&#039;);
+    this.passwordInput = page.getByLabel(&#039;Password&#039;);
+    this.submitButton = page.getByRole(&#039;button&#039;, { name: &#039;Sign in&#039; });
+    this.errorMessage = page.getByRole(&#039;alert&#039;);
   }
 
   async goto() {
-    await this.page.goto('/login');
+    await this.page.goto(&#039;/login&#039;);
   }
 
   async login(email: string, password: string) {
@@ -380,7 +430,7 @@ export class LoginPage {
 }
 
 // e2e/pages/dashboard-page.ts
-import { type Page, type Locator, expect } from '@playwright/test';
+import { type Page, type Locator, expect } from &#039;@playwright/test&#039;;
 
 export class DashboardPage {
   readonly heading: Locator;
@@ -389,27 +439,27 @@ export class DashboardPage {
   readonly resourceList: Locator;
 
   constructor(private page: Page) {
-    this.heading = page.getByRole('heading', { level: 1 });
-    this.createButton = page.getByRole('button', { name: 'Create' });
-    this.searchInput = page.getByPlaceholder('Search');
-    this.resourceList = page.getByTestId('resource-list');
+    this.heading = page.getByRole(&#039;heading&#039;, { level: 1 });
+    this.createButton = page.getByRole(&#039;button&#039;, { name: &#039;Create&#039; });
+    this.searchInput = page.getByPlaceholder(&#039;Search&#039;);
+    this.resourceList = page.getByTestId(&#039;resource-list&#039;);
   }
 
   async goto() {
-    await this.page.goto('/dashboard');
+    await this.page.goto(&#039;/dashboard&#039;);
   }
 
   async createResource(name: string) {
     await this.createButton.click();
-    await this.page.getByLabel('Name').fill(name);
-    await this.page.getByRole('button', { name: 'Save' }).click();
+    await this.page.getByLabel(&#039;Name&#039;).fill(name);
+    await this.page.getByRole(&#039;button&#039;, { name: &#039;Save&#039; }).click();
   }
 
   async search(query: string) {
     await this.searchInput.fill(query);
     // Wait for debounced search to trigger
     await this.page.waitForResponse(resp =&gt;
-      resp.url().includes('/api/resources') && resp.status() === 200
+      resp.url().includes(&#039;/api/resources&#039;) &amp;&amp; resp.status() === 200
     );
   }
 
@@ -418,7 +468,7 @@ export class DashboardPage {
   }
 
   async expectResourceCount(count: number) {
-    await expect(this.resourceList.getByRole('listitem')).toHaveCount(count);
+    await expect(this.resourceList.getByRole(&#039;listitem&#039;)).toHaveCount(count);
   }
 }
 ```
@@ -427,83 +477,83 @@ export class DashboardPage {
 
 ```typescript
 // e2e/auth.spec.ts
-import { test, expect } from './fixtures';
+import { test, expect } from &#039;./fixtures&#039;;
 
-test.describe('Authentication', () =&gt; {
+test.describe(&#039;Authentication&#039;, () =&gt; {
   // These tests run WITHOUT storageState (unauthenticated)
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test('successful login redirects to dashboard', async ({ loginPage, page }) =&gt; {
+  test(&#039;successful login redirects to dashboard&#039;, async ({ loginPage, page }) =&gt; {
     await loginPage.goto();
-    await loginPage.login('test@example.com', 'testpassword');
-    await expect(page).toHaveURL('/dashboard');
+    await loginPage.login(&#039;test@example.com&#039;, &#039;testpassword&#039;);
+    await expect(page).toHaveURL(&#039;/dashboard&#039;);
   });
 
-  test('invalid credentials shows error', async ({ loginPage }) =&gt; {
+  test(&#039;invalid credentials shows error&#039;, async ({ loginPage }) =&gt; {
     await loginPage.goto();
-    await loginPage.login('test@example.com', 'wrongpassword');
-    await loginPage.expectError('Invalid credentials');
+    await loginPage.login(&#039;test@example.com&#039;, &#039;wrongpassword&#039;);
+    await loginPage.expectError(&#039;Invalid credentials&#039;);
   });
 
-  test('logout clears session', async ({ page }) =&gt; {
+  test(&#039;logout clears session&#039;, async ({ page }) =&gt; {
     // Login first
-    await page.goto('/login');
+    await page.goto(&#039;/login&#039;);
     // ... login steps ...
 
     // Logout
-    await page.getByRole('button', { name: 'Logout' }).click();
-    await expect(page).toHaveURL('/login');
+    await page.getByRole(&#039;button&#039;, { name: &#039;Logout&#039; }).click();
+    await expect(page).toHaveURL(&#039;/login&#039;);
 
-    // Verify can't access protected route
-    await page.goto('/dashboard');
-    await expect(page).toHaveURL('/login');
+    // Verify can&#039;t access protected route
+    await page.goto(&#039;/dashboard&#039;);
+    await expect(page).toHaveURL(&#039;/login&#039;);
   });
 });
 
 // e2e/dashboard.spec.ts
-import { test, expect } from './fixtures';
+import { test, expect } from &#039;./fixtures&#039;;
 
-test.describe('Dashboard', () =&gt; {
-  test('displays resource list', async ({ dashboardPage }) =&gt; {
+test.describe(&#039;Dashboard&#039;, () =&gt; {
+  test(&#039;displays resource list&#039;, async ({ dashboardPage }) =&gt; {
     await dashboardPage.goto();
-    await expect(dashboardPage.heading).toHaveText('Dashboard');
+    await expect(dashboardPage.heading).toHaveText(&#039;Dashboard&#039;);
     await expect(dashboardPage.resourceList).toBeVisible();
   });
 
-  test('create new resource', async ({ dashboardPage, page }) =&gt; {
+  test(&#039;create new resource&#039;, async ({ dashboardPage, page }) =&gt; {
     await dashboardPage.goto();
-    await dashboardPage.createResource('New E2E Resource');
+    await dashboardPage.createResource(&#039;New E2E Resource&#039;);
 
     // Verify resource appears in list
-    await dashboardPage.expectResourceVisible('New E2E Resource');
+    await dashboardPage.expectResourceVisible(&#039;New E2E Resource&#039;);
   });
 
-  test('search filters results', async ({ dashboardPage, api }) =&gt; {
+  test(&#039;search filters results&#039;, async ({ dashboardPage, api }) =&gt; {
     // Seed test data via API
-    await api.createResource({ name: 'Alpha Item' });
-    await api.createResource({ name: 'Beta Item' });
+    await api.createResource({ name: &#039;Alpha Item&#039; });
+    await api.createResource({ name: &#039;Beta Item&#039; });
 
     await dashboardPage.goto();
-    await dashboardPage.search('Alpha');
-    await dashboardPage.expectResourceVisible('Alpha Item');
+    await dashboardPage.search(&#039;Alpha&#039;);
+    await dashboardPage.expectResourceVisible(&#039;Alpha Item&#039;);
   });
 
-  test('empty state shown when no resources', async ({ dashboardPage, page }) =&gt; {
+  test(&#039;empty state shown when no resources&#039;, async ({ dashboardPage, page }) =&gt; {
     await dashboardPage.goto();
-    await dashboardPage.search('nonexistent-query-xyz');
-    await expect(page.getByText('No results found')).toBeVisible();
+    await dashboardPage.search(&#039;nonexistent-query-xyz&#039;);
+    await expect(page.getByText(&#039;No results found&#039;)).toBeVisible();
   });
 });
 
 // e2e/crud.spec.ts
-import { test, expect } from './fixtures';
+import { test, expect } from &#039;./fixtures&#039;;
 
-test.describe('Resource CRUD', () =&gt; {
+test.describe(&#039;Resource CRUD&#039;, () =&gt; {
   let resourceId: string;
 
   test.beforeEach(async ({ api }) =&gt; {
     // Seed a resource for tests that need one
-    const resource = await api.createResource({ name: 'Test Resource' });
+    const resource = await api.createResource({ name: &#039;Test Resource&#039; });
     resourceId = resource.id;
   });
 
@@ -514,26 +564,26 @@ test.describe('Resource CRUD', () =&gt; {
     }
   });
 
-  test('edit resource name', async ({ page }) =&gt; {
+  test(&#039;edit resource name&#039;, async ({ page }) =&gt; {
     await page.goto(`/resources/${resourceId}`);
-    await page.getByRole('button', { name: 'Edit' }).click();
-    await page.getByLabel('Name').clear();
-    await page.getByLabel('Name').fill('Updated Resource');
-    await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByRole(&#039;button&#039;, { name: &#039;Edit&#039; }).click();
+    await page.getByLabel(&#039;Name&#039;).clear();
+    await page.getByLabel(&#039;Name&#039;).fill(&#039;Updated Resource&#039;);
+    await page.getByRole(&#039;button&#039;, { name: &#039;Save&#039; }).click();
 
-    await expect(page.getByRole('heading')).toHaveText('Updated Resource');
+    await expect(page.getByRole(&#039;heading&#039;)).toHaveText(&#039;Updated Resource&#039;);
   });
 
-  test('delete resource with confirmation', async ({ page }) =&gt; {
+  test(&#039;delete resource with confirmation&#039;, async ({ page }) =&gt; {
     await page.goto(`/resources/${resourceId}`);
-    await page.getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole(&#039;button&#039;, { name: &#039;Delete&#039; }).click();
 
     // Confirm deletion dialog
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await page.getByRole('button', { name: 'Confirm' }).click();
+    await expect(page.getByRole(&#039;dialog&#039;)).toBeVisible();
+    await page.getByRole(&#039;button&#039;, { name: &#039;Confirm&#039; }).click();
 
     // Should redirect to list
-    await expect(page).toHaveURL('/dashboard');
+    await expect(page).toHaveURL(&#039;/dashboard&#039;);
   });
 });
 ```
@@ -542,31 +592,31 @@ test.describe('Resource CRUD', () =&gt; {
 
 ```typescript
 // e2e/visual.spec.ts
-import { test, expect } from './fixtures';
+import { test, expect } from &#039;./fixtures&#039;;
 
-test.describe('Visual regression', () =&gt; {
-  test('dashboard matches snapshot', async ({ dashboardPage, page }) =&gt; {
+test.describe(&#039;Visual regression&#039;, () =&gt; {
+  test(&#039;dashboard matches snapshot&#039;, async ({ dashboardPage, page }) =&gt; {
     await dashboardPage.goto();
     // Wait for dynamic content to stabilize
-    await page.waitForLoadState('networkidle');
-    await expect(page).toHaveScreenshot('dashboard.png', {
+    await page.waitForLoadState(&#039;networkidle&#039;);
+    await expect(page).toHaveScreenshot(&#039;dashboard.png&#039;, {
       maxDiffPixelRatio: 0.01,
     });
   });
 
-  test('login page matches snapshot', async ({ loginPage, page }) =&gt; {
+  test(&#039;login page matches snapshot&#039;, async ({ loginPage, page }) =&gt; {
     test.use({ storageState: { cookies: [], origins: [] } });
     await loginPage.goto();
-    await expect(page).toHaveScreenshot('login.png', {
+    await expect(page).toHaveScreenshot(&#039;login.png&#039;, {
       maxDiffPixelRatio: 0.01,
     });
   });
 
   // Component-level screenshots
-  test('navigation component matches snapshot', async ({ page }) =&gt; {
-    await page.goto('/dashboard');
-    const nav = page.getByRole('navigation');
-    await expect(nav).toHaveScreenshot('navigation.png');
+  test(&#039;navigation component matches snapshot&#039;, async ({ page }) =&gt; {
+    await page.goto(&#039;/dashboard&#039;);
+    const nav = page.getByRole(&#039;navigation&#039;);
+    await expect(nav).toHaveScreenshot(&#039;navigation.png&#039;);
   });
 });
 ```
@@ -598,7 +648,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: &#039;npm&#039;
 
       - run: npm ci
 
@@ -655,15 +705,15 @@ Prefer `getByRole()`, `getByLabel()`, `getByText()` over CSS selectors or test I
 
 ```typescript
 // Preferred — accessible and resilient
-await page.getByRole('button', { name: 'Submit' }).click();
-await page.getByLabel('Email').fill('user@test.com');
+await page.getByRole(&#039;button&#039;, { name: &#039;Submit&#039; }).click();
+await page.getByLabel(&#039;Email&#039;).fill(&#039;user@test.com&#039;);
 
-// Fallback — when role-based doesn't work
-await page.getByTestId('custom-widget').click();
+// Fallback — when role-based doesn&#039;t work
+await page.getByTestId(&#039;custom-widget&#039;).click();
 
 // Avoid — fragile, breaks on refactors
-await page.locator('.btn-primary').click();
-await page.locator('#email-input').fill('user@test.com');
+await page.locator(&#039;.btn-primary&#039;).click();
+await page.locator(&#039;#email-input&#039;).fill(&#039;user@test.com&#039;);
 ```
 
 ### Wait for network, not timers
@@ -671,25 +721,25 @@ Never use `page.waitForTimeout()`. Wait for specific conditions:
 
 ```typescript
 // Wait for API response
-await page.waitForResponse(resp =&gt; resp.url().includes('/api/data'));
+await page.waitForResponse(resp =&gt; resp.url().includes(&#039;/api/data&#039;));
 
 // Wait for element state
-await expect(page.getByText('Saved')).toBeVisible();
+await expect(page.getByText(&#039;Saved&#039;)).toBeVisible();
 
 // Wait for navigation
-await expect(page).toHaveURL('/dashboard');
+await expect(page).toHaveURL(&#039;/dashboard&#039;);
 
 // Wait for loading to finish
-await expect(page.getByTestId('spinner')).toBeHidden();
+await expect(page.getByTestId(&#039;spinner&#039;)).toBeHidden();
 ```
 
 ### Isolate test data
 Each test should create its own data and clean up after:
 
 ```typescript
-test('edit resource', async ({ api, page }) =&gt; {
+test(&#039;edit resource&#039;, async ({ api, page }) =&gt; {
   // Arrange — seed via API
-  const resource = await api.createResource({ name: 'Test' });
+  const resource = await api.createResource({ name: &#039;Test&#039; });
 
   // Act
   await page.goto(`/resources/${resource.id}`);
@@ -702,7 +752,7 @@ test('edit resource', async ({ api, page }) =&gt; {
 ### Tag tests for selective runs
 
 ```typescript
-test('checkout flow @slow @checkout', async ({ page }) =&gt; {
+test(&#039;checkout flow @slow @checkout&#039;, async ({ page }) =&gt; {
   // Long test tagged for selective execution
 });
 
@@ -731,8 +781,46 @@ blob-report/
 - [ ] Trace, screenshot, and video are captured on failure for debugging
 - [ ] `.auth/` directory is in `.gitignore`
 - [ ] `npx playwright test` passes locally before pushing
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">playwright</span><span class="tag">e2e</span><span class="tag">testing</span><span class="tag">automation</span><span class="tag">typescript</span><span class="tag">ci</span><span class="tag">visual-regression</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>105</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

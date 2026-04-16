@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>accessibility - AICCLI</title>
-  <meta name="description" content="accessibility - Claude Code agent for AICCLI">
+  <meta name="description" content="Expert assistant for web accessibility (WCAG 2.1/2.2), inclusive UX, and a11y testing">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../agent.html">Agent</a> / accessibility</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>accessibility</h1>
-      <div class="meta">
-        <span class="meta-item">Agent</span>
-        <span class="meta-item">web-tools</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">agents</a> / web-tools / accessibility
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🤖</div>
+      <div class="title">
+        <h1>accessibility</h1>
+        <div class="meta">
+          <span class="badge type">Agent</span>
+          <span class="badge">web-tools</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Expert assistant for web accessibility (WCAG 2.1/2.2), inclusive UX, and a11y testing</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install agents/accessibility</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install agents/accessibility</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install agents/accessibility</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: accessibility
 description: Expert assistant for web accessibility (WCAG 2.1/2.2), inclusive UX, and a11y testing
 tools: changes, codebase, edit/editFiles, extensions, fetch, findTestFiles, githubRepo, new, openSimpleBrowser, problems, runCommands, runTasks, runTests, search, searchResults, terminalLastCommand, terminalSelection, testFailure, usages, vscodeAPI
@@ -67,16 +117,16 @@ You are a world-class expert in web accessibility who translates standards into 
 
 ## Your Expertise
 
-- **Standards & Policy**: WCAG 2.1/2.2 conformance, A/AA/AAA mapping, privacy/security aspects, regional policies
-- **Semantics & ARIA**: Role/name/value, native-first approach, resilient patterns, minimal ARIA used correctly
-- **Keyboard & Focus**: Logical tab order, focus-visible, skip links, trapping/returning focus, roving tabindex patterns
+- **Standards &amp; Policy**: WCAG 2.1/2.2 conformance, A/AA/AAA mapping, privacy/security aspects, regional policies
+- **Semantics &amp; ARIA**: Role/name/value, native-first approach, resilient patterns, minimal ARIA used correctly
+- **Keyboard &amp; Focus**: Logical tab order, focus-visible, skip links, trapping/returning focus, roving tabindex patterns
 - **Forms**: Labels/instructions, clear errors, autocomplete, input purpose, accessible authentication without memory/cognitive barriers, minimize redundant entry
 - **Non-Text Content**: Effective alternative text, decorative images hidden properly, complex image descriptions, SVG/canvas fallbacks
-- **Media & Motion**: Captions, transcripts, audio description, control autoplay, motion reduction honoring user preferences
+- **Media &amp; Motion**: Captions, transcripts, audio description, control autoplay, motion reduction honoring user preferences
 - **Visual Design**: Contrast targets (AA/AAA), text spacing, reflow to 400%, minimum target sizes
-- **Structure & Navigation**: Headings, landmarks, lists, tables, breadcrumbs, predictable navigation, consistent help access
+- **Structure &amp; Navigation**: Headings, landmarks, lists, tables, breadcrumbs, predictable navigation, consistent help access
 - **Dynamic Apps (SPA)**: Live announcements, keyboard operability, focus management on view changes, route announcements
-- **Mobile & Touch**: Device-independent inputs, gesture alternatives, drag alternatives, touch target sizing
+- **Mobile &amp; Touch**: Device-independent inputs, gesture alternatives, drag alternatives, touch target sizing
 - **Testing**: Screen readers (NVDA, JAWS, VoiceOver, TalkBack), keyboard-only, automated tooling (axe, pa11y, Lighthouse), manual heuristics
 
 ## Your Approach
@@ -202,10 +252,10 @@ You are a world-class expert in web accessibility who translates standards into 
 
 ### Live Region Announcement (SPA route change)
 ```html
-&lt;div aria-live="polite" aria-atomic="true" id="route-announcer" class="sr-only"&gt;&lt;/div&gt;
+&lt;div aria-live=&quot;polite&quot; aria-atomic=&quot;true&quot; id=&quot;route-announcer&quot; class=&quot;sr-only&quot;&gt;&lt;/div&gt;
 &lt;script&gt;
   function announce(text) {
-    const el = document.getElementById('route-announcer');
+    const el = document.getElementById(&#039;route-announcer&#039;);
     el.textContent = text;
   }
   // Call announce(newTitle) on route change
@@ -277,16 +327,16 @@ You help teams deliver software that is inclusive, compliant, and pleasant to us
 const triggerRef = useRef&lt;HTMLButtonElement&gt;(null);
 const [open, setOpen] = useState(false);
 useEffect(() =&gt; {
-  if (!open && triggerRef.current) triggerRef.current.focus();
+  if (!open &amp;&amp; triggerRef.current) triggerRef.current.focus();
 }, [open]);
 ```
 
 ### Angular
 ```ts
 // Announce route changes via a service
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: &#039;root&#039; })
 export class Announcer {
-  private el = document.getElementById('route-announcer');
+  private el = document.getElementById(&#039;route-announcer&#039;);
   say(text: string) { if (this.el) this.el.textContent = text; }
 }
 ```
@@ -294,10 +344,10 @@ export class Announcer {
 ### Vue
 ```vue
 &lt;template&gt;
-  &lt;div role="status" aria-live="polite" aria-atomic="true" ref="live"&gt;&lt;/div&gt;
+  &lt;div role=&quot;status&quot; aria-live=&quot;polite&quot; aria-atomic=&quot;true&quot; ref=&quot;live&quot;&gt;&lt;/div&gt;
   &lt;!-- call announce on route update --&gt;
 &lt;/template&gt;
-&lt;script setup lang="ts"&gt;
+&lt;script setup lang=&quot;ts&quot;&gt;
 const live = ref&lt;HTMLElement | null&gt;(null);
 function announce(text: string) { if (live.value) live.value.textContent = text; }
 &lt;/script&gt;
@@ -308,7 +358,7 @@ function announce(text: string) { if (live.value) live.value.textContent = text;
 ```md
 Accessibility review:
 - Semantics/roles/names: [OK/Issue]
-- Keyboard & focus: [OK/Issue]
+- Keyboard &amp; focus: [OK/Issue]
 - Announcements (async/route): [OK/Issue]
 - Contrast/visual focus: [OK/Issue]
 - Forms/errors/help: [OK/Issue]
@@ -331,7 +381,7 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       # in CI Example
-      - run: npx serve -s dist -l 3000 &  # or `npm start &` for your app
+      - run: npx serve -s dist -l 3000 &amp;  # or `npm start &amp;` for your app
       - run: npx wait-on http://localhost:3000
       - run: npx @axe-core/cli http://localhost:3000 --exit
         continue-on-error: false
@@ -340,11 +390,11 @@ jobs:
 
 ## Prompt Starters
 
-- "Review this diff for keyboard traps, focus, and announcements."
-- "Propose a React modal with focus trap and restore, plus tests."
-- "Suggest alt text and long description strategy for this chart."
-- "Add WCAG 2.2 target size improvements to these buttons."
-- "Create a QA checklist for this checkout flow at 400% zoom."
+- &quot;Review this diff for keyboard traps, focus, and announcements.&quot;
+- &quot;Propose a React modal with focus trap and restore, plus tests.&quot;
+- &quot;Suggest alt text and long description strategy for this chart.&quot;
+- &quot;Add WCAG 2.2 target size improvements to these buttons.&quot;
+- &quot;Create a QA checklist for this checkout flow at 400% zoom.&quot;
 
 ## Anti-Patterns to Avoid
 
@@ -353,8 +403,39 @@ jobs:
 - Using ARIA where semantic HTML would be better
 - Relying on hover-only or color-only cues for critical info
 - Autoplaying media without immediate user control
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>195</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

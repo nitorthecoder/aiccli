@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>daily-meeting-update - AICCLI</title>
-  <meta name="description" content="daily-meeting-update - Claude Code skill for AICCLI">
+  <meta name="description" content=""Interactive daily standup/meeting update generator. Use when user says 'daily', 'standup', 'scrum update', 'status update', 'what did I do yesterday', 'prepare">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / daily-meeting-update</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>daily-meeting-update</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">enterprise-communication</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / enterprise-communication / daily-meeting-update
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>daily-meeting-update</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">enterprise-communication</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Interactive daily standup/meeting update generator. Use when user says 'daily', 'standup', 'scrum update', 'status update', 'what did I do yesterday', 'prepare for meeting', 'morning update', or 'team sync'. Pulls activity from GitHub, Jira, and Claude Code session history. Conducts 4-question interview (yesterday, today, blockers, discussion topics) and generates formatted Markdown update."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/daily-meeting-update</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/daily-meeting-update</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/daily-meeting-update</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: daily-meeting-update
-description: "Interactive daily standup/meeting update generator. Use when user says 'daily', 'standup', 'scrum update', 'status update', 'what did I do yesterday', 'prepare for meeting', 'morning update', or 'team sync'. Pulls activity from GitHub, Jira, and Claude Code session history. Conducts 4-question interview (yesterday, today, blockers, discussion topics) and generates formatted Markdown update."
+description: &quot;Interactive daily standup/meeting update generator. Use when user says &#039;daily&#039;, &#039;standup&#039;, &#039;scrum update&#039;, &#039;status update&#039;, &#039;what did I do yesterday&#039;, &#039;prepare for meeting&#039;, &#039;morning update&#039;, or &#039;team sync&#039;. Pulls activity from GitHub, Jira, and Claude Code session history. Conducts 4-question interview (yesterday, today, blockers, discussion topics) and generates formatted Markdown update.&quot;
 user-invocable: true
 ---
 
@@ -74,16 +124,16 @@ START
   │
   ▼
 ┌─────────────────────────────────────────────────────┐
-│ Phase 1: DETECT & OFFER INTEGRATIONS                │
+│ Phase 1: DETECT &amp; OFFER INTEGRATIONS                │
 │ • Check: Claude Code history? gh CLI? jira CLI?     │
-│ • Claude Code → Pull yesterday's session digest     │
+│ • Claude Code → Pull yesterday&#039;s session digest     │
 │   → User selects relevant items via multiSelect     │
 │ • GitHub/Jira → Ask user, pull if approved          │
 │ • Pull data NOW (before interview)                  │
 ├─────────────────────────────────────────────────────┤
 │ Phase 2: INTERVIEW (with insights)                  │
 │ • Show pulled data as context                       │
-│ • Yesterday: "I see you merged PR #123, what else?" │
+│ • Yesterday: &quot;I see you merged PR #123, what else?&quot; │
 │ • Today: What will you work on?                     │
 │ • Blockers: Anything blocking you?                  │
 │ • Topics: Anything to discuss at end of meeting?    │
@@ -97,11 +147,11 @@ START
 
 ---
 
-## Phase 1: Detect & Offer Integrations
+## Phase 1: Detect &amp; Offer Integrations
 
 ### Step 1: Silent Detection
 
-Check for available integrations **silently** (suppress errors, don't show to user):
+Check for available integrations **silently** (suppress errors, don&#039;t show to user):
 
 | Integration | Detection |
 |-------------|-----------|
@@ -120,21 +170,21 @@ Check for available integrations **silently** (suppress errors, don't show to us
 If `HAS_GH` or `HAS_GIT`:
 
 ```
-"I detected you have GitHub/Git configured. Want me to pull your recent activity (commits, PRs, reviews)?"
+&quot;I detected you have GitHub/Git configured. Want me to pull your recent activity (commits, PRs, reviews)?&quot;
 
 Options:
-- "Yes, pull the info"
-- "No, I'll provide everything manually"
+- &quot;Yes, pull the info&quot;
+- &quot;No, I&#039;ll provide everything manually&quot;
 ```
 
 If yes:
 
 ```
-"Which repositories/projects should I check?"
+&quot;Which repositories/projects should I check?&quot;
 
 Options:
-- "Just the current directory" (if in a git repo)
-- "I'll list the repos" → user provides list
+- &quot;Just the current directory&quot; (if in a git repo)
+- &quot;I&#039;ll list the repos&quot; → user provides list
 ```
 
 **Jira:**
@@ -142,11 +192,11 @@ Options:
 If `HAS_JIRA_CLI` or `HAS_ATLASSIAN_MCP`:
 
 ```
-"I detected you have Jira configured. Want me to pull your tickets?"
+&quot;I detected you have Jira configured. Want me to pull your tickets?&quot;
 
 Options:
-- "Yes, pull my tickets"
-- "No, I'll provide everything manually"
+- &quot;Yes, pull my tickets&quot;
+- &quot;No, I&#039;ll provide everything manually&quot;
 ```
 
 ### Step 3: Pull GitHub/Jira Data (if approved)
@@ -162,7 +212,7 @@ Options:
 
 ### Step 4: Offer Claude Code History
 
-This integration captures everything you worked on with Claude Code — useful for recalling work that isn't in git or Jira.
+This integration captures everything you worked on with Claude Code — useful for recalling work that isn&#039;t in git or Jira.
 
 **Detection:**
 ```bash
@@ -172,11 +222,11 @@ ls ~/.claude/projects/*/*.jsonl 2&gt;/dev/null | head -1
 **If Claude Code history exists, ask:**
 
 ```
-"I can also pull your Claude Code session history from yesterday. This can help recall work that isn't in git/Jira (research, debugging, planning). Want me to check?"
+&quot;I can also pull your Claude Code session history from yesterday. This can help recall work that isn&#039;t in git/Jira (research, debugging, planning). Want me to check?&quot;
 
 Options:
-- "Yes, pull my Claude Code sessions"
-- "No, I have everything I need"
+- &quot;Yes, pull my Claude Code sessions&quot;
+- &quot;No, I have everything I need&quot;
 ```
 
 **If yes, run the digest script:**
@@ -190,21 +240,21 @@ python3 ~/.claude/skills/daily-meeting-update/scripts/claude_digest.py --format 
 Use `AskUserQuestionTool` with `multiSelect: true` to let user pick relevant items:
 
 ```
-"Here are your Claude Code sessions from yesterday. Select the ones relevant to your standup:"
+&quot;Here are your Claude Code sessions from yesterday. Select the ones relevant to your standup:&quot;
 
 Options (multiSelect):
-- "Fix authentication bug (backend-api)"
-- "Implement OAuth flow (backend-api)"
-- "Update homepage styles (frontend-app)"
-- "Research payment providers (docs)"
+- &quot;Fix authentication bug (backend-api)&quot;
+- &quot;Implement OAuth flow (backend-api)&quot;
+- &quot;Update homepage styles (frontend-app)&quot;
+- &quot;Research payment providers (docs)&quot;
 ```
 
 **Key insight:** User selects which sessions are work-related. Personal projects or experiments can be excluded.
 
 **Do NOT run digest script when:**
-- User explicitly says "No" to Claude Code history
-- User says they'll provide everything manually
-- `~/.claude/projects` directory doesn't exist
+- User explicitly says &quot;No&quot; to Claude Code history
+- User says they&#039;ll provide everything manually
+- `~/.claude/projects` directory doesn&#039;t exist
 
 **If digest script fails:**
 - Fallback: Skip Claude Code integration silently, proceed with interview
@@ -224,28 +274,28 @@ Options (multiSelect):
 **If data was pulled**, show it first:
 
 ```
-"Here's what I found from your activity:
+&quot;Here&#039;s what I found from your activity:
 - Merged PR #123: fix login timeout
 - 3 commits in backend-api
 - Reviewed PR #456 (approved)
 
-Anything else you worked on yesterday that I missed?"
+Anything else you worked on yesterday that I missed?&quot;
 ```
 
 **If no data pulled:**
 
 ```
-"What did you work on yesterday/since the last standup?"
+&quot;What did you work on yesterday/since the last standup?&quot;
 ```
 
 If user response is vague, ask follow-up:
-- "Can you give more details about X?"
-- "Did you complete anything specific?"
+- &quot;Can you give more details about X?&quot;
+- &quot;Did you complete anything specific?&quot;
 
 ### Question 2: Today
 
 ```
-"What will you work on today?"
+&quot;What will you work on today?&quot;
 
 Options:
 - [Text input - user types freely]
@@ -254,31 +304,31 @@ Options:
 **If Jira data was pulled**, you can suggest:
 
 ```
-"I see you have these tickets assigned:
+&quot;I see you have these tickets assigned:
 - PROJ-123: Implement OAuth flow (In Progress)
 - PROJ-456: Fix payment bug (To Do)
 
-Will you work on any of these today?"
+Will you work on any of these today?&quot;
 ```
 
 ### Question 3: Blockers
 
 ```
-"Do you have any blockers or impediments?"
+&quot;Do you have any blockers or impediments?&quot;
 
 Options:
-- "No blockers"
-- "Yes, I have blockers" → follow-up for details
+- &quot;No blockers&quot;
+- &quot;Yes, I have blockers&quot; → follow-up for details
 ```
 
 ### Question 4: Topics for Discussion
 
 ```
-"Any topic you want to bring up at the end of the daily?"
+&quot;Any topic you want to bring up at the end of the daily?&quot;
 
 Options:
-- "No, nothing to discuss"
-- "Yes" → follow-up for details
+- &quot;No, nothing to discuss&quot;
+- &quot;Yes&quot; → follow-up for details
 
 Examples of topics:
 - Technical decision that needs input
@@ -304,9 +354,9 @@ Combine all information into clean Markdown:
 - [Items from interview]
 
 ## Blockers
-- [Blockers or "No blockers"]
+- [Blockers or &quot;No blockers&quot;]
 
-## PRs & Reviews (if pulled from GitHub)
+## PRs &amp; Reviews (if pulled from GitHub)
 - [PRs opened]
 - [PRs merged]
 - [Reviews done]
@@ -315,7 +365,7 @@ Combine all information into clean Markdown:
 - [Tickets updated]
 
 ## Topics for Discussion
-- [Topics or "None"]
+- [Topics or &quot;None&quot;]
 
 ---
 *Links:*
@@ -327,9 +377,9 @@ Combine all information into clean Markdown:
 
 ## Core Principles
 
-1. **Interview is primary** — Tools supplement, they don't replace human context
+1. **Interview is primary** — Tools supplement, they don&#039;t replace human context
 2. **Consent before access** — Always ask before pulling from any integration
-3. **Context-aware questions** — Show pulled data during interview to trigger memory ("I see you merged PR #123...")
+3. **Context-aware questions** — Show pulled data during interview to trigger memory (&quot;I see you merged PR #123...&quot;)
 
 ---
 
@@ -337,7 +387,7 @@ Combine all information into clean Markdown:
 
 | Phase | Action | Tool |
 |-------|--------|------|
-| 1. Detect & Offer | Check gh/jira/claude history, ask user, pull data | Bash (silent), AskUserQuestionTool* |
+| 1. Detect &amp; Offer | Check gh/jira/claude history, ask user, pull data | Bash (silent), AskUserQuestionTool* |
 | 2. Interview | Ask 4 questions with insights | AskUserQuestionTool* |
 | 3. Generate | Format Markdown | Output text |
 
@@ -346,10 +396,10 @@ Combine all information into clean Markdown:
 ### Claude Code Digest Script
 
 ```bash
-# Get yesterday's sessions as JSON
+# Get yesterday&#039;s sessions as JSON
 python3 ~/.claude/skills/daily-meeting-update/scripts/claude_digest.py --format json
 
-# Get today's sessions
+# Get today&#039;s sessions
 python3 ~/.claude/skills/daily-meeting-update/scripts/claude_digest.py --date today --format json
 
 # Filter to specific project
@@ -361,20 +411,20 @@ python3 ~/.claude/skills/daily-meeting-update/scripts/claude_digest.py --project
 ## Example Session
 
 ```
-Claude: "Let's prepare your daily! I detected GitHub configured. Want me to pull your recent activity?"
-User: "Yes"
+Claude: &quot;Let&#039;s prepare your daily! I detected GitHub configured. Want me to pull your recent activity?&quot;
+User: &quot;Yes&quot;
 
-Claude: "Which repos should I check?"
-User: "backend-api and frontend-app"
+Claude: &quot;Which repos should I check?&quot;
+User: &quot;backend-api and frontend-app&quot;
 
 [Claude pulls GitHub data silently]
 
-Claude: "I can also pull your Claude Code session history from yesterday. Want me to check?"
-User: "Yes"
+Claude: &quot;I can also pull your Claude Code session history from yesterday. Want me to check?&quot;
+User: &quot;Yes&quot;
 
 [Claude runs digest script, gets 5 sessions]
 
-Claude: "Here are your Claude Code sessions from yesterday. Select the ones relevant to your standup:"
+Claude: &quot;Here are your Claude Code sessions from yesterday. Select the ones relevant to your standup:&quot;
   ☑ Fix authentication timeout bug (backend-api)
   ☑ Implement OAuth flow (backend-api)
   ☐ Update personal blog (blog) - [user unchecks personal project]
@@ -383,7 +433,7 @@ Claude: "Here are your Claude Code sessions from yesterday. Select the ones rele
 
 User: [selects 3 relevant items]
 
-Claude: "Here's what I found from your activity:
+Claude: &quot;Here&#039;s what I found from your activity:
 - Merged PR #120: fix login timeout
 - Opened PR #125: feat: add OAuth flow
 - Reviewed PR #123 (approved), PR #456 (changes requested)
@@ -392,17 +442,17 @@ Claude: "Here's what I found from your activity:
 - [From Claude Code] Implement OAuth flow
 - [From Claude Code] Research payment providers
 
-Anything else you worked on yesterday that I missed?"
-User: "No, that covers it"
+Anything else you worked on yesterday that I missed?&quot;
+User: &quot;No, that covers it&quot;
 
-Claude: "What will you work on today?"
-User: "Continue the OAuth feature and deploy to staging"
+Claude: &quot;What will you work on today?&quot;
+User: &quot;Continue the OAuth feature and deploy to staging&quot;
 
-Claude: "Any blockers?"
-User: "No"
+Claude: &quot;Any blockers?&quot;
+User: &quot;No&quot;
 
-Claude: "Any topic to bring up at the end of the daily?"
-User: "Yes, I want to discuss the architecture of the new payments module"
+Claude: &quot;Any topic to bring up at the end of the daily?&quot;
+User: &quot;Yes, I want to discuss the architecture of the new payments module&quot;
 
 [Claude generates update]
 ```
@@ -427,7 +477,7 @@ User: "Yes, I want to discuss the architecture of the new payments module"
 ## Blockers
 - No blockers
 
-## PRs & Reviews
+## PRs &amp; Reviews
 - **Opened:** PR #125 - feat: add OAuth flow
 - **Merged:** PR #120 - fix: login timeout
 - **Reviews:** PR #123 (approved), PR #456 (changes requested)
@@ -447,24 +497,55 @@ User: "Yes, I want to discuss the architecture of the new payments module"
 
 | Avoid | Why (Expert Knowledge) | Instead |
 |-------|------------------------|---------|
-| Run gh/jira without asking | Users may have personal repos visible, or be in a sensitive project context they don't want exposed | Always ask first, let user choose repos |
-| Assume current directory is the only project | Developers often work on 2-5 repos simultaneously (frontend, backend, infra) | Ask "Which projects are you working on?" |
+| Run gh/jira without asking | Users may have personal repos visible, or be in a sensitive project context they don&#039;t want exposed | Always ask first, let user choose repos |
+| Assume current directory is the only project | Developers often work on 2-5 repos simultaneously (frontend, backend, infra) | Ask &quot;Which projects are you working on?&quot; |
 | Skip interview even with tool data | Tools capture WHAT happened but miss WHY and context (research, meetings, planning) | Interview is primary, tools supplement |
 | Generate update before all 4 questions | User might have critical blocker or discussion topic that changes the narrative | Complete interview, then generate |
-| Include raw commit messages | Commit messages are often cryptic ("fix", "wip") and don't tell the story | Summarize into human-readable outcomes |
-| Ask for data after interview | Showing insights during interview makes questions smarter ("I see you merged PR #123, anything else?") | Pull data first, then interview with context |
+| Include raw commit messages | Commit messages are often cryptic (&quot;fix&quot;, &quot;wip&quot;) and don&#039;t tell the story | Summarize into human-readable outcomes |
+| Ask for data after interview | Showing insights during interview makes questions smarter (&quot;I see you merged PR #123, anything else?&quot;) | Pull data first, then interview with context |
 
 ---
 
 ## NEVER
 
 - **NEVER assume tools are configured** — Many devs have gh installed but not authenticated, or jira CLI pointing to wrong instance
-- **NEVER skip the "Topics for Discussion" question** — This is often the most valuable part of standup that tools can't capture
+- **NEVER skip the &quot;Topics for Discussion&quot; question** — This is often the most valuable part of standup that tools can&#039;t capture
 - **NEVER generate more than 15 bullets** — Standup should be &lt;2 minutes to read; long updates lose the audience
-- **NEVER include ticket/PR numbers without context** — "PROJ-123" means nothing; always include title or summary
-- **NEVER pull data from repos user didn't explicitly approve** — Even if you can see other repos, respect boundaries
-</pre></div>
+- **NEVER include ticket/PR numbers without context** — &quot;PROJ-123&quot; means nothing; always include title or summary
+- **NEVER pull data from repos user didn&#039;t explicitly approve** — Even if you can see other repos, respect boundaries
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>44</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

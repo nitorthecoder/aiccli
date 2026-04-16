@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>agents-llamaindex - AICCLI</title>
-  <meta name="description" content="agents-llamaindex - Claude Code skill for AICCLI">
+  <meta name="description" content="Data framework for building LLM applications with RAG. Specializes in document ingestion (300+ connectors), indexing, and querying. Features vector indices, que">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / agents-llamaindex</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>agents-llamaindex</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / agents-llamaindex
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>agents-llamaindex</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Data framework for building LLM applications with RAG. Specializes in document ingestion (300+ connectors), indexing, and querying. Features vector indices, query engines, agents, and multi-modal support. Use for document Q&A, chatbots, knowledge retrieval, or building RAG pipelines. Best for data-centric LLM applications.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/agents-llamaindex</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/agents-llamaindex</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/agents-llamaindex</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: llamaindex
-description: Data framework for building LLM applications with RAG. Specializes in document ingestion (300+ connectors), indexing, and querying. Features vector indices, query engines, agents, and multi-modal support. Use for document Q&A, chatbots, knowledge retrieval, or building RAG pipelines. Best for data-centric LLM applications.
+description: Data framework for building LLM applications with RAG. Specializes in document ingestion (300+ connectors), indexing, and querying. Features vector indices, query engines, agents, and multi-modal support. Use for document Q&amp;A, chatbots, knowledge retrieval, or building RAG pipelines. Best for data-centric LLM applications.
 version: 1.0.0
 author: Orchestra Research
 license: MIT
@@ -112,14 +162,14 @@ pip install llama-index-embeddings-openai
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 
 # Load documents
-documents = SimpleDirectoryReader("data").load_data()
+documents = SimpleDirectoryReader(&quot;data&quot;).load_data()
 
 # Create index
 index = VectorStoreIndex.from_documents(documents)
 
 # Query
 query_engine = index.as_query_engine()
-response = query_engine.query("What did the author do growing up?")
+response = query_engine.query(&quot;What did the author do growing up?&quot;)
 print(response)
 ```
 
@@ -133,20 +183,20 @@ from llama_index.readers.web import SimpleWebPageReader
 from llama_index.readers.github import GithubRepositoryReader
 
 # Directory of files
-documents = SimpleDirectoryReader("./data").load_data()
+documents = SimpleDirectoryReader(&quot;./data&quot;).load_data()
 
 # Web pages
 reader = SimpleWebPageReader()
-documents = reader.load_data(["https://example.com"])
+documents = reader.load_data([&quot;https://example.com&quot;])
 
 # GitHub repository
-reader = GithubRepositoryReader(owner="user", repo="repo")
-documents = reader.load_data(branch="main")
+reader = GithubRepositoryReader(owner=&quot;user&quot;, repo=&quot;repo&quot;)
+documents = reader.load_data(branch=&quot;main&quot;)
 
 # Manual document creation
 doc = Document(
-    text="This is the document content",
-    metadata={"source": "manual", "date": "2025-01-01"}
+    text=&quot;This is the document content&quot;,
+    metadata={&quot;source&quot;: &quot;manual&quot;, &quot;date&quot;: &quot;2025-01-01&quot;}
 )
 ```
 
@@ -165,11 +215,11 @@ list_index = ListIndex.from_documents(documents)
 tree_index = TreeIndex.from_documents(documents)
 
 # Save index
-index.storage_context.persist(persist_dir="./storage")
+index.storage_context.persist(persist_dir=&quot;./storage&quot;)
 
 # Load index
 from llama_index.core import load_index_from_storage, StorageContext
-storage_context = StorageContext.from_defaults(persist_dir="./storage")
+storage_context = StorageContext.from_defaults(persist_dir=&quot;./storage&quot;)
 index = load_index_from_storage(storage_context)
 ```
 
@@ -178,19 +228,19 @@ index = load_index_from_storage(storage_context)
 ```python
 # Basic query
 query_engine = index.as_query_engine()
-response = query_engine.query("What is the main topic?")
+response = query_engine.query(&quot;What is the main topic?&quot;)
 print(response)
 
 # Streaming response
 query_engine = index.as_query_engine(streaming=True)
-response = query_engine.query("Explain quantum computing")
+response = query_engine.query(&quot;Explain quantum computing&quot;)
 for text in response.response_gen:
-    print(text, end="", flush=True)
+    print(text, end=&quot;&quot;, flush=True)
 
 # Custom configuration
 query_engine = index.as_query_engine(
     similarity_top_k=3,          # Return top 3 chunks
-    response_mode="compact",     # Or "tree_summarize", "simple_summarize"
+    response_mode=&quot;compact&quot;,     # Or &quot;tree_summarize&quot;, &quot;simple_summarize&quot;
     verbose=True
 )
 ```
@@ -200,12 +250,12 @@ query_engine = index.as_query_engine(
 ```python
 # Vector retriever
 retriever = index.as_retriever(similarity_top_k=5)
-nodes = retriever.retrieve("machine learning")
+nodes = retriever.retrieve(&quot;machine learning&quot;)
 
 # With filtering
 retriever = index.as_retriever(
     similarity_top_k=3,
-    filters={"metadata.category": "tutorial"}
+    filters={&quot;metadata.category&quot;: &quot;tutorial&quot;}
 )
 
 # Custom retriever
@@ -227,15 +277,15 @@ from llama_index.llms.openai import OpenAI
 
 # Define tools
 def multiply(a: int, b: int) -&gt; int:
-    """Multiply two numbers."""
+    &quot;&quot;&quot;Multiply two numbers.&quot;&quot;&quot;
     return a * b
 
 def add(a: int, b: int) -&gt; int:
-    """Add two numbers."""
+    &quot;&quot;&quot;Add two numbers.&quot;&quot;&quot;
     return a + b
 
 # Create agent
-llm = OpenAI(model="gpt-4o")
+llm = OpenAI(model=&quot;gpt-4o&quot;)
 agent = FunctionAgent.from_tools(
     tools=[multiply, add],
     llm=llm,
@@ -243,7 +293,7 @@ agent = FunctionAgent.from_tools(
 )
 
 # Use agent
-response = agent.chat("What is 25 * 17 + 142?")
+response = agent.chat(&quot;What is 25 * 17 + 142?&quot;)
 print(response)
 ```
 
@@ -258,8 +308,8 @@ index = VectorStoreIndex.from_documents(documents)
 # Wrap query engine as tool
 query_tool = QueryEngineTool.from_defaults(
     query_engine=index.as_query_engine(),
-    name="python_docs",
-    description="Useful for answering questions about Python programming"
+    name=&quot;python_docs&quot;,
+    description=&quot;Useful for answering questions about Python programming&quot;
 )
 
 # Agent with document search + calculator
@@ -269,7 +319,7 @@ agent = FunctionAgent.from_tools(
 )
 
 # Agent decides when to search docs vs calculate
-response = agent.chat("According to the docs, what is Python used for?")
+response = agent.chat(&quot;According to the docs, what is Python used for?&quot;)
 ```
 
 ## Advanced RAG patterns
@@ -281,14 +331,14 @@ from llama_index.core.chat_engine import CondensePlusContextChatEngine
 
 # Chat with memory
 chat_engine = index.as_chat_engine(
-    chat_mode="condense_plus_context",  # Or "context", "react"
+    chat_mode=&quot;condense_plus_context&quot;,  # Or &quot;context&quot;, &quot;react&quot;
     verbose=True
 )
 
 # Multi-turn conversation
-response1 = chat_engine.chat("What is Python?")
-response2 = chat_engine.chat("Can you give examples?")  # Remembers context
-response3 = chat_engine.chat("What about web frameworks?")
+response1 = chat_engine.chat(&quot;What is Python?&quot;)
+response2 = chat_engine.chat(&quot;Can you give examples?&quot;)  # Remembers context
+response3 = chat_engine.chat(&quot;What about web frameworks?&quot;)
 ```
 
 ### Metadata filtering
@@ -299,8 +349,8 @@ from llama_index.core.vector_stores import MetadataFilters, ExactMatchFilter
 # Filter by metadata
 filters = MetadataFilters(
     filters=[
-        ExactMatchFilter(key="category", value="tutorial"),
-        ExactMatchFilter(key="difficulty", value="beginner")
+        ExactMatchFilter(key=&quot;category&quot;, value=&quot;tutorial&quot;),
+        ExactMatchFilter(key=&quot;difficulty&quot;, value=&quot;beginner&quot;)
     ]
 )
 
@@ -327,7 +377,7 @@ class Summary(BaseModel):
 output_parser = PydanticOutputParser(output_cls=Summary)
 query_engine = index.as_query_engine(output_parser=output_parser)
 
-response = query_engine.query("Summarize the document")
+response = query_engine.query(&quot;Summarize the document&quot;)
 summary = response  # Pydantic model
 print(summary.title, summary.main_points)
 ```
@@ -339,9 +389,9 @@ print(summary.title, summary.main_points)
 ```python
 # Load all supported formats
 documents = SimpleDirectoryReader(
-    "./data",
+    &quot;./data&quot;,
     recursive=True,
-    required_exts=[".pdf", ".docx", ".txt", ".md"]
+    required_exts=[&quot;.pdf&quot;, &quot;.docx&quot;, &quot;.txt&quot;, &quot;.md&quot;]
 ).load_data()
 ```
 
@@ -352,8 +402,8 @@ from llama_index.readers.web import BeautifulSoupWebReader
 
 reader = BeautifulSoupWebReader()
 documents = reader.load_data(urls=[
-    "https://docs.python.org/3/tutorial/",
-    "https://docs.python.org/3/library/"
+    &quot;https://docs.python.org/3/tutorial/&quot;,
+    &quot;https://docs.python.org/3/library/&quot;
 ])
 ```
 
@@ -363,9 +413,9 @@ documents = reader.load_data(urls=[
 from llama_index.readers.database import DatabaseReader
 
 reader = DatabaseReader(
-    sql_database_uri="postgresql://user:pass@localhost/db"
+    sql_database_uri=&quot;postgresql://user:pass@localhost/db&quot;
 )
-documents = reader.load_data(query="SELECT * FROM articles")
+documents = reader.load_data(query=&quot;SELECT * FROM articles&quot;)
 ```
 
 ### API endpoints
@@ -374,7 +424,7 @@ documents = reader.load_data(query="SELECT * FROM articles")
 from llama_index.readers.json import JSONReader
 
 reader = JSONReader()
-documents = reader.load_data("https://api.example.com/data.json")
+documents = reader.load_data(&quot;https://api.example.com/data.json&quot;)
 ```
 
 ## Vector store integrations
@@ -386,8 +436,8 @@ from llama_index.vector_stores.chroma import ChromaVectorStore
 import chromadb
 
 # Initialize Chroma
-db = chromadb.PersistentClient(path="./chroma_db")
-collection = db.get_or_create_collection("my_collection")
+db = chromadb.PersistentClient(path=&quot;./chroma_db&quot;)
+collection = db.get_or_create_collection(&quot;my_collection&quot;)
 
 # Create vector store
 vector_store = ChromaVectorStore(chroma_collection=collection)
@@ -405,8 +455,8 @@ from llama_index.vector_stores.pinecone import PineconeVectorStore
 import pinecone
 
 # Initialize Pinecone
-pinecone.init(api_key="your-key", environment="us-west1-gcp")
-pinecone_index = pinecone.Index("my-index")
+pinecone.init(api_key=&quot;your-key&quot;, environment=&quot;us-west1-gcp&quot;)
+pinecone_index = pinecone.Index(&quot;my-index&quot;)
 
 # Create vector store
 vector_store = PineconeVectorStore(pinecone_index=pinecone_index)
@@ -440,7 +490,7 @@ from llama_index.llms.anthropic import Anthropic
 from llama_index.core import Settings
 
 # Set global LLM
-Settings.llm = Anthropic(model="claude-sonnet-4-5-20250929")
+Settings.llm = Anthropic(model=&quot;claude-sonnet-4-5-20250929&quot;)
 
 # Now all queries use Anthropic
 query_engine = index.as_query_engine()
@@ -453,7 +503,7 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
 # Use HuggingFace embeddings
 Settings.embed_model = HuggingFaceEmbedding(
-    model_name="sentence-transformers/all-mpnet-base-v2"
+    model_name=&quot;sentence-transformers/all-mpnet-base-v2&quot;
 )
 
 index = VectorStoreIndex.from_documents(documents)
@@ -465,11 +515,11 @@ index = VectorStoreIndex.from_documents(documents)
 from llama_index.core import PromptTemplate
 
 qa_prompt = PromptTemplate(
-    "Context: {context_str}\n"
-    "Question: {query_str}\n"
-    "Answer the question based only on the context. "
-    "If the answer is not in the context, say 'I don't know'.\n"
-    "Answer: "
+    &quot;Context: {context_str}\n&quot;
+    &quot;Question: {query_str}\n&quot;
+    &quot;Answer the question based only on the context. &quot;
+    &quot;If the answer is not in the context, say &#039;I don&#039;t know&#039;.\n&quot;
+    &quot;Answer: &quot;
 )
 
 query_engine = index.as_query_engine(text_qa_template=qa_prompt)
@@ -485,18 +535,18 @@ from llama_index.multi_modal_llms.openai import OpenAIMultiModal
 
 # Load images and documents
 documents = SimpleDirectoryReader(
-    "./data",
-    required_exts=[".jpg", ".png", ".pdf"]
+    &quot;./data&quot;,
+    required_exts=[&quot;.jpg&quot;, &quot;.png&quot;, &quot;.pdf&quot;]
 ).load_data()
 
 # Multi-modal index
 index = VectorStoreIndex.from_documents(documents)
 
 # Query with multi-modal LLM
-multi_modal_llm = OpenAIMultiModal(model="gpt-4o")
+multi_modal_llm = OpenAIMultiModal(model=&quot;gpt-4o&quot;)
 query_engine = index.as_query_engine(llm=multi_modal_llm)
 
-response = query_engine.query("What is in the diagram on page 3?")
+response = query_engine.query(&quot;What is in the diagram on page 3?&quot;)
 ```
 
 ## Evaluation
@@ -509,18 +559,18 @@ from llama_index.core.evaluation import RelevancyEvaluator, FaithfulnessEvaluato
 # Evaluate relevance
 relevancy = RelevancyEvaluator()
 result = relevancy.evaluate_response(
-    query="What is Python?",
+    query=&quot;What is Python?&quot;,
     response=response
 )
-print(f"Relevancy: {result.passing}")
+print(f&quot;Relevancy: {result.passing}&quot;)
 
 # Evaluate faithfulness (no hallucination)
 faithfulness = FaithfulnessEvaluator()
 result = faithfulness.evaluate_response(
-    query="What is Python?",
+    query=&quot;What is Python?&quot;,
     response=response
 )
-print(f"Faithfulness: {result.passing}")
+print(f&quot;Faithfulness: {result.passing}&quot;)
 ```
 
 ## Best practices
@@ -533,28 +583,28 @@ print(f"Faithfulness: {result.passing}")
 6. **Enable verbose during dev** - See retrieval process
 7. **Evaluate responses** - Check relevance and faithfulness
 8. **Use chat engine for conversations** - Built-in memory
-9. **Persist storage** - Don't lose your index
+9. **Persist storage** - Don&#039;t lose your index
 10. **Monitor costs** - Track embedding and LLM usage
 
 ## Common patterns
 
-### Document Q&A system
+### Document Q&amp;A system
 
 ```python
 # Complete RAG pipeline
-documents = SimpleDirectoryReader("docs").load_data()
+documents = SimpleDirectoryReader(&quot;docs&quot;).load_data()
 index = VectorStoreIndex.from_documents(documents)
-index.storage_context.persist(persist_dir="./storage")
+index.storage_context.persist(persist_dir=&quot;./storage&quot;)
 
 # Query
 query_engine = index.as_query_engine(
     similarity_top_k=3,
-    response_mode="compact",
+    response_mode=&quot;compact&quot;,
     verbose=True
 )
-response = query_engine.query("What is the main topic?")
+response = query_engine.query(&quot;What is the main topic?&quot;)
 print(response)
-print(f"Sources: {[node.metadata['file_name'] for node in response.source_nodes]}")
+print(f&quot;Sources: {[node.metadata[&#039;file_name&#039;] for node in response.source_nodes]}&quot;)
 ```
 
 ### Chatbot with memory
@@ -562,17 +612,17 @@ print(f"Sources: {[node.metadata['file_name'] for node in response.source_nodes]
 ```python
 # Conversational interface
 chat_engine = index.as_chat_engine(
-    chat_mode="condense_plus_context",
+    chat_mode=&quot;condense_plus_context&quot;,
     verbose=True
 )
 
 # Multi-turn chat
 while True:
-    user_input = input("You: ")
-    if user_input.lower() == "quit":
+    user_input = input(&quot;You: &quot;)
+    if user_input.lower() == &quot;quit&quot;:
         break
     response = chat_engine.chat(user_input)
-    print(f"Bot: {response}")
+    print(f&quot;Bot: {response}&quot;)
 ```
 
 ## Performance benchmarks
@@ -588,7 +638,7 @@ while True:
 
 | Feature | LlamaIndex | LangChain |
 |---------|------------|-----------|
-| **Best for** | RAG, document Q&A | Agents, general LLM apps |
+| **Best for** | RAG, document Q&amp;A | Agents, general LLM apps |
 | **Data connectors** | 300+ (LlamaHub) | 100+ |
 | **RAG focus** | Core feature | One of many |
 | **Learning curve** | Easier for RAG | Steeper |
@@ -598,7 +648,7 @@ while True:
 **Use LlamaIndex when:**
 - Your primary use case is RAG
 - Need many data connectors
-- Want simpler API for document Q&A
+- Want simpler API for document Q&amp;A
 - Building knowledge retrieval system
 
 **Use LangChain when:**
@@ -624,8 +674,46 @@ while True:
 - **License**: MIT
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Agents</span><span class="tag">LlamaIndex</span><span class="tag">RAG</span><span class="tag">Document Ingestion</span><span class="tag">Vector Indices</span><span class="tag">Query Engines</span><span class="tag">Knowledge Retrieval</span><span class="tag">Data Framework</span><span class="tag">Multimodal</span><span class="tag">Private Data</span><span class="tag">Connectors</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>163</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

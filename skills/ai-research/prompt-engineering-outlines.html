@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>prompt-engineering-outlines - AICCLI</title>
-  <meta name="description" content="prompt-engineering-outlines - Claude Code skill for AICCLI">
+  <meta name="description" content="Guarantee valid JSON/XML/code structure during generation, use Pydantic models for type-safe outputs, support local models (Transformers, vLLM), and maximize in">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / prompt-engineering-outlines</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>prompt-engineering-outlines</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / prompt-engineering-outlines
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>prompt-engineering-outlines</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Guarantee valid JSON/XML/code structure during generation, use Pydantic models for type-safe outputs, support local models (Transformers, vLLM), and maximize inference speed with Outlines - dottxt.ai's structured generation library</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/prompt-engineering-outlines</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/prompt-engineering-outlines</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/prompt-engineering-outlines</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: outlines
-description: Guarantee valid JSON/XML/code structure during generation, use Pydantic models for type-safe outputs, support local models (Transformers, vLLM), and maximize inference speed with Outlines - dottxt.ai's structured generation library
+description: Guarantee valid JSON/XML/code structure during generation, use Pydantic models for type-safe outputs, support local models (Transformers, vLLM), and maximize inference speed with Outlines - dottxt.ai&#039;s structured generation library
 version: 1.0.0
 author: Orchestra Research
 license: MIT
@@ -100,14 +150,14 @@ import outlines
 from typing import Literal
 
 # Load model
-model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
+model = outlines.models.transformers(&quot;microsoft/Phi-3-mini-4k-instruct&quot;)
 
 # Generate with type constraint
-prompt = "Sentiment of 'This product is amazing!': "
-generator = outlines.generate.choice(model, ["positive", "negative", "neutral"])
+prompt = &quot;Sentiment of &#039;This product is amazing!&#039;: &quot;
+generator = outlines.generate.choice(model, [&quot;positive&quot;, &quot;negative&quot;, &quot;neutral&quot;])
 sentiment = generator(prompt)
 
-print(sentiment)  # "positive" (guaranteed one of these)
+print(sentiment)  # &quot;positive&quot; (guaranteed one of these)
 ```
 
 ### With Pydantic Models
@@ -121,16 +171,16 @@ class User(BaseModel):
     age: int
     email: str
 
-model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
+model = outlines.models.transformers(&quot;microsoft/Phi-3-mini-4k-instruct&quot;)
 
 # Generate structured output
-prompt = "Extract user: John Doe, 30 years old, john@example.com"
+prompt = &quot;Extract user: John Doe, 30 years old, john@example.com&quot;
 generator = outlines.generate.json(model, User)
 user = generator(prompt)
 
-print(user.name)   # "John Doe"
+print(user.name)   # &quot;John Doe&quot;
 print(user.age)    # 30
-print(user.email)  # "john@example.com"
+print(user.email)  # &quot;john@example.com&quot;
 ```
 
 ## Core Concepts
@@ -158,7 +208,7 @@ class Person(BaseModel):
     name: str
     age: int
 
-model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
+model = outlines.models.transformers(&quot;microsoft/Phi-3-mini-4k-instruct&quot;)
 
 # Behind the scenes:
 # 1. Person -&gt; JSON schema
@@ -167,7 +217,7 @@ model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
 # 4. FSM filters tokens during generation
 
 generator = outlines.generate.json(model, Person)
-result = generator("Generate person: Alice, 25")
+result = generator(&quot;Generate person: Alice, 25&quot;)
 ```
 
 ### 2. Structured Generators
@@ -180,10 +230,10 @@ Outlines provides specialized generators for different output types.
 # Multiple choice selection
 generator = outlines.generate.choice(
     model,
-    ["positive", "negative", "neutral"]
+    [&quot;positive&quot;, &quot;negative&quot;, &quot;neutral&quot;]
 )
 
-sentiment = generator("Review: This is great!")
+sentiment = generator(&quot;Review: This is great!&quot;)
 # Result: One of the three choices
 ```
 
@@ -199,10 +249,10 @@ class Product(BaseModel):
 
 # Generate valid JSON matching schema
 generator = outlines.generate.json(model, Product)
-product = generator("Extract: iPhone 15, $999, available")
+product = generator(&quot;Extract: iPhone 15, $999, available&quot;)
 
 # Guaranteed valid Product instance
-print(type(product))  # &lt;class '__main__.Product'&gt;
+print(type(product))  # &lt;class &#039;__main__.Product&#039;&gt;
 ```
 
 #### Regex Generator
@@ -211,11 +261,11 @@ print(type(product))  # &lt;class '__main__.Product'&gt;
 # Generate text matching regex
 generator = outlines.generate.regex(
     model,
-    r"[0-9]{3}-[0-9]{3}-[0-9]{4}"  # Phone number pattern
+    r&quot;[0-9]{3}-[0-9]{3}-[0-9]{4}&quot;  # Phone number pattern
 )
 
-phone = generator("Generate phone number:")
-# Result: "555-123-4567" (guaranteed to match pattern)
+phone = generator(&quot;Generate phone number:&quot;)
+# Result: &quot;555-123-4567&quot; (guaranteed to match pattern)
 ```
 
 #### Integer/Float Generators
@@ -223,10 +273,10 @@ phone = generator("Generate phone number:")
 ```python
 # Generate specific numeric types
 int_generator = outlines.generate.integer(model)
-age = int_generator("Person's age:")  # Guaranteed integer
+age = int_generator(&quot;Person&#039;s age:&quot;)  # Guaranteed integer
 
 float_generator = outlines.generate.float(model)
-price = float_generator("Product price:")  # Guaranteed float
+price = float_generator(&quot;Product price:&quot;)  # Guaranteed float
 ```
 
 ### 3. Model Backends
@@ -240,8 +290,8 @@ import outlines
 
 # Load from Hugging Face
 model = outlines.models.transformers(
-    "microsoft/Phi-3-mini-4k-instruct",
-    device="cuda"  # Or "cpu"
+    &quot;microsoft/Phi-3-mini-4k-instruct&quot;,
+    device=&quot;cuda&quot;  # Or &quot;cpu&quot;
 )
 
 # Use with any generator
@@ -253,7 +303,7 @@ generator = outlines.generate.json(model, YourModel)
 ```python
 # Load GGUF model
 model = outlines.models.llamacpp(
-    "./models/llama-3.1-8b-instruct.Q4_K_M.gguf",
+    &quot;./models/llama-3.1-8b-instruct.Q4_K_M.gguf&quot;,
     n_gpu_layers=35
 )
 
@@ -265,7 +315,7 @@ generator = outlines.generate.json(model, YourModel)
 ```python
 # For production deployments
 model = outlines.models.vllm(
-    "meta-llama/Llama-3.1-8B-Instruct",
+    &quot;meta-llama/Llama-3.1-8B-Instruct&quot;,
     tensor_parallel_size=2  # Multi-GPU
 )
 
@@ -277,8 +327,8 @@ generator = outlines.generate.json(model, YourModel)
 ```python
 # Basic OpenAI support
 model = outlines.models.openai(
-    "gpt-4o-mini",
-    api_key="your-api-key"
+    &quot;gpt-4o-mini&quot;,
+    api_key=&quot;your-api-key&quot;
 )
 
 # Note: Some features limited with API models
@@ -295,15 +345,15 @@ Outlines has first-class Pydantic support with automatic schema translation.
 from pydantic import BaseModel, Field
 
 class Article(BaseModel):
-    title: str = Field(description="Article title")
-    author: str = Field(description="Author name")
-    word_count: int = Field(description="Number of words", gt=0)
-    tags: list[str] = Field(description="List of tags")
+    title: str = Field(description=&quot;Article title&quot;)
+    author: str = Field(description=&quot;Author name&quot;)
+    word_count: int = Field(description=&quot;Number of words&quot;, gt=0)
+    tags: list[str] = Field(description=&quot;List of tags&quot;)
 
-model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
+model = outlines.models.transformers(&quot;microsoft/Phi-3-mini-4k-instruct&quot;)
 generator = outlines.generate.json(model, Article)
 
-article = generator("Generate article about AI")
+article = generator(&quot;Generate article about AI&quot;)
 print(article.title)
 print(article.word_count)  # Guaranteed &gt; 0
 ```
@@ -322,9 +372,9 @@ class Person(BaseModel):
     address: Address  # Nested model
 
 generator = outlines.generate.json(model, Person)
-person = generator("Generate person in New York")
+person = generator(&quot;Generate person in New York&quot;)
 
-print(person.address.city)  # "New York"
+print(person.address.city)  # &quot;New York&quot;
 ```
 
 #### Enums and Literals
@@ -334,17 +384,17 @@ from enum import Enum
 from typing import Literal
 
 class Status(str, Enum):
-    PENDING = "pending"
-    APPROVED = "approved"
-    REJECTED = "rejected"
+    PENDING = &quot;pending&quot;
+    APPROVED = &quot;approved&quot;
+    REJECTED = &quot;rejected&quot;
 
 class Application(BaseModel):
     applicant: str
     status: Status  # Must be one of enum values
-    priority: Literal["low", "medium", "high"]  # Must be one of literals
+    priority: Literal[&quot;low&quot;, &quot;medium&quot;, &quot;high&quot;]  # Must be one of literals
 
 generator = outlines.generate.json(model, Application)
-app = generator("Generate application")
+app = generator(&quot;Generate application&quot;)
 
 print(app.status)  # Status.PENDING (or APPROVED/REJECTED)
 ```
@@ -363,21 +413,21 @@ class CompanyInfo(BaseModel):
     industry: str
     employees: int
 
-model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
+model = outlines.models.transformers(&quot;microsoft/Phi-3-mini-4k-instruct&quot;)
 generator = outlines.generate.json(model, CompanyInfo)
 
-text = """
+text = &quot;&quot;&quot;
 Apple Inc. was founded in 1976 in the technology industry.
 The company employs approximately 164,000 people worldwide.
-"""
+&quot;&quot;&quot;
 
-prompt = f"Extract company information:\n{text}\n\nCompany:"
+prompt = f&quot;Extract company information:\n{text}\n\nCompany:&quot;
 company = generator(prompt)
 
-print(f"Name: {company.name}")
-print(f"Founded: {company.founded_year}")
-print(f"Industry: {company.industry}")
-print(f"Employees: {company.employees}")
+print(f&quot;Name: {company.name}&quot;)
+print(f&quot;Founded: {company.founded_year}&quot;)
+print(f&quot;Industry: {company.industry}&quot;)
+print(f&quot;Employees: {company.employees}&quot;)
 ```
 
 ### Pattern 2: Classification
@@ -386,24 +436,24 @@ print(f"Employees: {company.employees}")
 from typing import Literal
 import outlines
 
-model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
+model = outlines.models.transformers(&quot;microsoft/Phi-3-mini-4k-instruct&quot;)
 
 # Binary classification
-generator = outlines.generate.choice(model, ["spam", "not_spam"])
-result = generator("Email: Buy now! 50% off!")
+generator = outlines.generate.choice(model, [&quot;spam&quot;, &quot;not_spam&quot;])
+result = generator(&quot;Email: Buy now! 50% off!&quot;)
 
 # Multi-class classification
-categories = ["technology", "business", "sports", "entertainment"]
+categories = [&quot;technology&quot;, &quot;business&quot;, &quot;sports&quot;, &quot;entertainment&quot;]
 category_gen = outlines.generate.choice(model, categories)
-category = category_gen("Article: Apple announces new iPhone...")
+category = category_gen(&quot;Article: Apple announces new iPhone...&quot;)
 
 # With confidence
 class Classification(BaseModel):
-    label: Literal["positive", "negative", "neutral"]
+    label: Literal[&quot;positive&quot;, &quot;negative&quot;, &quot;neutral&quot;]
     confidence: float
 
 classifier = outlines.generate.json(model, Classification)
-result = classifier("Review: This product is okay, nothing special")
+result = classifier(&quot;Review: This product is okay, nothing special&quot;)
 ```
 
 ### Pattern 3: Structured Forms
@@ -417,10 +467,10 @@ class UserProfile(BaseModel):
     country: str
     interests: list[str]
 
-model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
+model = outlines.models.transformers(&quot;microsoft/Phi-3-mini-4k-instruct&quot;)
 generator = outlines.generate.json(model, UserProfile)
 
-prompt = """
+prompt = &quot;&quot;&quot;
 Extract user profile from:
 Name: Alice Johnson
 Age: 28
@@ -428,11 +478,11 @@ Email: alice@example.com
 Phone: 555-0123
 Country: USA
 Interests: hiking, photography, cooking
-"""
+&quot;&quot;&quot;
 
 profile = generator(prompt)
 print(profile.full_name)
-print(profile.interests)  # ["hiking", "photography", "cooking"]
+print(profile.interests)  # [&quot;hiking&quot;, &quot;photography&quot;, &quot;cooking&quot;]
 ```
 
 ### Pattern 4: Multi-Entity Extraction
@@ -440,20 +490,20 @@ print(profile.interests)  # ["hiking", "photography", "cooking"]
 ```python
 class Entity(BaseModel):
     name: str
-    type: Literal["PERSON", "ORGANIZATION", "LOCATION"]
+    type: Literal[&quot;PERSON&quot;, &quot;ORGANIZATION&quot;, &quot;LOCATION&quot;]
 
 class DocumentEntities(BaseModel):
     entities: list[Entity]
 
-model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
+model = outlines.models.transformers(&quot;microsoft/Phi-3-mini-4k-instruct&quot;)
 generator = outlines.generate.json(model, DocumentEntities)
 
-text = "Tim Cook met with Satya Nadella at Microsoft headquarters in Redmond."
-prompt = f"Extract entities from: {text}"
+text = &quot;Tim Cook met with Satya Nadella at Microsoft headquarters in Redmond.&quot;
+prompt = f&quot;Extract entities from: {text}&quot;
 
 result = generator(prompt)
 for entity in result.entities:
-    print(f"{entity.name} ({entity.type})")
+    print(f&quot;{entity.name} ({entity.type})&quot;)
 ```
 
 ### Pattern 5: Code Generation
@@ -465,28 +515,28 @@ class PythonFunction(BaseModel):
     docstring: str
     body: str
 
-model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
+model = outlines.models.transformers(&quot;microsoft/Phi-3-mini-4k-instruct&quot;)
 generator = outlines.generate.json(model, PythonFunction)
 
-prompt = "Generate a Python function to calculate factorial"
+prompt = &quot;Generate a Python function to calculate factorial&quot;
 func = generator(prompt)
 
-print(f"def {func.function_name}({', '.join(func.parameters)}):")
-print(f'    """{func.docstring}"""')
-print(f"    {func.body}")
+print(f&quot;def {func.function_name}({&#039;, &#039;.join(func.parameters)}):&quot;)
+print(f&#039;    &quot;&quot;&quot;{func.docstring}&quot;&quot;&quot;&#039;)
+print(f&quot;    {func.body}&quot;)
 ```
 
 ### Pattern 6: Batch Processing
 
 ```python
 def batch_extract(texts: list[str], schema: type[BaseModel]):
-    """Extract structured data from multiple texts."""
-    model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
+    &quot;&quot;&quot;Extract structured data from multiple texts.&quot;&quot;&quot;
+    model = outlines.models.transformers(&quot;microsoft/Phi-3-mini-4k-instruct&quot;)
     generator = outlines.generate.json(model, schema)
 
     results = []
     for text in texts:
-        result = generator(f"Extract from: {text}")
+        result = generator(f&quot;Extract from: {text}&quot;)
         results.append(result)
 
     return results
@@ -496,14 +546,14 @@ class Person(BaseModel):
     age: int
 
 texts = [
-    "John is 30 years old",
-    "Alice is 25 years old",
-    "Bob is 40 years old"
+    &quot;John is 30 years old&quot;,
+    &quot;Alice is 25 years old&quot;,
+    &quot;Bob is 40 years old&quot;
 ]
 
 people = batch_extract(texts, Person)
 for person in people:
-    print(f"{person.name}: {person.age}")
+    print(f&quot;{person.name}: {person.age}&quot;)
 ```
 
 ## Backend Configuration
@@ -514,19 +564,19 @@ for person in people:
 import outlines
 
 # Basic usage
-model = outlines.models.transformers("microsoft/Phi-3-mini-4k-instruct")
+model = outlines.models.transformers(&quot;microsoft/Phi-3-mini-4k-instruct&quot;)
 
 # GPU configuration
 model = outlines.models.transformers(
-    "microsoft/Phi-3-mini-4k-instruct",
-    device="cuda",
-    model_kwargs={"torch_dtype": "float16"}
+    &quot;microsoft/Phi-3-mini-4k-instruct&quot;,
+    device=&quot;cuda&quot;,
+    model_kwargs={&quot;torch_dtype&quot;: &quot;float16&quot;}
 )
 
 # Popular models
-model = outlines.models.transformers("meta-llama/Llama-3.1-8B-Instruct")
-model = outlines.models.transformers("mistralai/Mistral-7B-Instruct-v0.3")
-model = outlines.models.transformers("Qwen/Qwen2.5-7B-Instruct")
+model = outlines.models.transformers(&quot;meta-llama/Llama-3.1-8B-Instruct&quot;)
+model = outlines.models.transformers(&quot;mistralai/Mistral-7B-Instruct-v0.3&quot;)
+model = outlines.models.transformers(&quot;Qwen/Qwen2.5-7B-Instruct&quot;)
 ```
 
 ### llama.cpp
@@ -534,7 +584,7 @@ model = outlines.models.transformers("Qwen/Qwen2.5-7B-Instruct")
 ```python
 # Load GGUF model
 model = outlines.models.llamacpp(
-    "./models/llama-3.1-8b.Q4_K_M.gguf",
+    &quot;./models/llama-3.1-8b.Q4_K_M.gguf&quot;,
     n_ctx=4096,         # Context window
     n_gpu_layers=35,    # GPU layers
     n_threads=8         # CPU threads
@@ -542,7 +592,7 @@ model = outlines.models.llamacpp(
 
 # Full GPU offload
 model = outlines.models.llamacpp(
-    "./models/model.gguf",
+    &quot;./models/model.gguf&quot;,
     n_gpu_layers=-1  # All layers on GPU
 )
 ```
@@ -551,18 +601,18 @@ model = outlines.models.llamacpp(
 
 ```python
 # Single GPU
-model = outlines.models.vllm("meta-llama/Llama-3.1-8B-Instruct")
+model = outlines.models.vllm(&quot;meta-llama/Llama-3.1-8B-Instruct&quot;)
 
 # Multi-GPU
 model = outlines.models.vllm(
-    "meta-llama/Llama-3.1-70B-Instruct",
+    &quot;meta-llama/Llama-3.1-70B-Instruct&quot;,
     tensor_parallel_size=4  # 4 GPUs
 )
 
 # With quantization
 model = outlines.models.vllm(
-    "meta-llama/Llama-3.1-8B-Instruct",
-    quantization="awq"  # Or "gptq"
+    &quot;meta-llama/Llama-3.1-8B-Instruct&quot;,
+    quantization=&quot;awq&quot;  # Or &quot;gptq&quot;
 )
 ```
 
@@ -594,7 +644,7 @@ from pydantic import Field
 class User(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     age: int = Field(ge=0, le=120)
-    email: str = Field(pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
+    email: str = Field(pattern=r&quot;^[\w\.-]+@[\w\.-]+\.\w+$&quot;)
 
 # ❌ Bad: No constraints
 class User(BaseModel):
@@ -608,9 +658,9 @@ class User(BaseModel):
 ```python
 # ✅ Good: Enum for fixed set
 class Priority(str, Enum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
+    LOW = &quot;low&quot;
+    MEDIUM = &quot;medium&quot;
+    HIGH = &quot;high&quot;
 
 class Task(BaseModel):
     title: str
@@ -626,14 +676,14 @@ class Task(BaseModel):
 
 ```python
 # ✅ Good: Clear context
-prompt = """
+prompt = &quot;&quot;&quot;
 Extract product information from the following text.
 Text: iPhone 15 Pro costs $999 and is currently in stock.
 Product:
-"""
+&quot;&quot;&quot;
 
 # ❌ Bad: Minimal context
-prompt = "iPhone 15 Pro costs $999 and is currently in stock."
+prompt = &quot;iPhone 15 Pro costs $999 and is currently in stock.&quot;
 ```
 
 ### 5. Handle Optional Fields
@@ -707,8 +757,46 @@ class Article(BaseModel):
 - `references/examples.md` - Production-ready examples
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Prompt Engineering</span><span class="tag">Outlines</span><span class="tag">Structured Generation</span><span class="tag">JSON Schema</span><span class="tag">Pydantic</span><span class="tag">Local Models</span><span class="tag">Grammar-Based Generation</span><span class="tag">vLLM</span><span class="tag">Transformers</span><span class="tag">Type Safety</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>62</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

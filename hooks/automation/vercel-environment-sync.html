@@ -4,87 +4,168 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>vercel-environment-sync - AICCLI</title>
-  <meta name="description" content="vercel-environment-sync - Claude Code hook for AICCLI">
+  <meta name="description" content="Synchronize environment variables between local development and Vercel deployments, ensuring consistency across all environments. Detects changes to .env files ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../hook.html">Hook</a> / vercel-environment-sync</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>vercel-environment-sync</h1>
-      <div class="meta">
-        <span class="meta-item">Hook</span>
-        <span class="meta-item">automation</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">hooks</a> / automation / vercel-environment-sync
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🪝</div>
+      <div class="title">
+        <h1>vercel-environment-sync</h1>
+        <div class="meta">
+          <span class="badge type">Hook</span>
+          <span class="badge">automation</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>{
-  "description": "Synchronize environment variables between local development and Vercel deployments, ensuring consistency across all environments. Detects changes to .env files and provides options to sync with Vercel, validates environment variable format, and ensures required variables are present. Setup: Export 'export VERCEL_TOKEN=your_token' (get from vercel.com/account/tokens).",
-  "hooks": {
-    "PostToolUse": [
+    </div>
+
+    <p class="desc">Synchronize environment variables between local development and Vercel deployments, ensuring consistency across all environments. Detects changes to .env files and provides options to sync with Vercel, validates environment variable format, and ensures required variables are present. Setup: Export 'export VERCEL_TOKEN=your_token' (get from vercel.com/account/tokens).</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install hooks/vercel-environment-sync</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install hooks/vercel-environment-sync</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install hooks/vercel-environment-sync</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>{
+  &quot;description&quot;: &quot;Synchronize environment variables between local development and Vercel deployments, ensuring consistency across all environments. Detects changes to .env files and provides options to sync with Vercel, validates environment variable format, and ensures required variables are present. Setup: Export &#039;export VERCEL_TOKEN=your_token&#039; (get from vercel.com/account/tokens).&quot;,
+  &quot;hooks&quot;: {
+    &quot;PostToolUse&quot;: [
       {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
+        &quot;matcher&quot;: &quot;Write|Edit|MultiEdit&quot;,
+        &quot;hooks&quot;: [
           {
-            "type": "command",
-            "command": "bash -c 'input=$(cat); FILE_PATH=$(echo \"$input\" | jq -r \".tool_input.file_path // empty\"); SUCCESS=$(echo \"$input\" | jq -r \".tool_response.success // false\"); if [ \"$SUCCESS\" = \"true\" ] && [[ \"$FILE_PATH\" =~ \\.env ]]; then echo \"🔐 Environment file change detected: $FILE_PATH\"; if [ -n \"$VERCEL_TOKEN\" ]; then echo \"🔄 Environment Sync available - Vercel token configured\"; ENV_TYPE=\"development\"; if [[ \"$FILE_PATH\" =~ \\.env\\.production ]]; then ENV_TYPE=\"production\"; elif [[ \"$FILE_PATH\" =~ \\.env\\.preview ]] || [[ \"$FILE_PATH\" =~ \\.env\\.staging ]]; then ENV_TYPE=\"preview\"; fi; echo \"📋 Environment type detected: $ENV_TYPE\"; if [ -f \"$FILE_PATH\" ]; then echo \"🔍 Validating environment variables in $FILE_PATH...\"; VALIDATION_ISSUES=0; while IFS= read -r line; do if [[ \"$line\" =~ ^[A-Z_][A-Z0-9_]*= ]] && [[ ! \"$line\" =~ ^# ]]; then VAR_NAME=$(echo \"$line\" | cut -d\"=\" -f1); VAR_VALUE=$(echo \"$line\" | cut -d\"=\" -f2-); if [[ \"$VAR_VALUE\" =~ ^[\\\"\\'].*[\\\"\\']$ ]]; then echo \"💡 $VAR_NAME: Quoted value detected (quotes will be included in value)\"; fi; if [[ \"$VAR_NAME\" =~ (SECRET|PRIVATE|KEY|TOKEN) ]] && [ ${#VAR_VALUE} -lt 16 ]; then echo \"⚠️ $VAR_NAME: Secret appears to be too short (${#VAR_VALUE} chars)\" &gt;&2; ((VALIDATION_ISSUES++)); fi; if [[ \"$VAR_VALUE\" == \"your-\"* ]] || [[ \"$VAR_VALUE\" == \"change-me\"* ]] || [[ \"$VAR_VALUE\" == \"replace-\"* ]]; then echo \"❌ $VAR_NAME: Placeholder value detected\" &gt;&2; ((VALIDATION_ISSUES++)); fi; elif [[ \"$line\" =~ ^[A-Za-z] ]] && [[ ! \"$line\" =~ ^# ]] && [ -n \"$line\" ]; then echo \"⚠️ Invalid environment variable format: $line\" &gt;&2; ((VALIDATION_ISSUES++)); fi; done &lt; \"$FILE_PATH\"; if [ $VALIDATION_ISSUES -eq 0 ]; then echo \"✅ Environment validation passed\"; VAR_COUNT=$(grep -c \"^[A-Z_][A-Z0-9_]*=\" \"$FILE_PATH\" 2&gt;/dev/null || echo \"0\"); echo \"📊 Found $VAR_COUNT environment variables\"; echo \"💡 Sync options:\"; echo \"  • Manual sync: vercel env pull .env.local\"; echo \"  • Push to Vercel: vercel env add [name] [environment]\"; echo \"  • Bulk sync: Use vercel-env-sync command if available\"; echo \"🔒 Security reminder: Never commit secrets to version control\"; else echo \"❌ Found $VALIDATION_ISSUES validation issues\" &gt;&2; echo \"🚨 Environment sync blocked due to validation errors\" &gt;&2; exit 2; fi; else echo \"❌ File $FILE_PATH not found\"; fi; else echo \"⚠️ VERCEL_TOKEN not configured. Set environment variable to enable sync features.\"; echo \"💡 Get token from: https://vercel.com/account/tokens\"; echo \"💡 Export with: export VERCEL_TOKEN=your_token\"; fi; else echo \"ℹ️ Environment sync skipped (not an .env file or failed operation)\"; fi'",
-            "timeout": 30
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;bash -c &#039;input=$(cat); FILE_PATH=$(echo \&quot;$input\&quot; | jq -r \&quot;.tool_input.file_path // empty\&quot;); SUCCESS=$(echo \&quot;$input\&quot; | jq -r \&quot;.tool_response.success // false\&quot;); if [ \&quot;$SUCCESS\&quot; = \&quot;true\&quot; ] &amp;&amp; [[ \&quot;$FILE_PATH\&quot; =~ \\.env ]]; then echo \&quot;🔐 Environment file change detected: $FILE_PATH\&quot;; if [ -n \&quot;$VERCEL_TOKEN\&quot; ]; then echo \&quot;🔄 Environment Sync available - Vercel token configured\&quot;; ENV_TYPE=\&quot;development\&quot;; if [[ \&quot;$FILE_PATH\&quot; =~ \\.env\\.production ]]; then ENV_TYPE=\&quot;production\&quot;; elif [[ \&quot;$FILE_PATH\&quot; =~ \\.env\\.preview ]] || [[ \&quot;$FILE_PATH\&quot; =~ \\.env\\.staging ]]; then ENV_TYPE=\&quot;preview\&quot;; fi; echo \&quot;📋 Environment type detected: $ENV_TYPE\&quot;; if [ -f \&quot;$FILE_PATH\&quot; ]; then echo \&quot;🔍 Validating environment variables in $FILE_PATH...\&quot;; VALIDATION_ISSUES=0; while IFS= read -r line; do if [[ \&quot;$line\&quot; =~ ^[A-Z_][A-Z0-9_]*= ]] &amp;&amp; [[ ! \&quot;$line\&quot; =~ ^# ]]; then VAR_NAME=$(echo \&quot;$line\&quot; | cut -d\&quot;=\&quot; -f1); VAR_VALUE=$(echo \&quot;$line\&quot; | cut -d\&quot;=\&quot; -f2-); if [[ \&quot;$VAR_VALUE\&quot; =~ ^[\\\&quot;\\&#039;].*[\\\&quot;\\&#039;]$ ]]; then echo \&quot;💡 $VAR_NAME: Quoted value detected (quotes will be included in value)\&quot;; fi; if [[ \&quot;$VAR_NAME\&quot; =~ (SECRET|PRIVATE|KEY|TOKEN) ]] &amp;&amp; [ ${#VAR_VALUE} -lt 16 ]; then echo \&quot;⚠️ $VAR_NAME: Secret appears to be too short (${#VAR_VALUE} chars)\&quot; &gt;&amp;2; ((VALIDATION_ISSUES++)); fi; if [[ \&quot;$VAR_VALUE\&quot; == \&quot;your-\&quot;* ]] || [[ \&quot;$VAR_VALUE\&quot; == \&quot;change-me\&quot;* ]] || [[ \&quot;$VAR_VALUE\&quot; == \&quot;replace-\&quot;* ]]; then echo \&quot;❌ $VAR_NAME: Placeholder value detected\&quot; &gt;&amp;2; ((VALIDATION_ISSUES++)); fi; elif [[ \&quot;$line\&quot; =~ ^[A-Za-z] ]] &amp;&amp; [[ ! \&quot;$line\&quot; =~ ^# ]] &amp;&amp; [ -n \&quot;$line\&quot; ]; then echo \&quot;⚠️ Invalid environment variable format: $line\&quot; &gt;&amp;2; ((VALIDATION_ISSUES++)); fi; done &lt; \&quot;$FILE_PATH\&quot;; if [ $VALIDATION_ISSUES -eq 0 ]; then echo \&quot;✅ Environment validation passed\&quot;; VAR_COUNT=$(grep -c \&quot;^[A-Z_][A-Z0-9_]*=\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null || echo \&quot;0\&quot;); echo \&quot;📊 Found $VAR_COUNT environment variables\&quot;; echo \&quot;💡 Sync options:\&quot;; echo \&quot;  • Manual sync: vercel env pull .env.local\&quot;; echo \&quot;  • Push to Vercel: vercel env add [name] [environment]\&quot;; echo \&quot;  • Bulk sync: Use vercel-env-sync command if available\&quot;; echo \&quot;🔒 Security reminder: Never commit secrets to version control\&quot;; else echo \&quot;❌ Found $VALIDATION_ISSUES validation issues\&quot; &gt;&amp;2; echo \&quot;🚨 Environment sync blocked due to validation errors\&quot; &gt;&amp;2; exit 2; fi; else echo \&quot;❌ File $FILE_PATH not found\&quot;; fi; else echo \&quot;⚠️ VERCEL_TOKEN not configured. Set environment variable to enable sync features.\&quot;; echo \&quot;💡 Get token from: https://vercel.com/account/tokens\&quot;; echo \&quot;💡 Export with: export VERCEL_TOKEN=your_token\&quot;; fi; else echo \&quot;ℹ️ Environment sync skipped (not an .env file or failed operation)\&quot;; fi&#039;&quot;,
+            &quot;timeout&quot;: 30
           }
         ]
       }
     ],
-    "SessionStart": [
+    &quot;SessionStart&quot;: [
       {
-        "matcher": "startup|resume",
-        "hooks": [
+        &quot;matcher&quot;: &quot;startup|resume&quot;,
+        &quot;hooks&quot;: [
           {
-            "type": "command",
-            "command": "bash -c 'echo \"🔐 Environment Sync Status Check...\"; if [ -n \"$VERCEL_TOKEN\" ]; then echo \"✅ Vercel token configured\"; if command -v vercel &gt;/dev/null 2&gt;&1; then echo \"✅ Vercel CLI available\"; PROJECT_STATUS=$(vercel project ls 2&gt;/dev/null | head -1); if [[ \"$PROJECT_STATUS\" =~ \"No projects found\" ]]; then echo \"⚠️ No Vercel project linked to current directory\"; echo \"💡 Run: vercel link\"; else echo \"✅ Vercel project linked\"; fi; else echo \"⚠️ Vercel CLI not installed\"; echo \"💡 Install with: npm i -g vercel\"; fi; if [ -f \".env.example\" ]; then echo \"📋 .env.example found - template available\"; fi; ENV_FILES=($(ls .env* 2&gt;/dev/null | grep -v .env.example || true)); if [ ${#ENV_FILES[@]} -gt 0 ]; then echo \"📁 Environment files found: ${ENV_FILES[*]}\"; for file in \"${ENV_FILES[@]}\"; do VAR_COUNT=$(grep -c \"^[A-Z_][A-Z0-9_]*=\" \"$file\" 2&gt;/dev/null || echo \"0\"); echo \"  $file: $VAR_COUNT variables\"; done; else echo \"ℹ️ No .env files found\"; fi; else echo \"⚠️ VERCEL_TOKEN not configured\"; echo \"💡 Environment sync features disabled\"; fi'",
-            "timeout": 15
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;bash -c &#039;echo \&quot;🔐 Environment Sync Status Check...\&quot;; if [ -n \&quot;$VERCEL_TOKEN\&quot; ]; then echo \&quot;✅ Vercel token configured\&quot;; if command -v vercel &gt;/dev/null 2&gt;&amp;1; then echo \&quot;✅ Vercel CLI available\&quot;; PROJECT_STATUS=$(vercel project ls 2&gt;/dev/null | head -1); if [[ \&quot;$PROJECT_STATUS\&quot; =~ \&quot;No projects found\&quot; ]]; then echo \&quot;⚠️ No Vercel project linked to current directory\&quot;; echo \&quot;💡 Run: vercel link\&quot;; else echo \&quot;✅ Vercel project linked\&quot;; fi; else echo \&quot;⚠️ Vercel CLI not installed\&quot;; echo \&quot;💡 Install with: npm i -g vercel\&quot;; fi; if [ -f \&quot;.env.example\&quot; ]; then echo \&quot;📋 .env.example found - template available\&quot;; fi; ENV_FILES=($(ls .env* 2&gt;/dev/null | grep -v .env.example || true)); if [ ${#ENV_FILES[@]} -gt 0 ]; then echo \&quot;📁 Environment files found: ${ENV_FILES[*]}\&quot;; for file in \&quot;${ENV_FILES[@]}\&quot;; do VAR_COUNT=$(grep -c \&quot;^[A-Z_][A-Z0-9_]*=\&quot; \&quot;$file\&quot; 2&gt;/dev/null || echo \&quot;0\&quot;); echo \&quot;  $file: $VAR_COUNT variables\&quot;; done; else echo \&quot;ℹ️ No .env files found\&quot;; fi; else echo \&quot;⚠️ VERCEL_TOKEN not configured\&quot;; echo \&quot;💡 Environment sync features disabled\&quot;; fi&#039;&quot;,
+            &quot;timeout&quot;: 15
           }
         ]
       }
     ]
   }
-}</pre></div>
+}</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>241</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

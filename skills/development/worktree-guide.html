@@ -4,64 +4,114 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>worktree-guide - AICCLI</title>
-  <meta name="description" content="worktree-guide - Claude Code skill for AICCLI">
+  <meta name="description" content="Interactive guide for parallel development with Ghostty, git worktrees, and Lazygit. Use when setting up multi-task workflows or learning the worktree system.">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / worktree-guide</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>worktree-guide</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / worktree-guide
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>worktree-guide</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Interactive guide for parallel development with Ghostty, git worktrees, and Lazygit. Use when setting up multi-task workflows or learning the worktree system.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/worktree-guide</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/worktree-guide</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/worktree-guide</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: worktree-guide
 description: Interactive guide for parallel development with Ghostty, git worktrees, and Lazygit. Use when setting up multi-task workflows or learning the worktree system.
 license: MIT
 metadata:
   author: claude-code-templates
-  version: "1.0"
+  version: &quot;1.0&quot;
 ---
 
 Guide the user through parallel development workflows using Ghostty terminal panels, git worktrees, and Lazygit. This is both a teaching experience and a practical reference.
@@ -70,16 +120,16 @@ Guide the user through parallel development workflows using Ghostty terminal pan
 
 ## Preflight
 
-Before starting, detect the user's environment:
+Before starting, detect the user&#039;s environment:
 
 ```bash
-git rev-parse --is-inside-work-tree 2&gt;&1 && echo "GIT_OK" || echo "NOT_GIT"
+git rev-parse --is-inside-work-tree 2&gt;&amp;1 &amp;&amp; echo &quot;GIT_OK&quot; || echo &quot;NOT_GIT&quot;
 ```
 
 **If not a git repo:**
-&gt; This isn't a git repository. Navigate to a git project first, then come back to `/worktree-guide`.
+&gt; This isn&#039;t a git repository. Navigate to a git project first, then come back to `/worktree-guide`.
 
-Check if we're in a worktree or main repo:
+Check if we&#039;re in a worktree or main repo:
 ```bash
 git worktree list
 pwd
@@ -89,7 +139,7 @@ Note the context for later guidance.
 
 ---
 
-## Phase 1: Welcome & Context Detection
+## Phase 1: Welcome &amp; Context Detection
 
 Display based on environment:
 
@@ -97,7 +147,7 @@ Display based on environment:
 ```
 ## Worktree Parallel Development Guide
 
-Welcome! I'll guide you through setting up and using parallel worktrees for multi-task development.
+Welcome! I&#039;ll guide you through setting up and using parallel worktrees for multi-task development.
 
 ┌─────────────────────────────────────────────────────────────┐
 │  Ghostty Terminal                                           │
@@ -114,7 +164,7 @@ Welcome! I'll guide you through setting up and using parallel worktrees for mult
 **Your workflow:**
 1. Create worktrees → `/worktree-init`
 2. Open Ghostty panels → `Cmd+D` / `Cmd+Shift+D`
-3. Run Claude in each panel → `cd &lt;worktree&gt; && claude`
+3. Run Claude in each panel → `cd &lt;worktree&gt; &amp;&amp; claude`
 4. Deliver when done → `/worktree-deliver`
 5. Clean up → `/worktree-cleanup`
 
@@ -122,16 +172,16 @@ What would you like to do?
 ```
 
 Use AskUserQuestion:
-- "Learn the full workflow" — Start from Phase 2
-- "Just show keybindings" — Jump to Quick Reference
-- "Create worktrees now" — Suggest `/worktree-init`
-- "Something else" — Ask what they need
+- &quot;Learn the full workflow&quot; — Start from Phase 2
+- &quot;Just show keybindings&quot; — Jump to Quick Reference
+- &quot;Create worktrees now&quot; — Suggest `/worktree-init`
+- &quot;Something else&quot; — Ask what they need
 
 **If already in a worktree:**
 ```
 ## Worktree Status
 
-You're already inside a worktree! Let me check your status.
+You&#039;re already inside a worktree! Let me check your status.
 ```
 
 Then run the equivalent of `/worktree-check` and provide contextual guidance.
@@ -144,7 +194,7 @@ Then run the equivalent of `/worktree-check` and provide contextual guidance.
 ```
 ## Ghostty Panel Management
 
-Ghostty's panel system is perfect for parallel development. Here are the essential keybindings:
+Ghostty&#039;s panel system is perfect for parallel development. Here are the essential keybindings:
 ```
 
 **SHOW:**
@@ -177,7 +227,7 @@ Ghostty's panel system is perfect for parallel development. Here are the essenti
 **Pro tip:** Use Cmd+Shift+F to zoom into a panel when you need focus, then press it again to return to the multi-panel view.
 ```
 
-**PAUSE** - "Ready to learn about Lazygit? (Or skip to workflow)"
+**PAUSE** - &quot;Ready to learn about Lazygit? (Or skip to workflow)&quot;
 
 ---
 
@@ -203,7 +253,7 @@ Lazygit gives you a visual overview of all your worktrees and their changes. Run
 │  n              Create new worktree                         │
 │  d              Delete worktree (with confirmation)         │
 │                                                             │
-│  FILES & STAGING                                            │
+│  FILES &amp; STAGING                                            │
 │  ─────────                                                  │
 │  Space          Stage/unstage file                          │
 │  a              Stage all files                             │
@@ -232,11 +282,11 @@ Lazygit gives you a visual overview of all your worktrees and their changes. Run
 **Monitoring workflow:**
 1. Open lazygit in the main repo (or a dedicated Ghostty panel)
 2. Press `w` to see all worktrees
-3. Use Enter to dive into any worktree's changes
+3. Use Enter to dive into any worktree&#039;s changes
 4. Press `q` to go back to the worktree list
 ```
 
-**PAUSE** - "Ready for the full workflow walkthrough?"
+**PAUSE** - &quot;Ready for the full workflow walkthrough?&quot;
 
 ---
 
@@ -246,7 +296,7 @@ Lazygit gives you a visual overview of all your worktrees and their changes. Run
 ```
 ## Full Parallel Development Workflow
 
-Let me walk you through the complete cycle. We'll go step by step.
+Let me walk you through the complete cycle. We&#039;ll go step by step.
 ```
 
 ### Step 4.1: Create Worktrees
@@ -303,8 +353,8 @@ Resulting layout:
 In each panel:
 1. cd to the worktree path (from the commands output)
 2. Run `claude` to start a Claude session
-3. Use `/worktree-check` anytime to verify which task you're working on
-4. Work normally—Claude doesn't know about other panels
+3. Use `/worktree-check` anytime to verify which task you&#039;re working on
+4. Work normally—Claude doesn&#039;t know about other panels
 ```
 
 ### Step 4.4: Deliver Completed Work
@@ -340,7 +390,7 @@ After your PRs are merged on GitHub:
 ```
 ## Troubleshooting
 
-### "I'm not sure which worktree I'm in"
+### &quot;I&#039;m not sure which worktree I&#039;m in&quot;
 
 Run `/worktree-check` — it shows your branch, task, and status.
 
@@ -350,28 +400,28 @@ $ pwd                          # Shows the worktree path
 
 ---
 
-### "I have uncommitted changes and want to switch tasks"
+### &quot;I have uncommitted changes and want to switch tasks&quot;
 
 **Option 1:** Commit work-in-progress
-$ git add . && git commit -m "wip: progress on feature"
+$ git add . &amp;&amp; git commit -m &quot;wip: progress on feature&quot;
 
 **Option 2:** Stash changes (temporary)
-$ git stash push -m "wip: parking changes"
+$ git stash push -m &quot;wip: parking changes&quot;
 
 Then in the other panel, continue working. Come back later with:
 $ git stash pop
 
 ---
 
-### "I accidentally started working in the wrong worktree"
+### &quot;I accidentally started working in the wrong worktree&quot;
 
-1. Stash your changes: `git stash push -m "work done in wrong place"`
+1. Stash your changes: `git stash push -m &quot;work done in wrong place&quot;`
 2. Navigate to the correct worktree
 3. Apply the stash: `git stash pop`
 
 ---
 
-### "My worktree has merge conflicts"
+### &quot;My worktree has merge conflicts&quot;
 
 1. Run `git fetch origin` to get latest
 2. Run `git rebase origin/main` (or merge if you prefer)
@@ -380,7 +430,7 @@ $ git stash pop
 
 ---
 
-### "I want to abandon a worktree"
+### &quot;I want to abandon a worktree&quot;
 
 From the main repo:
 $ git worktree remove ../worktrees/repo/claude-&lt;name&gt; --force
@@ -390,19 +440,19 @@ Note: Force is needed if there are uncommitted changes.
 
 ---
 
-### "/worktree-deliver failed on push"
+### &quot;/worktree-deliver failed on push&quot;
 
-Usually means the remote branch doesn't exist yet or there's a conflict.
+Usually means the remote branch doesn&#039;t exist yet or there&#039;s a conflict.
 
 Try:
 $ git push -u origin HEAD
 
-If there's a conflict with remote, pull first:
+If there&#039;s a conflict with remote, pull first:
 $ git pull --rebase origin claude/&lt;name&gt;
 
 ---
 
-### "The worktree path doesn't exist anymore"
+### &quot;The worktree path doesn&#039;t exist anymore&quot;
 
 The worktree was probably deleted manually. Clean up the git state:
 $ git worktree prune
@@ -421,7 +471,7 @@ $ git worktree prune
 │  COMMANDS                                                                   │
 │  ─────────                                                                  │
 │  /worktree-init &lt;task1&gt; | &lt;task2&gt;    Create worktrees for parallel tasks    │
-│  /worktree-check                     Show current worktree status & task    │
+│  /worktree-check                     Show current worktree status &amp; task    │
 │  /worktree-deliver                   Commit, push, and create PR            │
 │  /worktree-cleanup --all             Remove merged worktrees and branches   │
 │  /worktree-cleanup --dry-run         Preview what would be cleaned up       │
@@ -449,7 +499,7 @@ $ git worktree prune
 │  ─────────                                                                  │
 │  1. /worktree-init tasks...          Create worktrees                       │
 │  2. Cmd+D (split panels)             Open Ghostty panels                    │
-│  3. cd &lt;path&gt; && claude              Start Claude in each                   │
+│  3. cd &lt;path&gt; &amp;&amp; claude              Start Claude in each                   │
 │  4. /worktree-deliver                PR when done                           │
 │  5. /worktree-cleanup                Clean up after merge                   │
 │                                                                             │
@@ -463,12 +513,43 @@ $ git worktree prune
 - **Never execute destructive commands** without confirmation (worktree remove, branch delete)
 - **Always verify location** before suggesting worktree operations
 - **If user seems lost**, offer `/worktree-check` first
-- **Never force-delete** branches that aren't merged
-- **Don't assume tools are installed** — check for lazygit availability if suggesting it
-- **Respect user's pace** — don't rush through sections if they want to practice
+- **Never force-delete** branches that aren&#039;t merged
+- **Don&#039;t assume tools are installed** — check for lazygit availability if suggesting it
+- **Respect user&#039;s pace** — don&#039;t rush through sections if they want to practice
 - **Keep the reference card available** — offer to show it whenever relevant
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>12</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

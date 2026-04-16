@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>scientific-visualization - AICCLI</title>
-  <meta name="description" content="scientific-visualization - Claude Code skill for AICCLI">
+  <meta name="description" content=""Create publication figures with matplotlib/seaborn/plotly. Multi-panel layouts, error bars, significance markers, colorblind-safe, export PDF/EPS/TIFF, for jou">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / scientific-visualization</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>scientific-visualization</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / scientific-visualization
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>scientific-visualization</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Create publication figures with matplotlib/seaborn/plotly. Multi-panel layouts, error bars, significance markers, colorblind-safe, export PDF/EPS/TIFF, for journal-ready scientific plots."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/scientific-visualization</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/scientific-visualization</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/scientific-visualization</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: scientific-visualization
-description: "Create publication figures with matplotlib/seaborn/plotly. Multi-panel layouts, error bars, significance markers, colorblind-safe, export PDF/EPS/TIFF, for journal-ready scientific plots."
+description: &quot;Create publication figures with matplotlib/seaborn/plotly. Multi-panel layouts, error bars, significance markers, colorblind-safe, export PDF/EPS/TIFF, for journal-ready scientific plots.&quot;
 ---
 
 # Scientific Visualization
@@ -88,28 +138,28 @@ import numpy as np
 
 # Apply publication style (from scripts/style_presets.py)
 from style_presets import apply_publication_style
-apply_publication_style('default')
+apply_publication_style(&#039;default&#039;)
 
 # Create figure with appropriate size (single column = 3.5 inches)
 fig, ax = plt.subplots(figsize=(3.5, 2.5))
 
 # Plot data
 x = np.linspace(0, 10, 100)
-ax.plot(x, np.sin(x), label='sin(x)')
-ax.plot(x, np.cos(x), label='cos(x)')
+ax.plot(x, np.sin(x), label=&#039;sin(x)&#039;)
+ax.plot(x, np.cos(x), label=&#039;cos(x)&#039;)
 
 # Proper labeling with units
-ax.set_xlabel('Time (seconds)')
-ax.set_ylabel('Amplitude (mV)')
+ax.set_xlabel(&#039;Time (seconds)&#039;)
+ax.set_ylabel(&#039;Amplitude (mV)&#039;)
 ax.legend(frameon=False)
 
 # Remove unnecessary spines
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
+ax.spines[&#039;top&#039;].set_visible(False)
+ax.spines[&#039;right&#039;].set_visible(False)
 
 # Save in publication formats (from scripts/figure_export.py)
 from figure_export import save_publication_figure
-save_publication_figure(fig, 'figure1', formats=['pdf', 'png'], dpi=300)
+save_publication_figure(fig, &#039;figure1&#039;, formats=[&#039;pdf&#039;, &#039;png&#039;], dpi=300)
 ```
 
 ### Using Pre-configured Styles
@@ -120,13 +170,13 @@ Apply journal-specific styles using the matplotlib style files in `assets/`:
 import matplotlib.pyplot as plt
 
 # Option 1: Use style file directly
-plt.style.use('assets/nature.mplstyle')
+plt.style.use(&#039;assets/nature.mplstyle&#039;)
 
 # Option 2: Use style_presets.py helper
 from style_presets import configure_for_journal
-configure_for_journal('nature', figure_width='single')
+configure_for_journal(&#039;nature&#039;, figure_width=&#039;single&#039;)
 
-# Now create figures - they'll automatically match Nature specifications
+# Now create figures - they&#039;ll automatically match Nature specifications
 fig, ax = plt.subplots()
 # ... your plotting code ...
 ```
@@ -141,23 +191,23 @@ import matplotlib.pyplot as plt
 from style_presets import apply_publication_style
 
 # Apply publication style
-apply_publication_style('default')
-sns.set_theme(style='ticks', context='paper', font_scale=1.1)
-sns.set_palette('colorblind')
+apply_publication_style(&#039;default&#039;)
+sns.set_theme(style=&#039;ticks&#039;, context=&#039;paper&#039;, font_scale=1.1)
+sns.set_palette(&#039;colorblind&#039;)
 
 # Create statistical comparison figure
 fig, ax = plt.subplots(figsize=(3.5, 3))
-sns.boxplot(data=df, x='treatment', y='response', 
-            order=['Control', 'Low', 'High'], palette='Set2', ax=ax)
-sns.stripplot(data=df, x='treatment', y='response',
-              order=['Control', 'Low', 'High'], 
-              color='black', alpha=0.3, size=3, ax=ax)
-ax.set_ylabel('Response (μM)')
+sns.boxplot(data=df, x=&#039;treatment&#039;, y=&#039;response&#039;, 
+            order=[&#039;Control&#039;, &#039;Low&#039;, &#039;High&#039;], palette=&#039;Set2&#039;, ax=ax)
+sns.stripplot(data=df, x=&#039;treatment&#039;, y=&#039;response&#039;,
+              order=[&#039;Control&#039;, &#039;Low&#039;, &#039;High&#039;], 
+              color=&#039;black&#039;, alpha=0.3, size=3, ax=ax)
+ax.set_ylabel(&#039;Response (μM)&#039;)
 sns.despine()
 
 # Save figure
 from figure_export import save_publication_figure
-save_publication_figure(fig, 'treatment_comparison', formats=['pdf', 'png'], dpi=300)
+save_publication_figure(fig, &#039;treatment_comparison&#039;, formats=[&#039;pdf&#039;, &#039;png&#039;], dpi=300)
 ```
 
 ## Core Principles and Best Practices
@@ -176,11 +226,11 @@ save_publication_figure(fig, 'treatment_comparison', formats=['pdf', 'png'], dpi
 from figure_export import save_publication_figure
 
 # Saves in multiple formats with proper DPI
-save_publication_figure(fig, 'myfigure', formats=['pdf', 'png'], dpi=300)
+save_publication_figure(fig, &#039;myfigure&#039;, formats=[&#039;pdf&#039;, &#039;png&#039;], dpi=300)
 
 # Or save for specific journal requirements
 from figure_export import save_for_journal
-save_for_journal(fig, 'figure1', journal='nature', figure_type='combination')
+save_for_journal(fig, &#039;figure1&#039;, journal=&#039;nature&#039;, figure_type=&#039;combination&#039;)
 ```
 
 ### 2. Color Selection - Colorblind Accessibility
@@ -191,12 +241,12 @@ save_for_journal(fig, 'figure1', journal='nature', figure_type='combination')
 ```python
 # Option 1: Use assets/color_palettes.py
 from color_palettes import OKABE_ITO_LIST, apply_palette
-apply_palette('okabe_ito')
+apply_palette(&#039;okabe_ito&#039;)
 
 # Option 2: Manual specification
-okabe_ito = ['#E69F00', '#56B4E9', '#009E73', '#F0E442',
-             '#0072B2', '#D55E00', '#CC79A7', '#000000']
-plt.rcParams['axes.prop_cycle'] = plt.cycler(color=okabe_ito)
+okabe_ito = [&#039;#E69F00&#039;, &#039;#56B4E9&#039;, &#039;#009E73&#039;, &#039;#F0E442&#039;,
+             &#039;#0072B2&#039;, &#039;#D55E00&#039;, &#039;#CC79A7&#039;, &#039;#000000&#039;]
+plt.rcParams[&#039;axes.prop_cycle&#039;] = plt.cycler(color=okabe_ito)
 ```
 
 **For heatmaps/continuous data:**
@@ -214,19 +264,19 @@ plt.rcParams['axes.prop_cycle'] = plt.cycler(color=okabe_ito)
   - Axis labels: 7-9 pt
   - Tick labels: 6-8 pt
   - Panel labels: 8-12 pt (bold)
-- Sentence case for labels: "Time (hours)" not "TIME (HOURS)"
+- Sentence case for labels: &quot;Time (hours)&quot; not &quot;TIME (HOURS)&quot;
 - Always include units in parentheses
 
 **Implementation:**
 ```python
 # Set fonts globally
 import matplotlib as mpl
-mpl.rcParams['font.family'] = 'sans-serif'
-mpl.rcParams['font.sans-serif'] = ['Arial', 'Helvetica']
-mpl.rcParams['font.size'] = 8
-mpl.rcParams['axes.labelsize'] = 9
-mpl.rcParams['xtick.labelsize'] = 7
-mpl.rcParams['ytick.labelsize'] = 7
+mpl.rcParams[&#039;font.family&#039;] = &#039;sans-serif&#039;
+mpl.rcParams[&#039;font.sans-serif&#039;] = [&#039;Arial&#039;, &#039;Helvetica&#039;]
+mpl.rcParams[&#039;font.size&#039;] = 8
+mpl.rcParams[&#039;axes.labelsize&#039;] = 9
+mpl.rcParams[&#039;xtick.labelsize&#039;] = 7
+mpl.rcParams[&#039;ytick.labelsize&#039;] = 7
 ```
 
 ### 4. Figure Dimensions
@@ -241,7 +291,7 @@ mpl.rcParams['ytick.labelsize'] = 7
 from figure_export import check_figure_size
 
 fig = plt.figure(figsize=(3.5, 3))  # 89 mm for Nature
-check_figure_size(fig, journal='nature')
+check_figure_size(fig, journal=&#039;nature&#039;)
 ```
 
 ### 5. Multi-Panel Figures
@@ -266,7 +316,7 @@ ax2 = fig.add_subplot(gs[0, 1])
 # Add panel labels
 for i, ax in enumerate([ax1, ax2, ...]):
     ax.text(-0.15, 1.05, ascii_uppercase[i], transform=ax.transAxes,
-            fontsize=10, fontweight='bold', va='top')
+            fontsize=10, fontweight=&#039;bold&#039;, va=&#039;top&#039;)
 ```
 
 ## Common Tasks
@@ -288,11 +338,11 @@ See `references/matplotlib_examples.md` Example 1 for complete code.
 ```python
 import seaborn as sns
 fig, ax = plt.subplots(figsize=(5, 3))
-sns.lineplot(data=timeseries, x='time', y='measurement',
-             hue='treatment', errorbar=('ci', 95), 
+sns.lineplot(data=timeseries, x=&#039;time&#039;, y=&#039;measurement&#039;,
+             hue=&#039;treatment&#039;, errorbar=(&#039;ci&#039;, 95), 
              markers=True, ax=ax)
-ax.set_xlabel('Time (hours)')
-ax.set_ylabel('Measurement (AU)')
+ax.set_xlabel(&#039;Time (hours)&#039;)
+ax.set_ylabel(&#039;Measurement (AU)&#039;)
 sns.despine()
 ```
 
@@ -324,9 +374,9 @@ import seaborn as sns
 fig, ax = plt.subplots(figsize=(5, 4))
 corr = df.corr()
 mask = np.triu(np.ones_like(corr, dtype=bool))
-sns.heatmap(corr, mask=mask, annot=True, fmt='.2f',
-            cmap='RdBu_r', center=0, square=True,
-            linewidths=1, cbar_kws={'shrink': 0.8}, ax=ax)
+sns.heatmap(corr, mask=mask, annot=True, fmt=&#039;.2f&#039;,
+            cmap=&#039;RdBu_r&#039;, center=0, square=True,
+            linewidths=1, cbar_kws={&#039;shrink&#039;: 0.8}, ax=ax)
 ```
 
 ### Task 4: Prepare Figure for Specific Journal
@@ -336,13 +386,13 @@ sns.heatmap(corr, mask=mask, annot=True, fmt='.2f',
 2. Configure matplotlib for journal:
    ```python
    from style_presets import configure_for_journal
-   configure_for_journal('nature', figure_width='single')
+   configure_for_journal(&#039;nature&#039;, figure_width=&#039;single&#039;)
    ```
 3. Create figure (will auto-size correctly)
 4. Export with journal specifications:
    ```python
    from figure_export import save_for_journal
-   save_for_journal(fig, 'figure1', journal='nature', figure_type='line_art')
+   save_for_journal(fig, &#039;figure1&#039;, journal=&#039;nature&#039;, figure_type=&#039;line_art&#039;)
    ```
 
 ### Task 5: Fix an Existing Figure to Meet Publication Standards
@@ -371,11 +421,11 @@ sns.heatmap(corr, mask=mask, annot=True, fmt='.2f',
 from color_palettes import apply_palette
 import matplotlib.pyplot as plt
 
-apply_palette('okabe_ito')
+apply_palette(&#039;okabe_ito&#039;)
 
 # Add redundant encoding beyond color
-line_styles = ['-', '--', '-.', ':']
-markers = ['o', 's', '^', 'v']
+line_styles = [&#039;-&#039;, &#039;--&#039;, &#039;-.&#039;, &#039;:&#039;]
+markers = [&#039;o&#039;, &#039;s&#039;, &#039;^&#039;, &#039;v&#039;]
 
 for i, (data, label) in enumerate(datasets):
     plt.plot(x, data, linestyle=line_styles[i % 4],
@@ -394,10 +444,10 @@ for i, (data, label) in enumerate(datasets):
 ```python
 # Show individual points with summary statistics
 ax.scatter(x_jittered, individual_points, alpha=0.4, s=8)
-ax.errorbar(x, means, yerr=sems, fmt='o', capsize=3)
+ax.errorbar(x, means, yerr=sems, fmt=&#039;o&#039;, capsize=3)
 
 # Mark significance
-ax.text(1.5, max_y * 1.1, '***', ha='center', fontsize=8)
+ax.text(1.5, max_y * 1.1, &#039;***&#039;, ha=&#039;center&#039;, fontsize=8)
 ```
 
 ## Working with Different Plotting Libraries
@@ -429,16 +479,16 @@ import matplotlib.pyplot as plt
 from style_presets import apply_publication_style
 
 # Apply publication style
-apply_publication_style('default')
+apply_publication_style(&#039;default&#039;)
 
 # Configure seaborn for publication
-sns.set_theme(style='ticks', context='paper', font_scale=1.1)
-sns.set_palette('colorblind')  # Use colorblind-safe palette
+sns.set_theme(style=&#039;ticks&#039;, context=&#039;paper&#039;, font_scale=1.1)
+sns.set_palette(&#039;colorblind&#039;)  # Use colorblind-safe palette
 
 # Create figure
 fig, ax = plt.subplots(figsize=(3.5, 2.5))
-sns.scatterplot(data=df, x='time', y='response', 
-                hue='treatment', style='condition', ax=ax)
+sns.scatterplot(data=df, x=&#039;time&#039;, y=&#039;response&#039;, 
+                hue=&#039;treatment&#039;, style=&#039;condition&#039;, ax=ax)
 sns.despine()  # Remove top and right spines
 ```
 
@@ -448,12 +498,12 @@ sns.despine()  # Remove top and right spines
 ```python
 # Box plot with individual points for transparency
 fig, ax = plt.subplots(figsize=(3.5, 3))
-sns.boxplot(data=df, x='treatment', y='response', 
-            order=['Control', 'Low', 'High'], palette='Set2', ax=ax)
-sns.stripplot(data=df, x='treatment', y='response',
-              order=['Control', 'Low', 'High'], 
-              color='black', alpha=0.3, size=3, ax=ax)
-ax.set_ylabel('Response (μM)')
+sns.boxplot(data=df, x=&#039;treatment&#039;, y=&#039;response&#039;, 
+            order=[&#039;Control&#039;, &#039;Low&#039;, &#039;High&#039;], palette=&#039;Set2&#039;, ax=ax)
+sns.stripplot(data=df, x=&#039;treatment&#039;, y=&#039;response&#039;,
+              order=[&#039;Control&#039;, &#039;Low&#039;, &#039;High&#039;], 
+              color=&#039;black&#039;, alpha=0.3, size=3, ax=ax)
+ax.set_ylabel(&#039;Response (μM)&#039;)
 sns.despine()
 ```
 
@@ -461,9 +511,9 @@ sns.despine()
 ```python
 # Violin plot with split comparison
 fig, ax = plt.subplots(figsize=(4, 3))
-sns.violinplot(data=df, x='timepoint', y='expression',
-               hue='treatment', split=True, inner='quartile', ax=ax)
-ax.set_ylabel('Gene Expression (AU)')
+sns.violinplot(data=df, x=&#039;timepoint&#039;, y=&#039;expression&#039;,
+               hue=&#039;treatment&#039;, split=True, inner=&#039;quartile&#039;, ax=ax)
+ax.set_ylabel(&#039;Gene Expression (AU)&#039;)
 sns.despine()
 ```
 
@@ -473,9 +523,9 @@ sns.despine()
 fig, ax = plt.subplots(figsize=(5, 4))
 corr = df.corr()
 mask = np.triu(np.ones_like(corr, dtype=bool))  # Show only lower triangle
-sns.heatmap(corr, mask=mask, annot=True, fmt='.2f',
-            cmap='RdBu_r', center=0, square=True,
-            linewidths=1, cbar_kws={'shrink': 0.8}, ax=ax)
+sns.heatmap(corr, mask=mask, annot=True, fmt=&#039;.2f&#039;,
+            cmap=&#039;RdBu_r&#039;, center=0, square=True,
+            linewidths=1, cbar_kws={&#039;shrink&#039;: 0.8}, ax=ax)
 plt.tight_layout()
 ```
 
@@ -483,11 +533,11 @@ plt.tight_layout()
 ```python
 # Line plot with automatic CI calculation
 fig, ax = plt.subplots(figsize=(5, 3))
-sns.lineplot(data=timeseries, x='time', y='measurement',
-             hue='treatment', style='replicate',
-             errorbar=('ci', 95), markers=True, dashes=False, ax=ax)
-ax.set_xlabel('Time (hours)')
-ax.set_ylabel('Measurement (AU)')
+sns.lineplot(data=timeseries, x=&#039;time&#039;, y=&#039;measurement&#039;,
+             hue=&#039;treatment&#039;, style=&#039;replicate&#039;,
+             errorbar=(&#039;ci&#039;, 95), markers=True, dashes=False, ax=ax)
+ax.set_xlabel(&#039;Time (hours)&#039;)
+ax.set_ylabel(&#039;Measurement (AU)&#039;)
 sns.despine()
 ```
 
@@ -496,18 +546,18 @@ sns.despine()
 **Using FacetGrid for automatic faceting:**
 ```python
 # Create faceted plot
-g = sns.relplot(data=df, x='dose', y='response',
-                hue='treatment', col='cell_line', row='timepoint',
-                kind='line', height=2.5, aspect=1.2,
-                errorbar=('ci', 95), markers=True)
-g.set_axis_labels('Dose (μM)', 'Response (AU)')
-g.set_titles('{row_name} | {col_name}')
+g = sns.relplot(data=df, x=&#039;dose&#039;, y=&#039;response&#039;,
+                hue=&#039;treatment&#039;, col=&#039;cell_line&#039;, row=&#039;timepoint&#039;,
+                kind=&#039;line&#039;, height=2.5, aspect=1.2,
+                errorbar=(&#039;ci&#039;, 95), markers=True)
+g.set_axis_labels(&#039;Dose (μM)&#039;, &#039;Response (AU)&#039;)
+g.set_titles(&#039;{row_name} | {col_name}&#039;)
 sns.despine()
 
 # Save with correct DPI
 from figure_export import save_publication_figure
-save_publication_figure(g.figure, 'figure_facets', 
-                       formats=['pdf', 'png'], dpi=300)
+save_publication_figure(g.figure, &#039;figure_facets&#039;, 
+                       formats=[&#039;pdf&#039;, &#039;png&#039;], dpi=300)
 ```
 
 **Combining seaborn with matplotlib subplots:**
@@ -516,25 +566,25 @@ save_publication_figure(g.figure, 'figure_facets',
 fig, axes = plt.subplots(2, 2, figsize=(7, 6))
 
 # Panel A: Scatter with regression
-sns.regplot(data=df, x='predictor', y='response', ax=axes[0, 0])
-axes[0, 0].text(-0.15, 1.05, 'A', transform=axes[0, 0].transAxes,
-                fontsize=10, fontweight='bold')
+sns.regplot(data=df, x=&#039;predictor&#039;, y=&#039;response&#039;, ax=axes[0, 0])
+axes[0, 0].text(-0.15, 1.05, &#039;A&#039;, transform=axes[0, 0].transAxes,
+                fontsize=10, fontweight=&#039;bold&#039;)
 
 # Panel B: Distribution comparison
-sns.violinplot(data=df, x='group', y='value', ax=axes[0, 1])
-axes[0, 1].text(-0.15, 1.05, 'B', transform=axes[0, 1].transAxes,
-                fontsize=10, fontweight='bold')
+sns.violinplot(data=df, x=&#039;group&#039;, y=&#039;value&#039;, ax=axes[0, 1])
+axes[0, 1].text(-0.15, 1.05, &#039;B&#039;, transform=axes[0, 1].transAxes,
+                fontsize=10, fontweight=&#039;bold&#039;)
 
 # Panel C: Heatmap
-sns.heatmap(correlation_data, cmap='viridis', ax=axes[1, 0])
-axes[1, 0].text(-0.15, 1.05, 'C', transform=axes[1, 0].transAxes,
-                fontsize=10, fontweight='bold')
+sns.heatmap(correlation_data, cmap=&#039;viridis&#039;, ax=axes[1, 0])
+axes[1, 0].text(-0.15, 1.05, &#039;C&#039;, transform=axes[1, 0].transAxes,
+                fontsize=10, fontweight=&#039;bold&#039;)
 
 # Panel D: Time series
-sns.lineplot(data=timeseries, x='time', y='signal', 
-             hue='condition', ax=axes[1, 1])
-axes[1, 1].text(-0.15, 1.05, 'D', transform=axes[1, 1].transAxes,
-                fontsize=10, fontweight='bold')
+sns.lineplot(data=timeseries, x=&#039;time&#039;, y=&#039;signal&#039;, 
+             hue=&#039;condition&#039;, ax=axes[1, 1])
+axes[1, 1].text(-0.15, 1.05, &#039;D&#039;, transform=axes[1, 1].transAxes,
+                fontsize=10, fontweight=&#039;bold&#039;)
 
 plt.tight_layout()
 sns.despine()
@@ -546,16 +596,16 @@ Seaborn includes several colorblind-safe palettes:
 
 ```python
 # Use built-in colorblind palette (recommended)
-sns.set_palette('colorblind')
+sns.set_palette(&#039;colorblind&#039;)
 
 # Or specify custom colorblind-safe colors (Okabe-Ito)
-okabe_ito = ['#E69F00', '#56B4E9', '#009E73', '#F0E442',
-             '#0072B2', '#D55E00', '#CC79A7', '#000000']
+okabe_ito = [&#039;#E69F00&#039;, &#039;#56B4E9&#039;, &#039;#009E73&#039;, &#039;#F0E442&#039;,
+             &#039;#0072B2&#039;, &#039;#D55E00&#039;, &#039;#CC79A7&#039;, &#039;#000000&#039;]
 sns.set_palette(okabe_ito)
 
 # For heatmaps and continuous data
-sns.heatmap(data, cmap='viridis')  # Perceptually uniform
-sns.heatmap(corr, cmap='RdBu_r', center=0)  # Diverging, centered
+sns.heatmap(data, cmap=&#039;viridis&#039;)  # Perceptually uniform
+sns.heatmap(corr, cmap=&#039;RdBu_r&#039;, center=0)  # Diverging, centered
 ```
 
 #### Choosing Between Axes-Level and Figure-Level Functions
@@ -568,7 +618,7 @@ sns.heatmap(corr, cmap='RdBu_r', center=0)  # Diverging, centered
 
 ```python
 fig, ax = plt.subplots(figsize=(3.5, 2.5))
-sns.scatterplot(data=df, x='x', y='y', hue='group', ax=ax)
+sns.scatterplot(data=df, x=&#039;x&#039;, y=&#039;y&#039;, hue=&#039;group&#039;, ax=ax)
 ```
 
 **Figure-level functions** (e.g., `relplot`, `catplot`, `displot`):
@@ -578,7 +628,7 @@ sns.scatterplot(data=df, x='x', y='y', hue='group', ax=ax)
 - Use `height` and `aspect` for sizing
 
 ```python
-g = sns.relplot(data=df, x='x', y='y', col='category', kind='scatter')
+g = sns.relplot(data=df, x=&#039;x&#039;, y=&#039;y&#039;, col=&#039;category&#039;, kind=&#039;scatter&#039;)
 ```
 
 #### Statistical Rigor with Seaborn
@@ -587,27 +637,27 @@ Seaborn automatically computes and displays uncertainty:
 
 ```python
 # Line plot: shows mean ± 95% CI by default
-sns.lineplot(data=df, x='time', y='value', hue='treatment',
-             errorbar=('ci', 95))  # Can change to 'sd', 'se', etc.
+sns.lineplot(data=df, x=&#039;time&#039;, y=&#039;value&#039;, hue=&#039;treatment&#039;,
+             errorbar=(&#039;ci&#039;, 95))  # Can change to &#039;sd&#039;, &#039;se&#039;, etc.
 
 # Bar plot: shows mean with bootstrapped CI
-sns.barplot(data=df, x='treatment', y='response',
-            errorbar=('ci', 95), capsize=0.1)
+sns.barplot(data=df, x=&#039;treatment&#039;, y=&#039;response&#039;,
+            errorbar=(&#039;ci&#039;, 95), capsize=0.1)
 
 # Always specify error type in figure caption:
-# "Error bars represent 95% confidence intervals"
+# &quot;Error bars represent 95% confidence intervals&quot;
 ```
 
 #### Best Practices for Publication-Ready Seaborn Figures
 
 1. **Always set publication theme first:**
    ```python
-   sns.set_theme(style='ticks', context='paper', font_scale=1.1)
+   sns.set_theme(style=&#039;ticks&#039;, context=&#039;paper&#039;, font_scale=1.1)
    ```
 
 2. **Use colorblind-safe palettes:**
    ```python
-   sns.set_palette('colorblind')
+   sns.set_palette(&#039;colorblind&#039;)
    ```
 
 3. **Remove unnecessary elements:**
@@ -632,15 +682,15 @@ sns.barplot(data=df, x='treatment', y='response',
 
 6. **Include proper labels with units:**
    ```python
-   ax.set_xlabel('Time (hours)')
-   ax.set_ylabel('Expression (AU)')
+   ax.set_xlabel(&#039;Time (hours)&#039;)
+   ax.set_ylabel(&#039;Expression (AU)&#039;)
    ```
 
 7. **Export at correct resolution:**
    ```python
    from figure_export import save_publication_figure
-   save_publication_figure(fig, 'figure_name', 
-                          formats=['pdf', 'png'], dpi=300)
+   save_publication_figure(fig, &#039;figure_name&#039;, 
+                          formats=[&#039;pdf&#039;, &#039;png&#039;], dpi=300)
    ```
 
 #### Advanced Seaborn Techniques
@@ -648,28 +698,28 @@ sns.barplot(data=df, x='treatment', y='response',
 **Pairwise relationships for exploratory analysis:**
 ```python
 # Quick overview of all relationships
-g = sns.pairplot(data=df, hue='condition', 
-                 vars=['gene1', 'gene2', 'gene3'],
-                 corner=True, diag_kind='kde', height=2)
+g = sns.pairplot(data=df, hue=&#039;condition&#039;, 
+                 vars=[&#039;gene1&#039;, &#039;gene2&#039;, &#039;gene3&#039;],
+                 corner=True, diag_kind=&#039;kde&#039;, height=2)
 ```
 
 **Hierarchical clustering heatmap:**
 ```python
 # Cluster samples and features
-g = sns.clustermap(expression_data, method='ward', 
-                   metric='euclidean', z_score=0,
-                   cmap='RdBu_r', center=0, 
+g = sns.clustermap(expression_data, method=&#039;ward&#039;, 
+                   metric=&#039;euclidean&#039;, z_score=0,
+                   cmap=&#039;RdBu_r&#039;, center=0, 
                    figsize=(10, 8), 
                    row_colors=condition_colors,
-                   cbar_kws={'label': 'Z-score'})
+                   cbar_kws={&#039;label&#039;: &#039;Z-score&#039;})
 ```
 
 **Joint distributions with marginals:**
 ```python
 # Bivariate distribution with context
-g = sns.jointplot(data=df, x='gene1', y='gene2',
-                  hue='treatment', kind='scatter',
-                  height=6, ratio=4, marginal_kws={'kde': True})
+g = sns.jointplot(data=df, x=&#039;gene1&#039;, y=&#039;gene2&#039;,
+                  hue=&#039;treatment&#039;, kind=&#039;scatter&#039;,
+                  height=6, ratio=4, marginal_kws={&#039;kde&#039;: True})
 ```
 
 #### Common Seaborn Issues and Solutions
@@ -682,13 +732,13 @@ g._legend.set_bbox_to_anchor((0.9, 0.5))
 
 **Issue: Overlapping labels**
 ```python
-plt.xticks(rotation=45, ha='right')
+plt.xticks(rotation=45, ha=&#039;right&#039;)
 plt.tight_layout()
 ```
 
 **Issue: Text too small at final size**
 ```python
-sns.set_context('paper', font_scale=1.2)  # Increase if needed
+sns.set_context(&#039;paper&#039;, font_scale=1.2)  # Increase if needed
 ```
 
 #### Additional Resources
@@ -705,11 +755,11 @@ For more detailed seaborn information, see:
 - Configure for publication quality:
 ```python
 fig.update_layout(
-    font=dict(family='Arial, sans-serif', size=10),
-    plot_bgcolor='white',
+    font=dict(family=&#039;Arial, sans-serif&#039;, size=10),
+    plot_bgcolor=&#039;white&#039;,
     # ... see matplotlib_examples.md Example 8
 )
-fig.write_image('figure.png', scale=3)  # scale=3 gives ~300 DPI
+fig.write_image(&#039;figure.png&#039;, scale=3)  # scale=3 gives ~300 DPI
 ```
 
 ## Resources
@@ -781,18 +831,18 @@ fig.write_image('figure.png', scale=3)  # scale=3 gives ~300 DPI
 2. **Configure**: Apply appropriate style for journal
    ```python
    from style_presets import configure_for_journal
-   configure_for_journal('nature', 'single')
+   configure_for_journal(&#039;nature&#039;, &#039;single&#039;)
    ```
 3. **Create**: Build figure with proper labels, colors, statistics
 4. **Verify**: Check size, fonts, colors, accessibility
    ```python
    from figure_export import check_figure_size
-   check_figure_size(fig, journal='nature')
+   check_figure_size(fig, journal=&#039;nature&#039;)
    ```
 5. **Export**: Save in required formats
    ```python
    from figure_export import save_for_journal
-   save_for_journal(fig, 'figure1', 'nature', 'combination')
+   save_for_journal(fig, &#039;figure1&#039;, &#039;nature&#039;, &#039;combination&#039;)
    ```
 6. **Review**: View at final size in manuscript context
 
@@ -828,8 +878,39 @@ Before submitting figures, verify:
 - [ ] Legend is clear and complete
 
 Use this skill to ensure scientific figures meet the highest publication standards while remaining accessible to all readers.
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>205</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

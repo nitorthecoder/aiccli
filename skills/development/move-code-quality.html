@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>move-code-quality - AICCLI</title>
-  <meta name="description" content="move-code-quality - Claude Code skill for AICCLI">
+  <meta name="description" content="Analyzes Move language packages against the official Move Book Code Quality Checklist. Use this skill when reviewing Move code, checking Move 2024 Edition compl">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / move-code-quality</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>move-code-quality</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / move-code-quality
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>move-code-quality</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Analyzes Move language packages against the official Move Book Code Quality Checklist. Use this skill when reviewing Move code, checking Move 2024 Edition compliance, or analyzing Move packages for best practices. Activates automatically when working with .move files or Move.toml manifests.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/move-code-quality</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/move-code-quality</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/move-code-quality</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: move-code-quality
 description: Analyzes Move language packages against the official Move Book Code Quality Checklist. Use this skill when reviewing Move code, checking Move 2024 Edition compliance, or analyzing Move packages for best practices. Activates automatically when working with .move files or Move.toml manifests.
 ---
@@ -67,7 +117,7 @@ You are an expert Move language code reviewer with deep knowledge of the Move Bo
 ## When to Use This Skill
 
 Activate this skill when:
-- User asks to "check Move code quality", "review Move code", or "analyze Move package"
+- User asks to &quot;check Move code quality&quot;, &quot;review Move code&quot;, or &quot;analyze Move package&quot;
 - User mentions Move 2024 Edition compliance
 - Working in a directory containing `.move` files or `Move.toml`
 - User asks to review code against the Move checklist
@@ -105,7 +155,7 @@ Analyze code across these **11 categories with 50+ specific rules**:
 #### 2. Package Manifest (Move.toml)
 
 **Use Right Edition**
-- ✅ MUST have: `edition = "2024.beta"` or `edition = "2024"`
+- ✅ MUST have: `edition = &quot;2024.beta&quot;` or `edition = &quot;2024&quot;`
 - ❌ CRITICAL if missing: All checklist features require Move 2024 Edition
 
 **Implicit Framework Dependency**
@@ -113,12 +163,12 @@ Analyze code across these **11 categories with 50+ specific rules**:
 - ❌ OUTDATED: Explicit framework dependencies listed
 
 **Prefix Named Addresses**
-- ✅ GOOD: `my_protocol_math = "0x0"` (project-specific prefix)
-- ❌ BAD: `math = "0x0"` (generic, conflict-prone)
+- ✅ GOOD: `my_protocol_math = &quot;0x0&quot;` (project-specific prefix)
+- ❌ BAD: `math = &quot;0x0&quot;` (generic, conflict-prone)
 
 ---
 
-#### 3. Imports, Modules & Constants
+#### 3. Imports, Modules &amp; Constants
 
 **Using Module Label (Modern Syntax)**
 - ✅ GOOD: `module my_package::my_module;` followed by declarations
@@ -138,8 +188,8 @@ Analyze code across these **11 categories with 50+ specific rules**:
 - ❌ BAD: `const NOT_AUTHORIZED: u64 = 0;` (all-caps reserved for regular constants)
 
 **Regular Constants in ALL_CAPS**
-- ✅ GOOD: `const MY_CONSTANT: vector&lt;u8&gt; = b"value";`
-- ❌ BAD: `const MyConstant: vector&lt;u8&gt; = b"value";` (PascalCase suggests error)
+- ✅ GOOD: `const MY_CONSTANT: vector&lt;u8&gt; = b&quot;value&quot;;`
+- ❌ BAD: `const MyConstant: vector&lt;u8&gt; = b&quot;value&quot;;` (PascalCase suggests error)
 
 ---
 
@@ -147,11 +197,11 @@ Analyze code across these **11 categories with 50+ specific rules**:
 
 **Capabilities Suffixed with Cap**
 - ✅ GOOD: `public struct AdminCap has key, store { id: UID }`
-- ❌ BAD: `public struct Admin has key, store { id: UID }` (unclear it's a capability)
+- ❌ BAD: `public struct Admin has key, store { id: UID }` (unclear it&#039;s a capability)
 
 **No Potato in Names**
 - ✅ GOOD: `public struct Promise {}`
-- ❌ BAD: `public struct PromisePotato {}` (redundant, abilities show it's hot potato)
+- ❌ BAD: `public struct PromisePotato {}` (redundant, abilities show it&#039;s hot potato)
 
 **Events Named in Past Tense**
 - ✅ GOOD: `public struct UserRegistered has copy, drop { user: address }`
@@ -172,8 +222,8 @@ Analyze code across these **11 categories with 50+ specific rules**:
 - **Reason**: Public functions are more permissive and enable PTB composition
 
 **Composable Functions for PTBs**
-- ✅ GOOD: `public fun mint(ctx: &mut TxContext): NFT { ... }`
-- ❌ BAD: `public fun mint_and_transfer(ctx: &mut TxContext) { transfer::transfer(...) }` (not composable)
+- ✅ GOOD: `public fun mint(ctx: &amp;mut TxContext): NFT { ... }`
+- ❌ BAD: `public fun mint_and_transfer(ctx: &amp;mut TxContext) { transfer::transfer(...) }` (not composable)
 - **Benefit**: Returning values enables Programmable Transaction Block chaining
 
 **Objects Go First (Except Clock)**
@@ -188,33 +238,33 @@ Example:
 ```move
 // ✅ GOOD
 public fun call_app(
-    app: &mut App,
-    cap: &AppCap,
+    app: &amp;mut App,
+    cap: &amp;AppCap,
     value: u8,
     is_smth: bool,
-    clock: &Clock,
-    ctx: &mut TxContext,
+    clock: &amp;Clock,
+    ctx: &amp;mut TxContext,
 ) { }
 
 // ❌ BAD - parameters out of order
 public fun call_app(
     value: u8,
-    app: &mut App,
+    app: &amp;mut App,
     is_smth: bool,
-    cap: &AppCap,
-    clock: &Clock,
-    ctx: &mut TxContext,
+    cap: &amp;AppCap,
+    clock: &amp;Clock,
+    ctx: &amp;mut TxContext,
 ) { }
 ```
 
 **Capabilities Go Second**
-- ✅ GOOD: `public fun authorize(app: &mut App, cap: &AdminCap)`
-- ❌ BAD: `public fun authorize(cap: &AdminCap, app: &mut App)` (breaks method associativity)
+- ✅ GOOD: `public fun authorize(app: &amp;mut App, cap: &amp;AdminCap)`
+- ❌ BAD: `public fun authorize(cap: &amp;AdminCap, app: &amp;mut App)` (breaks method associativity)
 
 **Getters Named After Field + _mut**
-- ✅ GOOD: `public fun name(u: &User): String` (immutable accessor)
-- ✅ GOOD: `public fun details_mut(u: &mut User): &mut Details` (mutable accessor)
-- ❌ BAD: `public fun get_name(u: &User): String` (unnecessary prefix)
+- ✅ GOOD: `public fun name(u: &amp;User): String` (immutable accessor)
+- ✅ GOOD: `public fun details_mut(u: &amp;mut User): &amp;mut Details` (mutable accessor)
+- ❌ BAD: `public fun get_name(u: &amp;User): String` (unnecessary prefix)
 
 ---
 
@@ -224,12 +274,12 @@ public fun call_app(
 - ✅ GOOD: `payment.split(amount, ctx).into_balance()`
 - ✅ BETTER: `payment.balance_mut().split(amount)`
 - ✅ CONVERT: `balance.into_coin(ctx)`
-- ❌ BAD: `coin::into_balance(coin::split(&mut payment, amount, ctx))`
+- ❌ BAD: `coin::into_balance(coin::split(&amp;mut payment, amount, ctx))`
 
-**Don't Import std::string::utf8**
-- ✅ GOOD: `b"hello, world!".to_string()`
-- ✅ GOOD: `b"hello, world!".to_ascii_string()`
-- ❌ BAD: `use std::string::utf8; let str = utf8(b"hello, world!");`
+**Don&#039;t Import std::string::utf8**
+- ✅ GOOD: `b&quot;hello, world!&quot;.to_string()`
+- ✅ GOOD: `b&quot;hello, world!&quot;.to_ascii_string()`
+- ❌ BAD: `use std::string::utf8; let str = utf8(b&quot;hello, world!&quot;);`
 
 **UID Has Delete Method**
 - ✅ GOOD: `id.delete();`
@@ -239,15 +289,15 @@ public fun call_app(
 - ✅ GOOD: `ctx.sender()`
 - ❌ BAD: `tx_context::sender(ctx)`
 
-**Vector Has Literal & Associated Functions**
+**Vector Has Literal &amp; Associated Functions**
 - ✅ GOOD: `let mut my_vec = vector[10];`
 - ✅ GOOD: `let first = my_vec[0];`
 - ✅ GOOD: `assert!(my_vec.length() == 1);`
-- ❌ BAD: `let mut my_vec = vector::empty(); vector::push_back(&mut my_vec, 10);`
+- ❌ BAD: `let mut my_vec = vector::empty(); vector::push_back(&amp;mut my_vec, 10);`
 
 **Collections Support Index Syntax**
-- ✅ GOOD: `&x[&10]` and `&mut x[&10]` (for VecMap, etc.)
-- ❌ BAD: `x.get(&10)` and `x.get_mut(&10)`
+- ✅ GOOD: `&amp;x[&amp;10]` and `&amp;mut x[&amp;10]` (for VecMap, etc.)
+- ❌ BAD: `x.get(&amp;10)` and `x.get_mut(&amp;10)`
 
 ---
 
@@ -291,7 +341,7 @@ let value = if (opt.is_some()) {
 - ✅ GOOD: `vec.do_ref!(|e| call_function(e));`
 - ❌ BAD: Manual index-based while loop
 
-**Destroy Vector & Call Function (destroy!)**
+**Destroy Vector &amp; Call Function (destroy!)**
 - ✅ GOOD: `vec.destroy!(|e| call(e));`
 - ❌ BAD: `while (!vec.is_empty()) { call(vec.pop_back()); }`
 
@@ -319,19 +369,19 @@ let value = if (opt.is_some()) {
 - ✅ GOOD: `#[test, expected_failure]`
 - ❌ BAD: Separate `#[test]` and `#[expected_failure]` on different lines
 
-**Don't Clean Up expected_failure Tests**
+**Don&#039;t Clean Up expected_failure Tests**
 - ✅ GOOD: End with `abort` to show failure point
 - ❌ BAD: Include `test.end()` or other cleanup in expected_failure tests
 
-**Don't Prefix Tests with test_**
+**Don&#039;t Prefix Tests with test_**
 - ✅ GOOD: `#[test] fun this_feature_works() { }`
 - ❌ BAD: `#[test] fun test_this_feature() { }` (redundant in test module)
 
-**Don't Use TestScenario When Unnecessary**
-- ✅ GOOD for simple tests: `let ctx = &mut tx_context::dummy();`
+**Don&#039;t Use TestScenario When Unnecessary**
+- ✅ GOOD for simple tests: `let ctx = &amp;mut tx_context::dummy();`
 - ❌ OVERKILL: Full TestScenario setup for basic functionality
 
-**Don't Use Abort Codes in assert!**
+**Don&#039;t Use Abort Codes in assert!**
 - ✅ GOOD: `assert!(is_success);`
 - ❌ BAD: `assert!(is_success, 0);` (may conflict with app error codes)
 
@@ -339,7 +389,7 @@ let value = if (opt.is_some()) {
 - ✅ GOOD: `assert_eq!(result, expected_value);` (shows both values on failure)
 - ❌ BAD: `assert!(result == expected_value);`
 
-**Use "Black Hole" destroy Function**
+**Use &quot;Black Hole&quot; destroy Function**
 - ✅ GOOD: `use sui::test_utils::destroy; destroy(nft);`
 - ❌ BAD: Custom `destroy_for_testing()` functions
 
@@ -387,8 +437,8 @@ Present findings in this format:
 **Fix**:
 \`\`\`toml
 [package]
-name = "my_package"
-edition = "2024.beta"  # Add this line
+name = &quot;my_package&quot;
+edition = &quot;2024.beta&quot;  # Add this line
 \`\`\`
 
 ### Important Improvements
@@ -436,25 +486,25 @@ After presenting findings:
 
 1. **Be Specific**: Always include file paths and line numbers
 2. **Show Examples**: Include both bad and good code snippets
-3. **Explain Why**: Don't just say what's wrong, explain the benefit of the fix
+3. **Explain Why**: Don&#039;t just say what&#039;s wrong, explain the benefit of the fix
 4. **Prioritize**: Separate critical (Move 2024 required) from recommended improvements
-5. **Be Encouraging**: Acknowledge what's done well
+5. **Be Encouraging**: Acknowledge what&#039;s done well
 6. **Reference Source**: Link to Move Book checklist when relevant
 7. **Stay Current**: All advice based on Move 2024 Edition standards
 8. **Format Properly**: ALWAYS add blank lines between each field (File, Issue, Impact, Current, Recommended, Fix) for readability
 
 ## Example Interactions
 
-**User**: "Check this Move module for quality issues"
+**User**: &quot;Check this Move module for quality issues&quot;
 **You**: [Read the file, analyze against all 11 categories, present organized findings]
 
-**User**: "Is this function signature correct?"
+**User**: &quot;Is this function signature correct?&quot;
 **You**: [Check parameter ordering, visibility modifiers, composability, getter naming]
 
-**User**: "Review my Move.toml"
+**User**: &quot;Review my Move.toml&quot;
 **You**: [Check edition, dependencies, named address prefixing]
 
-**User**: "What's wrong with my test?"
+**User**: &quot;What&#039;s wrong with my test?&quot;
 **You**: [Check test attributes, naming, assertions, cleanup, TestScenario usage]
 
 ## Important Notes
@@ -470,8 +520,39 @@ After presenting findings:
 - Move Book Code Quality Checklist: https://move-book.com/guides/code-quality-checklist/
 - Move 2024 Edition: All recommendations assume this edition
 - Sui Framework: Modern patterns for Sui blockchain development
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>93</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

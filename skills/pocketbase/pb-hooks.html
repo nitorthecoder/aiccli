@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>pb-hooks - AICCLI</title>
-  <meta name="description" content="pb-hooks - Claude Code skill for AICCLI">
+  <meta name="description" content=""Server-side JavaScript hooks for PocketBase (pb_hooks). Use when writing custom routes, event hooks, cron jobs, sending emails, making HTTP requests, querying ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / pb-hooks</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>pb-hooks</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">pocketbase</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / pocketbase / pb-hooks
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>pb-hooks</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">pocketbase</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
-name: "PocketBase Hooks"
-description: "Server-side JavaScript hooks for PocketBase (pb_hooks). Use when writing custom routes, event hooks, cron jobs, sending emails, making HTTP requests, querying the database, or extending PocketBase with server-side logic. Covers the goja ES5 runtime, routing, middleware, all event hooks, DB queries, record operations, and global APIs."
+    </div>
+
+    <p class="desc">"Server-side JavaScript hooks for PocketBase (pb_hooks). Use when writing custom routes, event hooks, cron jobs, sending emails, making HTTP requests, querying the database, or extending PocketBase with server-side logic. Covers the goja ES5 runtime, routing, middleware, all event hooks, DB queries, record operations, and global APIs."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pb-hooks</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/pb-hooks</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/pb-hooks</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
+name: &quot;PocketBase Hooks&quot;
+description: &quot;Server-side JavaScript hooks for PocketBase (pb_hooks). Use when writing custom routes, event hooks, cron jobs, sending emails, making HTTP requests, querying the database, or extending PocketBase with server-side logic. Covers the goja ES5 runtime, routing, middleware, all event hooks, DB queries, record operations, and global APIs.&quot;
 ---
 
 # PocketBase Server-Side JavaScript (pb_hooks)
@@ -77,9 +127,9 @@ description: "Server-side JavaScript hooks for PocketBase (pb_hooks). Use when w
 ### Adding routes
 
 ```js
-routerAdd("GET", "/api/hello/{name}", function(e) {
-    var name = e.request.pathValue("name")
-    return e.json(200, { "message": "Hello " + name })
+routerAdd(&quot;GET&quot;, &quot;/api/hello/{name}&quot;, function(e) {
+    var name = e.request.pathValue(&quot;name&quot;)
+    return e.json(200, { &quot;message&quot;: &quot;Hello &quot; + name })
 }, /* optional middleware */)
 ```
 
@@ -104,17 +154,17 @@ routerAdd("GET", "/api/hello/{name}", function(e) {
 
 ```js
 // Body (JSON)
-var body = new DynamicModel({ name: "", age: 0 })
+var body = new DynamicModel({ name: &quot;&quot;, age: 0 })
 e.bindBody(body)
 
 // Query params
-var page = e.request.url.query().get("page")
+var page = e.request.url.query().get(&quot;page&quot;)
 
 // Headers
-var token = e.request.header.get("Authorization")
+var token = e.request.header.get(&quot;Authorization&quot;)
 
 // Uploaded files
-var files = e.findUploadedFiles("document")  // returns array of *filesystem.File
+var files = e.findUploadedFiles(&quot;document&quot;)  // returns array of *filesystem.File
 
 // Auth state
 var user = e.auth          // current auth record or null
@@ -126,10 +176,10 @@ var isSuper = e.hasSuperuserAuth()
 ### Built-in middleware
 
 ```js
-routerAdd("GET", "/api/protected", handler,
+routerAdd(&quot;GET&quot;, &quot;/api/protected&quot;, handler,
     $apis.requireAuth(),                // any authenticated user
     // OR
-    $apis.requireAuth("users"),         // only "users" collection
+    $apis.requireAuth(&quot;users&quot;),         // only &quot;users&quot; collection
     // OR
     $apis.requireSuperuserAuth(),       // superusers only
     // OR
@@ -161,7 +211,7 @@ function myMiddleware(e) {
     return result
 }
 
-routerAdd("GET", "/api/test", handler, myMiddleware)
+routerAdd(&quot;GET&quot;, &quot;/api/test&quot;, handler, myMiddleware)
 ```
 
 Priority: middleware runs in order — first registered, first executed.
@@ -179,21 +229,21 @@ Each record event has 3 variants:
 // Before/during create
 onRecordCreateExecute(function(e) {
     // e.record — the record being created
-    e.record.set("status", "pending")
+    e.record.set(&quot;status&quot;, &quot;pending&quot;)
     return e.next()  // proceed with creation
-}, "posts")  // optional collection filter
+}, &quot;posts&quot;)  // optional collection filter
 
 // After successful create
 onRecordAfterCreateSuccess(function(e) {
     // e.record — the created record (has ID now)
-    console.log("Created:", e.record.id)
-}, "posts")
+    console.log(&quot;Created:&quot;, e.record.id)
+}, &quot;posts&quot;)
 
 // After failed create
 onRecordAfterCreateError(function(e) {
     // e.error — the error
-    console.log("Failed:", e.error)
-}, "posts")
+    console.log(&quot;Failed:&quot;, e.error)
+}, &quot;posts&quot;)
 ```
 
 ### All record hooks
@@ -223,23 +273,23 @@ onRecordAuthWithPasswordRequest(function(e) {
     // e.record — the auth record
     // e.password — the provided password
     return e.next()
-}, "users")
+}, &quot;users&quot;)
 
 onRecordAuthWithOAuth2Request(function(e) {
     // e.record — the auth record (may be new)
     // e.oAuth2User — OAuth2 user data
     // e.isNewRecord — true if first OAuth2 login
     return e.next()
-}, "users")
+}, &quot;users&quot;)
 
 onRecordAuthWithOTPRequest(function(e) {
     // e.record — the auth record
     return e.next()
-}, "users")
+}, &quot;users&quot;)
 
 onRecordAuthRefreshRequest(function(e) {
     return e.next()
-}, "users")
+}, &quot;users&quot;)
 ```
 
 ### Realtime hooks
@@ -264,7 +314,7 @@ onRealtimeSubscribeRequest(function(e) {
 onFileDownloadRequest(function(e) {
     // e.record, e.fileField, e.servedPath, e.servedName
     return e.next()
-}, "documents")
+}, &quot;documents&quot;)
 
 onBatchRequest(function(e) {
     // e.batch — array of sub-requests
@@ -292,11 +342,11 @@ onTerminate(function(e) {
 
 ```js
 onRecordValidate(function(e) {
-    if (e.record.getString("title").length &lt; 3) {
-        e.error = new ValidationError("title", "Title must be at least 3 characters")
+    if (e.record.getString(&quot;title&quot;).length &lt; 3) {
+        e.error = new ValidationError(&quot;title&quot;, &quot;Title must be at least 3 characters&quot;)
     }
     return e.next()
-}, "posts")
+}, &quot;posts&quot;)
 ```
 
 ### Enrich hook (modify API response)
@@ -304,14 +354,14 @@ onRecordValidate(function(e) {
 ```js
 onRecordEnrich(function(e) {
     // Hide field from non-owners
-    if (!e.requestInfo.auth || e.requestInfo.auth.id !== e.record.getString("author")) {
-        e.record.hide("private_notes")
+    if (!e.requestInfo.auth || e.requestInfo.auth.id !== e.record.getString(&quot;author&quot;)) {
+        e.record.hide(&quot;private_notes&quot;)
     }
     // Add computed field
     e.record.withCustomData(true)
-    e.record.set("displayName", e.record.getString("first") + " " + e.record.getString("last"))
+    e.record.set(&quot;displayName&quot;, e.record.getString(&quot;first&quot;) + &quot; &quot; + e.record.getString(&quot;last&quot;))
     return e.next()
-}, "users")
+}, &quot;users&quot;)
 ```
 
 ## Database
@@ -319,14 +369,14 @@ onRecordEnrich(function(e) {
 ### Query builder
 
 ```js
-var results = arrayOf(new DynamicModel({ id: "", title: "", count: 0 }))
+var results = arrayOf(new DynamicModel({ id: &quot;&quot;, title: &quot;&quot;, count: 0 }))
 
 $app.db()
-    .select("id", "title", "COUNT(comments) as count")
-    .from("posts")
-    .where($dbx.hashExp({ status: "active" }))
-    .andWhere($dbx.like("title", "hello"))
-    .orderBy("created DESC")
+    .select(&quot;id&quot;, &quot;title&quot;, &quot;COUNT(comments) as count&quot;)
+    .from(&quot;posts&quot;)
+    .where($dbx.hashExp({ status: &quot;active&quot; }))
+    .andWhere($dbx.like(&quot;title&quot;, &quot;hello&quot;))
+    .orderBy(&quot;created DESC&quot;)
     .limit(10)
     .offset(0)
     .all(results)  // populates results array
@@ -343,8 +393,8 @@ $app.db()
 ### Raw queries
 
 ```js
-$app.db().newQuery("SELECT * FROM posts WHERE status = {:status}")
-    .bind({ status: "active" })
+$app.db().newQuery(&quot;SELECT * FROM posts WHERE status = {:status}&quot;)
+    .bind({ status: &quot;active&quot; })
     .all(results)
 ```
 
@@ -353,19 +403,19 @@ $app.db().newQuery("SELECT * FROM posts WHERE status = {:status}")
 ### $dbx expressions
 
 ```js
-$dbx.hashExp({ field: "value" })           // field = "value"
-$dbx.hashExp({ field: ["a", "b"] })        // field IN ("a", "b")
-$dbx.not($dbx.hashExp({ field: "value" })) // NOT (field = "value")
+$dbx.hashExp({ field: &quot;value&quot; })           // field = &quot;value&quot;
+$dbx.hashExp({ field: [&quot;a&quot;, &quot;b&quot;] })        // field IN (&quot;a&quot;, &quot;b&quot;)
+$dbx.not($dbx.hashExp({ field: &quot;value&quot; })) // NOT (field = &quot;value&quot;)
 $dbx.and(expr1, expr2)                     // expr1 AND expr2
 $dbx.or(expr1, expr2)                      // expr1 OR expr2
-$dbx.like("field", "val")                  // field LIKE "%val%"
-$dbx.orLike("field", "a", "b")            // field LIKE "%a%" OR field LIKE "%b%"
-$dbx.notLike("field", "val")              // field NOT LIKE "%val%"
-$dbx.in("field", "a", "b", "c")           // field IN ("a", "b", "c")
-$dbx.notIn("field", "a", "b")             // field NOT IN ("a", "b")
-$dbx.between("field", 1, 10)              // field BETWEEN 1 AND 10
-$dbx.exists($dbx.exp("SELECT 1 FROM t WHERE ..."))
-$dbx.exp("raw SQL expression", optionalParams)
+$dbx.like(&quot;field&quot;, &quot;val&quot;)                  // field LIKE &quot;%val%&quot;
+$dbx.orLike(&quot;field&quot;, &quot;a&quot;, &quot;b&quot;)            // field LIKE &quot;%a%&quot; OR field LIKE &quot;%b%&quot;
+$dbx.notLike(&quot;field&quot;, &quot;val&quot;)              // field NOT LIKE &quot;%val%&quot;
+$dbx.in(&quot;field&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;)           // field IN (&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
+$dbx.notIn(&quot;field&quot;, &quot;a&quot;, &quot;b&quot;)             // field NOT IN (&quot;a&quot;, &quot;b&quot;)
+$dbx.between(&quot;field&quot;, 1, 10)              // field BETWEEN 1 AND 10
+$dbx.exists($dbx.exp(&quot;SELECT 1 FROM t WHERE ...&quot;))
+$dbx.exp(&quot;raw SQL expression&quot;, optionalParams)
 ```
 
 ### Transactions
@@ -373,8 +423,8 @@ $dbx.exp("raw SQL expression", optionalParams)
 ```js
 $app.runInTransaction(function(txApp) {
     // use txApp instead of $app inside transaction
-    var record = txApp.findRecordById("posts", "RECORD_ID")
-    record.set("views", record.getInt("views") + 1)
+    var record = txApp.findRecordById(&quot;posts&quot;, &quot;RECORD_ID&quot;)
+    record.set(&quot;views&quot;, record.getInt(&quot;views&quot;) + 1)
     txApp.save(record)
 })
 ```
@@ -385,38 +435,38 @@ $app.runInTransaction(function(txApp) {
 
 ```js
 // By ID
-var record = $app.findRecordById("posts", "RECORD_ID")
+var record = $app.findRecordById(&quot;posts&quot;, &quot;RECORD_ID&quot;)
 
 // By field value
-var record = $app.findFirstRecordByData("users", "email", "user@example.com")
+var record = $app.findFirstRecordByData(&quot;users&quot;, &quot;email&quot;, &quot;user@example.com&quot;)
 
 // By filter expression (same syntax as API rules)
-var record = $app.findFirstRecordByFilter("posts", "slug = {:slug}", { slug: "my-post" })
+var record = $app.findFirstRecordByFilter(&quot;posts&quot;, &quot;slug = {:slug}&quot;, { slug: &quot;my-post&quot; })
 
 // Multiple records with filter
 var records = $app.findRecordsByFilter(
-    "posts",                    // collection
-    "status = 'active'",        // filter
-    "-created",                 // sort
+    &quot;posts&quot;,                    // collection
+    &quot;status = &#039;active&#039;&quot;,        // filter
+    &quot;-created&quot;,                 // sort
     10,                         // limit
     0                           // offset
 )
 
 // All records (no limit)
-var records = $app.findAllRecords("posts", $dbx.hashExp({ status: "active" }))
+var records = $app.findAllRecords(&quot;posts&quot;, $dbx.hashExp({ status: &quot;active&quot; }))
 
 // Count
-var total = $app.countRecords("posts", $dbx.hashExp({ status: "active" }))
+var total = $app.countRecords(&quot;posts&quot;, $dbx.hashExp({ status: &quot;active&quot; }))
 ```
 
 ### Create records
 
 ```js
-var collection = $app.findCollectionByNameOrId("posts")
+var collection = $app.findCollectionByNameOrId(&quot;posts&quot;)
 var record = new Record(collection)
-record.set("title", "My Post")
-record.set("author", "USER_ID")
-record.set("tags", ["tag1", "tag2"])  // multi-relation
+record.set(&quot;title&quot;, &quot;My Post&quot;)
+record.set(&quot;author&quot;, &quot;USER_ID&quot;)
+record.set(&quot;tags&quot;, [&quot;tag1&quot;, &quot;tag2&quot;])  // multi-relation
 $app.save(record)
 // record.id is now set
 ```
@@ -424,15 +474,15 @@ $app.save(record)
 ### Update records
 
 ```js
-var record = $app.findRecordById("posts", "RECORD_ID")
-record.set("title", "Updated Title")
+var record = $app.findRecordById(&quot;posts&quot;, &quot;RECORD_ID&quot;)
+record.set(&quot;title&quot;, &quot;Updated Title&quot;)
 $app.save(record)
 ```
 
 ### Delete records
 
 ```js
-var record = $app.findRecordById("posts", "RECORD_ID")
+var record = $app.findRecordById(&quot;posts&quot;, &quot;RECORD_ID&quot;)
 $app.delete(record)
 ```
 
@@ -440,37 +490,37 @@ $app.delete(record)
 
 ```js
 record.id
-record.getString("title")
-record.getInt("count")
-record.getFloat("price")
-record.getBool("active")
-record.getStringSlice("tags")  // for multi-valued fields
-record.getDateTime("created")  // returns DateTime object
-record.get("field")            // raw interface{} value
+record.getString(&quot;title&quot;)
+record.getInt(&quot;count&quot;)
+record.getFloat(&quot;price&quot;)
+record.getBool(&quot;active&quot;)
+record.getStringSlice(&quot;tags&quot;)  // for multi-valued fields
+record.getDateTime(&quot;created&quot;)  // returns DateTime object
+record.get(&quot;field&quot;)            // raw interface{} value
 ```
 
 ### Expand relations
 
 ```js
-$app.expandRecord(record, ["author", "tags"], null)
-var author = record.expandedOne("author")   // single relation
-var tags = record.expandedAll("tags")        // multi relation
+$app.expandRecord(record, [&quot;author&quot;, &quot;tags&quot;], null)
+var author = record.expandedOne(&quot;author&quot;)   // single relation
+var tags = record.expandedAll(&quot;tags&quot;)        // multi relation
 ```
 
 ### File operations
 
 ```js
 // Assign file from path
-var file = $filesystem.fileFromPath("/path/to/file.pdf")
-record.set("document", file)
+var file = $filesystem.fileFromPath(&quot;/path/to/file.pdf&quot;)
+record.set(&quot;document&quot;, file)
 
 // Assign file from bytes
-var file = $filesystem.fileFromBytes(byteArray, "report.pdf")
-record.set("document", file)
+var file = $filesystem.fileFromBytes(byteArray, &quot;report.pdf&quot;)
+record.set(&quot;document&quot;, file)
 
 // Assign file from URL
-var file = $filesystem.fileFromURL("https://example.com/file.pdf")
-record.set("document", file)
+var file = $filesystem.fileFromURL(&quot;https://example.com/file.pdf&quot;)
+record.set(&quot;document&quot;, file)
 
 $app.save(record)
 ```
@@ -478,15 +528,15 @@ $app.save(record)
 ## Cron Jobs
 
 ```js
-cronAdd("daily_cleanup", "0 3 * * *", function() {
+cronAdd(&quot;daily_cleanup&quot;, &quot;0 3 * * *&quot;, function() {
     // runs every day at 3:00 AM
-    var old = $app.findRecordsByFilter("temp", "created &lt; @now - 30d", "", 0, 0)
+    var old = $app.findRecordsByFilter(&quot;temp&quot;, &quot;created &lt; @now - 30d&quot;, &quot;&quot;, 0, 0)
     for (var i = 0; i &lt; old.length; i++) {
         $app.delete(old[i])
     }
 })
 
-cronRemove("daily_cleanup")  // remove a previously registered job
+cronRemove(&quot;daily_cleanup&quot;)  // remove a previously registered job
 ```
 
 Cron expressions: `minute hour day month weekday`
@@ -497,9 +547,9 @@ Preview registered crons: Dashboard &gt; Settings &gt; Crons
 ```js
 var message = new MailerMessage()
 message.from = { address: $app.settings().meta.senderAddress, name: $app.settings().meta.senderName }
-message.to = [{ address: "user@example.com", name: "User" }]
-message.subject = "Hello"
-message.html = "&lt;h1&gt;Hello World&lt;/h1&gt;"
+message.to = [{ address: &quot;user@example.com&quot;, name: &quot;User&quot; }]
+message.subject = &quot;Hello&quot;
+message.html = &quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;
 // message.bcc, message.cc — optional arrays
 // message.attachments — optional
 
@@ -511,10 +561,10 @@ $app.newMailClient().send(message)
 ```js
 onMailerRecordVerificationSend(function(e) {
     // e.record, e.message
-    e.message.subject = "Custom verification subject"
-    e.message.html = "&lt;p&gt;Custom HTML with token: " + e.meta.token + "&lt;/p&gt;"
+    e.message.subject = &quot;Custom verification subject&quot;
+    e.message.html = &quot;&lt;p&gt;Custom HTML with token: &quot; + e.meta.token + &quot;&lt;/p&gt;&quot;
     return e.next()
-}, "users")
+}, &quot;users&quot;)
 
 // Similar hooks: onMailerRecordResetPasswordSend, onMailerRecordEmailChangeSend, onMailerRecordOTPSend
 ```
@@ -523,10 +573,10 @@ onMailerRecordVerificationSend(function(e) {
 
 ```js
 var res = $http.send({
-    url: "https://api.example.com/data",
-    method: "POST",
-    body: JSON.stringify({ key: "value" }),
-    headers: { "Content-Type": "application/json", "Authorization": "Bearer TOKEN" },
+    url: &quot;https://api.example.com/data&quot;,
+    method: &quot;POST&quot;,
+    body: JSON.stringify({ key: &quot;value&quot; }),
+    headers: { &quot;Content-Type&quot;: &quot;application/json&quot;, &quot;Authorization&quot;: &quot;Bearer TOKEN&quot; },
     timeout: 30  // seconds
 })
 
@@ -539,12 +589,12 @@ res.body         // raw string
 
 // Multipart upload
 var formData = new FormData()
-formData.append("file", $filesystem.fileFromPath("/path/to/file.pdf"))
-formData.append("name", "test")
+formData.append(&quot;file&quot;, $filesystem.fileFromPath(&quot;/path/to/file.pdf&quot;))
+formData.append(&quot;name&quot;, &quot;test&quot;)
 
 var res = $http.send({
-    url: "https://api.example.com/upload",
-    method: "POST",
+    url: &quot;https://api.example.com/upload&quot;,
+    method: &quot;POST&quot;,
     body: formData
 })
 ```
@@ -554,16 +604,16 @@ var res = $http.send({
 ## Error Types
 
 ```js
-throw new BadRequestError("message", optionalData)     // 400
-throw new UnauthorizedError("message", optionalData)    // 401
-throw new ForbiddenError("message", optionalData)       // 403
-throw new NotFoundError("message", optionalData)        // 404
-throw new TooManyRequestsError("message", optionalData) // 429
-throw new InternalServerError("message", optionalData)  // 500
-throw new ApiError(statusCode, "message", optionalData) // custom status
+throw new BadRequestError(&quot;message&quot;, optionalData)     // 400
+throw new UnauthorizedError(&quot;message&quot;, optionalData)    // 401
+throw new ForbiddenError(&quot;message&quot;, optionalData)       // 403
+throw new NotFoundError(&quot;message&quot;, optionalData)        // 404
+throw new TooManyRequestsError(&quot;message&quot;, optionalData) // 429
+throw new InternalServerError(&quot;message&quot;, optionalData)  // 500
+throw new ApiError(statusCode, &quot;message&quot;, optionalData) // custom status
 
 // Validation errors (for onRecordValidate)
-new ValidationError("field_name", "error message")
+new ValidationError(&quot;field_name&quot;, &quot;error message&quot;)
 ```
 
 ## Global Objects
@@ -582,17 +632,17 @@ new ValidationError("field_name", "error message")
 
 ```js
 var token = $security.randomString(32)
-var hash = $security.hs256("data", "secret")
-var encrypted = $security.encrypt("data", "encryptionKey")
-var decrypted = $security.decrypt(encrypted, "encryptionKey")
+var hash = $security.hs256(&quot;data&quot;, &quot;secret&quot;)
+var encrypted = $security.encrypt(&quot;data&quot;, &quot;encryptionKey&quot;)
+var decrypted = $security.decrypt(encrypted, &quot;encryptionKey&quot;)
 ```
 
 ### $os examples
 
 ```js
-var result = $os.exec("ls", ["-la", "/tmp"])  // returns { code, output }
-var files = $os.readDir("/path")
-var tmp = $os.tempDir("prefix")
+var result = $os.exec(&quot;ls&quot;, [&quot;-la&quot;, &quot;/tmp&quot;])  // returns { code, output }
+var files = $os.readDir(&quot;/path&quot;)
+var tmp = $os.tempDir(&quot;prefix&quot;)
 ```
 
 ## Common Patterns
@@ -602,10 +652,10 @@ var tmp = $os.tempDir("prefix")
 ```js
 onRecordCreateExecute(function(e) {
     if (e.auth) {
-        e.record.set("author", e.auth.id)
+        e.record.set(&quot;author&quot;, e.auth.id)
     }
     return e.next()
-}, "posts")
+}, &quot;posts&quot;)
 ```
 
 ### Cascade custom logic on delete
@@ -613,24 +663,24 @@ onRecordCreateExecute(function(e) {
 ```js
 onRecordDeleteExecute(function(e) {
     // Clean up related data not handled by cascadeDelete
-    var comments = $app.findRecordsByFilter("comments", "post = {:id}", "-created", 0, 0, { id: e.record.id })
+    var comments = $app.findRecordsByFilter(&quot;comments&quot;, &quot;post = {:id}&quot;, &quot;-created&quot;, 0, 0, { id: e.record.id })
     for (var i = 0; i &lt; comments.length; i++) {
         $app.delete(comments[i])
     }
     return e.next()
-}, "posts")
+}, &quot;posts&quot;)
 ```
 
 ### Rate limiting per user
 
 ```js
-routerAdd("POST", "/api/expensive-action", function(e) {
-    var recent = $app.countRecords("actions",
+routerAdd(&quot;POST&quot;, &quot;/api/expensive-action&quot;, function(e) {
+    var recent = $app.countRecords(&quot;actions&quot;,
         $dbx.hashExp({ user: e.auth.id }),
-        $dbx.exp("created &gt; {:cutoff}", { cutoff: new DateTime().sub(1 * 60) })  // last minute
+        $dbx.exp(&quot;created &gt; {:cutoff}&quot;, { cutoff: new DateTime().sub(1 * 60) })  // last minute
     )
     if (recent &gt;= 5) {
-        throw new TooManyRequestsError("Rate limit exceeded")
+        throw new TooManyRequestsError(&quot;Rate limit exceeded&quot;)
     }
     // proceed with action
     return e.json(200, { ok: true })
@@ -643,23 +693,54 @@ routerAdd("POST", "/api/expensive-action", function(e) {
 onRecordCreateAfterSuccessExecute(function(e) {
     try {
         $http.send({
-            url: "https://hooks.example.com/webhook",
-            method: "POST",
+            url: &quot;https://hooks.example.com/webhook&quot;,
+            method: &quot;POST&quot;,
             body: JSON.stringify({
-                event: "record.create",
+                event: &quot;record.create&quot;,
                 collection: e.record.collection().name,
                 record: e.record
             }),
-            headers: { "Content-Type": "application/json" },
+            headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
             timeout: 10
         })
     } catch (err) {
-        console.log("Webhook failed:", err)
+        console.log(&quot;Webhook failed:&quot;, err)
     }
 })
 ```
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>4</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

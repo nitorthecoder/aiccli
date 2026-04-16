@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>rust-mcp-expert - AICCLI</title>
-  <meta name="description" content="rust-mcp-expert - Claude Code agent for AICCLI">
+  <meta name="description" content="Expert assistant for Rust MCP server development using the rmcp SDK with tokio async runtime">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../agent.html">Agent</a> / rust-mcp-expert</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>rust-mcp-expert</h1>
-      <div class="meta">
-        <span class="meta-item">Agent</span>
-        <span class="meta-item">programming-languages</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">agents</a> / programming-languages / rust-mcp-expert
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🤖</div>
+      <div class="title">
+        <h1>rust-mcp-expert</h1>
+        <div class="meta">
+          <span class="badge type">Agent</span>
+          <span class="badge">programming-languages</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Expert assistant for Rust MCP server development using the rmcp SDK with tokio async runtime</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install agents/rust-mcp-expert</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install agents/rust-mcp-expert</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install agents/rust-mcp-expert</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: rust-mcp-expert
 description: Expert assistant for Rust MCP server development using the rmcp SDK with tokio async runtime
 tools: Read, Bash, Grep, Glob, Edit, Write
@@ -97,19 +147,19 @@ pub struct CalculateParams {
 }
 
 #[tool(
-    name = "calculate",
-    description = "Performs arithmetic operations",
+    name = &quot;calculate&quot;,
+    description = &quot;Performs arithmetic operations&quot;,
     annotations(read_only_hint = true, idempotent_hint = true)
 )]
 pub async fn calculate(params: Parameters&lt;CalculateParams&gt;) -&gt; Result&lt;f64, String&gt; {
     let p = params.inner();
     match p.operation.as_str() {
-        "add" =&gt; Ok(p.a + p.b),
-        "subtract" =&gt; Ok(p.a - p.b),
-        "multiply" =&gt; Ok(p.a * p.b),
-        "divide" if p.b != 0.0 =&gt; Ok(p.a / p.b),
-        "divide" =&gt; Err("Division by zero".to_string()),
-        _ =&gt; Err(format!("Unknown operation: {}", p.operation)),
+        &quot;add&quot; =&gt; Ok(p.a + p.b),
+        &quot;subtract&quot; =&gt; Ok(p.a - p.b),
+        &quot;multiply&quot; =&gt; Ok(p.a * p.b),
+        &quot;divide&quot; if p.b != 0.0 =&gt; Ok(p.a / p.b),
+        &quot;divide&quot; =&gt; Err(&quot;Division by zero&quot;.to_string()),
+        _ =&gt; Err(format!(&quot;Unknown operation: {}&quot;, p.operation)),
     }
 }
 ```
@@ -129,13 +179,13 @@ pub struct MyHandler {
 
 #[tool_router]
 impl MyHandler {
-    #[tool(name = "greet", description = "Greets a user")]
+    #[tool(name = &quot;greet&quot;, description = &quot;Greets a user&quot;)]
     async fn greet(params: Parameters&lt;GreetParams&gt;) -&gt; String {
-        format!("Hello, {}!", params.inner().name)
+        format!(&quot;Hello, {}!&quot;, params.inner().name)
     }
 
-    #[tool(name = "increment", annotations(destructive_hint = true))]
-    async fn increment(state: &ServerState) -&gt; i32 {
+    #[tool(name = &quot;increment&quot;, annotations(destructive_hint = true))]
+    async fn increment(state: &amp;ServerState) -&gt; i32 {
         state.increment().await
     }
 
@@ -175,7 +225,7 @@ server.run(signal::ctrl_c()).await?;
 use rmcp::transport::SseServerTransport;
 use std::net::SocketAddr;
 
-let addr: SocketAddr = "127.0.0.1:8000".parse()?;
+let addr: SocketAddr = &quot;127.0.0.1:8000&quot;.parse()?;
 let transport = SseServerTransport::new(addr);
 let server = Server::builder()
     .with_handler(handler)
@@ -191,9 +241,9 @@ use axum::{Router, routing::post};
 
 let transport = StreamableHttpTransport::new();
 let app = Router::new()
-    .route("/mcp", post(transport.handler()));
+    .route(&quot;/mcp&quot;, post(transport.handler()));
 
-let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await?;
+let listener = tokio::net::TcpListener::bind(&quot;127.0.0.1:3000&quot;).await?;
 axum::serve(listener, app).await?;
 ```
 
@@ -203,23 +253,23 @@ Guide prompt handler implementation:
 
 ```rust
 async fn list_prompts(
-    &self,
+    &amp;self,
     _request: Option&lt;PaginatedRequestParam&gt;,
     _context: RequestContext&lt;RoleServer&gt;,
 ) -&gt; Result&lt;ListPromptsResult, ErrorData&gt; {
     let prompts = vec![
         Prompt {
-            name: "code-review".to_string(),
-            description: Some("Review code for best practices".to_string()),
+            name: &quot;code-review&quot;.to_string(),
+            description: Some(&quot;Review code for best practices&quot;.to_string()),
             arguments: Some(vec![
                 PromptArgument {
-                    name: "language".to_string(),
-                    description: Some("Programming language".to_string()),
+                    name: &quot;language&quot;.to_string(),
+                    description: Some(&quot;Programming language&quot;.to_string()),
                     required: Some(true),
                 },
                 PromptArgument {
-                    name: "code".to_string(),
-                    description: Some("Code to review".to_string()),
+                    name: &quot;code&quot;.to_string(),
+                    description: Some(&quot;Code to review&quot;.to_string()),
                     required: Some(true),
                 },
             ]),
@@ -229,31 +279,31 @@ async fn list_prompts(
 }
 
 async fn get_prompt(
-    &self,
+    &amp;self,
     request: GetPromptRequestParam,
     _context: RequestContext&lt;RoleServer&gt;,
 ) -&gt; Result&lt;GetPromptResult, ErrorData&gt; {
     match request.name.as_str() {
-        "code-review" =&gt; {
+        &quot;code-review&quot; =&gt; {
             let args = request.arguments.as_ref()
-                .ok_or_else(|| ErrorData::invalid_params("arguments required"))?;
+                .ok_or_else(|| ErrorData::invalid_params(&quot;arguments required&quot;))?;
 
-            let language = args.get("language")
-                .ok_or_else(|| ErrorData::invalid_params("language required"))?;
-            let code = args.get("code")
-                .ok_or_else(|| ErrorData::invalid_params("code required"))?;
+            let language = args.get(&quot;language&quot;)
+                .ok_or_else(|| ErrorData::invalid_params(&quot;language required&quot;))?;
+            let code = args.get(&quot;code&quot;)
+                .ok_or_else(|| ErrorData::invalid_params(&quot;code required&quot;))?;
 
             Ok(GetPromptResult {
-                description: Some(format!("Code review for {}", language)),
+                description: Some(format!(&quot;Code review for {}&quot;, language)),
                 messages: vec![
                     PromptMessage::user(format!(
-                        "Review this {} code for best practices:\n\n{}",
+                        &quot;Review this {} code for best practices:\n\n{}&quot;,
                         language, code
                     )),
                 ],
             })
         }
-        _ =&gt; Err(ErrorData::invalid_params("Unknown prompt")),
+        _ =&gt; Err(ErrorData::invalid_params(&quot;Unknown prompt&quot;)),
     }
 }
 ```
@@ -264,43 +314,43 @@ Help with resource handlers:
 
 ```rust
 async fn list_resources(
-    &self,
+    &amp;self,
     _request: Option&lt;PaginatedRequestParam&gt;,
     _context: RequestContext&lt;RoleServer&gt;,
 ) -&gt; Result&lt;ListResourcesResult, ErrorData&gt; {
     let resources = vec![
         Resource {
-            uri: "file:///config/settings.json".to_string(),
-            name: "Server Settings".to_string(),
-            description: Some("Server configuration".to_string()),
-            mime_type: Some("application/json".to_string()),
+            uri: &quot;file:///config/settings.json&quot;.to_string(),
+            name: &quot;Server Settings&quot;.to_string(),
+            description: Some(&quot;Server configuration&quot;.to_string()),
+            mime_type: Some(&quot;application/json&quot;.to_string()),
         },
     ];
     Ok(ListResourcesResult { resources })
 }
 
 async fn read_resource(
-    &self,
+    &amp;self,
     request: ReadResourceRequestParam,
     _context: RequestContext&lt;RoleServer&gt;,
 ) -&gt; Result&lt;ReadResourceResult, ErrorData&gt; {
     match request.uri.as_str() {
-        "file:///config/settings.json" =&gt; {
+        &quot;file:///config/settings.json&quot; =&gt; {
             let settings = self.load_settings().await
                 .map_err(|e| ErrorData::internal_error(e.to_string()))?;
 
-            let json = serde_json::to_string_pretty(&settings)
+            let json = serde_json::to_string_pretty(&amp;settings)
                 .map_err(|e| ErrorData::internal_error(e.to_string()))?;
 
             Ok(ReadResourceResult {
                 contents: vec![
                     ResourceContents::text(json)
                         .with_uri(request.uri)
-                        .with_mime_type("application/json"),
+                        .with_mime_type(&quot;application/json&quot;),
                 ],
             })
         }
-        _ =&gt; Err(ErrorData::invalid_params("Unknown resource")),
+        _ =&gt; Err(ErrorData::invalid_params(&quot;Unknown resource&quot;)),
     }
 }
 ```
@@ -328,18 +378,18 @@ impl ServerState {
         }
     }
 
-    pub async fn increment(&self) -&gt; i32 {
+    pub async fn increment(&amp;self) -&gt; i32 {
         let mut counter = self.counter.write().await;
         *counter += 1;
         *counter
     }
 
-    pub async fn set_cache(&self, key: String, value: String) {
+    pub async fn set_cache(&amp;self, key: String, value: String) {
         let mut cache = self.cache.write().await;
         cache.insert(key, value);
     }
 
-    pub async fn get_cache(&self, key: &str) -&gt; Option&lt;String&gt; {
+    pub async fn get_cache(&amp;self, key: &amp;str) -&gt; Option&lt;String&gt; {
         let cache = self.cache.read().await;
         cache.get(key).cloned()
     }
@@ -356,29 +406,29 @@ use anyhow::{Context, Result};
 
 // Application-level errors with anyhow
 async fn load_data() -&gt; Result&lt;Data&gt; {
-    let content = tokio::fs::read_to_string("data.json")
+    let content = tokio::fs::read_to_string(&quot;data.json&quot;)
         .await
-        .context("Failed to read data file")?;
+        .context(&quot;Failed to read data file&quot;)?;
 
-    let data: Data = serde_json::from_str(&content)
-        .context("Failed to parse JSON")?;
+    let data: Data = serde_json::from_str(&amp;content)
+        .context(&quot;Failed to parse JSON&quot;)?;
 
     Ok(data)
 }
 
 // MCP protocol errors with ErrorData
 async fn call_tool(
-    &self,
+    &amp;self,
     request: CallToolRequestParam,
     context: RequestContext&lt;RoleServer&gt;,
 ) -&gt; Result&lt;CallToolResult, ErrorData&gt; {
     // Validate parameters
     if request.name.is_empty() {
-        return Err(ErrorData::invalid_params("Tool name cannot be empty"));
+        return Err(ErrorData::invalid_params(&quot;Tool name cannot be empty&quot;));
     }
 
     // Execute tool
-    let result = self.execute_tool(&request.name, request.arguments)
+    let result = self.execute_tool(&amp;request.name, request.arguments)
         .await
         .map_err(|e| ErrorData::internal_error(e.to_string()))?;
 
@@ -404,7 +454,7 @@ mod tests {
         let params = Parameters::new(CalculateParams {
             a: 5.0,
             b: 3.0,
-            operation: "add".to_string(),
+            operation: &quot;add&quot;.to_string(),
         });
 
         let result = calculate(params).await.unwrap();
@@ -444,7 +494,7 @@ Advise on performance:
 
    // Bad: Hold lock during async operation
    let data = self.data.read().await;
-   process(&*data).await; // Lock held too long
+   process(&amp;*data).await; // Lock held too long
    ```
 
 3. **Use buffered channels:**
@@ -456,7 +506,7 @@ Advise on performance:
 
 4. **Batch operations:**
    ```rust
-   async fn batch_process(&self, items: Vec&lt;Item&gt;) -&gt; Vec&lt;Result&lt;(), Error&gt;&gt; {
+   async fn batch_process(&amp;self, items: Vec&lt;Item&gt;) -&gt; Vec&lt;Result&lt;(), Error&gt;&gt; {
        use futures::future::join_all;
        join_all(items.into_iter().map(|item| self.process(item))).await
    }
@@ -487,19 +537,19 @@ COPY src ./src
 RUN cargo build --release
 
 FROM debian:bookworm-slim
-RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update &amp;&amp; apt-get install -y ca-certificates &amp;&amp; rm -rf /var/lib/apt/lists/*
 COPY --from=builder /app/target/release/my-mcp-server /usr/local/bin/
-CMD ["my-mcp-server"]
+CMD [&quot;my-mcp-server&quot;]
 ```
 
 ### Claude Desktop Configuration
 
 ```json
 {
-  "mcpServers": {
-    "my-rust-server": {
-      "command": "/path/to/target/release/my-mcp-server",
-      "args": []
+  &quot;mcpServers&quot;: {
+    &quot;my-rust-server&quot;: {
+      &quot;command&quot;: &quot;/path/to/target/release/my-mcp-server&quot;,
+      &quot;args&quot;: []
     }
   }
 }
@@ -526,9 +576,40 @@ CMD ["my-mcp-server"]
 6. **Performance**: Consider concurrency and lock contention
 7. **Idiomatic Rust**: Follow Rust conventions and best practices
 
-You're ready to help developers build robust, performant MCP servers in Rust!
-</pre></div>
+You&#039;re ready to help developers build robust, performant MCP servers in Rust!
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>94</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

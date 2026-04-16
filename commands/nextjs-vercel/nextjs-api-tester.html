@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>nextjs-api-tester - AICCLI</title>
-  <meta name="description" content="nextjs-api-tester - Claude Code command for AICCLI">
+  <meta name="description" content="Test and validate Next.js API routes with comprehensive test scenarios">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../command.html">Command</a> / nextjs-api-tester</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>nextjs-api-tester</h1>
-      <div class="meta">
-        <span class="meta-item">Command</span>
-        <span class="meta-item">nextjs-vercel</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">commands</a> / nextjs-vercel / nextjs-api-tester
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⌨️</div>
+      <div class="title">
+        <h1>nextjs-api-tester</h1>
+        <div class="meta">
+          <span class="badge type">Command</span>
+          <span class="badge">nextjs-vercel</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Test and validate Next.js API routes with comprehensive test scenarios</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/nextjs-api-tester</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install commands/nextjs-api-tester</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install commands/nextjs-api-tester</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 allowed-tools: Read, Write, Edit, Bash
-argument-hint: [route-path] [--method=GET] [--data='{}'] [--headers='{}']
+argument-hint: [route-path] [--method=GET] [--data=&#039;{}&#039;] [--headers=&#039;{}&#039;]
 description: Test and validate Next.js API routes with comprehensive test scenarios
 ---
 
@@ -74,7 +124,7 @@ description: Test and validate Next.js API routes with comprehensive test scenar
 - Environment variables: @.env.local
 
 ### Project Context
-- Next.js version: !`grep '"next"' package.json | head -1`
+- Next.js version: !`grep &#039;&quot;next&quot;&#039; package.json | head -1`
 - TypeScript config: @tsconfig.json (if exists)
 - Testing framework: @jest.config.js or @vitest.config.js (if exists)
 
@@ -99,27 +149,27 @@ Based on the provided route path, analyze:
 ### 1. Basic Functionality Tests
 ```javascript
 // Basic API route test template
-describe('API Route: /api/[route-path]', () =&gt; {
-  describe('GET requests', () =&gt; {
-    test('should return 200 for valid request', async () =&gt; {
-      const response = await fetch('/api/[route-path]');
+describe(&#039;API Route: /api/[route-path]&#039;, () =&gt; {
+  describe(&#039;GET requests&#039;, () =&gt; {
+    test(&#039;should return 200 for valid request&#039;, async () =&gt; {
+      const response = await fetch(&#039;/api/[route-path]&#039;);
       expect(response.status).toBe(200);
     });
 
-    test('should return valid JSON response', async () =&gt; {
-      const response = await fetch('/api/[route-path]');
+    test(&#039;should return valid JSON response&#039;, async () =&gt; {
+      const response = await fetch(&#039;/api/[route-path]&#039;);
       const data = await response.json();
       expect(data).toBeDefined();
-      expect(typeof data).toBe('object');
+      expect(typeof data).toBe(&#039;object&#039;);
     });
   });
 
-  describe('POST requests', () =&gt; {
-    test('should create resource with valid data', async () =&gt; {
-      const testData = { name: 'Test', email: 'test@example.com' };
-      const response = await fetch('/api/[route-path]', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+  describe(&#039;POST requests&#039;, () =&gt; {
+    test(&#039;should create resource with valid data&#039;, async () =&gt; {
+      const testData = { name: &#039;Test&#039;, email: &#039;test@example.com&#039; };
+      const response = await fetch(&#039;/api/[route-path]&#039;, {
+        method: &#039;POST&#039;,
+        headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
         body: JSON.stringify(testData)
       });
       
@@ -128,11 +178,11 @@ describe('API Route: /api/[route-path]', () =&gt; {
       expect(result.name).toBe(testData.name);
     });
 
-    test('should reject invalid data', async () =&gt; {
-      const invalidData = { invalid: 'field' };
-      const response = await fetch('/api/[route-path]', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+    test(&#039;should reject invalid data&#039;, async () =&gt; {
+      const invalidData = { invalid: &#039;field&#039; };
+      const response = await fetch(&#039;/api/[route-path]&#039;, {
+        method: &#039;POST&#039;,
+        headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
         body: JSON.stringify(invalidData)
       });
       
@@ -144,24 +194,24 @@ describe('API Route: /api/[route-path]', () =&gt; {
 
 ### 2. Authentication Tests
 ```javascript
-describe('Authentication', () =&gt; {
-  test('should require authentication for protected routes', async () =&gt; {
-    const response = await fetch('/api/protected-route');
+describe(&#039;Authentication&#039;, () =&gt; {
+  test(&#039;should require authentication for protected routes&#039;, async () =&gt; {
+    const response = await fetch(&#039;/api/protected-route&#039;);
     expect(response.status).toBe(401);
   });
 
-  test('should allow authenticated requests', async () =&gt; {
-    const token = 'valid-jwt-token';
-    const response = await fetch('/api/protected-route', {
-      headers: { 'Authorization': `Bearer ${token}` }
+  test(&#039;should allow authenticated requests&#039;, async () =&gt; {
+    const token = &#039;valid-jwt-token&#039;;
+    const response = await fetch(&#039;/api/protected-route&#039;, {
+      headers: { &#039;Authorization&#039;: `Bearer ${token}` }
     });
     expect(response.status).not.toBe(401);
   });
 
-  test('should validate JWT token format', async () =&gt; {
-    const invalidToken = 'invalid-token';
-    const response = await fetch('/api/protected-route', {
-      headers: { 'Authorization': `Bearer ${invalidToken}` }
+  test(&#039;should validate JWT token format&#039;, async () =&gt; {
+    const invalidToken = &#039;invalid-token&#039;;
+    const response = await fetch(&#039;/api/protected-route&#039;, {
+      headers: { &#039;Authorization&#039;: `Bearer ${invalidToken}` }
     });
     expect(response.status).toBe(403);
   });
@@ -170,12 +220,12 @@ describe('Authentication', () =&gt; {
 
 ### 3. Input Validation Tests
 ```javascript
-describe('Input Validation', () =&gt; {
+describe(&#039;Input Validation&#039;, () =&gt; {
   const validationTests = [
-    { field: 'email', invalid: 'not-an-email', valid: 'test@example.com' },
-    { field: 'phone', invalid: '123', valid: '+1234567890' },
-    { field: 'age', invalid: -1, valid: 25 },
-    { field: 'name', invalid: '', valid: 'John Doe' }
+    { field: &#039;email&#039;, invalid: &#039;not-an-email&#039;, valid: &#039;test@example.com&#039; },
+    { field: &#039;phone&#039;, invalid: &#039;123&#039;, valid: &#039;+1234567890&#039; },
+    { field: &#039;age&#039;, invalid: -1, valid: 25 },
+    { field: &#039;name&#039;, invalid: &#039;&#039;, valid: &#039;John Doe&#039; }
   ];
 
   validationTests.forEach(({ field, invalid, valid }) =&gt; {
@@ -184,17 +234,17 @@ describe('Input Validation', () =&gt; {
       const validData = { [field]: valid };
 
       // Test invalid data
-      const invalidResponse = await fetch('/api/[route-path]', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const invalidResponse = await fetch(&#039;/api/[route-path]&#039;, {
+        method: &#039;POST&#039;,
+        headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
         body: JSON.stringify(invalidData)
       });
       expect(invalidResponse.status).toBe(400);
 
       // Test valid data
-      const validResponse = await fetch('/api/[route-path]', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const validResponse = await fetch(&#039;/api/[route-path]&#039;, {
+        method: &#039;POST&#039;,
+        headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
         body: JSON.stringify(validData)
       });
       expect(validResponse.status).not.toBe(400);
@@ -205,36 +255,36 @@ describe('Input Validation', () =&gt; {
 
 ### 4. Error Handling Tests
 ```javascript
-describe('Error Handling', () =&gt; {
-  test('should handle malformed JSON', async () =&gt; {
-    const response = await fetch('/api/[route-path]', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: 'invalid-json'
+describe(&#039;Error Handling&#039;, () =&gt; {
+  test(&#039;should handle malformed JSON&#039;, async () =&gt; {
+    const response = await fetch(&#039;/api/[route-path]&#039;, {
+      method: &#039;POST&#039;,
+      headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
+      body: &#039;invalid-json&#039;
     });
     expect(response.status).toBe(400);
   });
 
-  test('should handle missing Content-Type header', async () =&gt; {
-    const response = await fetch('/api/[route-path]', {
-      method: 'POST',
-      body: JSON.stringify({ test: 'data' })
+  test(&#039;should handle missing Content-Type header&#039;, async () =&gt; {
+    const response = await fetch(&#039;/api/[route-path]&#039;, {
+      method: &#039;POST&#039;,
+      body: JSON.stringify({ test: &#039;data&#039; })
     });
     expect(response.status).toBe(400);
   });
 
-  test('should handle request timeout', async () =&gt; {
+  test(&#039;should handle request timeout&#039;, async () =&gt; {
     // Mock slow endpoint
     jest.setTimeout(5000);
-    const response = await fetch('/api/slow-endpoint');
+    const response = await fetch(&#039;/api/slow-endpoint&#039;);
     // Test appropriate timeout handling
   }, 5000);
 
-  test('should handle database connection errors', async () =&gt; {
+  test(&#039;should handle database connection errors&#039;, async () =&gt; {
     // Mock database failure
-    const mockDbError = jest.spyOn(db, 'connect').mockRejectedValue(new Error('DB Error'));
+    const mockDbError = jest.spyOn(db, &#039;connect&#039;).mockRejectedValue(new Error(&#039;DB Error&#039;));
     
-    const response = await fetch('/api/[route-path]');
+    const response = await fetch(&#039;/api/[route-path]&#039;);
     expect(response.status).toBe(500);
     
     mockDbError.mockRestore();
@@ -244,19 +294,19 @@ describe('Error Handling', () =&gt; {
 
 ### 5. Performance Tests
 ```javascript
-describe('Performance', () =&gt; {
-  test('should respond within acceptable time', async () =&gt; {
+describe(&#039;Performance&#039;, () =&gt; {
+  test(&#039;should respond within acceptable time&#039;, async () =&gt; {
     const startTime = Date.now();
-    const response = await fetch('/api/[route-path]');
+    const response = await fetch(&#039;/api/[route-path]&#039;);
     const endTime = Date.now();
     
     expect(response.status).toBe(200);
     expect(endTime - startTime).toBeLessThan(1000); // 1 second
   });
 
-  test('should handle concurrent requests', async () =&gt; {
+  test(&#039;should handle concurrent requests&#039;, async () =&gt; {
     const promises = Array.from({ length: 10 }, () =&gt;
-      fetch('/api/[route-path]')
+      fetch(&#039;/api/[route-path]&#039;)
     );
     
     const responses = await Promise.all(promises);
@@ -265,9 +315,9 @@ describe('Performance', () =&gt; {
     });
   });
 
-  test('should implement rate limiting', async () =&gt; {
+  test(&#039;should implement rate limiting&#039;, async () =&gt; {
     const requests = Array.from({ length: 100 }, () =&gt;
-      fetch('/api/[route-path]')
+      fetch(&#039;/api/[route-path]&#039;)
     );
     
     const responses = await Promise.all(requests);
@@ -282,24 +332,24 @@ describe('Performance', () =&gt; {
 ### cURL Commands Generation
 ```bash
 # GET request
-curl -X GET "http://localhost:3000/api/[route-path]" \
-  -H "Accept: application/json"
+curl -X GET &quot;http://localhost:3000/api/[route-path]&quot; \
+  -H &quot;Accept: application/json&quot;
 
 # POST request with data
-curl -X POST "http://localhost:3000/api/[route-path]" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{"key": "value"}'
+curl -X POST &quot;http://localhost:3000/api/[route-path]&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -H &quot;Accept: application/json&quot; \
+  -d &#039;{&quot;key&quot;: &quot;value&quot;}&#039;
 
 # Authenticated request
-curl -X GET "http://localhost:3000/api/protected-route" \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
-  -H "Accept: application/json"
+curl -X GET &quot;http://localhost:3000/api/protected-route&quot; \
+  -H &quot;Authorization: Bearer YOUR_TOKEN_HERE&quot; \
+  -H &quot;Accept: application/json&quot;
 
 # Upload file
-curl -X POST "http://localhost:3000/api/upload" \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
-  -F "file=@path/to/file.jpg"
+curl -X POST &quot;http://localhost:3000/api/upload&quot; \
+  -H &quot;Authorization: Bearer YOUR_TOKEN_HERE&quot; \
+  -F &quot;file=@path/to/file.jpg&quot;
 ```
 
 ### HTTPie Commands
@@ -311,7 +361,7 @@ http GET localhost:3000/api/[route-path]
 http POST localhost:3000/api/[route-path] key=value
 
 # Authenticated request
-http GET localhost:3000/api/protected-route Authorization:"Bearer TOKEN"
+http GET localhost:3000/api/protected-route Authorization:&quot;Bearer TOKEN&quot;
 
 # Custom headers
 http GET localhost:3000/api/[route-path] X-Custom-Header:value
@@ -322,41 +372,41 @@ http GET localhost:3000/api/[route-path] X-Custom-Header:value
 ### Postman Collection Generation
 ```json
 {
-  "info": {
-    "name": "Next.js API Tests",
-    "description": "Generated API tests for [route-path]"
+  &quot;info&quot;: {
+    &quot;name&quot;: &quot;Next.js API Tests&quot;,
+    &quot;description&quot;: &quot;Generated API tests for [route-path]&quot;
   },
-  "item": [
+  &quot;item&quot;: [
     {
-      "name": "GET [route-path]",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/[route-path]",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "[route-path]"]
+      &quot;name&quot;: &quot;GET [route-path]&quot;,
+      &quot;request&quot;: {
+        &quot;method&quot;: &quot;GET&quot;,
+        &quot;header&quot;: [],
+        &quot;url&quot;: {
+          &quot;raw&quot;: &quot;{{baseUrl}}/api/[route-path]&quot;,
+          &quot;host&quot;: [&quot;{{baseUrl}}&quot;],
+          &quot;path&quot;: [&quot;api&quot;, &quot;[route-path]&quot;]
         }
       }
     },
     {
-      "name": "POST [route-path]",
-      "request": {
-        "method": "POST",
-        "header": [
+      &quot;name&quot;: &quot;POST [route-path]&quot;,
+      &quot;request&quot;: {
+        &quot;method&quot;: &quot;POST&quot;,
+        &quot;header&quot;: [
           {
-            "key": "Content-Type",
-            "value": "application/json"
+            &quot;key&quot;: &quot;Content-Type&quot;,
+            &quot;value&quot;: &quot;application/json&quot;
           }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"key\": \"value\"\n}"
+        &quot;body&quot;: {
+          &quot;mode&quot;: &quot;raw&quot;,
+          &quot;raw&quot;: &quot;{\n  \&quot;key\&quot;: \&quot;value\&quot;\n}&quot;
         },
-        "url": {
-          "raw": "{{baseUrl}}/api/[route-path]",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "[route-path]"]
+        &quot;url&quot;: {
+          &quot;raw&quot;: &quot;{{baseUrl}}/api/[route-path]&quot;,
+          &quot;host&quot;: [&quot;{{baseUrl}}&quot;],
+          &quot;path&quot;: [&quot;api&quot;, &quot;[route-path]&quot;]
         }
       }
     }
@@ -367,20 +417,20 @@ http GET localhost:3000/api/[route-path] X-Custom-Header:value
 ### Thunder Client Collection
 ```json
 {
-  "client": "Thunder Client",
-  "collectionName": "Next.js API Tests",
-  "dateExported": "2024-01-01",
-  "version": "1.1",
-  "folders": [],
-  "requests": [
+  &quot;client&quot;: &quot;Thunder Client&quot;,
+  &quot;collectionName&quot;: &quot;Next.js API Tests&quot;,
+  &quot;dateExported&quot;: &quot;2024-01-01&quot;,
+  &quot;version&quot;: &quot;1.1&quot;,
+  &quot;folders&quot;: [],
+  &quot;requests&quot;: [
     {
-      "name": "Test API Route",
-      "url": "localhost:3000/api/[route-path]",
-      "method": "GET",
-      "headers": [
+      &quot;name&quot;: &quot;Test API Route&quot;,
+      &quot;url&quot;: &quot;localhost:3000/api/[route-path]&quot;,
+      &quot;method&quot;: &quot;GET&quot;,
+      &quot;headers&quot;: [
         {
-          "name": "Accept",
-          "value": "application/json"
+          &quot;name&quot;: &quot;Accept&quot;,
+          &quot;value&quot;: &quot;application/json&quot;
         }
       ]
     }
@@ -394,23 +444,23 @@ http GET localhost:3000/api/[route-path] X-Custom-Header:value
 ```typescript
 // test/fixtures/apiTestData.ts
 export const validUserData = {
-  name: 'John Doe',
-  email: 'john@example.com',
+  name: &#039;John Doe&#039;,
+  email: &#039;john@example.com&#039;,
   age: 30,
-  role: 'user'
+  role: &#039;user&#039;
 };
 
 export const invalidUserData = {
-  name: '',
-  email: 'invalid-email',
+  name: &#039;&#039;,
+  email: &#039;invalid-email&#039;,
   age: -1,
-  role: 'invalid-role'
+  role: &#039;invalid-role&#039;
 };
 
 export const testHeaders = {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json',
-  'User-Agent': 'API-Test-Suite/1.0'
+  &#039;Content-Type&#039;: &#039;application/json&#039;,
+  &#039;Accept&#039;: &#039;application/json&#039;,
+  &#039;User-Agent&#039;: &#039;API-Test-Suite/1.0&#039;
 };
 ```
 
@@ -437,13 +487,13 @@ export function generateBulkTestData(count: number) {
 ```javascript
 // jest.config.js for API testing
 module.exports = {
-  testEnvironment: 'node',
-  setupFilesAfterEnv: ['&lt;rootDir&gt;/test/setup.js'],
-  testMatch: ['**/__tests__/**/*.test.js', '**/?(*.)+(spec|test).js'],
+  testEnvironment: &#039;node&#039;,
+  setupFilesAfterEnv: [&#039;&lt;rootDir&gt;/test/setup.js&#039;],
+  testMatch: [&#039;**/__tests__/**/*.test.js&#039;, &#039;**/?(*.)+(spec|test).js&#039;],
   collectCoverageFrom: [
-    'pages/api/**/*.{js,ts}',
-    'app/api/**/*.{js,ts}',
-    '!**/*.d.ts',
+    &#039;pages/api/**/*.{js,ts}&#039;,
+    &#039;app/api/**/*.{js,ts}&#039;,
+    &#039;!**/*.d.ts&#039;,
   ],
   coverageThreshold: {
     global: {
@@ -459,8 +509,8 @@ module.exports = {
 ### Test Setup
 ```javascript
 // test/setup.js
-import { createMocks } from 'node-mocks-http';
-import { testDb } from './testDatabase';
+import { createMocks } from &#039;node-mocks-http&#039;;
+import { testDb } from &#039;./testDatabase&#039;;
 
 // Global test setup
 beforeAll(async () =&gt; {
@@ -505,7 +555,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: &#039;18&#039;
       - run: npm ci
       - run: npm run test:api
       - name: Upload coverage
@@ -521,7 +571,7 @@ npm run test:api -- --watch
 npm run test:api -- --coverage
 
 # Specific route testing
-npm run test:api -- --testNamePattern="api/users"
+npm run test:api -- --testNamePattern=&quot;api/users&quot;
 ```
 
 ## Test Results Analysis
@@ -533,8 +583,39 @@ Generate comprehensive test report including:
 4. **Error Handling**: Exception scenarios and error responses
 5. **Compatibility**: Cross-environment testing results
 
-Provide actionable recommendations for improving API reliability, performance, and security.</pre></div>
+Provide actionable recommendations for improving API reliability, performance, and security.</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>336</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

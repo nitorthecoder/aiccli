@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>systematic-debugging - AICCLI</title>
-  <meta name="description" content="systematic-debugging - Claude Code skill for AICCLI">
+  <meta name="description" content="Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / systematic-debugging</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>systematic-debugging</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / systematic-debugging
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>systematic-debugging</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/systematic-debugging</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/systematic-debugging</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/systematic-debugging</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: systematic-debugging
 description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes
 ---
@@ -76,7 +126,7 @@ Random fixes waste time and create new bugs. Quick patches mask underlying issue
 NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 ```
 
-If you haven't completed Phase 1, you cannot propose fixes.
+If you haven&#039;t completed Phase 1, you cannot propose fixes.
 
 ## When to Use
 
@@ -90,14 +140,14 @@ Use for ANY technical issue:
 
 **Use this ESPECIALLY when:**
 - Under time pressure (emergencies make guessing tempting)
-- "Just one quick fix" seems obvious
-- You've already tried multiple fixes
-- Previous fix didn't work
-- You don't fully understand the issue
+- &quot;Just one quick fix&quot; seems obvious
+- You&#039;ve already tried multiple fixes
+- Previous fix didn&#039;t work
+- You don&#039;t fully understand the issue
 
-**Don't skip when:**
+**Don&#039;t skip when:**
 - Issue seems simple (simple bugs have root causes too)
-- You're in a hurry (rushing guarantees rework)
+- You&#039;re in a hurry (rushing guarantees rework)
 - Manager wants it fixed NOW (systematic is faster than thrashing)
 
 ## The Four Phases
@@ -109,7 +159,7 @@ You MUST complete each phase before proceeding to the next.
 **BEFORE attempting ANY fix:**
 
 1. **Read Error Messages Carefully**
-   - Don't skip past errors or warnings
+   - Don&#039;t skip past errors or warnings
    - They often contain the exact solution
    - Read stack traces completely
    - Note line numbers, file paths, error codes
@@ -118,7 +168,7 @@ You MUST complete each phase before proceeding to the next.
    - Can you trigger it reliably?
    - What are the exact steps?
    - Does it happen every time?
-   - If not reproducible → gather more data, don't guess
+   - If not reproducible → gather more data, don&#039;t guess
 
 3. **Check Recent Changes**
    - What changed that could cause this?
@@ -146,20 +196,20 @@ You MUST complete each phase before proceeding to the next.
    **Example (multi-layer system):**
    ```bash
    # Layer 1: Workflow
-   echo "=== Secrets available in workflow: ==="
-   echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}"
+   echo &quot;=== Secrets available in workflow: ===&quot;
+   echo &quot;IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}&quot;
 
    # Layer 2: Build script
-   echo "=== Env vars in build script: ==="
-   env | grep IDENTITY || echo "IDENTITY not in environment"
+   echo &quot;=== Env vars in build script: ===&quot;
+   env | grep IDENTITY || echo &quot;IDENTITY not in environment&quot;
 
    # Layer 3: Signing script
-   echo "=== Keychain state: ==="
+   echo &quot;=== Keychain state: ===&quot;
    security list-keychains
    security find-identity -v
 
    # Layer 4: Actual signing
-   codesign --sign "$IDENTITY" --verbose=4 "$APP"
+   codesign --sign &quot;$IDENTITY&quot; --verbose=4 &quot;$APP&quot;
    ```
 
    **This reveals:** Which layer fails (secrets → workflow ✓, workflow → build ✗)
@@ -182,17 +232,17 @@ You MUST complete each phase before proceeding to the next.
 
 1. **Find Working Examples**
    - Locate similar working code in same codebase
-   - What works that's similar to what's broken?
+   - What works that&#039;s similar to what&#039;s broken?
 
 2. **Compare Against References**
    - If implementing pattern, read reference implementation COMPLETELY
-   - Don't skim - read every line
+   - Don&#039;t skim - read every line
    - Understand the pattern fully before applying
 
 3. **Identify Differences**
-   - What's different between working and broken?
+   - What&#039;s different between working and broken?
    - List every difference, however small
-   - Don't assume "that can't matter"
+   - Don&#039;t assume &quot;that can&#039;t matter&quot;
 
 4. **Understand Dependencies**
    - What other components does this need?
@@ -204,23 +254,23 @@ You MUST complete each phase before proceeding to the next.
 **Scientific method:**
 
 1. **Form Single Hypothesis**
-   - State clearly: "I think X is the root cause because Y"
+   - State clearly: &quot;I think X is the root cause because Y&quot;
    - Write it down
    - Be specific, not vague
 
 2. **Test Minimally**
    - Make the SMALLEST possible change to test hypothesis
    - One variable at a time
-   - Don't fix multiple things at once
+   - Don&#039;t fix multiple things at once
 
 3. **Verify Before Continuing**
    - Did it work? Yes → Phase 4
-   - Didn't work? Form NEW hypothesis
-   - DON'T add more fixes on top
+   - Didn&#039;t work? Form NEW hypothesis
+   - DON&#039;T add more fixes on top
 
-4. **When You Don't Know**
-   - Say "I don't understand X"
-   - Don't pretend to know
+4. **When You Don&#039;t Know**
+   - Say &quot;I don&#039;t understand X&quot;
+   - Don&#039;t pretend to know
    - Ask for help
    - Research more
 
@@ -238,7 +288,7 @@ You MUST complete each phase before proceeding to the next.
 2. **Implement Single Fix**
    - Address the root cause identified
    - ONE change at a time
-   - No "while I'm here" improvements
+   - No &quot;while I&#039;m here&quot; improvements
    - No bundled refactoring
 
 3. **Verify Fix**
@@ -246,23 +296,23 @@ You MUST complete each phase before proceeding to the next.
    - No other tests broken?
    - Issue actually resolved?
 
-4. **If Fix Doesn't Work**
+4. **If Fix Doesn&#039;t Work**
    - STOP
    - Count: How many fixes have you tried?
    - If &lt; 3: Return to Phase 1, re-analyze with new information
    - **If ≥ 3: STOP and question the architecture (step 5 below)**
-   - DON'T attempt Fix #4 without architectural discussion
+   - DON&#039;T attempt Fix #4 without architectural discussion
 
 5. **If 3+ Fixes Failed: Question Architecture**
 
    **Pattern indicating architectural problem:**
    - Each fix reveals new shared state/coupling/problem in different place
-   - Fixes require "massive refactoring" to implement
+   - Fixes require &quot;massive refactoring&quot; to implement
    - Each fix creates new symptoms elsewhere
 
    **STOP and question fundamentals:**
    - Is this pattern fundamentally sound?
-   - Are we "sticking with it through sheer inertia"?
+   - Are we &quot;sticking with it through sheer inertia&quot;?
    - Should we refactor architecture vs. continue fixing symptoms?
 
    **Discuss with your human partner before attempting more fixes**
@@ -272,30 +322,30 @@ You MUST complete each phase before proceeding to the next.
 ## Red Flags - STOP and Follow Process
 
 If you catch yourself thinking:
-- "Quick fix for now, investigate later"
-- "Just try changing X and see if it works"
-- "Add multiple changes, run tests"
-- "Skip the test, I'll manually verify"
-- "It's probably X, let me fix that"
-- "I don't fully understand but this might work"
-- "Pattern says X but I'll adapt it differently"
-- "Here are the main problems: [lists fixes without investigation]"
+- &quot;Quick fix for now, investigate later&quot;
+- &quot;Just try changing X and see if it works&quot;
+- &quot;Add multiple changes, run tests&quot;
+- &quot;Skip the test, I&#039;ll manually verify&quot;
+- &quot;It&#039;s probably X, let me fix that&quot;
+- &quot;I don&#039;t fully understand but this might work&quot;
+- &quot;Pattern says X but I&#039;ll adapt it differently&quot;
+- &quot;Here are the main problems: [lists fixes without investigation]&quot;
 - Proposing solutions before tracing data flow
-- **"One more fix attempt" (when already tried 2+)**
+- **&quot;One more fix attempt&quot; (when already tried 2+)**
 - **Each fix reveals new problem in different place**
 
 **ALL of these mean: STOP. Return to Phase 1.**
 
 **If 3+ fixes failed:** Question the architecture (see Phase 4.5)
 
-## your human partner's Signals You're Doing It Wrong
+## your human partner&#039;s Signals You&#039;re Doing It Wrong
 
 **Watch for these redirections:**
-- "Is that not happening?" - You assumed without verifying
-- "Will it show us...?" - You should have added evidence gathering
-- "Stop guessing" - You're proposing fixes without understanding
-- "Ultrathink this" - Question fundamentals, not just symptoms
-- "We're stuck?" (frustrated) - Your approach isn't working
+- &quot;Is that not happening?&quot; - You assumed without verifying
+- &quot;Will it show us...?&quot; - You should have added evidence gathering
+- &quot;Stop guessing&quot; - You&#039;re proposing fixes without understanding
+- &quot;Ultrathink this&quot; - Question fundamentals, not just symptoms
+- &quot;We&#039;re stuck?&quot; (frustrated) - Your approach isn&#039;t working
 
 **When you see these:** STOP. Return to Phase 1.
 
@@ -303,14 +353,14 @@ If you catch yourself thinking:
 
 | Excuse | Reality |
 |--------|---------|
-| "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast for simple bugs. |
-| "Emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. |
-| "Just try this first, then investigate" | First fix sets the pattern. Do it right from the start. |
-| "I'll write test after confirming fix works" | Untested fixes don't stick. Test first proves it. |
-| "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
-| "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
-| "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
-| "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question pattern, don't fix again. |
+| &quot;Issue is simple, don&#039;t need process&quot; | Simple issues have root causes too. Process is fast for simple bugs. |
+| &quot;Emergency, no time for process&quot; | Systematic debugging is FASTER than guess-and-check thrashing. |
+| &quot;Just try this first, then investigate&quot; | First fix sets the pattern. Do it right from the start. |
+| &quot;I&#039;ll write test after confirming fix works&quot; | Untested fixes don&#039;t stick. Test first proves it. |
+| &quot;Multiple fixes at once saves time&quot; | Can&#039;t isolate what worked. Causes new bugs. |
+| &quot;Reference too long, I&#039;ll adapt the pattern&quot; | Partial understanding guarantees bugs. Read it completely. |
+| &quot;I see the problem, let me fix it&quot; | Seeing symptoms ≠ understanding root cause. |
+| &quot;One more fix attempt&quot; (after 2+ failures) | 3+ failures = architectural problem. Question pattern, don&#039;t fix again. |
 
 ## Quick Reference
 
@@ -321,16 +371,16 @@ If you catch yourself thinking:
 | **3. Hypothesis** | Form theory, test minimally | Confirmed or new hypothesis |
 | **4. Implementation** | Create test, fix, verify | Bug resolved, tests pass |
 
-## When Process Reveals "No Root Cause"
+## When Process Reveals &quot;No Root Cause&quot;
 
 If systematic investigation reveals issue is truly environmental, timing-dependent, or external:
 
-1. You've completed the process
+1. You&#039;ve completed the process
 2. Document what you investigated
 3. Implement appropriate handling (retry, timeout, error message)
 4. Add monitoring/logging for future investigation
 
-**But:** 95% of "no root cause" cases are incomplete investigation.
+**But:** 95% of &quot;no root cause&quot; cases are incomplete investigation.
 
 ## Supporting Techniques
 
@@ -351,8 +401,39 @@ From debugging sessions:
 - Random fixes approach: 2-3 hours of thrashing
 - First-time fix rate: 95% vs 40%
 - New bugs introduced: Near zero vs common
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>1033</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

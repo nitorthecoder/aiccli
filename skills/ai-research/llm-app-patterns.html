@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>llm-app-patterns - AICCLI</title>
-  <meta name="description" content="llm-app-patterns - Claude Code skill for AICCLI">
+  <meta name="description" content=""Production-ready patterns for building LLM applications. Covers RAG pipelines, agent architectures, prompt IDEs, and LLMOps monitoring. Use when designing AI a">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / llm-app-patterns</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>llm-app-patterns</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / llm-app-patterns
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>llm-app-patterns</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Production-ready patterns for building LLM applications. Covers RAG pipelines, agent architectures, prompt IDEs, and LLMOps monitoring. Use when designing AI applications, implementing RAG, building agents, or setting up LLM observability."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/llm-app-patterns</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/llm-app-patterns</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/llm-app-patterns</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: llm-app-patterns
-description: "Production-ready patterns for building LLM applications. Covers RAG pipelines, agent architectures, prompt IDEs, and LLMOps monitoring. Use when designing AI applications, implementing RAG, building agents, or setting up LLM observability."
+description: &quot;Production-ready patterns for building LLM applications. Covers RAG pipelines, agent architectures, prompt IDEs, and LLMOps monitoring. Use when designing AI applications, implementing RAG, building agents, or setting up LLM observability.&quot;
 ---
 
 # 🤖 LLM Application Patterns
@@ -101,68 +151,68 @@ RAG (Retrieval-Augmented Generation) grounds LLM responses in your data.
 # Chunking strategies
 class ChunkingStrategy:
     # Fixed-size chunks (simple but may break context)
-    FIXED_SIZE = "fixed_size"  # e.g., 512 tokens
+    FIXED_SIZE = &quot;fixed_size&quot;  # e.g., 512 tokens
 
     # Semantic chunking (preserves meaning)
-    SEMANTIC = "semantic"      # Split on paragraphs/sections
+    SEMANTIC = &quot;semantic&quot;      # Split on paragraphs/sections
 
     # Recursive splitting (tries multiple separators)
-    RECURSIVE = "recursive"    # ["\n\n", "\n", " ", ""]
+    RECURSIVE = &quot;recursive&quot;    # [&quot;\n\n&quot;, &quot;\n&quot;, &quot; &quot;, &quot;&quot;]
 
     # Document-aware (respects structure)
-    DOCUMENT_AWARE = "document_aware"  # Headers, lists, etc.
+    DOCUMENT_AWARE = &quot;document_aware&quot;  # Headers, lists, etc.
 
 # Recommended settings
 CHUNK_CONFIG = {
-    "chunk_size": 512,       # tokens
-    "chunk_overlap": 50,     # token overlap between chunks
-    "separators": ["\n\n", "\n", ". ", " "],
+    &quot;chunk_size&quot;: 512,       # tokens
+    &quot;chunk_overlap&quot;: 50,     # token overlap between chunks
+    &quot;separators&quot;: [&quot;\n\n&quot;, &quot;\n&quot;, &quot;. &quot;, &quot; &quot;],
 }
 ```
 
-### 1.2 Embedding & Storage
+### 1.2 Embedding &amp; Storage
 
 ```python
 # Vector database selection
 VECTOR_DB_OPTIONS = {
-    "pinecone": {
-        "use_case": "Production, managed service",
-        "scale": "Billions of vectors",
-        "features": ["Hybrid search", "Metadata filtering"]
+    &quot;pinecone&quot;: {
+        &quot;use_case&quot;: &quot;Production, managed service&quot;,
+        &quot;scale&quot;: &quot;Billions of vectors&quot;,
+        &quot;features&quot;: [&quot;Hybrid search&quot;, &quot;Metadata filtering&quot;]
     },
-    "weaviate": {
-        "use_case": "Self-hosted, multi-modal",
-        "scale": "Millions of vectors",
-        "features": ["GraphQL API", "Modules"]
+    &quot;weaviate&quot;: {
+        &quot;use_case&quot;: &quot;Self-hosted, multi-modal&quot;,
+        &quot;scale&quot;: &quot;Millions of vectors&quot;,
+        &quot;features&quot;: [&quot;GraphQL API&quot;, &quot;Modules&quot;]
     },
-    "chromadb": {
-        "use_case": "Development, prototyping",
-        "scale": "Thousands of vectors",
-        "features": ["Simple API", "In-memory option"]
+    &quot;chromadb&quot;: {
+        &quot;use_case&quot;: &quot;Development, prototyping&quot;,
+        &quot;scale&quot;: &quot;Thousands of vectors&quot;,
+        &quot;features&quot;: [&quot;Simple API&quot;, &quot;In-memory option&quot;]
     },
-    "pgvector": {
-        "use_case": "Existing Postgres infrastructure",
-        "scale": "Millions of vectors",
-        "features": ["SQL integration", "ACID compliance"]
+    &quot;pgvector&quot;: {
+        &quot;use_case&quot;: &quot;Existing Postgres infrastructure&quot;,
+        &quot;scale&quot;: &quot;Millions of vectors&quot;,
+        &quot;features&quot;: [&quot;SQL integration&quot;, &quot;ACID compliance&quot;]
     }
 }
 
 # Embedding model selection
 EMBEDDING_MODELS = {
-    "openai/text-embedding-3-small": {
-        "dimensions": 1536,
-        "cost": "$0.02/1M tokens",
-        "quality": "Good for most use cases"
+    &quot;openai/text-embedding-3-small&quot;: {
+        &quot;dimensions&quot;: 1536,
+        &quot;cost&quot;: &quot;$0.02/1M tokens&quot;,
+        &quot;quality&quot;: &quot;Good for most use cases&quot;
     },
-    "openai/text-embedding-3-large": {
-        "dimensions": 3072,
-        "cost": "$0.13/1M tokens",
-        "quality": "Best for complex queries"
+    &quot;openai/text-embedding-3-large&quot;: {
+        &quot;dimensions&quot;: 3072,
+        &quot;cost&quot;: &quot;$0.13/1M tokens&quot;,
+        &quot;quality&quot;: &quot;Best for complex queries&quot;
     },
-    "local/bge-large": {
-        "dimensions": 1024,
-        "cost": "Free (compute only)",
-        "quality": "Comparable to OpenAI small"
+    &quot;local/bge-large&quot;: {
+        &quot;dimensions&quot;: 1024,
+        &quot;cost&quot;: &quot;Free (compute only)&quot;,
+        &quot;quality&quot;: &quot;Comparable to OpenAI small&quot;
     }
 }
 ```
@@ -181,11 +231,11 @@ def semantic_search(query: str, top_k: int = 5):
 
 # Hybrid search (semantic + keyword)
 def hybrid_search(query: str, top_k: int = 5, alpha: float = 0.5):
-    """
+    &quot;&quot;&quot;
     alpha=1.0: Pure semantic
     alpha=0.0: Pure keyword (BM25)
     alpha=0.5: Balanced
-    """
+    &quot;&quot;&quot;
     semantic_results = vector_db.similarity_search(query)
     keyword_results = bm25_search(query)
 
@@ -194,7 +244,7 @@ def hybrid_search(query: str, top_k: int = 5, alpha: float = 0.5):
 
 # Multi-query retrieval
 def multi_query_retrieval(query: str):
-    """Generate multiple query variations for better recall"""
+    &quot;&quot;&quot;Generate multiple query variations for better recall&quot;&quot;&quot;
     queries = llm.generate_query_variations(query, n=3)
     all_results = []
     for q in queries:
@@ -203,7 +253,7 @@ def multi_query_retrieval(query: str):
 
 # Contextual compression
 def compressed_retrieval(query: str):
-    """Retrieve then compress to relevant parts only"""
+    &quot;&quot;&quot;Retrieve then compress to relevant parts only&quot;&quot;&quot;
     docs = semantic_search(query, top_k=10)
     compressed = llm.extract_relevant_parts(docs, query)
     return compressed
@@ -212,21 +262,21 @@ def compressed_retrieval(query: str):
 ### 1.4 Generation with Context
 
 ```python
-RAG_PROMPT_TEMPLATE = """
-Answer the user's question based ONLY on the following context.
-If the context doesn't contain enough information, say "I don't have enough information to answer that."
+RAG_PROMPT_TEMPLATE = &quot;&quot;&quot;
+Answer the user&#039;s question based ONLY on the following context.
+If the context doesn&#039;t contain enough information, say &quot;I don&#039;t have enough information to answer that.&quot;
 
 Context:
 {context}
 
 Question: {question}
 
-Answer:"""
+Answer:&quot;&quot;&quot;
 
 def generate_with_rag(question: str):
     # Retrieve
     context_docs = hybrid_search(question, top_k=5)
-    context = "\n\n".join([doc.content for doc in context_docs])
+    context = &quot;\n\n&quot;.join([doc.content for doc in context_docs])
 
     # Generate
     prompt = RAG_PROMPT_TEMPLATE.format(
@@ -238,8 +288,8 @@ def generate_with_rag(question: str):
 
     # Return with citations
     return {
-        "answer": response,
-        "sources": [doc.metadata for doc in context_docs]
+        &quot;answer&quot;: response,
+        &quot;sources&quot;: [doc.metadata for doc in context_docs]
     }
 ```
 
@@ -251,17 +301,17 @@ def generate_with_rag(question: str):
 
 ```
 Thought: I need to search for information about X
-Action: search("X")
+Action: search(&quot;X&quot;)
 Observation: [search results]
 Thought: Based on the results, I should...
 Action: calculate(...)
 Observation: [calculation result]
 Thought: I now have enough information
-Action: final_answer("The answer is...")
+Action: final_answer(&quot;The answer is...&quot;)
 ```
 
 ```python
-REACT_PROMPT = """
+REACT_PROMPT = &quot;&quot;&quot;
 You are an AI assistant that can use tools to answer questions.
 
 Available tools:
@@ -276,7 +326,7 @@ Thought: I have enough information to answer
 Final Answer: [your final response]
 
 Question: {question}
-"""
+&quot;&quot;&quot;
 
 class ReActAgent:
     def __init__(self, tools: list, llm):
@@ -293,14 +343,14 @@ class ReActAgent:
         for _ in range(self.max_iterations):
             response = self.llm.generate(prompt)
 
-            if "Final Answer:" in response:
+            if &quot;Final Answer:&quot; in response:
                 return self._extract_final_answer(response)
 
             action = self._parse_action(response)
             observation = self._execute_tool(action)
-            prompt += f"\nObservation: {observation}\n"
+            prompt += f&quot;\nObservation: {observation}\n&quot;
 
-        return "Max iterations reached"
+        return &quot;Max iterations reached&quot;
 ```
 
 ### 2.2 Function Calling Pattern
@@ -309,44 +359,44 @@ class ReActAgent:
 # Define tools as functions with schemas
 TOOLS = [
     {
-        "name": "search_web",
-        "description": "Search the web for current information",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "query": {
-                    "type": "string",
-                    "description": "Search query"
+        &quot;name&quot;: &quot;search_web&quot;,
+        &quot;description&quot;: &quot;Search the web for current information&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;query&quot;: {
+                    &quot;type&quot;: &quot;string&quot;,
+                    &quot;description&quot;: &quot;Search query&quot;
                 }
             },
-            "required": ["query"]
+            &quot;required&quot;: [&quot;query&quot;]
         }
     },
     {
-        "name": "calculate",
-        "description": "Perform mathematical calculations",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "expression": {
-                    "type": "string",
-                    "description": "Math expression to evaluate"
+        &quot;name&quot;: &quot;calculate&quot;,
+        &quot;description&quot;: &quot;Perform mathematical calculations&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;expression&quot;: {
+                    &quot;type&quot;: &quot;string&quot;,
+                    &quot;description&quot;: &quot;Math expression to evaluate&quot;
                 }
             },
-            "required": ["expression"]
+            &quot;required&quot;: [&quot;expression&quot;]
         }
     }
 ]
 
 class FunctionCallingAgent:
     def run(self, question: str) -&gt; str:
-        messages = [{"role": "user", "content": question}]
+        messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: question}]
 
         while True:
             response = self.llm.chat(
                 messages=messages,
                 tools=TOOLS,
-                tool_choice="auto"
+                tool_choice=&quot;auto&quot;
             )
 
             if response.tool_calls:
@@ -356,9 +406,9 @@ class FunctionCallingAgent:
                         tool_call.arguments
                     )
                     messages.append({
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "content": str(result)
+                        &quot;role&quot;: &quot;tool&quot;,
+                        &quot;tool_call_id&quot;: tool_call.id,
+                        &quot;content&quot;: str(result)
                     })
             else:
                 return response.content
@@ -368,16 +418,16 @@ class FunctionCallingAgent:
 
 ```python
 class PlanAndExecuteAgent:
-    """
+    &quot;&quot;&quot;
     1. Create a plan (list of steps)
     2. Execute each step
     3. Replan if needed
-    """
+    &quot;&quot;&quot;
 
     def run(self, task: str) -&gt; str:
         # Planning phase
         plan = self.planner.create_plan(task)
-        # Returns: ["Step 1: ...", "Step 2: ...", ...]
+        # Returns: [&quot;Step 1: ...&quot;, &quot;Step 2: ...&quot;, ...]
 
         results = []
         for step in plan:
@@ -402,16 +452,16 @@ class PlanAndExecuteAgent:
 
 ```python
 class AgentTeam:
-    """
+    &quot;&quot;&quot;
     Specialized agents collaborating on complex tasks
-    """
+    &quot;&quot;&quot;
 
     def __init__(self):
         self.agents = {
-            "researcher": ResearchAgent(),
-            "analyst": AnalystAgent(),
-            "writer": WriterAgent(),
-            "critic": CriticAgent()
+            &quot;researcher&quot;: ResearchAgent(),
+            &quot;analyst&quot;: AnalystAgent(),
+            &quot;writer&quot;: WriterAgent(),
+            &quot;critic&quot;: CriticAgent()
         }
         self.coordinator = CoordinatorAgent()
 
@@ -429,7 +479,7 @@ class AgentTeam:
             results[assignment.id] = result
 
         # Critic reviews
-        critique = self.agents["critic"].review(results)
+        critique = self.agents[&quot;critic&quot;].review(results)
 
         if critique.needs_revision:
             # Iterate with feedback
@@ -454,31 +504,31 @@ class PromptTemplate:
         # Validate all variables provided
         missing = set(self.variables) - set(kwargs.keys())
         if missing:
-            raise ValueError(f"Missing variables: {missing}")
+            raise ValueError(f&quot;Missing variables: {missing}&quot;)
 
         return self.template.format(**kwargs)
 
     def with_examples(self, examples: list[dict]) -&gt; str:
-        """Add few-shot examples"""
-        example_text = "\n\n".join([
-            f"Input: {ex['input']}\nOutput: {ex['output']}"
+        &quot;&quot;&quot;Add few-shot examples&quot;&quot;&quot;
+        example_text = &quot;\n\n&quot;.join([
+            f&quot;Input: {ex[&#039;input&#039;]}\nOutput: {ex[&#039;output&#039;]}&quot;
             for ex in examples
         ])
-        return f"{example_text}\n\n{self.template}"
+        return f&quot;{example_text}\n\n{self.template}&quot;
 
 # Usage
 summarizer = PromptTemplate(
-    template="Summarize the following text in {style} style:\n\n{text}",
-    variables=["style", "text"]
+    template=&quot;Summarize the following text in {style} style:\n\n{text}&quot;,
+    variables=[&quot;style&quot;, &quot;text&quot;]
 )
 
 prompt = summarizer.format(
-    style="professional",
-    text="Long article content..."
+    style=&quot;professional&quot;,
+    text=&quot;Long article content...&quot;
 )
 ```
 
-### 3.2 Prompt Versioning & A/B Testing
+### 3.2 Prompt Versioning &amp; A/B Testing
 
 ```python
 class PromptRegistry:
@@ -486,27 +536,27 @@ class PromptRegistry:
         self.db = db
 
     def register(self, name: str, template: str, version: str):
-        """Store prompt with version"""
+        &quot;&quot;&quot;Store prompt with version&quot;&quot;&quot;
         self.db.save({
-            "name": name,
-            "template": template,
-            "version": version,
-            "created_at": datetime.now(),
-            "metrics": {}
+            &quot;name&quot;: name,
+            &quot;template&quot;: template,
+            &quot;version&quot;: version,
+            &quot;created_at&quot;: datetime.now(),
+            &quot;metrics&quot;: {}
         })
 
-    def get(self, name: str, version: str = "latest") -&gt; str:
-        """Retrieve specific version"""
+    def get(self, name: str, version: str = &quot;latest&quot;) -&gt; str:
+        &quot;&quot;&quot;Retrieve specific version&quot;&quot;&quot;
         return self.db.get(name, version)
 
     def ab_test(self, name: str, user_id: str) -&gt; str:
-        """Return variant based on user bucket"""
+        &quot;&quot;&quot;Return variant based on user bucket&quot;&quot;&quot;
         variants = self.db.get_all_versions(name)
         bucket = hash(user_id) % len(variants)
         return variants[bucket]
 
     def record_outcome(self, prompt_id: str, outcome: dict):
-        """Track prompt performance"""
+        &quot;&quot;&quot;Track prompt performance&quot;&quot;&quot;
         self.db.update_metrics(prompt_id, outcome)
 ```
 
@@ -514,87 +564,87 @@ class PromptRegistry:
 
 ```python
 class PromptChain:
-    """
+    &quot;&quot;&quot;
     Chain prompts together, passing output as input to next
-    """
+    &quot;&quot;&quot;
 
     def __init__(self, steps: list[dict]):
         self.steps = steps
 
     def run(self, initial_input: str) -&gt; dict:
-        context = {"input": initial_input}
+        context = {&quot;input&quot;: initial_input}
         results = []
 
         for step in self.steps:
-            prompt = step["prompt"].format(**context)
+            prompt = step[&quot;prompt&quot;].format(**context)
             output = llm.generate(prompt)
 
             # Parse output if needed
-            if step.get("parser"):
-                output = step["parser"](output)
+            if step.get(&quot;parser&quot;):
+                output = step[&quot;parser&quot;](output)
 
-            context[step["output_key"]] = output
+            context[step[&quot;output_key&quot;]] = output
             results.append({
-                "step": step["name"],
-                "output": output
+                &quot;step&quot;: step[&quot;name&quot;],
+                &quot;output&quot;: output
             })
 
         return {
-            "final_output": context[self.steps[-1]["output_key"]],
-            "intermediate_results": results
+            &quot;final_output&quot;: context[self.steps[-1][&quot;output_key&quot;]],
+            &quot;intermediate_results&quot;: results
         }
 
 # Example: Research → Analyze → Summarize
 chain = PromptChain([
     {
-        "name": "research",
-        "prompt": "Research the topic: {input}",
-        "output_key": "research"
+        &quot;name&quot;: &quot;research&quot;,
+        &quot;prompt&quot;: &quot;Research the topic: {input}&quot;,
+        &quot;output_key&quot;: &quot;research&quot;
     },
     {
-        "name": "analyze",
-        "prompt": "Analyze these findings:\n{research}",
-        "output_key": "analysis"
+        &quot;name&quot;: &quot;analyze&quot;,
+        &quot;prompt&quot;: &quot;Analyze these findings:\n{research}&quot;,
+        &quot;output_key&quot;: &quot;analysis&quot;
     },
     {
-        "name": "summarize",
-        "prompt": "Summarize this analysis in 3 bullet points:\n{analysis}",
-        "output_key": "summary"
+        &quot;name&quot;: &quot;summarize&quot;,
+        &quot;prompt&quot;: &quot;Summarize this analysis in 3 bullet points:\n{analysis}&quot;,
+        &quot;output_key&quot;: &quot;summary&quot;
     }
 ])
 ```
 
 ---
 
-## 4. LLMOps & Observability
+## 4. LLMOps &amp; Observability
 
 ### 4.1 Metrics to Track
 
 ```python
 LLM_METRICS = {
     # Performance
-    "latency_p50": "50th percentile response time",
-    "latency_p99": "99th percentile response time",
-    "tokens_per_second": "Generation speed",
+    &quot;latency_p50&quot;: &quot;50th percentile response time&quot;,
+    &quot;latency_p99&quot;: &quot;99th percentile response time&quot;,
+    &quot;tokens_per_second&quot;: &quot;Generation speed&quot;,
 
     # Quality
-    "user_satisfaction": "Thumbs up/down ratio",
-    "task_completion": "% tasks completed successfully",
-    "hallucination_rate": "% responses with factual errors",
+    &quot;user_satisfaction&quot;: &quot;Thumbs up/down ratio&quot;,
+    &quot;task_completion&quot;: &quot;% tasks completed successfully&quot;,
+    &quot;hallucination_rate&quot;: &quot;% responses with factual errors&quot;,
 
     # Cost
-    "cost_per_request": "Average $ per API call",
-    "tokens_per_request": "Average tokens used",
-    "cache_hit_rate": "% requests served from cache",
+    &quot;cost_per_request&quot;: &quot;Average $ per API call&quot;,
+    &quot;tokens_per_request&quot;: &quot;Average tokens used&quot;,
+    &quot;cache_hit_rate&quot;: &quot;% requests served from cache&quot;,
 
     # Reliability
-    "error_rate": "% failed requests",
-    "timeout_rate": "% requests that timed out",
-    "retry_rate": "% requests needing retry"
+    &quot;error_rate&quot;: &quot;% failed requests&quot;,
+    &quot;timeout_rate&quot;: &quot;% requests that timed out&quot;,
+    &quot;retry_rate&quot;: &quot;% requests needing retry&quot;
 }
 ```
 
-### 4.2 Logging & Tracing
+### 4.2 Logging &amp; Tracing
 
 ```python
 import logging
@@ -604,40 +654,40 @@ tracer = trace.get_tracer(__name__)
 
 class LLMLogger:
     def log_request(self, request_id: str, data: dict):
-        """Log LLM request for debugging and analysis"""
+        &quot;&quot;&quot;Log LLM request for debugging and analysis&quot;&quot;&quot;
         log_entry = {
-            "request_id": request_id,
-            "timestamp": datetime.now().isoformat(),
-            "model": data["model"],
-            "prompt": data["prompt"][:500],  # Truncate for storage
-            "prompt_tokens": data["prompt_tokens"],
-            "temperature": data.get("temperature", 1.0),
-            "user_id": data.get("user_id"),
+            &quot;request_id&quot;: request_id,
+            &quot;timestamp&quot;: datetime.now().isoformat(),
+            &quot;model&quot;: data[&quot;model&quot;],
+            &quot;prompt&quot;: data[&quot;prompt&quot;][:500],  # Truncate for storage
+            &quot;prompt_tokens&quot;: data[&quot;prompt_tokens&quot;],
+            &quot;temperature&quot;: data.get(&quot;temperature&quot;, 1.0),
+            &quot;user_id&quot;: data.get(&quot;user_id&quot;),
         }
-        logging.info(f"LLM_REQUEST: {json.dumps(log_entry)}")
+        logging.info(f&quot;LLM_REQUEST: {json.dumps(log_entry)}&quot;)
 
     def log_response(self, request_id: str, data: dict):
-        """Log LLM response"""
+        &quot;&quot;&quot;Log LLM response&quot;&quot;&quot;
         log_entry = {
-            "request_id": request_id,
-            "completion_tokens": data["completion_tokens"],
-            "total_tokens": data["total_tokens"],
-            "latency_ms": data["latency_ms"],
-            "finish_reason": data["finish_reason"],
-            "cost_usd": self._calculate_cost(data),
+            &quot;request_id&quot;: request_id,
+            &quot;completion_tokens&quot;: data[&quot;completion_tokens&quot;],
+            &quot;total_tokens&quot;: data[&quot;total_tokens&quot;],
+            &quot;latency_ms&quot;: data[&quot;latency_ms&quot;],
+            &quot;finish_reason&quot;: data[&quot;finish_reason&quot;],
+            &quot;cost_usd&quot;: self._calculate_cost(data),
         }
-        logging.info(f"LLM_RESPONSE: {json.dumps(log_entry)}")
+        logging.info(f&quot;LLM_RESPONSE: {json.dumps(log_entry)}&quot;)
 
 # Distributed tracing
-@tracer.start_as_current_span("llm_call")
+@tracer.start_as_current_span(&quot;llm_call&quot;)
 def call_llm(prompt: str) -&gt; str:
     span = trace.get_current_span()
-    span.set_attribute("prompt.length", len(prompt))
+    span.set_attribute(&quot;prompt.length&quot;, len(prompt))
 
     response = llm.generate(prompt)
 
-    span.set_attribute("response.length", len(response))
-    span.set_attribute("tokens.total", response.usage.total_tokens)
+    span.set_attribute(&quot;response.length&quot;, len(response))
+    span.set_attribute(&quot;tokens.total&quot;, response.usage.total_tokens)
 
     return response.content
 ```
@@ -646,9 +696,9 @@ def call_llm(prompt: str) -&gt; str:
 
 ```python
 class LLMEvaluator:
-    """
+    &quot;&quot;&quot;
     Evaluate LLM outputs for quality
-    """
+    &quot;&quot;&quot;
 
     def evaluate_response(self,
                           question: str,
@@ -657,32 +707,32 @@ class LLMEvaluator:
         scores = {}
 
         # Relevance: Does it answer the question?
-        scores["relevance"] = self._score_relevance(question, response)
+        scores[&quot;relevance&quot;] = self._score_relevance(question, response)
 
         # Coherence: Is it well-structured?
-        scores["coherence"] = self._score_coherence(response)
+        scores[&quot;coherence&quot;] = self._score_coherence(response)
 
         # Groundedness: Is it based on provided context?
-        scores["groundedness"] = self._score_groundedness(response)
+        scores[&quot;groundedness&quot;] = self._score_groundedness(response)
 
         # Accuracy: Does it match ground truth?
         if ground_truth:
-            scores["accuracy"] = self._score_accuracy(response, ground_truth)
+            scores[&quot;accuracy&quot;] = self._score_accuracy(response, ground_truth)
 
         # Harmfulness: Is it safe?
-        scores["safety"] = self._score_safety(response)
+        scores[&quot;safety&quot;] = self._score_safety(response)
 
         return scores
 
     def run_benchmark(self, test_cases: list[dict]) -&gt; dict:
-        """Run evaluation on test set"""
+        &quot;&quot;&quot;Run evaluation on test set&quot;&quot;&quot;
         results = []
         for case in test_cases:
-            response = llm.generate(case["prompt"])
+            response = llm.generate(case[&quot;prompt&quot;])
             scores = self.evaluate_response(
-                question=case["prompt"],
+                question=case[&quot;prompt&quot;],
                 response=response,
-                ground_truth=case.get("expected")
+                ground_truth=case.get(&quot;expected&quot;)
             )
             results.append(scores)
 
@@ -705,8 +755,8 @@ class LLMCache:
         self.ttl = ttl_seconds
 
     def _cache_key(self, prompt: str, model: str, **kwargs) -&gt; str:
-        """Generate deterministic cache key"""
-        content = f"{model}:{prompt}:{json.dumps(kwargs, sort_keys=True)}"
+        &quot;&quot;&quot;Generate deterministic cache key&quot;&quot;&quot;
+        content = f&quot;{model}:{prompt}:{json.dumps(kwargs, sort_keys=True)}&quot;
         return hashlib.sha256(content.encode()).hexdigest()
 
     def get_or_generate(self, prompt: str, model: str, **kwargs) -&gt; str:
@@ -721,13 +771,13 @@ class LLMCache:
         response = llm.generate(prompt, model=model, **kwargs)
 
         # Cache (only cache deterministic outputs)
-        if kwargs.get("temperature", 1.0) == 0:
+        if kwargs.get(&quot;temperature&quot;, 1.0) == 0:
             self.redis.setex(key, self.ttl, response)
 
         return response
 ```
 
-### 5.2 Rate Limiting & Retry
+### 5.2 Rate Limiting &amp; Retry
 
 ```python
 import time
@@ -739,7 +789,7 @@ class RateLimiter:
         self.timestamps = []
 
     def acquire(self):
-        """Wait if rate limit would be exceeded"""
+        &quot;&quot;&quot;Wait if rate limit would be exceeded&quot;&quot;&quot;
         now = time.time()
 
         # Remove old timestamps
@@ -764,7 +814,7 @@ def call_llm_with_retry(prompt: str) -&gt; str:
     except APIError as e:
         if e.status_code &gt;= 500:
             raise  # Retry server errors
-        raise  # Don't retry client errors
+        raise  # Don&#039;t retry client errors
 ```
 
 ### 5.3 Fallback Strategy
@@ -782,15 +832,15 @@ class LLMWithFallback:
             try:
                 return llm.generate(prompt, model=model, **kwargs)
             except (RateLimitError, APIError) as e:
-                logging.warning(f"Model {model} failed: {e}")
+                logging.warning(f&quot;Model {model} failed: {e}&quot;)
                 continue
 
-        raise AllModelsFailedError("All models exhausted")
+        raise AllModelsFailedError(&quot;All models exhausted&quot;)
 
 # Usage
 llm_client = LLMWithFallback(
-    primary="gpt-4-turbo",
-    fallbacks=["gpt-3.5-turbo", "claude-3-sonnet"]
+    primary=&quot;gpt-4-turbo&quot;,
+    fallbacks=[&quot;gpt-3.5-turbo&quot;, &quot;claude-3-sonnet&quot;]
 )
 ```
 
@@ -815,8 +865,39 @@ llm_client = LLMWithFallback(
 - [LangChain Docs](https://python.langchain.com/)
 - [LlamaIndex](https://www.llamaindex.ai/)
 - [Anthropic Cookbook](https://github.com/anthropics/anthropic-cookbook)
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>67</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

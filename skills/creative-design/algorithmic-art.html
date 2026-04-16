@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>algorithmic-art - AICCLI</title>
-  <meta name="description" content="algorithmic-art - Claude Code skill for AICCLI">
+  <meta name="description" content="Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generati">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / algorithmic-art</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>algorithmic-art</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">creative-design</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / creative-design / algorithmic-art
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>algorithmic-art</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">creative-design</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists' work to avoid copyright violations.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/algorithmic-art</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/algorithmic-art</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/algorithmic-art</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: algorithmic-art
-description: Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists' work to avoid copyright violations.
+description: Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists&#039; work to avoid copyright violations.
 license: Complete terms in LICENSE.txt
 ---
 
@@ -90,7 +140,7 @@ The philosophy must emphasize: Algorithmic expression. Emergent behavior. Comput
 
 ### HOW TO GENERATE AN ALGORITHMIC PHILOSOPHY
 
-**Name the movement** (1-2 words): "Organic Turbulence" / "Quantum Harmonics" / "Emergent Stillness"
+**Name the movement** (1-2 words): &quot;Organic Turbulence&quot; / &quot;Quantum Harmonics&quot; / &quot;Emergent Stillness&quot;
 
 **Articulate the philosophy** (4-6 paragraphs - concise but complete):
 
@@ -103,30 +153,30 @@ To capture the ALGORITHMIC essence, express how this philosophy manifests throug
 
 **CRITICAL GUIDELINES:**
 - **Avoid redundancy**: Each algorithmic aspect should be mentioned once. Avoid repeating concepts about noise theory, particle dynamics, or mathematical principles unless adding new depth.
-- **Emphasize craftsmanship REPEATEDLY**: The philosophy MUST stress multiple times that the final algorithm should appear as though it took countless hours to develop, was refined with care, and comes from someone at the absolute top of their field. This framing is essential - repeat phrases like "meticulously crafted algorithm," "the product of deep computational expertise," "painstaking optimization," "master-level implementation."
+- **Emphasize craftsmanship REPEATEDLY**: The philosophy MUST stress multiple times that the final algorithm should appear as though it took countless hours to develop, was refined with care, and comes from someone at the absolute top of their field. This framing is essential - repeat phrases like &quot;meticulously crafted algorithm,&quot; &quot;the product of deep computational expertise,&quot; &quot;painstaking optimization,&quot; &quot;master-level implementation.&quot;
 - **Leave creative space**: Be specific about the algorithmic direction, but concise enough that the next Claude has room to make interpretive implementation choices at an extremely high level of craftsmanship.
 
 The philosophy must guide the next version to express ideas ALGORITHMICALLY, not through static images. Beauty lives in the process, not the final frame.
 
 ### PHILOSOPHY EXAMPLES
 
-**"Organic Turbulence"**
+**&quot;Organic Turbulence&quot;**
 Philosophy: Chaos constrained by natural law, order emerging from disorder.
 Algorithmic expression: Flow fields driven by layered Perlin noise. Thousands of particles following vector forces, their trails accumulating into organic density maps. Multiple noise octaves create turbulent regions and calm zones. Color emerges from velocity and density - fast particles burn bright, slow ones fade to shadow. The algorithm runs until equilibrium - a meticulously tuned balance where every parameter was refined through countless iterations by a master of computational aesthetics.
 
-**"Quantum Harmonics"**
+**&quot;Quantum Harmonics&quot;**
 Philosophy: Discrete entities exhibiting wave-like interference patterns.
 Algorithmic expression: Particles initialized on a grid, each carrying a phase value that evolves through sine waves. When particles are near, their phases interfere - constructive interference creates bright nodes, destructive creates voids. Simple harmonic motion generates complex emergent mandalas. The result of painstaking frequency calibration where every ratio was carefully chosen to produce resonant beauty.
 
-**"Recursive Whispers"**
+**&quot;Recursive Whispers&quot;**
 Philosophy: Self-similarity across scales, infinite depth in finite space.
 Algorithmic expression: Branching structures that subdivide recursively. Each branch slightly randomized but constrained by golden ratios. L-systems or recursive subdivision generate tree-like forms that feel both mathematical and organic. Subtle noise perturbations break perfect symmetry. Line weights diminish with each recursion level. Every branching angle the product of deep mathematical exploration.
 
-**"Field Dynamics"**
+**&quot;Field Dynamics&quot;**
 Philosophy: Invisible forces made visible through their effects on matter.
 Algorithmic expression: Vector fields constructed from mathematical functions or noise. Particles born at edges, flowing along field lines, dying when they reach equilibrium or boundaries. Multiple fields can attract, repel, or rotate particles. The visualization shows only the traces - ghost-like evidence of invisible forces. A computational dance meticulously choreographed through force balance.
 
-**"Stochastic Crystallization"**
+**&quot;Stochastic Crystallization&quot;**
 Philosophy: Random processes crystallizing into ordered structures.
 Algorithmic expression: Randomized circle packing or Voronoi tessellation. Start with random points, let them evolve through relaxation algorithms. Cells push apart until equilibrium. Color based on cell size, neighbor count, or distance from center. The organic tiling that emerges feels both random and inevitable. Every seed produces unique crystalline beauty - the mark of a master-level generative algorithm.
 
@@ -134,7 +184,7 @@ Algorithmic expression: Randomized circle packing or Voronoi tessellation. Start
 
 ### ESSENTIAL PRINCIPLES
 - **ALGORITHMIC PHILOSOPHY**: Creating a computational worldview to be expressed through code
-- **PROCESS OVER PRODUCT**: Always emphasize that beauty emerges from the algorithm's execution - each run is unique
+- **PROCESS OVER PRODUCT**: Always emphasize that beauty emerges from the algorithm&#039;s execution - each run is unique
 - **PARAMETRIC EXPRESSION**: Ideas communicate through mathematical relationships, forces, behaviors - not static composition
 - **ARTISTIC FREEDOM**: The next Claude interprets the philosophy algorithmically - provide creative implementation room
 - **PURE GENERATIVE ART**: This is about making LIVING ALGORITHMS, not static images with randomness
@@ -151,7 +201,7 @@ Algorithmic expression: Randomized circle packing or Voronoi tessellation. Start
 **THE ESSENTIAL PRINCIPLE**:
 The concept is a **subtle, niche reference embedded within the algorithm itself** - not always literal, always sophisticated. Someone familiar with the subject should feel it intuitively, while others simply experience a masterful generative composition. The algorithmic philosophy provides the computational language. The deduced concept provides the soul - the quiet conceptual DNA woven invisibly into parameters, behaviors, and emergence patterns.
 
-This is **VERY IMPORTANT**: The reference must be so refined that it enhances the work's depth without announcing itself. Think like a jazz musician quoting another song through algorithmic harmony - only those who know will catch it, but everyone appreciates the generative beauty.
+This is **VERY IMPORTANT**: The reference must be so refined that it enhances the work&#039;s depth without announcing itself. Think like a jazz musician quoting another song through algorithmic harmony - only those who know will catch it, but everyone appreciates the generative beauty.
 
 ---
 
@@ -167,7 +217,7 @@ With the philosophy AND conceptual framework established, express it through cod
 2. **Study** the exact structure, styling, and Anthropic branding
 3. **Use that file as the LITERAL STARTING POINT** - not just inspiration
 4. **Keep all FIXED sections exactly as shown** (header, sidebar structure, Anthropic colors/fonts, seed controls, action buttons)
-5. **Replace only the VARIABLE sections** marked in the file's comments (algorithm, parameters, UI controls for parameters)
+5. **Replace only the VARIABLE sections** marked in the file&#039;s comments (algorithm, parameters, UI controls for parameters)
 
 **Avoid:**
 - ❌ Creating HTML from scratch
@@ -176,12 +226,12 @@ With the philosophy AND conceptual framework established, express it through cod
 - ❌ Changing the sidebar structure
 
 **Follow these practices:**
-- ✅ Copy the template's exact HTML structure
+- ✅ Copy the template&#039;s exact HTML structure
 - ✅ Keep Anthropic branding (Poppins/Lora fonts, light colors, gradient backdrop)
 - ✅ Maintain the sidebar layout (Seed → Parameters → Colors? → Actions)
 - ✅ Replace only the p5.js algorithm and parameter controls
 
-The template is the foundation. Build on it, don't rebuild it.
+The template is the foundation. Build on it, don&#039;t rebuild it.
 
 ---
 
@@ -199,7 +249,7 @@ noiseSeed(seed);
 
 **Parameter Structure - FOLLOW THE PHILOSOPHY**:
 
-To establish parameters that emerge naturally from the algorithmic philosophy, consider: "What qualities of this system can be adjusted?"
+To establish parameters that emerge naturally from the algorithmic philosophy, consider: &quot;What qualities of this system can be adjusted?&quot;
 
 ```javascript
 let params = {
@@ -215,13 +265,13 @@ let params = {
 };
 ```
 
-**To design effective parameters, focus on the properties the system needs to be tunable rather than thinking in terms of "pattern types".**
+**To design effective parameters, focus on the properties the system needs to be tunable rather than thinking in terms of &quot;pattern types&quot;.**
 
 **Core Algorithm - EXPRESS THE PHILOSOPHY**:
 
 **CRITICAL**: The algorithmic philosophy should dictate what to build.
 
-To express the philosophy through code, avoid thinking "which pattern should I use?" and instead think "how to express this philosophy through code?"
+To express the philosophy through code, avoid thinking &quot;which pattern should I use?&quot; and instead think &quot;how to express this philosophy through code?&quot;
 
 If the philosophy is about **organic emergence**, consider using:
 - Elements that accumulate or grow over time
@@ -281,7 +331,7 @@ The HTML artifact contains everything: p5.js (from CDN), the algorithm, paramete
 
 To allow exploration of the generative art, create a single, self-contained HTML artifact. Ensure this artifact works immediately in claude.ai or any browser - no setup required. Embed everything inline.
 
-### CRITICAL: WHAT'S FIXED VS VARIABLE
+### CRITICAL: WHAT&#039;S FIXED VS VARIABLE
 
 The `templates/viewer.html` file is the foundation. It contains the exact structure and styling needed.
 
@@ -309,7 +359,7 @@ The `templates/viewer.html` file is the foundation. It contains the exact struct
   - Some art needs color pickers
   - Some art might use fixed colors
   - Some art might be monochrome (no color controls needed)
-  - Decide based on the art's needs
+  - Decide based on the art&#039;s needs
 
 **Every artwork should have unique parameters and algorithm!** The fixed parts provide consistent UX - everything else expresses the unique vision.
 
@@ -323,8 +373,8 @@ The `templates/viewer.html` file is the foundation. It contains the exact struct
 
 **2. Seed Navigation**
 - Display current seed number
-- "Previous" and "Next" buttons to cycle through seeds
-- "Random" button for random seed
+- &quot;Previous&quot; and &quot;Next&quot; buttons to cycle through seeds
+- &quot;Random&quot; button for random seed
 - Input field to jump to specific seed
 - Generate 100 variations when requested (seeds 1-100)
 
@@ -334,15 +384,15 @@ The `templates/viewer.html` file is the foundation. It contains the exact struct
 &lt;html&gt;
 &lt;head&gt;
   &lt;!-- p5.js from CDN - always available --&gt;
-  &lt;script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js&quot;&gt;&lt;/script&gt;
   &lt;style&gt;
     /* All styling inline - clean, minimal */
     /* Canvas on top, controls below */
   &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
-  &lt;div id="canvas-container"&gt;&lt;/div&gt;
-  &lt;div id="controls"&gt;
+  &lt;div id=&quot;canvas-container&quot;&gt;&lt;/div&gt;
+  &lt;div id=&quot;controls&quot;&gt;
     &lt;!-- All parameter controls --&gt;
   &lt;/div&gt;
   &lt;script&gt;
@@ -368,10 +418,10 @@ The sidebar structure:
 
 **2. Parameters (VARIABLE)** - Create controls for the art:
 ```html
-&lt;div class="control-group"&gt;
+&lt;div class=&quot;control-group&quot;&gt;
     &lt;label&gt;Parameter Name&lt;/label&gt;
-    &lt;input type="range" id="param" min="..." max="..." step="..." value="..." oninput="updateParam('param', this.value)"&gt;
-    &lt;span class="value-display" id="param-value"&gt;...&lt;/span&gt;
+    &lt;input type=&quot;range&quot; id=&quot;param&quot; min=&quot;...&quot; max=&quot;...&quot; step=&quot;...&quot; value=&quot;...&quot; oninput=&quot;updateParam(&#039;param&#039;, this.value)&quot;&gt;
+    &lt;span class=&quot;value-display&quot; id=&quot;param-value&quot;&gt;...&lt;/span&gt;
 &lt;/div&gt;
 ```
 Add as many control-group divs as there are parameters.
@@ -397,16 +447,16 @@ Add as many control-group divs as there are parameters.
 The HTML artifact works immediately:
 1. **In claude.ai**: Displayed as an interactive artifact - runs instantly
 2. **As a file**: Save and open in any browser - no server needed
-3. **Sharing**: Send the HTML file - it's completely self-contained
+3. **Sharing**: Send the HTML file - it&#039;s completely self-contained
 
 ---
 
-## VARIATIONS & EXPLORATION
+## VARIATIONS &amp; EXPLORATION
 
 The artifact includes seed navigation by default (prev/next/random buttons), allowing users to explore variations without creating multiple files. If the user wants specific variations highlighted:
 
-- Include seed presets (buttons for "Variation 1: Seed 42", "Variation 2: Seed 127", etc.)
-- Add a "Gallery Mode" that shows thumbnails of multiple seeds side-by-side
+- Include seed presets (buttons for &quot;Variation 1: Seed 42&quot;, &quot;Variation 2: Seed 127&quot;, etc.)
+- Add a &quot;Gallery Mode&quot; that shows thumbnails of multiple seeds side-by-side
 - All within the same single artifact
 
 This is like creating a series of prints from the same plate - the algorithm is consistent, but each seed reveals different facets of its potential. The interactive nature means users discover their own favorites by exploring the seed space.
@@ -419,7 +469,7 @@ This is like creating a series of prints from the same plate - the algorithm is 
 
 Each request is unique. The process involves:
 
-1. **Interpret the user's intent** - What aesthetic is being sought?
+1. **Interpret the user&#039;s intent** - What aesthetic is being sought?
 2. **Create an algorithmic philosophy** (4-6 paragraphs) describing the computational approach
 3. **Implement it in code** - Build the algorithm that expresses this philosophy
 4. **Design appropriate parameters** - What should be tunable?
@@ -453,14 +503,45 @@ This skill includes helpful templates and documentation:
 - **templates/generator_template.js**: Reference for p5.js best practices and code structure principles.
   - Shows how to organize parameters, use seeded randomness, structure classes
   - NOT a pattern menu - use these principles to build unique algorithms
-  - Embed algorithms inline in the HTML artifact (don't create separate .js files)
+  - Embed algorithms inline in the HTML artifact (don&#039;t create separate .js files)
 
 **Critical reminder**:
 - The **template is the STARTING POINT**, not inspiration
 - The **algorithm is where to create** something unique
-- Don't copy the flow field example - build what the philosophy demands
-- But DO keep the exact UI structure and Anthropic branding from the template</pre></div>
+- Don&#039;t copy the flow field example - build what the philosophy demands
+- But DO keep the exact UI structure and Anthropic branding from the template</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>887</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>Complete terms in LICENSE.txt</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

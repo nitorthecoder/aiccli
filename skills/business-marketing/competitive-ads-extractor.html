@@ -4,65 +4,115 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>competitive-ads-extractor - AICCLI</title>
-  <meta name="description" content="competitive-ads-extractor - Claude Code skill for AICCLI">
+  <meta name="description" content="Extracts and analyzes competitors' ads from ad libraries (Facebook, LinkedIn, etc.) to understand what messaging, problems, and creative approaches are working.">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / competitive-ads-extractor</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>competitive-ads-extractor</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">business-marketing</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / business-marketing / competitive-ads-extractor
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>competitive-ads-extractor</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">business-marketing</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Extracts and analyzes competitors' ads from ad libraries (Facebook, LinkedIn, etc.) to understand what messaging, problems, and creative approaches are working. Helps inspire and improve your own ad campaigns.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/competitive-ads-extractor</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/competitive-ads-extractor</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/competitive-ads-extractor</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: competitive-ads-extractor
-description: Extracts and analyzes competitors' ads from ad libraries (Facebook, LinkedIn, etc.) to understand what messaging, problems, and creative approaches are working. Helps inspire and improve your own ad campaigns.
+description: Extracts and analyzes competitors&#039; ads from ad libraries (Facebook, LinkedIn, etc.) to understand what messaging, problems, and creative approaches are working. Helps inspire and improve your own ad campaigns.
 ---
 
 # Competitive Ads Extractor
 
-This skill extracts your competitors' ads from ad libraries and analyzes what's working—the problems they're highlighting, use cases they're targeting, and copy/creative that's resonating.
+This skill extracts your competitors&#039; ads from ad libraries and analyzes what&#039;s working—the problems they&#039;re highlighting, use cases they&#039;re targeting, and copy/creative that&#039;s resonating.
 
 ## When to Use This Skill
 
@@ -106,7 +156,7 @@ about [specific problem]. What pain points are they highlighting?
 
 ```
 Extract ads from these 5 competitors: [list]. 
-Compare their approaches and tell me what's working.
+Compare their approaches and tell me what&#039;s working.
 ```
 
 ### Specific Platform
@@ -118,7 +168,7 @@ B2B positioning strategy
 
 ## Example
 
-**User**: "Extract ads from Notion on Facebook Ad Library and tell me what messaging is working for them."
+**User**: &quot;Extract ads from Notion on Facebook Ad Library and tell me what messaging is working for them.&quot;
 
 **Process**:
 ```
@@ -147,20 +197,20 @@ Analyzing messaging...
 - Primary Themes: Productivity (35%), Collaboration (30%), 
   Templates (20%), AI Features (15%)
 - Ad Formats: Static images (60%), Video (40%)
-- CTA Patterns: "Try for free", "Get started"
+- CTA Patterns: &quot;Try for free&quot;, &quot;Get started&quot;
 
-## Key Problems They're Highlighting
+## Key Problems They&#039;re Highlighting
 
 1. **Scattered Information** (8 ads)
-   Copy: "Stop switching between 10 different tools"
+   Copy: &quot;Stop switching between 10 different tools&quot;
    Why it works: Direct pain point many teams face
 
 2. **Meeting Overload** (5 ads)
-   Copy: "Replace unnecessary meetings with async updates"
+   Copy: &quot;Replace unnecessary meetings with async updates&quot;
    Why it works: Post-COVID remote work pain point
 
 3. **Lost Documentation** (4 ads)
-   Copy: "Never ask 'where is that doc?' again"
+   Copy: &quot;Never ask &#039;where is that doc?&#039; again&quot;
    Why it works: Universal workplace frustration
 
 ## Successful Creative Patterns
@@ -176,26 +226,26 @@ Analyzing messaging...
 - Used for new features (AI, templates)
 
 ### Pattern 3: Social Proof
-- "Join 20M users" messaging
+- &quot;Join 20M users&quot; messaging
 - Customer logos
 - Used in 4 ads targeting enterprise
 
-## Copy That's Working
+## Copy That&#039;s Working
 
 Best Headlines:
-1. "Your team's knowledge, finally in one place"
+1. &quot;Your team&#039;s knowledge, finally in one place&quot;
    → Benefit-focused, addresses pain directly
    
-2. "The all-in-one workspace"
+2. &quot;The all-in-one workspace&quot;
    → Clear positioning, broad appeal
    
-3. "AI that actually helps you work"
+3. &quot;AI that actually helps you work&quot;
    → Addresses AI skepticism, practical angle
 
 Best Body Copy Patterns:
 - Short sentences (under 10 words)
 - Focus on outcomes not features
-- Include specific numbers ("Cut meetings by 50%")
+- Include specific numbers (&quot;Cut meetings by 50%&quot;)
 
 ## Audience Targeting Insights
 
@@ -207,14 +257,14 @@ Based on ad variations:
 
 ## Recommendations for Your Ads
 
-1. **Test the "tool sprawl" pain point**
+1. **Test the &quot;tool sprawl&quot; pain point**
    → Strong resonance based on their ad frequency
 
 2. **Use product screenshots over abstract visuals**
    → All their top ads show actual UI
 
 3. **Lead with the problem, not the solution**
-   → "Tired of X?" performs better than "Introducing Y"
+   → &quot;Tired of X?&quot; performs better than &quot;Introducing Y&quot;
 
 4. **Keep copy under 100 characters**
    → Their shortest ads seem most frequent
@@ -228,7 +278,7 @@ Based on ad variations:
 - Best performers: ~/competitor-ads/notion/top-10/
 ```
 
-**Inspired by:** Sumant Subrahmanya's use case from Lenny's Newsletter
+**Inspired by:** Sumant Subrahmanya&#039;s use case from Lenny&#039;s Newsletter
 
 ## What You Can Learn
 
@@ -258,12 +308,12 @@ Based on ad variations:
 
 ## Best Practices
 
-### Legal & Ethical
+### Legal &amp; Ethical
 ✓ Only use for research and inspiration
-✓ Don't copy ads directly
+✓ Don&#039;t copy ads directly
 ✓ Respect intellectual property
 ✓ Use insights to inform original creative
-✗ Don't plagiarize copy or steal designs
+✗ Don&#039;t plagiarize copy or steal designs
 
 ### Analysis Tips
 1. **Look for patterns**: What themes repeat?
@@ -276,7 +326,7 @@ Based on ad variations:
 
 ### Trend Tracking
 ```
-Compare [Competitor]'s ads from Q1 vs Q2. 
+Compare [Competitor]&#039;s ads from Q1 vs Q2. 
 What messaging has changed?
 ```
 
@@ -348,8 +398,39 @@ Which gets more engagement? (if data available)
 - Planning product marketing strategy
 - Inspiring social media content
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>497</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

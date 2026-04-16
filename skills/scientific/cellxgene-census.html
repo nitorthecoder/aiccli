@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>cellxgene-census - AICCLI</title>
-  <meta name="description" content="cellxgene-census - Claude Code skill for AICCLI">
+  <meta name="description" content=""Query CZ CELLxGENE Census (61M+ cells). Filter by cell type/tissue/disease, retrieve expression data, integrate with scanpy/PyTorch, for population-scale singl">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / cellxgene-census</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>cellxgene-census</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / cellxgene-census
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>cellxgene-census</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Query CZ CELLxGENE Census (61M+ cells). Filter by cell type/tissue/disease, retrieve expression data, integrate with scanpy/PyTorch, for population-scale single-cell analysis."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/cellxgene-census</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/cellxgene-census</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/cellxgene-census</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: cellxgene-census
-description: "Query CZ CELLxGENE Census (61M+ cells). Filter by cell type/tissue/disease, retrieve expression data, integrate with scanpy/PyTorch, for population-scale single-cell analysis."
+description: &quot;Query CZ CELLxGENE Census (61M+ cells). Filter by cell type/tissue/disease, retrieve expression data, integrate with scanpy/PyTorch, for population-scale single-cell analysis.&quot;
 ---
 
 # CZ CELLxGENE Census
@@ -110,14 +160,14 @@ with cellxgene_census.open_soma() as census:
     # Work with census data
 
 # Open specific version for reproducibility
-with cellxgene_census.open_soma(census_version="2023-07-25") as census:
+with cellxgene_census.open_soma(census_version=&quot;2023-07-25&quot;) as census:
     # Work with census data
 ```
 
 **Key points:**
 - Use context manager (`with` statement) for automatic cleanup
 - Specify `census_version` for reproducible analyses
-- Default opens latest "stable" release
+- Default opens latest &quot;stable&quot; release
 
 ### 2. Exploring Census Information
 
@@ -126,14 +176,14 @@ Before querying expression data, explore available datasets and metadata.
 **Access summary information:**
 ```python
 # Get summary statistics
-summary = census["census_info"]["summary"].read().concat().to_pandas()
-print(f"Total cells: {summary['total_cell_count'][0]}")
+summary = census[&quot;census_info&quot;][&quot;summary&quot;].read().concat().to_pandas()
+print(f&quot;Total cells: {summary[&#039;total_cell_count&#039;][0]}&quot;)
 
 # Get all datasets
-datasets = census["census_info"]["datasets"].read().concat().to_pandas()
+datasets = census[&quot;census_info&quot;][&quot;datasets&quot;].read().concat().to_pandas()
 
 # Filter datasets by criteria
-covid_datasets = datasets[datasets["disease"].str.contains("COVID", na=False)]
+covid_datasets = datasets[datasets[&quot;disease&quot;].str.contains(&quot;COVID&quot;, na=False)]
 ```
 
 **Query cell metadata to understand available data:**
@@ -141,15 +191,15 @@ covid_datasets = datasets[datasets["disease"].str.contains("COVID", na=False)]
 # Get unique cell types in a tissue
 cell_metadata = cellxgene_census.get_obs(
     census,
-    "homo_sapiens",
-    value_filter="tissue_general == 'brain' and is_primary_data == True",
-    column_names=["cell_type"]
+    &quot;homo_sapiens&quot;,
+    value_filter=&quot;tissue_general == &#039;brain&#039; and is_primary_data == True&quot;,
+    column_names=[&quot;cell_type&quot;]
 )
-unique_cell_types = cell_metadata["cell_type"].unique()
-print(f"Found {len(unique_cell_types)} cell types in brain")
+unique_cell_types = cell_metadata[&quot;cell_type&quot;].unique()
+print(f&quot;Found {len(unique_cell_types)} cell types in brain&quot;)
 
 # Count cells by tissue
-tissue_counts = cell_metadata.groupby("tissue_general").size()
+tissue_counts = cell_metadata.groupby(&quot;tissue_general&quot;).size()
 ```
 
 **Important:** Always filter for `is_primary_data == True` to avoid counting duplicate cells unless specifically analyzing duplicates.
@@ -162,18 +212,18 @@ For queries returning &lt; 100k cells that fit in memory, use `get_anndata()`:
 # Basic query with cell type and tissue filters
 adata = cellxgene_census.get_anndata(
     census=census,
-    organism="Homo sapiens",  # or "Mus musculus"
-    obs_value_filter="cell_type == 'B cell' and tissue_general == 'lung' and is_primary_data == True",
-    obs_column_names=["assay", "disease", "sex", "donor_id"],
+    organism=&quot;Homo sapiens&quot;,  # or &quot;Mus musculus&quot;
+    obs_value_filter=&quot;cell_type == &#039;B cell&#039; and tissue_general == &#039;lung&#039; and is_primary_data == True&quot;,
+    obs_column_names=[&quot;assay&quot;, &quot;disease&quot;, &quot;sex&quot;, &quot;donor_id&quot;],
 )
 
 # Query specific genes with multiple filters
 adata = cellxgene_census.get_anndata(
     census=census,
-    organism="Homo sapiens",
-    var_value_filter="feature_name in ['CD4', 'CD8A', 'CD19', 'FOXP3']",
-    obs_value_filter="cell_type == 'T cell' and disease == 'COVID-19' and is_primary_data == True",
-    obs_column_names=["cell_type", "tissue_general", "donor_id"],
+    organism=&quot;Homo sapiens&quot;,
+    var_value_filter=&quot;feature_name in [&#039;CD4&#039;, &#039;CD8A&#039;, &#039;CD19&#039;, &#039;FOXP3&#039;]&quot;,
+    obs_value_filter=&quot;cell_type == &#039;T cell&#039; and disease == &#039;COVID-19&#039; and is_primary_data == True&quot;,
+    obs_column_names=[&quot;cell_type&quot;, &quot;tissue_general&quot;, &quot;donor_id&quot;],
 )
 ```
 
@@ -181,23 +231,23 @@ adata = cellxgene_census.get_anndata(
 - Use `obs_value_filter` for cell filtering
 - Use `var_value_filter` for gene filtering
 - Combine conditions with `and`, `or`
-- Use `in` for multiple values: `tissue in ['lung', 'liver']`
+- Use `in` for multiple values: `tissue in [&#039;lung&#039;, &#039;liver&#039;]`
 - Select only needed columns with `obs_column_names`
 
 **Getting metadata separately:**
 ```python
 # Query cell metadata
 cell_metadata = cellxgene_census.get_obs(
-    census, "homo_sapiens",
-    value_filter="disease == 'COVID-19' and is_primary_data == True",
-    column_names=["cell_type", "tissue_general", "donor_id"]
+    census, &quot;homo_sapiens&quot;,
+    value_filter=&quot;disease == &#039;COVID-19&#039; and is_primary_data == True&quot;,
+    column_names=[&quot;cell_type&quot;, &quot;tissue_general&quot;, &quot;donor_id&quot;]
 )
 
 # Query gene metadata
 gene_metadata = cellxgene_census.get_var(
-    census, "homo_sapiens",
-    value_filter="feature_name in ['CD4', 'CD8A']",
-    column_names=["feature_id", "feature_name", "feature_length"]
+    census, &quot;homo_sapiens&quot;,
+    value_filter=&quot;feature_name in [&#039;CD4&#039;, &#039;CD8A&#039;]&quot;,
+    column_names=[&quot;feature_id&quot;, &quot;feature_name&quot;, &quot;feature_length&quot;]
 )
 ```
 
@@ -209,18 +259,18 @@ For queries exceeding available RAM, use `axis_query()` with iterative processin
 import tiledbsoma as soma
 
 # Create axis query
-query = census["census_data"]["homo_sapiens"].axis_query(
-    measurement_name="RNA",
+query = census[&quot;census_data&quot;][&quot;homo_sapiens&quot;].axis_query(
+    measurement_name=&quot;RNA&quot;,
     obs_query=soma.AxisQuery(
-        value_filter="tissue_general == 'brain' and is_primary_data == True"
+        value_filter=&quot;tissue_general == &#039;brain&#039; and is_primary_data == True&quot;
     ),
     var_query=soma.AxisQuery(
-        value_filter="feature_name in ['FOXP2', 'TBR1', 'SATB2']"
+        value_filter=&quot;feature_name in [&#039;FOXP2&#039;, &#039;TBR1&#039;, &#039;SATB2&#039;]&quot;
     )
 )
 
 # Iterate through expression matrix in chunks
-iterator = query.X("raw").tables()
+iterator = query.X(&quot;raw&quot;).tables()
 for batch in iterator:
     # batch is a pyarrow.Table with columns:
     # - soma_data: expression value
@@ -235,9 +285,9 @@ for batch in iterator:
 n_observations = 0
 sum_values = 0.0
 
-iterator = query.X("raw").tables()
+iterator = query.X(&quot;raw&quot;).tables()
 for batch in iterator:
-    values = batch["soma_data"].to_numpy()
+    values = batch[&quot;soma_data&quot;].to_numpy()
     n_observations += len(values)
     sum_values += values.sum()
 
@@ -254,11 +304,11 @@ from cellxgene_census.experimental.ml import experiment_dataloader
 with cellxgene_census.open_soma() as census:
     # Create dataloader
     dataloader = experiment_dataloader(
-        census["census_data"]["homo_sapiens"],
-        measurement_name="RNA",
-        X_name="raw",
-        obs_value_filter="tissue_general == 'liver' and is_primary_data == True",
-        obs_column_names=["cell_type"],
+        census[&quot;census_data&quot;][&quot;homo_sapiens&quot;],
+        measurement_name=&quot;RNA&quot;,
+        X_name=&quot;raw&quot;,
+        obs_value_filter=&quot;tissue_general == &#039;liver&#039; and is_primary_data == True&quot;,
+        obs_column_names=[&quot;cell_type&quot;],
         batch_size=128,
         shuffle=True,
     )
@@ -266,8 +316,8 @@ with cellxgene_census.open_soma() as census:
     # Training loop
     for epoch in range(num_epochs):
         for batch in dataloader:
-            X = batch["X"]  # Gene expression tensor
-            labels = batch["obs"]["cell_type"]  # Cell type labels
+            X = batch[&quot;X&quot;]  # Gene expression tensor
+            labels = batch[&quot;obs&quot;][&quot;cell_type&quot;]  # Cell type labels
 
             # Forward pass
             outputs = model(X)
@@ -286,8 +336,8 @@ from cellxgene_census.experimental.ml import ExperimentDataset
 # Create dataset from experiment
 dataset = ExperimentDataset(
     experiment_axis_query,
-    layer_name="raw",
-    obs_column_names=["cell_type"],
+    layer_name=&quot;raw&quot;,
+    obs_column_names=[&quot;cell_type&quot;],
     batch_size=128,
 )
 
@@ -308,8 +358,8 @@ import scanpy as sc
 # Load data from Census
 adata = cellxgene_census.get_anndata(
     census=census,
-    organism="Homo sapiens",
-    obs_value_filter="cell_type == 'neuron' and tissue_general == 'cortex' and is_primary_data == True",
+    organism=&quot;Homo sapiens&quot;,
+    obs_value_filter=&quot;cell_type == &#039;neuron&#039; and tissue_general == &#039;cortex&#039; and is_primary_data == True&quot;,
 )
 
 # Standard scanpy workflow
@@ -323,7 +373,7 @@ sc.pp.neighbors(adata)
 sc.tl.umap(adata)
 
 # Visualization
-sc.pl.umap(adata, color=["cell_type", "tissue", "disease"])
+sc.pl.umap(adata, color=[&quot;cell_type&quot;, &quot;tissue&quot;, &quot;disease&quot;])
 ```
 
 ### 7. Multi-Dataset Integration
@@ -332,16 +382,16 @@ Query and integrate multiple datasets:
 
 ```python
 # Strategy 1: Query multiple tissues separately
-tissues = ["lung", "liver", "kidney"]
+tissues = [&quot;lung&quot;, &quot;liver&quot;, &quot;kidney&quot;]
 adatas = []
 
 for tissue in tissues:
     adata = cellxgene_census.get_anndata(
         census=census,
-        organism="Homo sapiens",
-        obs_value_filter=f"tissue_general == '{tissue}' and is_primary_data == True",
+        organism=&quot;Homo sapiens&quot;,
+        obs_value_filter=f&quot;tissue_general == &#039;{tissue}&#039; and is_primary_data == True&quot;,
     )
-    adata.obs["tissue"] = tissue
+    adata.obs[&quot;tissue&quot;] = tissue
     adatas.append(adata)
 
 # Concatenate
@@ -350,8 +400,8 @@ combined = adatas[0].concatenate(adatas[1:])
 # Strategy 2: Query multiple datasets directly
 adata = cellxgene_census.get_anndata(
     census=census,
-    organism="Homo sapiens",
-    obs_value_filter="tissue_general in ['lung', 'liver', 'kidney'] and is_primary_data == True",
+    organism=&quot;Homo sapiens&quot;,
+    obs_value_filter=&quot;tissue_general in [&#039;lung&#039;, &#039;liver&#039;, &#039;kidney&#039;] and is_primary_data == True&quot;,
 )
 ```
 
@@ -360,13 +410,13 @@ adata = cellxgene_census.get_anndata(
 ### Always Filter for Primary Data
 Unless analyzing duplicates, always include `is_primary_data == True` in queries to avoid counting cells multiple times:
 ```python
-obs_value_filter="cell_type == 'B cell' and is_primary_data == True"
+obs_value_filter=&quot;cell_type == &#039;B cell&#039; and is_primary_data == True&quot;
 ```
 
 ### Specify Census Version for Reproducibility
 Always specify the Census version in production analyses:
 ```python
-census = cellxgene_census.open_soma(census_version="2023-07-25")
+census = cellxgene_census.open_soma(census_version=&quot;2023-07-25&quot;)
 ```
 
 ### Estimate Query Size Before Loading
@@ -374,12 +424,12 @@ For large queries, first check the number of cells to avoid memory issues:
 ```python
 # Get cell count
 metadata = cellxgene_census.get_obs(
-    census, "homo_sapiens",
-    value_filter="tissue_general == 'brain' and is_primary_data == True",
-    column_names=["soma_joinid"]
+    census, &quot;homo_sapiens&quot;,
+    value_filter=&quot;tissue_general == &#039;brain&#039; and is_primary_data == True&quot;,
+    column_names=[&quot;soma_joinid&quot;]
 )
 n_cells = len(metadata)
-print(f"Query will return {n_cells:,} cells")
+print(f&quot;Query will return {n_cells:,} cells&quot;)
 
 # If too large (&gt;100k), use out-of-core processing
 ```
@@ -388,16 +438,16 @@ print(f"Query will return {n_cells:,} cells")
 The `tissue_general` field provides coarser categories than `tissue`, useful for cross-tissue analyses:
 ```python
 # Broader grouping
-obs_value_filter="tissue_general == 'immune system'"
+obs_value_filter=&quot;tissue_general == &#039;immune system&#039;&quot;
 
 # Specific tissue
-obs_value_filter="tissue == 'peripheral blood mononuclear cell'"
+obs_value_filter=&quot;tissue == &#039;peripheral blood mononuclear cell&#039;&quot;
 ```
 
 ### Select Only Needed Columns
 Minimize data transfer by specifying only required metadata columns:
 ```python
-obs_column_names=["cell_type", "tissue_general", "disease"]  # Not all columns
+obs_column_names=[&quot;cell_type&quot;, &quot;tissue_general&quot;, &quot;disease&quot;]  # Not all columns
 ```
 
 ### Check Dataset Presence for Gene-Specific Queries
@@ -405,27 +455,27 @@ When analyzing specific genes, verify which datasets measured them:
 ```python
 presence = cellxgene_census.get_presence_matrix(
     census,
-    "homo_sapiens",
-    var_value_filter="feature_name in ['CD4', 'CD8A']"
+    &quot;homo_sapiens&quot;,
+    var_value_filter=&quot;feature_name in [&#039;CD4&#039;, &#039;CD8A&#039;]&quot;
 )
 ```
 
 ### Two-Step Workflow: Explore Then Query
 First explore metadata to understand available data, then query expression:
 ```python
-# Step 1: Explore what's available
+# Step 1: Explore what&#039;s available
 metadata = cellxgene_census.get_obs(
-    census, "homo_sapiens",
-    value_filter="disease == 'COVID-19' and is_primary_data == True",
-    column_names=["cell_type", "tissue_general"]
+    census, &quot;homo_sapiens&quot;,
+    value_filter=&quot;disease == &#039;COVID-19&#039; and is_primary_data == True&quot;,
+    column_names=[&quot;cell_type&quot;, &quot;tissue_general&quot;]
 )
 print(metadata.value_counts())
 
 # Step 2: Query based on findings
 adata = cellxgene_census.get_anndata(
     census=census,
-    organism="Homo sapiens",
-    obs_value_filter="disease == 'COVID-19' and cell_type == 'T cell' and is_primary_data == True",
+    organism=&quot;Homo sapiens&quot;,
+    obs_value_filter=&quot;disease == &#039;COVID-19&#039; and cell_type == &#039;T cell&#039; and is_primary_data == True&quot;,
 )
 ```
 
@@ -443,8 +493,8 @@ Key fields for filtering:
 - `is_primary_data` (Boolean: True = unique cell)
 
 ### Gene Metadata (var)
-- `feature_id` (Ensembl gene ID, e.g., "ENSG00000161798")
-- `feature_name` (Gene symbol, e.g., "FOXP2")
+- `feature_id` (Ensembl gene ID, e.g., &quot;ENSG00000161798&quot;)
+- `feature_name` (Gene symbol, e.g., &quot;FOXP2&quot;)
 - `feature_length` (Gene length in base pairs)
 
 ## Reference Documentation
@@ -479,11 +529,11 @@ Examples and patterns for:
 ```python
 with cellxgene_census.open_soma() as census:
     cells = cellxgene_census.get_obs(
-        census, "homo_sapiens",
-        value_filter="tissue_general == 'lung' and is_primary_data == True",
-        column_names=["cell_type"]
+        census, &quot;homo_sapiens&quot;,
+        value_filter=&quot;tissue_general == &#039;lung&#039; and is_primary_data == True&quot;,
+        column_names=[&quot;cell_type&quot;]
     )
-    print(cells["cell_type"].value_counts())
+    print(cells[&quot;cell_type&quot;].value_counts())
 ```
 
 ### Use Case 2: Query Marker Gene Expression
@@ -491,9 +541,9 @@ with cellxgene_census.open_soma() as census:
 with cellxgene_census.open_soma() as census:
     adata = cellxgene_census.get_anndata(
         census=census,
-        organism="Homo sapiens",
-        var_value_filter="feature_name in ['CD4', 'CD8A', 'CD19']",
-        obs_value_filter="cell_type in ['T cell', 'B cell'] and is_primary_data == True",
+        organism=&quot;Homo sapiens&quot;,
+        var_value_filter=&quot;feature_name in [&#039;CD4&#039;, &#039;CD8A&#039;, &#039;CD19&#039;]&quot;,
+        obs_value_filter=&quot;cell_type in [&#039;T cell&#039;, &#039;B cell&#039;] and is_primary_data == True&quot;,
     )
 ```
 
@@ -503,11 +553,11 @@ from cellxgene_census.experimental.ml import experiment_dataloader
 
 with cellxgene_census.open_soma() as census:
     dataloader = experiment_dataloader(
-        census["census_data"]["homo_sapiens"],
-        measurement_name="RNA",
-        X_name="raw",
-        obs_value_filter="is_primary_data == True",
-        obs_column_names=["cell_type"],
+        census[&quot;census_data&quot;][&quot;homo_sapiens&quot;],
+        measurement_name=&quot;RNA&quot;,
+        X_name=&quot;raw&quot;,
+        obs_value_filter=&quot;is_primary_data == True&quot;,
+        obs_column_names=[&quot;cell_type&quot;],
         batch_size=128,
         shuffle=True,
     )
@@ -524,12 +574,12 @@ with cellxgene_census.open_soma() as census:
 with cellxgene_census.open_soma() as census:
     adata = cellxgene_census.get_anndata(
         census=census,
-        organism="Homo sapiens",
-        obs_value_filter="cell_type == 'macrophage' and tissue_general in ['lung', 'liver', 'brain'] and is_primary_data == True",
+        organism=&quot;Homo sapiens&quot;,
+        obs_value_filter=&quot;cell_type == &#039;macrophage&#039; and tissue_general in [&#039;lung&#039;, &#039;liver&#039;, &#039;brain&#039;] and is_primary_data == True&quot;,
     )
 
     # Analyze macrophage differences across tissues
-    sc.tl.rank_genes_groups(adata, groupby="tissue_general")
+    sc.tl.rank_genes_groups(adata, groupby=&quot;tissue_general&quot;)
 ```
 
 ## Troubleshooting
@@ -560,8 +610,39 @@ with cellxgene_census.open_soma() as census:
 - Always specify `census_version` explicitly
 - Use same version across all analyses
 - Check release notes for version-specific changes
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>6</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

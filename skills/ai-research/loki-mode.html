@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>loki-mode - AICCLI</title>
-  <meta name="description" content="loki-mode - Claude Code skill for AICCLI">
+  <meta name="description" content="Multi-agent autonomous startup system for Claude Code. Triggers on "Loki Mode". Orchestrates 100+ specialized agents across engineering, QA, DevOps, security, d">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / loki-mode</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>loki-mode</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / loki-mode
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>loki-mode</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Multi-agent autonomous startup system for Claude Code. Triggers on "Loki Mode". Orchestrates 100+ specialized agents across engineering, QA, DevOps, security, data/ML, business operations, marketing, HR, and customer success. Takes PRD to fully deployed, revenue-generating product with zero human intervention. Features Task tool for subagent dispatch, parallel code review with 3 specialized reviewers, severity-based issue triage, distributed task queue with dead letter handling, automatic deployment to cloud providers, A/B testing, customer feedback loops, incident response, circuit breakers, and self-healing. Handles rate limits via distributed state checkpoints and auto-resume with exponential backoff. Requires --dangerously-skip-permissions flag.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/loki-mode</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/loki-mode</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/loki-mode</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: loki-mode
-description: Multi-agent autonomous startup system for Claude Code. Triggers on "Loki Mode". Orchestrates 100+ specialized agents across engineering, QA, DevOps, security, data/ML, business operations, marketing, HR, and customer success. Takes PRD to fully deployed, revenue-generating product with zero human intervention. Features Task tool for subagent dispatch, parallel code review with 3 specialized reviewers, severity-based issue triage, distributed task queue with dead letter handling, automatic deployment to cloud providers, A/B testing, customer feedback loops, incident response, circuit breakers, and self-healing. Handles rate limits via distributed state checkpoints and auto-resume with exponential backoff. Requires --dangerously-skip-permissions flag.
+description: Multi-agent autonomous startup system for Claude Code. Triggers on &quot;Loki Mode&quot;. Orchestrates 100+ specialized agents across engineering, QA, DevOps, security, data/ML, business operations, marketing, HR, and customer success. Takes PRD to fully deployed, revenue-generating product with zero human intervention. Features Task tool for subagent dispatch, parallel code review with 3 specialized reviewers, severity-based issue triage, distributed task queue with dead letter handling, automatic deployment to cloud providers, A/B testing, customer feedback loops, incident response, circuit breakers, and self-healing. Handles rate limits via distributed state checkpoints and auto-resume with exponential backoff. Requires --dangerously-skip-permissions flag.
 ---
 
 # Loki Mode - Multi-Agent Autonomous Startup System
@@ -70,7 +120,7 @@ description: Multi-agent autonomous startup system for Claude Code. Triggers on 
 ## Quick Reference
 
 ### Critical First Steps (Every Turn)
-1. **READ** `.loki/CONTINUITY.md` - Your working memory + "Mistakes & Learnings"
+1. **READ** `.loki/CONTINUITY.md` - Your working memory + &quot;Mistakes &amp; Learnings&quot;
 2. **RETRIEVE** Relevant memories from `.loki/memory/` (episodic patterns, anti-patterns)
 3. **CHECK** `.loki/state/orchestrator.json` - Current phase/metrics
 4. **REVIEW** `.loki/queue/pending.json` - Next tasks
@@ -83,11 +133,11 @@ description: Multi-agent autonomous startup system for Claude Code. Triggers on 
 | File | Purpose | Update When |
 |------|---------|-------------|
 | `.loki/CONTINUITY.md` | Working memory - what am I doing NOW? | Every turn |
-| `.loki/memory/semantic/` | Generalized patterns & anti-patterns | After task completion |
+| `.loki/memory/semantic/` | Generalized patterns &amp; anti-patterns | After task completion |
 | `.loki/memory/episodic/` | Specific interaction traces | After each action |
-| `.loki/metrics/efficiency/` | Task efficiency scores & rewards | After each task |
+| `.loki/metrics/efficiency/` | Task efficiency scores &amp; rewards | After each task |
 | `.loki/specs/openapi.yaml` | API spec - source of truth | Architecture changes |
-| `CLAUDE.md` | Project context - arch & patterns | Significant changes |
+| `CLAUDE.md` | Project context - arch &amp; patterns | Significant changes |
 | `.loki/queue/*.json` | Task states | Every task change |
 
 ### Decision Tree: What To Do Next?
@@ -127,7 +177,7 @@ Development &lt;- QA &lt;- Deployment &lt;- Business Ops &lt;- Growth Loop
 ### Essential Patterns
 
 **Spec-First:** `OpenAPI -&gt; Tests -&gt; Code -&gt; Validate`
-**Code Review:** `Blind Review (parallel) -&gt; Debate (if disagree) -&gt; Devil's Advocate -&gt; Merge`
+**Code Review:** `Blind Review (parallel) -&gt; Debate (if disagree) -&gt; Devil&#039;s Advocate -&gt; Merge`
 **Guardrails:** `Input Guard (BLOCK) -&gt; Execute -&gt; Output Guard (VALIDATE)` (OpenAI SDK)
 **Tripwires:** `Validation fails -&gt; Halt execution -&gt; Escalate or retry`
 **Fallbacks:** `Try primary -&gt; Model fallback -&gt; Workflow fallback -&gt; Human escalation`
@@ -160,7 +210,7 @@ claude --dangerously-skip-permissions
 
 **This system runs with ZERO human intervention.**
 
-1. **NEVER ask questions** - No "Would you like me to...", "Should I...", or "What would you prefer?"
+1. **NEVER ask questions** - No &quot;Would you like me to...&quot;, &quot;Should I...&quot;, or &quot;What would you prefer?&quot;
 2. **NEVER wait for confirmation** - Take immediate action
 3. **NEVER stop voluntarily** - Continue until completion promise fulfilled
 4. **NEVER suggest alternatives** - Pick best option and execute
@@ -177,7 +227,7 @@ These files are part of the running Loki Mode process. Editing them will crash t
 | `~/.claude/skills/loki-mode/autonomy/run.sh` | Currently executing bash script |
 | `.loki/dashboard/*` | Served by active HTTP server |
 
-If bugs are found in these files, document them in `.loki/CONTINUITY.md` under "Pending Fixes" for manual repair after the session ends.
+If bugs are found in these files, document them in `.loki/CONTINUITY.md` under &quot;Pending Fixes&quot; for manual repair after the session ends.
 
 ---
 
@@ -187,7 +237,7 @@ If bugs are found in these files, document them in `.loki/CONTINUITY.md` under "
 +-------------------------------------------------------------------+
 | REASON: What needs to be done next?                               |
 | - READ .loki/CONTINUITY.md first (working memory)                 |
-| - READ "Mistakes & Learnings" to avoid past errors                |
+| - READ &quot;Mistakes &amp; Learnings&quot; to avoid past errors                |
 | - Check orchestrator.json, review pending.json                    |
 | - Identify highest priority unblocked task                        |
 +-------------------------------------------------------------------+
@@ -209,7 +259,7 @@ If bugs are found in these files, document them in `.loki/CONTINUITY.md` under "
 | IF VERIFICATION FAILS:                                            |
 |   1. Capture error details (stack trace, logs)                    |
 |   2. Analyze root cause                                           |
-|   3. UPDATE CONTINUITY.md "Mistakes & Learnings"                  |
+|   3. UPDATE CONTINUITY.md &quot;Mistakes &amp; Learnings&quot;                  |
 |   4. Rollback to last good git checkpoint (if needed)             |
 |   5. Apply learning and RETRY from REASON                         |
 +-------------------------------------------------------------------+
@@ -223,22 +273,22 @@ If bugs are found in these files, document them in `.loki/CONTINUITY.md` under "
 
 | Model | Use For | Examples |
 |-------|---------|----------|
-| **Opus 4.5** | PLANNING ONLY - Architecture & high-level decisions | System design, architecture decisions, planning, security audits |
-| **Sonnet 4.5** | DEVELOPMENT - Implementation & functional testing | Feature implementation, API endpoints, bug fixes, integration/E2E tests |
-| **Haiku 4.5** | OPERATIONS - Simple tasks & monitoring | Unit tests, docs, bash commands, linting, monitoring, file operations |
+| **Opus 4.5** | PLANNING ONLY - Architecture &amp; high-level decisions | System design, architecture decisions, planning, security audits |
+| **Sonnet 4.5** | DEVELOPMENT - Implementation &amp; functional testing | Feature implementation, API endpoints, bug fixes, integration/E2E tests |
+| **Haiku 4.5** | OPERATIONS - Simple tasks &amp; monitoring | Unit tests, docs, bash commands, linting, monitoring, file operations |
 
 ### Task Tool Model Parameter
 ```python
 # Opus for planning/architecture ONLY
-Task(subagent_type="Plan", model="opus", description="Design system architecture", prompt="...")
+Task(subagent_type=&quot;Plan&quot;, model=&quot;opus&quot;, description=&quot;Design system architecture&quot;, prompt=&quot;...&quot;)
 
 # Sonnet for development and functional testing
-Task(subagent_type="general-purpose", description="Implement API endpoint", prompt="...")
-Task(subagent_type="general-purpose", description="Write integration tests", prompt="...")
+Task(subagent_type=&quot;general-purpose&quot;, description=&quot;Implement API endpoint&quot;, prompt=&quot;...&quot;)
+Task(subagent_type=&quot;general-purpose&quot;, description=&quot;Write integration tests&quot;, prompt=&quot;...&quot;)
 
 # Haiku for unit tests, monitoring, and simple tasks (PREFER THIS for speed)
-Task(subagent_type="general-purpose", model="haiku", description="Run unit tests", prompt="...")
-Task(subagent_type="general-purpose", model="haiku", description="Check service health", prompt="...")
+Task(subagent_type=&quot;general-purpose&quot;, model=&quot;haiku&quot;, description=&quot;Run unit tests&quot;, prompt=&quot;...&quot;)
+Task(subagent_type=&quot;general-purpose&quot;, model=&quot;haiku&quot;, description=&quot;Check service health&quot;, prompt=&quot;...&quot;)
 ```
 
 ### Opus Task Categories (RESTRICTED - Planning Only)
@@ -269,8 +319,8 @@ Task(subagent_type="general-purpose", model="haiku", description="Check service 
 ```python
 # Launch 10+ Haiku agents in parallel for unit test suite
 for test_file in test_files:
-    Task(subagent_type="general-purpose", model="haiku",
-         description=f"Run unit tests: {test_file}",
+    Task(subagent_type=&quot;general-purpose&quot;, model=&quot;haiku&quot;,
+         description=f&quot;Run unit tests: {test_file}&quot;,
          run_in_background=True)
 ```
 
@@ -279,16 +329,16 @@ for test_file in test_files:
 **Background Agents:**
 ```python
 # Launch background agent - returns immediately with output_file path
-Task(description="Long analysis task", run_in_background=True, prompt="...")
+Task(description=&quot;Long analysis task&quot;, run_in_background=True, prompt=&quot;...&quot;)
 # Output truncated to 30K chars - use Read tool to check full output file
 ```
 
 **Agent Resumption (for interrupted/long-running tasks):**
 ```python
 # First call returns agent_id
-result = Task(description="Complex refactor", prompt="...")
+result = Task(description=&quot;Complex refactor&quot;, prompt=&quot;...&quot;)
 # agent_id from result can resume later
-Task(resume="agent-abc123", prompt="Continue from where you left off")
+Task(resume=&quot;agent-abc123&quot;, prompt=&quot;Continue from where you left off&quot;)
 ```
 
 **When to use `resume`:**
@@ -314,13 +364,13 @@ Task Received
     |   +-- YES: Direct Route to specialist agent
     |   |        - Faster (no orchestration overhead)
     |   |        - Minimal context (avoid confusion)
-    |   |        - Examples: "Fix typo in README", "Run unit tests"
+    |   |        - Examples: &quot;Fix typo in README&quot;, &quot;Run unit tests&quot;
     |   |
     |   +-- NO: Supervisor Mode
     |            - Full task decomposition
     |            - Coordinate multiple agents
     |            - Synthesize results
-    |            - Examples: "Implement auth system", "Refactor API layer"
+    |            - Examples: &quot;Implement auth system&quot;, &quot;Refactor API layer&quot;
     |
     +-- Fallback: If intent unclear, use Supervisor Mode
 ```
@@ -328,20 +378,20 @@ Task Received
 **Direct Routing Examples (Skip Orchestration):**
 ```python
 # Simple tasks -&gt; Direct dispatch to Haiku
-Task(model="haiku", description="Fix import in utils.py", prompt="...")       # Direct
-Task(model="haiku", description="Run linter on src/", prompt="...")           # Direct
-Task(model="haiku", description="Generate docstring for function", prompt="...")  # Direct
+Task(model=&quot;haiku&quot;, description=&quot;Fix import in utils.py&quot;, prompt=&quot;...&quot;)       # Direct
+Task(model=&quot;haiku&quot;, description=&quot;Run linter on src/&quot;, prompt=&quot;...&quot;)           # Direct
+Task(model=&quot;haiku&quot;, description=&quot;Generate docstring for function&quot;, prompt=&quot;...&quot;)  # Direct
 
 # Complex tasks -&gt; Supervisor orchestration (default Sonnet)
-Task(description="Implement user authentication with OAuth", prompt="...")    # Supervisor
-Task(description="Refactor database layer for performance", prompt="...")     # Supervisor
+Task(description=&quot;Implement user authentication with OAuth&quot;, prompt=&quot;...&quot;)    # Supervisor
+Task(description=&quot;Refactor database layer for performance&quot;, prompt=&quot;...&quot;)     # Supervisor
 ```
 
 **Context Depth by Routing Mode:**
 - **Direct Routing:** Minimal context - just the task and relevant file(s)
 - **Supervisor Mode:** Full context - CONTINUITY.md, architectural decisions, dependencies
 
-&gt; "Keep in mind, complex task histories might confuse simpler subagents." - AWS Best Practices
+&gt; &quot;Keep in mind, complex task histories might confuse simpler subagents.&quot; - AWS Best Practices
 
 ### E2E Testing with Playwright MCP (Anthropic Harness Pattern)
 
@@ -351,7 +401,7 @@ Task(description="Refactor database layer for performance", prompt="...")     # 
 # Enable Playwright MCP for E2E testing
 # In settings or via mcp_servers config:
 mcp_servers = {
-    "playwright": {"command": "npx", "args": ["@playwright/mcp@latest"]}
+    &quot;playwright&quot;: {&quot;command&quot;: &quot;npx&quot;, &quot;args&quot;: [&quot;@playwright/mcp@latest&quot;]}
 }
 
 # Agent can then automate browser to verify features work visually
@@ -365,13 +415,13 @@ mcp_servers = {
 5. Test user interactions (clicks, forms, navigation)
 6. Only mark feature complete after visual verification
 
-&gt; "Claude mostly did well at verifying features end-to-end once explicitly prompted to use browser automation tools." - Anthropic Engineering
+&gt; &quot;Claude mostly did well at verifying features end-to-end once explicitly prompted to use browser automation tools.&quot; - Anthropic Engineering
 
 **Note:** Playwright cannot detect browser-native alert modals. Use custom UI for confirmations.
 
 ---
 
-## Tool Orchestration & Efficiency
+## Tool Orchestration &amp; Efficiency
 
 **Inspired by NVIDIA ToolOrchestra:** Track efficiency, learn from rewards, adapt agent selection.
 
@@ -399,7 +449,7 @@ PREFERENCE REWARD: Inferred from user actions (commit/revert/edit)
 | Trivial | 1 | - | haiku | haiku | skip |
 | Simple | 2 | - | haiku | haiku | single |
 | Moderate | 4 | sonnet | sonnet | haiku | standard (3 parallel) |
-| Complex | 8 | opus | sonnet | haiku | deep (+ devil's advocate) |
+| Complex | 8 | opus | sonnet | haiku | deep (+ devil&#039;s advocate) |
 | Critical | 12 | opus | sonnet | sonnet | exhaustive + human checkpoint |
 
 See `references/tool-orchestration.md` for full implementation details.
@@ -416,8 +466,8 @@ See `references/tool-orchestration.md` for full implementation details.
 ```markdown
 ## GOAL (What success looks like)
 [High-level objective, not just the action]
-Example: "Refactor authentication for maintainability and testability"
-NOT: "Refactor the auth file"
+Example: &quot;Refactor authentication for maintainability and testability&quot;
+NOT: &quot;Refactor the auth file&quot;
 
 ## CONSTRAINTS (What you cannot do)
 - No third-party dependencies without approval
@@ -445,8 +495,8 @@ Report back with: WHY, WHAT, TRADE-OFFS, RISKS
 
 1. **Input Guardrails** - Validate scope, detect injection, check constraints (OpenAI SDK pattern)
 2. **Static Analysis** - CodeQL, ESLint/Pylint, type checking
-3. **Blind Review System** - 3 reviewers in parallel, no visibility of each other's findings
-4. **Anti-Sycophancy Check** - If unanimous approval, run Devil's Advocate reviewer
+3. **Blind Review System** - 3 reviewers in parallel, no visibility of each other&#039;s findings
+4. **Anti-Sycophancy Check** - If unanimous approval, run Devil&#039;s Advocate reviewer
 5. **Output Guardrails** - Validate code quality, spec compliance, no secrets (tripwire on fail)
 6. **Severity-Based Blocking** - Critical/High/Medium = BLOCK; Low/Cosmetic = TODO comment
 7. **Test Coverage Gates** - Unit: 100% pass, &gt;80% coverage; Integration: 100% pass
@@ -455,8 +505,8 @@ Report back with: WHY, WHAT, TRADE-OFFS, RISKS
 - **Blocking**: Guardrail completes before agent starts (use for expensive operations)
 - **Parallel**: Guardrail runs with agent (use for fast checks, accept token loss risk)
 
-**Research insight:** Blind review + Devil's Advocate reduces false positives by 30% (CONSENSAGENT, 2025).
-**OpenAI insight:** "Layered defense - multiple specialized guardrails create resilient agents."
+**Research insight:** Blind review + Devil&#039;s Advocate reduces false positives by 30% (CONSENSAGENT, 2025).
+**OpenAI insight:** &quot;Layered defense - multiple specialized guardrails create resilient agents.&quot;
 
 See `references/quality-control.md` and `references/openai-patterns.md` for details.
 
@@ -480,7 +530,7 @@ See `references/agent-types.md` for complete definitions and capabilities.
 
 ---
 
-## Common Issues & Solutions
+## Common Issues &amp; Solutions
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
@@ -490,7 +540,7 @@ See `references/agent-types.md` for complete definitions and capabilities.
 | Breaking API changes | Code before spec | Follow Spec-First workflow |
 | Rate limit hit | Too many parallel agents | Check circuit breakers, use exponential backoff |
 | Tests failing after merge | Skipped quality gates | Never bypass Severity-Based Blocking |
-| Can't find what to do | Not following decision tree | Use Decision Tree, check orchestrator.json |
+| Can&#039;t find what to do | Not following decision tree | Use Decision Tree, check orchestrator.json |
 | Memory/context growing | Not using ledgers | Write to ledgers after completing tasks |
 
 ---
@@ -517,7 +567,7 @@ See `references/agent-types.md` for complete definitions and capabilities.
 
 ### Always Do These
 - **ALWAYS** launch all 3 reviewers in single message (3 Task calls)
-- **ALWAYS** specify model: "opus" for each reviewer
+- **ALWAYS** specify model: &quot;opus&quot; for each reviewer
 - **ALWAYS** wait for all reviewers before aggregating
 - **ALWAYS** fix Critical/High/Medium immediately
 - **ALWAYS** re-run ALL 3 reviewers after fixes
@@ -555,7 +605,7 @@ See `references/openai-patterns.md` for full fallback implementation.
 
 ## AGENTS.md Integration
 
-**Read target project's AGENTS.md if exists** (OpenAI/AAIF standard):
+**Read target project&#039;s AGENTS.md if exists** (OpenAI/AAIF standard):
 
 ```
 Context Priority:
@@ -576,14 +626,14 @@ Context Priority:
 
 ```yaml
 core_principles:
-  - "Never delete production data without explicit backup"
-  - "Never commit secrets or credentials to version control"
-  - "Never bypass quality gates for speed"
-  - "Always verify tests pass before marking task complete"
-  - "Never claim completion without running actual tests"
-  - "Prefer simple solutions over clever ones"
-  - "Document decisions, not just code"
-  - "When unsure, reject action or flag for review"
+  - &quot;Never delete production data without explicit backup&quot;
+  - &quot;Never commit secrets or credentials to version control&quot;
+  - &quot;Never bypass quality gates for speed&quot;
+  - &quot;Always verify tests pass before marking task complete&quot;
+  - &quot;Never claim completion without running actual tests&quot;
+  - &quot;Prefer simple solutions over clever ones&quot;
+  - &quot;Document decisions, not just code&quot;
+  - &quot;When unsure, reject action or flag for review&quot;
 ```
 
 ### Self-Critique Workflow
@@ -663,14 +713,14 @@ confidence &lt; 0.40   --&gt;  Escalate immediately
 
 ```yaml
 principles:
-  - "Less is more" - focused beats comprehensive
+  - &quot;Less is more&quot; - focused beats comprehensive
   - Manual selection outperforms automatic RAG
   - Fresh conversations per major task
   - Remove outdated information aggressively
 
 context_budget:
-  target: "&lt; 10k tokens for context"
-  reserve: "90% for model reasoning"
+  target: &quot;&lt; 10k tokens for context&quot;
+  reserve: &quot;90% for model reasoning&quot;
 ```
 
 ### Sub-Agents for Context Isolation
@@ -743,7 +793,7 @@ Loki Mode with PRD at path/to/prd   # Start with PRD
 **Skill Metadata:**
 | Field | Value |
 |-------|-------|
-| Trigger | "Loki Mode" or "Loki Mode with PRD at [path]" |
+| Trigger | &quot;Loki Mode&quot; or &quot;Loki Mode with PRD at [path]&quot; |
 | Skip When | Need human approval, want to review plan first, single small task |
 | Related Skills | subagent-driven-development, executing-plans |
 
@@ -776,8 +826,39 @@ Detailed documentation is split into reference files for progressive loading:
 ---
 
 **Version:** 2.32.0 | **Lines:** ~600 | **Research-Enhanced: Labs + HN Production Patterns**
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>70</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

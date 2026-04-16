@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>prompt-engineering-guidance - AICCLI</title>
-  <meta name="description" content="prompt-engineering-guidance - Claude Code skill for AICCLI">
+  <meta name="description" content="Control LLM output with regex and grammars, guarantee valid JSON/XML/code generation, enforce structured formats, and build multi-step workflows with Guidance -">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / prompt-engineering-guidance</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>prompt-engineering-guidance</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / prompt-engineering-guidance
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>prompt-engineering-guidance</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Control LLM output with regex and grammars, guarantee valid JSON/XML/code generation, enforce structured formats, and build multi-step workflows with Guidance - Microsoft Research's constrained generation framework</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/prompt-engineering-guidance</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/prompt-engineering-guidance</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/prompt-engineering-guidance</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: guidance
-description: Control LLM output with regex and grammars, guarantee valid JSON/XML/code generation, enforce structured formats, and build multi-step workflows with Guidance - Microsoft Research's constrained generation framework
+description: Control LLM output with regex and grammars, guarantee valid JSON/XML/code generation, enforce structured formats, and build multi-step workflows with Guidance - Microsoft Research&#039;s constrained generation framework
 version: 1.0.0
 author: Orchestra Research
 license: MIT
@@ -98,12 +148,12 @@ pip install guidance[llama_cpp]     # llama.cpp models
 from guidance import models, gen
 
 # Load model (supports OpenAI, Transformers, llama.cpp)
-lm = models.OpenAI("gpt-4")
+lm = models.OpenAI(&quot;gpt-4&quot;)
 
 # Generate with constraints
-result = lm + "The capital of France is " + gen("capital", max_tokens=5)
+result = lm + &quot;The capital of France is &quot; + gen(&quot;capital&quot;, max_tokens=5)
 
-print(result["capital"])  # "Paris"
+print(result[&quot;capital&quot;])  # &quot;Paris&quot;
 ```
 
 ### With Anthropic Claude
@@ -112,14 +162,14 @@ print(result["capital"])  # "Paris"
 from guidance import models, gen, system, user, assistant
 
 # Configure Claude
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
 
 # Use context managers for chat format
 with system():
-    lm += "You are a helpful assistant."
+    lm += &quot;You are a helpful assistant.&quot;
 
 with user():
-    lm += "What is the capital of France?"
+    lm += &quot;What is the capital of France?&quot;
 
 with assistant():
     lm += gen(max_tokens=20)
@@ -134,21 +184,21 @@ Guidance uses Pythonic context managers for chat-style interactions.
 ```python
 from guidance import system, user, assistant, gen
 
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
 
 # System message
 with system():
-    lm += "You are a JSON generation expert."
+    lm += &quot;You are a JSON generation expert.&quot;
 
 # User message
 with user():
-    lm += "Generate a person object with name and age."
+    lm += &quot;Generate a person object with name and age.&quot;
 
 # Assistant response
 with assistant():
-    lm += gen("response", max_tokens=100)
+    lm += gen(&quot;response&quot;, max_tokens=100)
 
-print(lm["response"])
+print(lm[&quot;response&quot;])
 ```
 
 **Benefits:**
@@ -165,19 +215,19 @@ Guidance ensures outputs match specified patterns using regex or grammars.
 ```python
 from guidance import models, gen
 
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
 
 # Constrain to valid email format
-lm += "Email: " + gen("email", regex=r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
+lm += &quot;Email: &quot; + gen(&quot;email&quot;, regex=r&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;)
 
 # Constrain to date format (YYYY-MM-DD)
-lm += "Date: " + gen("date", regex=r"\d{4}-\d{2}-\d{2}")
+lm += &quot;Date: &quot; + gen(&quot;date&quot;, regex=r&quot;\d{4}-\d{2}-\d{2}&quot;)
 
 # Constrain to phone number
-lm += "Phone: " + gen("phone", regex=r"\d{3}-\d{3}-\d{4}")
+lm += &quot;Phone: &quot; + gen(&quot;phone&quot;, regex=r&quot;\d{3}-\d{3}-\d{4}&quot;)
 
-print(lm["email"])  # Guaranteed valid email
-print(lm["date"])   # Guaranteed YYYY-MM-DD format
+print(lm[&quot;email&quot;])  # Guaranteed valid email
+print(lm[&quot;date&quot;])   # Guaranteed YYYY-MM-DD format
 ```
 
 **How it works:**
@@ -190,33 +240,33 @@ print(lm["date"])   # Guaranteed YYYY-MM-DD format
 ```python
 from guidance import models, gen, select
 
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
 
 # Constrain to specific choices
-lm += "Sentiment: " + select(["positive", "negative", "neutral"], name="sentiment")
+lm += &quot;Sentiment: &quot; + select([&quot;positive&quot;, &quot;negative&quot;, &quot;neutral&quot;], name=&quot;sentiment&quot;)
 
 # Multiple-choice selection
-lm += "Best answer: " + select(
-    ["A) Paris", "B) London", "C) Berlin", "D) Madrid"],
-    name="answer"
+lm += &quot;Best answer: &quot; + select(
+    [&quot;A) Paris&quot;, &quot;B) London&quot;, &quot;C) Berlin&quot;, &quot;D) Madrid&quot;],
+    name=&quot;answer&quot;
 )
 
-print(lm["sentiment"])  # One of: positive, negative, neutral
-print(lm["answer"])     # One of: A, B, C, or D
+print(lm[&quot;sentiment&quot;])  # One of: positive, negative, neutral
+print(lm[&quot;answer&quot;])     # One of: A, B, C, or D
 ```
 
 ### 3. Token Healing
 
-Guidance automatically "heals" token boundaries between prompt and generation.
+Guidance automatically &quot;heals&quot; token boundaries between prompt and generation.
 
 **Problem:** Tokenization creates unnatural boundaries.
 
 ```python
 # Without token healing
-prompt = "The capital of France is "
-# Last token: " is "
-# First generated token might be " Par" (with leading space)
-# Result: "The capital of France is  Paris" (double space!)
+prompt = &quot;The capital of France is &quot;
+# Last token: &quot; is &quot;
+# First generated token might be &quot; Par&quot; (with leading space)
+# Result: &quot;The capital of France is  Paris&quot; (double space!)
 ```
 
 **Solution:** Guidance backs up one token and regenerates.
@@ -224,11 +274,11 @@ prompt = "The capital of France is "
 ```python
 from guidance import models, gen
 
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
 
 # Token healing enabled by default
-lm += "The capital of France is " + gen("capital", max_tokens=5)
-# Result: "The capital of France is Paris" (correct spacing)
+lm += &quot;The capital of France is &quot; + gen(&quot;capital&quot;, max_tokens=5)
+# Result: &quot;The capital of France is Paris&quot; (correct spacing)
 ```
 
 **Benefits:**
@@ -243,21 +293,21 @@ Define complex structures using context-free grammars.
 ```python
 from guidance import models, gen
 
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
 
 # JSON grammar (simplified)
-json_grammar = """
+json_grammar = &quot;&quot;&quot;
 {
-    "name": &lt;gen name regex="[A-Za-z ]+" max_tokens=20&gt;,
-    "age": &lt;gen age regex="[0-9]+" max_tokens=3&gt;,
-    "email": &lt;gen email regex="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}" max_tokens=50&gt;
+    &quot;name&quot;: &lt;gen name regex=&quot;[A-Za-z ]+&quot; max_tokens=20&gt;,
+    &quot;age&quot;: &lt;gen age regex=&quot;[0-9]+&quot; max_tokens=3&gt;,
+    &quot;email&quot;: &lt;gen email regex=&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}&quot; max_tokens=50&gt;
 }
-"""
+&quot;&quot;&quot;
 
 # Generate valid JSON
-lm += gen("person", grammar=json_grammar)
+lm += gen(&quot;person&quot;, grammar=json_grammar)
 
-print(lm["person"])  # Guaranteed valid JSON structure
+print(lm[&quot;person&quot;])  # Guaranteed valid JSON structure
 ```
 
 **Use cases:**
@@ -275,17 +325,17 @@ from guidance import guidance, gen, models
 
 @guidance
 def generate_person(lm):
-    """Generate a person with name and age."""
-    lm += "Name: " + gen("name", max_tokens=20, stop="\n")
-    lm += "\nAge: " + gen("age", regex=r"[0-9]+", max_tokens=3)
+    &quot;&quot;&quot;Generate a person with name and age.&quot;&quot;&quot;
+    lm += &quot;Name: &quot; + gen(&quot;name&quot;, max_tokens=20, stop=&quot;\n&quot;)
+    lm += &quot;\nAge: &quot; + gen(&quot;age&quot;, regex=r&quot;[0-9]+&quot;, max_tokens=3)
     return lm
 
 # Use the function
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
 lm = generate_person(lm)
 
-print(lm["name"])
-print(lm["age"])
+print(lm[&quot;name&quot;])
+print(lm[&quot;age&quot;])
 ```
 
 **Stateful Functions:**
@@ -293,27 +343,27 @@ print(lm["age"])
 ```python
 @guidance(stateless=False)
 def react_agent(lm, question, tools, max_rounds=5):
-    """ReAct agent with tool use."""
-    lm += f"Question: {question}\n\n"
+    &quot;&quot;&quot;ReAct agent with tool use.&quot;&quot;&quot;
+    lm += f&quot;Question: {question}\n\n&quot;
 
     for i in range(max_rounds):
         # Thought
-        lm += f"Thought {i+1}: " + gen("thought", stop="\n")
+        lm += f&quot;Thought {i+1}: &quot; + gen(&quot;thought&quot;, stop=&quot;\n&quot;)
 
         # Action
-        lm += "\nAction: " + select(list(tools.keys()), name="action")
+        lm += &quot;\nAction: &quot; + select(list(tools.keys()), name=&quot;action&quot;)
 
         # Execute tool
-        tool_result = tools[lm["action"]]()
-        lm += f"\nObservation: {tool_result}\n\n"
+        tool_result = tools[lm[&quot;action&quot;]]()
+        lm += f&quot;\nObservation: {tool_result}\n\n&quot;
 
         # Check if done
-        lm += "Done? " + select(["Yes", "No"], name="done")
-        if lm["done"] == "Yes":
+        lm += &quot;Done? &quot; + select([&quot;Yes&quot;, &quot;No&quot;], name=&quot;done&quot;)
+        if lm[&quot;done&quot;] == &quot;Yes&quot;:
             break
 
     # Final answer
-    lm += "\nFinal Answer: " + gen("answer", max_tokens=100)
+    lm += &quot;\nFinal Answer: &quot; + gen(&quot;answer&quot;, max_tokens=100)
     return lm
 ```
 
@@ -325,8 +375,8 @@ def react_agent(lm, question, tools, max_rounds=5):
 from guidance import models
 
 lm = models.Anthropic(
-    model="claude-sonnet-4-5-20250929",
-    api_key="your-api-key"  # Or set ANTHROPIC_API_KEY env var
+    model=&quot;claude-sonnet-4-5-20250929&quot;,
+    api_key=&quot;your-api-key&quot;  # Or set ANTHROPIC_API_KEY env var
 )
 ```
 
@@ -334,8 +384,8 @@ lm = models.Anthropic(
 
 ```python
 lm = models.OpenAI(
-    model="gpt-4o-mini",
-    api_key="your-api-key"  # Or set OPENAI_API_KEY env var
+    model=&quot;gpt-4o-mini&quot;,
+    api_key=&quot;your-api-key&quot;  # Or set OPENAI_API_KEY env var
 )
 ```
 
@@ -345,8 +395,8 @@ lm = models.OpenAI(
 from guidance.models import Transformers
 
 lm = Transformers(
-    "microsoft/Phi-4-mini-instruct",
-    device="cuda"  # Or "cpu"
+    &quot;microsoft/Phi-4-mini-instruct&quot;,
+    device=&quot;cuda&quot;  # Or &quot;cpu&quot;
 )
 ```
 
@@ -356,7 +406,7 @@ lm = Transformers(
 from guidance.models import LlamaCpp
 
 lm = LlamaCpp(
-    model_path="/path/to/model.gguf",
+    model_path=&quot;/path/to/model.gguf&quot;,
     n_ctx=4096,
     n_gpu_layers=35
 )
@@ -369,20 +419,20 @@ lm = LlamaCpp(
 ```python
 from guidance import models, gen, system, user, assistant
 
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
 
 with system():
-    lm += "You generate valid JSON."
+    lm += &quot;You generate valid JSON.&quot;
 
 with user():
-    lm += "Generate a user profile with name, age, and email."
+    lm += &quot;Generate a user profile with name, age, and email.&quot;
 
 with assistant():
-    lm += """{
-    "name": """ + gen("name", regex=r'"[A-Za-z ]+"', max_tokens=30) + """,
-    "age": """ + gen("age", regex=r"[0-9]+", max_tokens=3) + """,
-    "email": """ + gen("email", regex=r'"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"', max_tokens=50) + """
-}"""
+    lm += &quot;&quot;&quot;{
+    &quot;name&quot;: &quot;&quot;&quot; + gen(&quot;name&quot;, regex=r&#039;&quot;[A-Za-z ]+&quot;&#039;, max_tokens=30) + &quot;&quot;&quot;,
+    &quot;age&quot;: &quot;&quot;&quot; + gen(&quot;age&quot;, regex=r&quot;[0-9]+&quot;, max_tokens=3) + &quot;&quot;&quot;,
+    &quot;email&quot;: &quot;&quot;&quot; + gen(&quot;email&quot;, regex=r&#039;&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;&#039;, max_tokens=50) + &quot;&quot;&quot;
+}&quot;&quot;&quot;
 
 print(lm)  # Valid JSON guaranteed
 ```
@@ -392,16 +442,16 @@ print(lm)  # Valid JSON guaranteed
 ```python
 from guidance import models, gen, select
 
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
 
-text = "This product is amazing! I love it."
+text = &quot;This product is amazing! I love it.&quot;
 
-lm += f"Text: {text}\n"
-lm += "Sentiment: " + select(["positive", "negative", "neutral"], name="sentiment")
-lm += "\nConfidence: " + gen("confidence", regex=r"[0-9]+", max_tokens=3) + "%"
+lm += f&quot;Text: {text}\n&quot;
+lm += &quot;Sentiment: &quot; + select([&quot;positive&quot;, &quot;negative&quot;, &quot;neutral&quot;], name=&quot;sentiment&quot;)
+lm += &quot;\nConfidence: &quot; + gen(&quot;confidence&quot;, regex=r&quot;[0-9]+&quot;, max_tokens=3) + &quot;%&quot;
 
-print(f"Sentiment: {lm['sentiment']}")
-print(f"Confidence: {lm['confidence']}%")
+print(f&quot;Sentiment: {lm[&#039;sentiment&#039;]}&quot;)
+print(f&quot;Confidence: {lm[&#039;confidence&#039;]}%&quot;)
 ```
 
 ### Pattern 3: Multi-Step Reasoning
@@ -411,22 +461,22 @@ from guidance import models, gen, guidance
 
 @guidance
 def chain_of_thought(lm, question):
-    """Generate answer with step-by-step reasoning."""
-    lm += f"Question: {question}\n\n"
+    &quot;&quot;&quot;Generate answer with step-by-step reasoning.&quot;&quot;&quot;
+    lm += f&quot;Question: {question}\n\n&quot;
 
     # Generate multiple reasoning steps
     for i in range(3):
-        lm += f"Step {i+1}: " + gen(f"step_{i+1}", stop="\n", max_tokens=100) + "\n"
+        lm += f&quot;Step {i+1}: &quot; + gen(f&quot;step_{i+1}&quot;, stop=&quot;\n&quot;, max_tokens=100) + &quot;\n&quot;
 
     # Final answer
-    lm += "\nTherefore, the answer is: " + gen("answer", max_tokens=50)
+    lm += &quot;\nTherefore, the answer is: &quot; + gen(&quot;answer&quot;, max_tokens=50)
 
     return lm
 
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
-lm = chain_of_thought(lm, "What is 15% of 200?")
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+lm = chain_of_thought(lm, &quot;What is 15% of 200?&quot;)
 
-print(lm["answer"])
+print(lm[&quot;answer&quot;])
 ```
 
 ### Pattern 4: ReAct Agent
@@ -436,38 +486,38 @@ from guidance import models, gen, select, guidance
 
 @guidance(stateless=False)
 def react_agent(lm, question):
-    """ReAct agent with tool use."""
+    &quot;&quot;&quot;ReAct agent with tool use.&quot;&quot;&quot;
     tools = {
-        "calculator": lambda expr: eval(expr),
-        "search": lambda query: f"Search results for: {query}",
+        &quot;calculator&quot;: lambda expr: eval(expr),
+        &quot;search&quot;: lambda query: f&quot;Search results for: {query}&quot;,
     }
 
-    lm += f"Question: {question}\n\n"
+    lm += f&quot;Question: {question}\n\n&quot;
 
     for round in range(5):
         # Thought
-        lm += f"Thought: " + gen("thought", stop="\n") + "\n"
+        lm += f&quot;Thought: &quot; + gen(&quot;thought&quot;, stop=&quot;\n&quot;) + &quot;\n&quot;
 
         # Action selection
-        lm += "Action: " + select(["calculator", "search", "answer"], name="action")
+        lm += &quot;Action: &quot; + select([&quot;calculator&quot;, &quot;search&quot;, &quot;answer&quot;], name=&quot;action&quot;)
 
-        if lm["action"] == "answer":
-            lm += "\nFinal Answer: " + gen("answer", max_tokens=100)
+        if lm[&quot;action&quot;] == &quot;answer&quot;:
+            lm += &quot;\nFinal Answer: &quot; + gen(&quot;answer&quot;, max_tokens=100)
             break
 
         # Action input
-        lm += "\nAction Input: " + gen("action_input", stop="\n") + "\n"
+        lm += &quot;\nAction Input: &quot; + gen(&quot;action_input&quot;, stop=&quot;\n&quot;) + &quot;\n&quot;
 
         # Execute tool
-        if lm["action"] in tools:
-            result = tools[lm["action"]](lm["action_input"])
-            lm += f"Observation: {result}\n\n"
+        if lm[&quot;action&quot;] in tools:
+            result = tools[lm[&quot;action&quot;]](lm[&quot;action_input&quot;])
+            lm += f&quot;Observation: {result}\n\n&quot;
 
     return lm
 
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
-lm = react_agent(lm, "What is 25 * 4 + 10?")
-print(lm["answer"])
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+lm = react_agent(lm, &quot;What is 25 * 4 + 10?&quot;)
+print(lm[&quot;answer&quot;])
 ```
 
 ### Pattern 5: Data Extraction
@@ -477,32 +527,32 @@ from guidance import models, gen, guidance
 
 @guidance
 def extract_entities(lm, text):
-    """Extract structured entities from text."""
-    lm += f"Text: {text}\n\n"
+    &quot;&quot;&quot;Extract structured entities from text.&quot;&quot;&quot;
+    lm += f&quot;Text: {text}\n\n&quot;
 
     # Extract person
-    lm += "Person: " + gen("person", stop="\n", max_tokens=30) + "\n"
+    lm += &quot;Person: &quot; + gen(&quot;person&quot;, stop=&quot;\n&quot;, max_tokens=30) + &quot;\n&quot;
 
     # Extract organization
-    lm += "Organization: " + gen("organization", stop="\n", max_tokens=30) + "\n"
+    lm += &quot;Organization: &quot; + gen(&quot;organization&quot;, stop=&quot;\n&quot;, max_tokens=30) + &quot;\n&quot;
 
     # Extract date
-    lm += "Date: " + gen("date", regex=r"\d{4}-\d{2}-\d{2}", max_tokens=10) + "\n"
+    lm += &quot;Date: &quot; + gen(&quot;date&quot;, regex=r&quot;\d{4}-\d{2}-\d{2}&quot;, max_tokens=10) + &quot;\n&quot;
 
     # Extract location
-    lm += "Location: " + gen("location", stop="\n", max_tokens=30) + "\n"
+    lm += &quot;Location: &quot; + gen(&quot;location&quot;, stop=&quot;\n&quot;, max_tokens=30) + &quot;\n&quot;
 
     return lm
 
-text = "Tim Cook announced at Apple Park on 2024-09-15 in Cupertino."
+text = &quot;Tim Cook announced at Apple Park on 2024-09-15 in Cupertino.&quot;
 
-lm = models.Anthropic("claude-sonnet-4-5-20250929")
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
 lm = extract_entities(lm, text)
 
-print(f"Person: {lm['person']}")
-print(f"Organization: {lm['organization']}")
-print(f"Date: {lm['date']}")
-print(f"Location: {lm['location']}")
+print(f&quot;Person: {lm[&#039;person&#039;]}&quot;)
+print(f&quot;Organization: {lm[&#039;organization&#039;]}&quot;)
+print(f&quot;Date: {lm[&#039;date&#039;]}&quot;)
+print(f&quot;Location: {lm[&#039;location&#039;]}&quot;)
 ```
 
 ## Best Practices
@@ -511,20 +561,20 @@ print(f"Location: {lm['location']}")
 
 ```python
 # ✅ Good: Regex ensures valid format
-lm += "Email: " + gen("email", regex=r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
+lm += &quot;Email: &quot; + gen(&quot;email&quot;, regex=r&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;)
 
 # ❌ Bad: Free generation may produce invalid emails
-lm += "Email: " + gen("email", max_tokens=50)
+lm += &quot;Email: &quot; + gen(&quot;email&quot;, max_tokens=50)
 ```
 
 ### 2. Use select() for Fixed Categories
 
 ```python
 # ✅ Good: Guaranteed valid category
-lm += "Status: " + select(["pending", "approved", "rejected"], name="status")
+lm += &quot;Status: &quot; + select([&quot;pending&quot;, &quot;approved&quot;, &quot;rejected&quot;], name=&quot;status&quot;)
 
 # ❌ Bad: May generate typos or invalid values
-lm += "Status: " + gen("status", max_tokens=20)
+lm += &quot;Status: &quot; + gen(&quot;status&quot;, max_tokens=20)
 ```
 
 ### 3. Leverage Token Healing
@@ -532,17 +582,17 @@ lm += "Status: " + gen("status", max_tokens=20)
 ```python
 # Token healing is enabled by default
 # No special action needed - just concatenate naturally
-lm += "The capital is " + gen("capital")  # Automatic healing
+lm += &quot;The capital is &quot; + gen(&quot;capital&quot;)  # Automatic healing
 ```
 
 ### 4. Use stop Sequences
 
 ```python
 # ✅ Good: Stop at newline for single-line outputs
-lm += "Name: " + gen("name", stop="\n")
+lm += &quot;Name: &quot; + gen(&quot;name&quot;, stop=&quot;\n&quot;)
 
 # ❌ Bad: May generate multiple lines
-lm += "Name: " + gen("name", max_tokens=50)
+lm += &quot;Name: &quot; + gen(&quot;name&quot;, max_tokens=50)
 ```
 
 ### 5. Create Reusable Functions
@@ -551,13 +601,13 @@ lm += "Name: " + gen("name", max_tokens=50)
 # ✅ Good: Reusable pattern
 @guidance
 def generate_person(lm):
-    lm += "Name: " + gen("name", stop="\n")
-    lm += "\nAge: " + gen("age", regex=r"[0-9]+")
+    lm += &quot;Name: &quot; + gen(&quot;name&quot;, stop=&quot;\n&quot;)
+    lm += &quot;\nAge: &quot; + gen(&quot;age&quot;, regex=r&quot;[0-9]+&quot;)
     return lm
 
 # Use multiple times
 lm = generate_person(lm)
-lm += "\n\n"
+lm += &quot;\n\n&quot;
 lm = generate_person(lm)
 ```
 
@@ -565,10 +615,10 @@ lm = generate_person(lm)
 
 ```python
 # ✅ Good: Reasonable constraints
-lm += gen("name", regex=r"[A-Za-z ]+", max_tokens=30)
+lm += gen(&quot;name&quot;, regex=r&quot;[A-Za-z ]+&quot;, max_tokens=30)
 
 # ❌ Too strict: May fail or be very slow
-lm += gen("name", regex=r"^(John|Jane)$", max_tokens=10)
+lm += gen(&quot;name&quot;, regex=r&quot;^(John|Jane)$&quot;, max_tokens=10)
 ```
 
 ## Comparison to Alternatives
@@ -627,8 +677,46 @@ lm += gen("name", regex=r"^(John|Jane)$", max_tokens=10)
 - `references/examples.md` - Production-ready examples
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Prompt Engineering</span><span class="tag">Guidance</span><span class="tag">Constrained Generation</span><span class="tag">Structured Output</span><span class="tag">JSON Validation</span><span class="tag">Grammar</span><span class="tag">Microsoft Research</span><span class="tag">Format Enforcement</span><span class="tag">Multi-Step Workflows</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>146</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

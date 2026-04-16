@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>nextjs-middleware-creator - AICCLI</title>
-  <meta name="description" content="nextjs-middleware-creator - Claude Code command for AICCLI">
+  <meta name="description" content="Create optimized Next.js middleware with authentication, rate limiting, and routing logic">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../command.html">Command</a> / nextjs-middleware-creator</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>nextjs-middleware-creator</h1>
-      <div class="meta">
-        <span class="meta-item">Command</span>
-        <span class="meta-item">nextjs-vercel</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">commands</a> / nextjs-vercel / nextjs-middleware-creator
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⌨️</div>
+      <div class="title">
+        <h1>nextjs-middleware-creator</h1>
+        <div class="meta">
+          <span class="badge type">Command</span>
+          <span class="badge">nextjs-vercel</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Create optimized Next.js middleware with authentication, rate limiting, and routing logic</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/nextjs-middleware-creator</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install commands/nextjs-middleware-creator</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install commands/nextjs-middleware-creator</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 allowed-tools: Read, Write, Edit
 argument-hint: [middleware-type] [--auth] [--rate-limit] [--redirect] [--rewrite]
 description: Create optimized Next.js middleware with authentication, rate limiting, and routing logic
@@ -97,11 +147,11 @@ lib/middleware/              # Middleware utilities
 ### 2. Base Middleware Template
 ```typescript
 // middleware.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { authMiddleware } from './lib/middleware/auth';
-import { rateLimitMiddleware } from './lib/middleware/rateLimit';
-import { securityMiddleware } from './lib/middleware/security';
-import { redirectMiddleware } from './lib/middleware/redirects';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+import { authMiddleware } from &#039;./lib/middleware/auth&#039;;
+import { rateLimitMiddleware } from &#039;./lib/middleware/rateLimit&#039;;
+import { securityMiddleware } from &#039;./lib/middleware/security&#039;;
+import { redirectMiddleware } from &#039;./lib/middleware/redirects&#039;;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -132,14 +182,14 @@ export async function middleware(request: NextRequest) {
 }
 
 function isProtectedRoute(pathname: string): boolean {
-  const protectedPaths = ['/dashboard', '/admin', '/api/protected'];
+  const protectedPaths = [&#039;/dashboard&#039;, &#039;/admin&#039;, &#039;/api/protected&#039;];
   return protectedPaths.some(path =&gt; pathname.startsWith(path));
 }
 
 export const config = {
   matcher: [
     // Match all request paths except static files and images
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    &#039;/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)&#039;,
   ],
 };
 ```
@@ -149,18 +199,18 @@ export const config = {
 ### 1. Authentication Middleware
 ```typescript
 // lib/middleware/auth.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+import { jwtVerify } from &#039;jose&#039;;
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'your-secret-key'
+  process.env.JWT_SECRET || &#039;your-secret-key&#039;
 );
 
 export async function authMiddleware(request: NextRequest) {
   try {
     // Get token from cookies or Authorization header
-    const token = request.cookies.get('auth-token')?.value ||
-      request.headers.get('authorization')?.replace('Bearer ', '');
+    const token = request.cookies.get(&#039;auth-token&#039;)?.value ||
+      request.headers.get(&#039;authorization&#039;)?.replace(&#039;Bearer &#039;, &#039;&#039;);
 
     if (!token) {
       return redirectToLogin(request);
@@ -171,30 +221,30 @@ export async function authMiddleware(request: NextRequest) {
     
     // Add user info to headers for downstream use
     const response = NextResponse.next();
-    response.headers.set('x-user-id', payload.sub as string);
-    response.headers.set('x-user-role', payload.role as string);
+    response.headers.set(&#039;x-user-id&#039;, payload.sub as string);
+    response.headers.set(&#039;x-user-role&#039;, payload.role as string);
     
     return response;
     
   } catch (error) {
-    console.error('Auth middleware error:', error);
+    console.error(&#039;Auth middleware error:&#039;, error);
     return redirectToLogin(request);
   }
 }
 
 function redirectToLogin(request: NextRequest) {
-  const loginUrl = new URL('/login', request.url);
-  loginUrl.searchParams.set('callbackUrl', request.url);
+  const loginUrl = new URL(&#039;/login&#039;, request.url);
+  loginUrl.searchParams.set(&#039;callbackUrl&#039;, request.url);
   return NextResponse.redirect(loginUrl);
 }
 
 // Role-based access control
 export function requireRole(allowedRoles: string[]) {
   return async function roleMiddleware(request: NextRequest) {
-    const userRole = request.headers.get('x-user-role');
+    const userRole = request.headers.get(&#039;x-user-role&#039;);
     
     if (!userRole || !allowedRoles.includes(userRole)) {
-      return new NextResponse('Forbidden', { status: 403 });
+      return new NextResponse(&#039;Forbidden&#039;, { status: 403 });
     }
     
     return NextResponse.next();
@@ -205,7 +255,7 @@ export function requireRole(allowedRoles: string[]) {
 ### 2. Rate Limiting Middleware
 ```typescript
 // lib/middleware/rateLimit.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
 // Simple in-memory store (use Redis in production)
 const requestCounts = new Map&lt;string, { count: number; resetTime: number }&gt;();
@@ -248,13 +298,13 @@ export async function rateLimitMiddleware(
   if (clientData.count &gt; config.maxRequests) {
     const resetTime = Math.ceil((clientData.resetTime - now) / 1000);
     
-    return new NextResponse('Rate limit exceeded', {
+    return new NextResponse(&#039;Rate limit exceeded&#039;, {
       status: 429,
       headers: {
-        'X-RateLimit-Limit': config.maxRequests.toString(),
-        'X-RateLimit-Remaining': '0',
-        'X-RateLimit-Reset': resetTime.toString(),
-        'Retry-After': resetTime.toString(),
+        &#039;X-RateLimit-Limit&#039;: config.maxRequests.toString(),
+        &#039;X-RateLimit-Remaining&#039;: &#039;0&#039;,
+        &#039;X-RateLimit-Reset&#039;: resetTime.toString(),
+        &#039;Retry-After&#039;: resetTime.toString(),
       },
     });
   }
@@ -263,10 +313,10 @@ export async function rateLimitMiddleware(
 }
 
 function getClientIP(request: NextRequest): string {
-  return request.headers.get('x-forwarded-for') ||
-    request.headers.get('x-real-ip') ||
+  return request.headers.get(&#039;x-forwarded-for&#039;) ||
+    request.headers.get(&#039;x-real-ip&#039;) ||
     request.ip ||
-    'unknown';
+    &#039;unknown&#039;;
 }
 
 // API-specific rate limiting
@@ -281,7 +331,7 @@ export const apiRateLimit = (request: NextRequest) =&gt;
 ### 3. Security Headers Middleware
 ```typescript
 // lib/middleware/security.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
 export async function securityMiddleware(request: NextRequest) {
   const response = NextResponse.next();
@@ -289,25 +339,25 @@ export async function securityMiddleware(request: NextRequest) {
   // Security headers
   const securityHeaders = {
     // XSS Protection
-    'X-XSS-Protection': '1; mode=block',
+    &#039;X-XSS-Protection&#039;: &#039;1; mode=block&#039;,
     
     // Content Type Options
-    'X-Content-Type-Options': 'nosniff',
+    &#039;X-Content-Type-Options&#039;: &#039;nosniff&#039;,
     
     // Frame Options
-    'X-Frame-Options': 'DENY',
+    &#039;X-Frame-Options&#039;: &#039;DENY&#039;,
     
     // HSTS
-    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+    &#039;Strict-Transport-Security&#039;: &#039;max-age=31536000; includeSubDomains&#039;,
     
     // Referrer Policy
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    &#039;Referrer-Policy&#039;: &#039;strict-origin-when-cross-origin&#039;,
     
     // Permissions Policy
-    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    &#039;Permissions-Policy&#039;: &#039;camera=(), microphone=(), geolocation=()&#039;,
     
     // Content Security Policy
-    'Content-Security-Policy': generateCSP(),
+    &#039;Content-Security-Policy&#039;: generateCSP(),
   };
   
   // Apply security headers
@@ -320,23 +370,23 @@ export async function securityMiddleware(request: NextRequest) {
 
 function generateCSP(): string {
   const csp = [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: https:",
-    "font-src 'self' data:",
-    "connect-src 'self'",
-    "frame-ancestors 'none'",
+    &quot;default-src &#039;self&#039;&quot;,
+    &quot;script-src &#039;self&#039; &#039;unsafe-eval&#039; &#039;unsafe-inline&#039;&quot;,
+    &quot;style-src &#039;self&#039; &#039;unsafe-inline&#039;&quot;,
+    &quot;img-src &#039;self&#039; data: https:&quot;,
+    &quot;font-src &#039;self&#039; data:&quot;,
+    &quot;connect-src &#039;self&#039;&quot;,
+    &quot;frame-ancestors &#039;none&#039;&quot;,
   ];
   
-  return csp.join('; ');
+  return csp.join(&#039;; &#039;);
 }
 ```
 
 ### 4. CORS Middleware
 ```typescript
 // lib/middleware/cors.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
 interface CorsOptions {
   origin: string | string[] | boolean;
@@ -347,8 +397,8 @@ interface CorsOptions {
 
 const defaultCorsOptions: CorsOptions = {
   origin: true, // Allow all origins in development
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  methods: [&#039;GET&#039;, &#039;POST&#039;, &#039;PUT&#039;, &#039;DELETE&#039;, &#039;OPTIONS&#039;],
+  allowedHeaders: [&#039;Content-Type&#039;, &#039;Authorization&#039;, &#039;X-Requested-With&#039;],
   credentials: true,
 };
 
@@ -357,30 +407,30 @@ export function corsMiddleware(options: Partial&lt;CorsOptions&gt; = {}) {
   
   return function cors(request: NextRequest) {
     const response = NextResponse.next();
-    const origin = request.headers.get('origin');
+    const origin = request.headers.get(&#039;origin&#039;);
     
     // Handle preflight requests
-    if (request.method === 'OPTIONS') {
+    if (request.method === &#039;OPTIONS&#039;) {
       return handlePreflight(request, config);
     }
     
     // Set CORS headers
     if (shouldAllowOrigin(origin, config.origin)) {
-      response.headers.set('Access-Control-Allow-Origin', origin || '*');
+      response.headers.set(&#039;Access-Control-Allow-Origin&#039;, origin || &#039;*&#039;);
     }
     
     if (config.credentials) {
-      response.headers.set('Access-Control-Allow-Credentials', 'true');
+      response.headers.set(&#039;Access-Control-Allow-Credentials&#039;, &#039;true&#039;);
     }
     
     response.headers.set(
-      'Access-Control-Allow-Methods',
-      config.methods.join(', ')
+      &#039;Access-Control-Allow-Methods&#039;,
+      config.methods.join(&#039;, &#039;)
     );
     
     response.headers.set(
-      'Access-Control-Allow-Headers',
-      config.allowedHeaders.join(', ')
+      &#039;Access-Control-Allow-Headers&#039;,
+      config.allowedHeaders.join(&#039;, &#039;)
     );
     
     return response;
@@ -389,19 +439,19 @@ export function corsMiddleware(options: Partial&lt;CorsOptions&gt; = {}) {
 
 function handlePreflight(request: NextRequest, config: CorsOptions) {
   const headers = new Headers();
-  const origin = request.headers.get('origin');
+  const origin = request.headers.get(&#039;origin&#039;);
   
   if (shouldAllowOrigin(origin, config.origin)) {
-    headers.set('Access-Control-Allow-Origin', origin || '*');
+    headers.set(&#039;Access-Control-Allow-Origin&#039;, origin || &#039;*&#039;);
   }
   
   if (config.credentials) {
-    headers.set('Access-Control-Allow-Credentials', 'true');
+    headers.set(&#039;Access-Control-Allow-Credentials&#039;, &#039;true&#039;);
   }
   
-  headers.set('Access-Control-Allow-Methods', config.methods.join(', '));
-  headers.set('Access-Control-Allow-Headers', config.allowedHeaders.join(', '));
-  headers.set('Access-Control-Max-Age', '86400'); // 24 hours
+  headers.set(&#039;Access-Control-Allow-Methods&#039;, config.methods.join(&#039;, &#039;));
+  headers.set(&#039;Access-Control-Allow-Headers&#039;, config.allowedHeaders.join(&#039;, &#039;));
+  headers.set(&#039;Access-Control-Max-Age&#039;, &#039;86400&#039;); // 24 hours
   
   return new NextResponse(null, { status: 200, headers });
 }
@@ -412,8 +462,8 @@ function shouldAllowOrigin(
 ): boolean {
   if (allowedOrigin === true) return true;
   if (allowedOrigin === false) return false;
-  if (typeof allowedOrigin === 'string') return origin === allowedOrigin;
-  if (Array.isArray(allowedOrigin)) return allowedOrigin.includes(origin || '');
+  if (typeof allowedOrigin === &#039;string&#039;) return origin === allowedOrigin;
+  if (Array.isArray(allowedOrigin)) return allowedOrigin.includes(origin || &#039;&#039;);
   return false;
 }
 ```
@@ -421,7 +471,7 @@ function shouldAllowOrigin(
 ### 5. Redirect and Rewrite Middleware
 ```typescript
 // lib/middleware/redirects.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
 interface RedirectRule {
   source: string | RegExp;
@@ -433,35 +483,35 @@ interface RedirectRule {
 const redirectRules: RedirectRule[] = [
   // Legacy URL redirects
   {
-    source: '/old-page',
-    destination: '/new-page',
+    source: &#039;/old-page&#039;,
+    destination: &#039;/new-page&#039;,
     permanent: true,
   },
   
   // Dynamic redirects
   {
     source: /^\/user\/(.+)$/,
-    destination: '/profile/$1',
+    destination: &#039;/profile/$1&#039;,
     permanent: false,
   },
   
   // Conditional redirects
   {
-    source: '/admin',
-    destination: '/admin/dashboard',
+    source: &#039;/admin&#039;,
+    destination: &#039;/admin/dashboard&#039;,
     conditions: (request) =&gt; {
-      const userRole = request.headers.get('x-user-role');
-      return userRole === 'admin';
+      const userRole = request.headers.get(&#039;x-user-role&#039;);
+      return userRole === &#039;admin&#039;;
     },
   },
   
   // Maintenance mode
   {
     source: /.*/,
-    destination: '/maintenance',
+    destination: &#039;/maintenance&#039;,
     conditions: (request) =&gt; {
-      return process.env.MAINTENANCE_MODE === 'true' &&
-        !request.nextUrl.pathname.startsWith('/maintenance');
+      return process.env.MAINTENANCE_MODE === &#039;true&#039; &amp;&amp;
+        !request.nextUrl.pathname.startsWith(&#039;/maintenance&#039;);
     },
   },
 ];
@@ -489,7 +539,7 @@ function shouldApplyRule(
   request: NextRequest
 ): boolean {
   // Check pattern match
-  const matches = typeof rule.source === 'string'
+  const matches = typeof rule.source === &#039;string&#039;
     ? pathname === rule.source
     : rule.source.test(pathname);
   
@@ -515,7 +565,7 @@ function resolveDestination(destination: string, pathname: string): string {
 ### 6. A/B Testing Middleware
 ```typescript
 // lib/middleware/abTest.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
 interface ABTest {
   name: string;
@@ -526,15 +576,15 @@ interface ABTest {
 
 const activeTests: ABTest[] = [
   {
-    name: 'homepage-design',
-    variants: ['control', 'variant-a', 'variant-b'],
+    name: &#039;homepage-design&#039;,
+    variants: [&#039;control&#039;, &#039;variant-a&#039;, &#039;variant-b&#039;],
     traffic: 50,
   },
   {
-    name: 'checkout-flow',
-    variants: ['old-checkout', 'new-checkout'],
+    name: &#039;checkout-flow&#039;,
+    variants: [&#039;old-checkout&#039;, &#039;new-checkout&#039;],
     traffic: 100,
-    condition: (req) =&gt; req.nextUrl.pathname.startsWith('/checkout'),
+    condition: (req) =&gt; req.nextUrl.pathname.startsWith(&#039;/checkout&#039;),
   },
 ];
 
@@ -543,7 +593,7 @@ export function abTestMiddleware(request: NextRequest) {
   
   for (const test of activeTests) {
     // Check if user should be included in test
-    if (test.condition && !test.condition(request)) continue;
+    if (test.condition &amp;&amp; !test.condition(request)) continue;
     
     // Check traffic allocation
     const userId = getUserId(request);
@@ -571,9 +621,9 @@ export function abTestMiddleware(request: NextRequest) {
 
 function getUserId(request: NextRequest): string {
   // Get user ID from cookie, or generate anonymous ID
-  return request.cookies.get('user-id')?.value ||
-    request.headers.get('x-forwarded-for') ||
-    'anonymous';
+  return request.cookies.get(&#039;user-id&#039;)?.value ||
+    request.headers.get(&#039;x-forwarded-for&#039;) ||
+    &#039;anonymous&#039;;
 }
 
 function hashString(str: string): number {
@@ -581,7 +631,7 @@ function hashString(str: string): number {
   for (let i = 0; i &lt; str.length; i++) {
     const char = str.charCodeAt(i);
     hash = ((hash &lt;&lt; 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    hash = hash &amp; hash; // Convert to 32-bit integer
   }
   return Math.abs(hash);
 }
@@ -592,7 +642,7 @@ function hashString(str: string): number {
 ### 1. Middleware Composition
 ```typescript
 // lib/middleware/compose.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
 type MiddlewareFunction = (
   request: NextRequest,
@@ -606,12 +656,12 @@ export function composeMiddleware(...middlewares: MiddlewareFunction[]) {
     for (const middleware of middlewares) {
       const result = await middleware(request, response || undefined);
       
-      if (result && result.status &gt;= 300 && result.status &lt; 400) {
+      if (result &amp;&amp; result.status &gt;= 300 &amp;&amp; result.status &lt; 400) {
         // Handle redirects immediately
         return result;
       }
       
-      if (result && result.status &gt;= 400) {
+      if (result &amp;&amp; result.status &gt;= 400) {
         // Handle errors immediately  
         return result;
       }
@@ -629,7 +679,7 @@ export function composeMiddleware(...middlewares: MiddlewareFunction[]) {
 ### 2. Feature Flag Middleware
 ```typescript
 // lib/middleware/featureFlags.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
 interface FeatureFlag {
   name: string;
@@ -641,14 +691,14 @@ interface FeatureFlag {
 
 const featureFlags: FeatureFlag[] = [
   {
-    name: 'new-dashboard',
+    name: &#039;new-dashboard&#039;,
     enabled: true,
     percentage: 25,
   },
   {
-    name: 'premium-features',
+    name: &#039;premium-features&#039;,
     enabled: true,
-    userGroups: ['premium', 'admin'],
+    userGroups: [&#039;premium&#039;, &#039;admin&#039;],
   },
 ];
 
@@ -674,7 +724,7 @@ export function featureFlagMiddleware(request: NextRequest) {
     
     // Check user groups
     if (flag.userGroups) {
-      const userRole = request.headers.get('x-user-role');
+      const userRole = request.headers.get(&#039;x-user-role&#039;);
       if (!userRole || !flag.userGroups.includes(userRole)) {
         activeFlags[flag.name] = false;
         continue;
@@ -685,7 +735,7 @@ export function featureFlagMiddleware(request: NextRequest) {
   }
   
   // Set feature flags in headers
-  response.headers.set('x-feature-flags', JSON.stringify(activeFlags));
+  response.headers.set(&#039;x-feature-flags&#039;, JSON.stringify(activeFlags));
   
   return response;
 }
@@ -696,24 +746,24 @@ export function featureFlagMiddleware(request: NextRequest) {
 ### 1. Unit Tests
 ```typescript
 // __tests__/middleware.test.ts
-import { NextRequest } from 'next/server';
-import { middleware } from '../middleware';
+import { NextRequest } from &#039;next/server&#039;;
+import { middleware } from &#039;../middleware&#039;;
 
-describe('Middleware', () =&gt; {
-  it('should add security headers', async () =&gt; {
-    const request = new NextRequest('http://localhost:3000/');
+describe(&#039;Middleware&#039;, () =&gt; {
+  it(&#039;should add security headers&#039;, async () =&gt; {
+    const request = new NextRequest(&#039;http://localhost:3000/&#039;);
     const response = await middleware(request);
     
-    expect(response.headers.get('X-Frame-Options')).toBe('DENY');
-    expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff');
+    expect(response.headers.get(&#039;X-Frame-Options&#039;)).toBe(&#039;DENY&#039;);
+    expect(response.headers.get(&#039;X-Content-Type-Options&#039;)).toBe(&#039;nosniff&#039;);
   });
 
-  it('should redirect unauthenticated users from protected routes', async () =&gt; {
-    const request = new NextRequest('http://localhost:3000/dashboard');
+  it(&#039;should redirect unauthenticated users from protected routes&#039;, async () =&gt; {
+    const request = new NextRequest(&#039;http://localhost:3000/dashboard&#039;);
     const response = await middleware(request);
     
     expect(response.status).toBe(302);
-    expect(response.headers.get('location')).toContain('/login');
+    expect(response.headers.get(&#039;location&#039;)).toContain(&#039;/login&#039;);
   });
 });
 ```
@@ -721,12 +771,12 @@ describe('Middleware', () =&gt; {
 ### 2. Integration Tests
 ```typescript
 // __tests__/middleware.integration.test.ts
-describe('Middleware Integration', () =&gt; {
-  it('should handle complete authentication flow', async () =&gt; {
+describe(&#039;Middleware Integration&#039;, () =&gt; {
+  it(&#039;should handle complete authentication flow&#039;, async () =&gt; {
     // Test login -&gt; dashboard -&gt; logout flow
   });
   
-  it('should respect rate limiting', async () =&gt; {
+  it(&#039;should respect rate limiting&#039;, async () =&gt; {
     // Test multiple requests hitting rate limit
   });
 });
@@ -743,7 +793,7 @@ export function monitoringMiddleware(request: NextRequest) {
   return new Response(JSON.stringify({}), {
     status: 200,
     headers: {
-      'x-response-time': `${Date.now() - start}ms`,
+      &#039;x-response-time&#039;: `${Date.now() - start}ms`,
     },
   });
 }
@@ -756,17 +806,48 @@ export function errorHandlerMiddleware(
   error: Error,
   request: NextRequest
 ): NextResponse {
-  console.error('Middleware error:', error);
+  console.error(&#039;Middleware error:&#039;, error);
   
   // Log to monitoring service
   // logError(error, request);
   
-  return new NextResponse('Internal Server Error', { status: 500 });
+  return new NextResponse(&#039;Internal Server Error&#039;, { status: 500 });
 }
 ```
 
-Generate comprehensive middleware implementation with all requested features, proper TypeScript types, and production-ready patterns.</pre></div>
+Generate comprehensive middleware implementation with all requested features, proper TypeScript types, and production-ready patterns.</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>262</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

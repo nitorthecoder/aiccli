@@ -4,67 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>geo-database - AICCLI</title>
-  <meta name="description" content="geo-database - Claude Code skill for AICCLI">
+  <meta name="description" content=""Access NCBI GEO for gene expression/genomics data. Search/download microarray and RNA-seq datasets (GSE, GSM, GPL), retrieve SOFT/Matrix files, for transcripto">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / geo-database</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>geo-database</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / geo-database
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>geo-database</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Access NCBI GEO for gene expression/genomics data. Search/download microarray and RNA-seq datasets (GSE, GSM, GPL), retrieve SOFT/Matrix files, for transcriptomics and expression analysis."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/geo-database</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/geo-database</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/geo-database</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: geo-database
-description: "Access NCBI GEO for gene expression/genomics data. Search/download microarray and RNA-seq datasets (GSE, GSM, GPL), retrieve SOFT/Matrix files, for transcriptomics and expression analysis."
+description: &quot;Access NCBI GEO for gene expression/genomics data. Search/download microarray and RNA-seq datasets (GSE, GSM, GPL), retrieve SOFT/Matrix files, for transcriptomics and expression analysis.&quot;
 ---
 
 # GEO Database
 
 ## Overview
 
-The Gene Expression Omnibus (GEO) is NCBI's public repository for high-throughput gene expression and functional genomics data. GEO contains over 264,000 studies with more than 8 million samples from both array-based and sequence-based experiments.
+The Gene Expression Omnibus (GEO) is NCBI&#039;s public repository for high-throughput gene expression and functional genomics data. GEO contains over 264,000 studies with more than 8 million samples from both array-based and sequence-based experiments.
 
 ## When to Use This Skill
 
@@ -116,30 +166,30 @@ Search for studies by keywords, organism, or experimental conditions:
 from Bio import Entrez
 
 # Configure Entrez (required)
-Entrez.email = "your.email@example.com"
+Entrez.email = &quot;your.email@example.com&quot;
 
 # Search for datasets
 def search_geo_datasets(query, retmax=20):
-    """Search GEO DataSets database"""
+    &quot;&quot;&quot;Search GEO DataSets database&quot;&quot;&quot;
     handle = Entrez.esearch(
-        db="gds",
+        db=&quot;gds&quot;,
         term=query,
         retmax=retmax,
-        usehistory="y"
+        usehistory=&quot;y&quot;
     )
     results = Entrez.read(handle)
     handle.close()
     return results
 
 # Example searches
-results = search_geo_datasets("breast cancer[MeSH] AND Homo sapiens[Organism]")
-print(f"Found {results['Count']} datasets")
+results = search_geo_datasets(&quot;breast cancer[MeSH] AND Homo sapiens[Organism]&quot;)
+print(f&quot;Found {results[&#039;Count&#039;]} datasets&quot;)
 
 # Search by specific platform
-results = search_geo_datasets("GPL570[Accession]")
+results = search_geo_datasets(&quot;GPL570[Accession]&quot;)
 
 # Search by study type
-results = search_geo_datasets("expression profiling by array[DataSet Type]")
+results = search_geo_datasets(&quot;expression profiling by array[DataSet Type]&quot;)
 ```
 
 **GEO Profiles Search:**
@@ -148,11 +198,11 @@ Find gene-specific expression patterns:
 
 ```python
 # Search for gene expression profiles
-def search_geo_profiles(gene_name, organism="Homo sapiens", retmax=100):
-    """Search GEO Profiles for a specific gene"""
-    query = f"{gene_name}[Gene Name] AND {organism}[Organism]"
+def search_geo_profiles(gene_name, organism=&quot;Homo sapiens&quot;, retmax=100):
+    &quot;&quot;&quot;Search GEO Profiles for a specific gene&quot;&quot;&quot;
+    query = f&quot;{gene_name}[Gene Name] AND {organism}[Organism]&quot;
     handle = Entrez.esearch(
-        db="geoprofiles",
+        db=&quot;geoprofiles&quot;,
         term=query,
         retmax=retmax
     )
@@ -161,31 +211,31 @@ def search_geo_profiles(gene_name, organism="Homo sapiens", retmax=100):
     return results
 
 # Find TP53 expression across studies
-tp53_results = search_geo_profiles("TP53", organism="Homo sapiens")
-print(f"Found {tp53_results['Count']} expression profiles for TP53")
+tp53_results = search_geo_profiles(&quot;TP53&quot;, organism=&quot;Homo sapiens&quot;)
+print(f&quot;Found {tp53_results[&#039;Count&#039;]} expression profiles for TP53&quot;)
 ```
 
 **Advanced Search Patterns:**
 
 ```python
 # Combine multiple search terms
-def advanced_geo_search(terms, operator="AND"):
-    """Build complex search queries"""
-    query = f" {operator} ".join(terms)
+def advanced_geo_search(terms, operator=&quot;AND&quot;):
+    &quot;&quot;&quot;Build complex search queries&quot;&quot;&quot;
+    query = f&quot; {operator} &quot;.join(terms)
     return search_geo_datasets(query)
 
 # Find recent high-throughput studies
 search_terms = [
-    "RNA-seq[DataSet Type]",
-    "Homo sapiens[Organism]",
-    "2024[Publication Date]"
+    &quot;RNA-seq[DataSet Type]&quot;,
+    &quot;Homo sapiens[Organism]&quot;,
+    &quot;2024[Publication Date]&quot;
 ]
 results = advanced_geo_search(search_terms)
 
 # Search by author and condition
 search_terms = [
-    "Smith[Author]",
-    "diabetes[Disease]"
+    &quot;Smith[Author]&quot;,
+    &quot;diabetes[Disease]&quot;
 ]
 results = advanced_geo_search(search_terms)
 ```
@@ -205,25 +255,25 @@ uv pip install GEOparse
 import GEOparse
 
 # Download and parse a GEO Series
-gse = GEOparse.get_GEO(geo="GSE123456", destdir="./data")
+gse = GEOparse.get_GEO(geo=&quot;GSE123456&quot;, destdir=&quot;./data&quot;)
 
 # Access series metadata
-print(gse.metadata['title'])
-print(gse.metadata['summary'])
-print(gse.metadata['overall_design'])
+print(gse.metadata[&#039;title&#039;])
+print(gse.metadata[&#039;summary&#039;])
+print(gse.metadata[&#039;overall_design&#039;])
 
 # Access sample information
 for gsm_name, gsm in gse.gsms.items():
-    print(f"Sample: {gsm_name}")
-    print(f"  Title: {gsm.metadata['title'][0]}")
-    print(f"  Source: {gsm.metadata['source_name_ch1'][0]}")
-    print(f"  Characteristics: {gsm.metadata.get('characteristics_ch1', [])}")
+    print(f&quot;Sample: {gsm_name}&quot;)
+    print(f&quot;  Title: {gsm.metadata[&#039;title&#039;][0]}&quot;)
+    print(f&quot;  Source: {gsm.metadata[&#039;source_name_ch1&#039;][0]}&quot;)
+    print(f&quot;  Characteristics: {gsm.metadata.get(&#039;characteristics_ch1&#039;, [])}&quot;)
 
 # Access platform information
 for gpl_name, gpl in gse.gpls.items():
-    print(f"Platform: {gpl_name}")
-    print(f"  Title: {gpl.metadata['title'][0]}")
-    print(f"  Organism: {gpl.metadata['organism'][0]}")
+    print(f&quot;Platform: {gpl_name}&quot;)
+    print(f&quot;  Title: {gpl.metadata[&#039;title&#039;][0]}&quot;)
+    print(f&quot;  Organism: {gpl.metadata[&#039;organism&#039;][0]}&quot;)
 ```
 
 **Working with Expression Data:**
@@ -233,22 +283,22 @@ import GEOparse
 import pandas as pd
 
 # Get expression data from series
-gse = GEOparse.get_GEO(geo="GSE123456", destdir="./data")
+gse = GEOparse.get_GEO(geo=&quot;GSE123456&quot;, destdir=&quot;./data&quot;)
 
 # Extract expression matrix
 # Method 1: From series matrix file (fastest)
-if hasattr(gse, 'pivot_samples'):
-    expression_df = gse.pivot_samples('VALUE')
+if hasattr(gse, &#039;pivot_samples&#039;):
+    expression_df = gse.pivot_samples(&#039;VALUE&#039;)
     print(expression_df.shape)  # genes x samples
 
 # Method 2: From individual samples
 expression_data = {}
 for gsm_name, gsm in gse.gsms.items():
-    if hasattr(gsm, 'table'):
-        expression_data[gsm_name] = gsm.table['VALUE']
+    if hasattr(gsm, &#039;table&#039;):
+        expression_data[gsm_name] = gsm.table[&#039;VALUE&#039;]
 
 expression_df = pd.DataFrame(expression_data)
-print(f"Expression matrix: {expression_df.shape}")
+print(f&quot;Expression matrix: {expression_df.shape}&quot;)
 ```
 
 **Accessing Supplementary Files:**
@@ -256,20 +306,20 @@ print(f"Expression matrix: {expression_df.shape}")
 ```python
 import GEOparse
 
-gse = GEOparse.get_GEO(geo="GSE123456", destdir="./data")
+gse = GEOparse.get_GEO(geo=&quot;GSE123456&quot;, destdir=&quot;./data&quot;)
 
 # Download supplementary files
 gse.download_supplementary_files(
-    directory="./data/GSE123456_suppl",
+    directory=&quot;./data/GSE123456_suppl&quot;,
     download_sra=False  # Set to True to download SRA files
 )
 
 # List available supplementary files
 for gsm_name, gsm in gse.gsms.items():
-    if hasattr(gsm, 'supplementary_files'):
-        print(f"Sample {gsm_name}:")
-        for file_url in gsm.metadata.get('supplementary_file', []):
-            print(f"  {file_url}")
+    if hasattr(gsm, &#039;supplementary_files&#039;):
+        print(f&quot;Sample {gsm_name}:&quot;)
+        for file_url in gsm.metadata.get(&#039;supplementary_file&#039;, []):
+            print(f&quot;  {file_url}&quot;)
 ```
 
 **Filtering and Subsetting Data:**
@@ -277,24 +327,24 @@ for gsm_name, gsm in gse.gsms.items():
 ```python
 import GEOparse
 
-gse = GEOparse.get_GEO(geo="GSE123456", destdir="./data")
+gse = GEOparse.get_GEO(geo=&quot;GSE123456&quot;, destdir=&quot;./data&quot;)
 
 # Filter samples by metadata
 control_samples = [
     gsm_name for gsm_name, gsm in gse.gsms.items()
-    if 'control' in gsm.metadata.get('title', [''])[0].lower()
+    if &#039;control&#039; in gsm.metadata.get(&#039;title&#039;, [&#039;&#039;])[0].lower()
 ]
 
 treatment_samples = [
     gsm_name for gsm_name, gsm in gse.gsms.items()
-    if 'treatment' in gsm.metadata.get('title', [''])[0].lower()
+    if &#039;treatment&#039; in gsm.metadata.get(&#039;title&#039;, [&#039;&#039;])[0].lower()
 ]
 
-print(f"Control samples: {len(control_samples)}")
-print(f"Treatment samples: {len(treatment_samples)}")
+print(f&quot;Control samples: {len(control_samples)}&quot;)
+print(f&quot;Treatment samples: {len(treatment_samples)}&quot;)
 
 # Extract subset expression matrix
-expression_df = gse.pivot_samples('VALUE')
+expression_df = gse.pivot_samples(&#039;VALUE&#039;)
 control_expr = expression_df[control_samples]
 treatment_expr = expression_df[treatment_samples]
 ```
@@ -309,48 +359,48 @@ treatment_expr = expression_df[treatment_samples]
 from Bio import Entrez
 import time
 
-Entrez.email = "your.email@example.com"
+Entrez.email = &quot;your.email@example.com&quot;
 
 # Step 1: Search for GEO entries
-def search_geo(query, db="gds", retmax=100):
-    """Search GEO using E-utilities"""
+def search_geo(query, db=&quot;gds&quot;, retmax=100):
+    &quot;&quot;&quot;Search GEO using E-utilities&quot;&quot;&quot;
     handle = Entrez.esearch(
         db=db,
         term=query,
         retmax=retmax,
-        usehistory="y"
+        usehistory=&quot;y&quot;
     )
     results = Entrez.read(handle)
     handle.close()
     return results
 
 # Step 2: Fetch summaries
-def fetch_geo_summaries(id_list, db="gds"):
-    """Fetch document summaries for GEO entries"""
-    ids = ",".join(id_list)
+def fetch_geo_summaries(id_list, db=&quot;gds&quot;):
+    &quot;&quot;&quot;Fetch document summaries for GEO entries&quot;&quot;&quot;
+    ids = &quot;,&quot;.join(id_list)
     handle = Entrez.esummary(db=db, id=ids)
     summaries = Entrez.read(handle)
     handle.close()
     return summaries
 
 # Step 3: Fetch full records
-def fetch_geo_records(id_list, db="gds"):
-    """Fetch full GEO records"""
-    ids = ",".join(id_list)
-    handle = Entrez.efetch(db=db, id=ids, retmode="xml")
+def fetch_geo_records(id_list, db=&quot;gds&quot;):
+    &quot;&quot;&quot;Fetch full GEO records&quot;&quot;&quot;
+    ids = &quot;,&quot;.join(id_list)
+    handle = Entrez.efetch(db=db, id=ids, retmode=&quot;xml&quot;)
     records = Entrez.read(handle)
     handle.close()
     return records
 
 # Example workflow
-search_results = search_geo("breast cancer AND Homo sapiens")
-id_list = search_results['IdList'][:5]
+search_results = search_geo(&quot;breast cancer AND Homo sapiens&quot;)
+id_list = search_results[&#039;IdList&#039;][:5]
 
 summaries = fetch_geo_summaries(id_list)
 for summary in summaries:
-    print(f"GDS: {summary.get('Accession', 'N/A')}")
-    print(f"Title: {summary.get('title', 'N/A')}")
-    print(f"Samples: {summary.get('n_samples', 'N/A')}")
+    print(f&quot;GDS: {summary.get(&#039;Accession&#039;, &#039;N/A&#039;)}&quot;)
+    print(f&quot;Title: {summary.get(&#039;title&#039;, &#039;N/A&#039;)}&quot;)
+    print(f&quot;Samples: {summary.get(&#039;n_samples&#039;, &#039;N/A&#039;)}&quot;)
     print()
 ```
 
@@ -360,10 +410,10 @@ for summary in summaries:
 from Bio import Entrez
 import time
 
-Entrez.email = "your.email@example.com"
+Entrez.email = &quot;your.email@example.com&quot;
 
 def batch_fetch_geo_metadata(accessions, batch_size=100):
-    """Fetch metadata for multiple GEO accessions"""
+    &quot;&quot;&quot;Fetch metadata for multiple GEO accessions&quot;&quot;&quot;
     results = {}
 
     for i in range(0, len(accessions), batch_size):
@@ -372,16 +422,16 @@ def batch_fetch_geo_metadata(accessions, batch_size=100):
         # Search for each accession
         for accession in batch:
             try:
-                query = f"{accession}[Accession]"
-                search_handle = Entrez.esearch(db="gds", term=query)
+                query = f&quot;{accession}[Accession]&quot;
+                search_handle = Entrez.esearch(db=&quot;gds&quot;, term=query)
                 search_results = Entrez.read(search_handle)
                 search_handle.close()
 
-                if search_results['IdList']:
+                if search_results[&#039;IdList&#039;]:
                     # Fetch summary
                     summary_handle = Entrez.esummary(
-                        db="gds",
-                        id=search_results['IdList'][0]
+                        db=&quot;gds&quot;,
+                        id=search_results[&#039;IdList&#039;][0]
                     )
                     summary = Entrez.read(summary_handle)
                     summary_handle.close()
@@ -391,12 +441,12 @@ def batch_fetch_geo_metadata(accessions, batch_size=100):
                 time.sleep(0.34)  # Max 3 requests per second
 
             except Exception as e:
-                print(f"Error fetching {accession}: {e}")
+                print(f&quot;Error fetching {accession}: {e}&quot;)
 
     return results
 
 # Fetch metadata for multiple datasets
-gse_list = ["GSE100001", "GSE100002", "GSE100003"]
+gse_list = [&quot;GSE100001&quot;, &quot;GSE100002&quot;, &quot;GSE100003&quot;]
 metadata = batch_fetch_geo_metadata(gse_list)
 ```
 
@@ -410,24 +460,24 @@ GEO data can be downloaded directly via FTP:
 import ftplib
 import os
 
-def download_geo_ftp(accession, file_type="matrix", dest_dir="./data"):
-    """Download GEO files via FTP"""
+def download_geo_ftp(accession, file_type=&quot;matrix&quot;, dest_dir=&quot;./data&quot;):
+    &quot;&quot;&quot;Download GEO files via FTP&quot;&quot;&quot;
     # Construct FTP path based on accession type
-    if accession.startswith("GSE"):
+    if accession.startswith(&quot;GSE&quot;):
         # Series files
         gse_num = accession[3:]
-        base_num = gse_num[:-3] + "nnn"
-        ftp_path = f"/geo/series/GSE{base_num}/{accession}/"
+        base_num = gse_num[:-3] + &quot;nnn&quot;
+        ftp_path = f&quot;/geo/series/GSE{base_num}/{accession}/&quot;
 
-        if file_type == "matrix":
-            filename = f"{accession}_series_matrix.txt.gz"
-        elif file_type == "soft":
-            filename = f"{accession}_family.soft.gz"
-        elif file_type == "miniml":
-            filename = f"{accession}_family.xml.tgz"
+        if file_type == &quot;matrix&quot;:
+            filename = f&quot;{accession}_series_matrix.txt.gz&quot;
+        elif file_type == &quot;soft&quot;:
+            filename = f&quot;{accession}_family.soft.gz&quot;
+        elif file_type == &quot;miniml&quot;:
+            filename = f&quot;{accession}_family.xml.tgz&quot;
 
     # Connect to FTP server
-    ftp = ftplib.FTP("ftp.ncbi.nlm.nih.gov")
+    ftp = ftplib.FTP(&quot;ftp.ncbi.nlm.nih.gov&quot;)
     ftp.login()
     ftp.cwd(ftp_path)
 
@@ -435,18 +485,18 @@ def download_geo_ftp(accession, file_type="matrix", dest_dir="./data"):
     os.makedirs(dest_dir, exist_ok=True)
     local_file = os.path.join(dest_dir, filename)
 
-    with open(local_file, 'wb') as f:
-        ftp.retrbinary(f'RETR {filename}', f.write)
+    with open(local_file, &#039;wb&#039;) as f:
+        ftp.retrbinary(f&#039;RETR {filename}&#039;, f.write)
 
     ftp.quit()
-    print(f"Downloaded: {local_file}")
+    print(f&quot;Downloaded: {local_file}&quot;)
     return local_file
 
 # Download series matrix file
-download_geo_ftp("GSE123456", file_type="matrix")
+download_geo_ftp(&quot;GSE123456&quot;, file_type=&quot;matrix&quot;)
 
 # Download SOFT format file
-download_geo_ftp("GSE123456", file_type="soft")
+download_geo_ftp(&quot;GSE123456&quot;, file_type=&quot;soft&quot;)
 ```
 
 **Using wget or curl for Downloads:**
@@ -473,33 +523,33 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load dataset
-gse = GEOparse.get_GEO(geo="GSE123456", destdir="./data")
-expression_df = gse.pivot_samples('VALUE')
+gse = GEOparse.get_GEO(geo=&quot;GSE123456&quot;, destdir=&quot;./data&quot;)
+expression_df = gse.pivot_samples(&#039;VALUE&#039;)
 
 # Check for missing values
-print(f"Missing values: {expression_df.isnull().sum().sum()}")
+print(f&quot;Missing values: {expression_df.isnull().sum().sum()}&quot;)
 
 # Log transformation (if needed)
 if expression_df.min().min() &gt; 0:  # Check if already log-transformed
     if expression_df.max().max() &gt; 100:
         expression_df = np.log2(expression_df + 1)
-        print("Applied log2 transformation")
+        print(&quot;Applied log2 transformation&quot;)
 
 # Distribution plots
 plt.figure(figsize=(12, 5))
 
 plt.subplot(1, 2, 1)
 expression_df.plot.box(ax=plt.gca())
-plt.title("Expression Distribution per Sample")
+plt.title(&quot;Expression Distribution per Sample&quot;)
 plt.xticks(rotation=90)
 
 plt.subplot(1, 2, 2)
 expression_df.mean(axis=1).hist(bins=50)
-plt.title("Gene Expression Distribution")
-plt.xlabel("Average Expression")
+plt.title(&quot;Gene Expression Distribution&quot;)
+plt.xlabel(&quot;Average Expression&quot;)
 
 plt.tight_layout()
-plt.savefig("geo_qc.png", dpi=300, bbox_inches='tight')
+plt.savefig(&quot;geo_qc.png&quot;, dpi=300, bbox_inches=&#039;tight&#039;)
 ```
 
 **Differential Expression Analysis:**
@@ -510,12 +560,12 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 
-gse = GEOparse.get_GEO(geo="GSE123456", destdir="./data")
-expression_df = gse.pivot_samples('VALUE')
+gse = GEOparse.get_GEO(geo=&quot;GSE123456&quot;, destdir=&quot;./data&quot;)
+expression_df = gse.pivot_samples(&#039;VALUE&#039;)
 
 # Define sample groups
-control_samples = ["GSM1", "GSM2", "GSM3"]
-treatment_samples = ["GSM4", "GSM5", "GSM6"]
+control_samples = [&quot;GSM1&quot;, &quot;GSM2&quot;, &quot;GSM3&quot;]
+treatment_samples = [&quot;GSM4&quot;, &quot;GSM5&quot;, &quot;GSM6&quot;]
 
 # Calculate fold changes and p-values
 results = []
@@ -528,11 +578,11 @@ for gene in expression_df.index:
     t_stat, p_value = stats.ttest_ind(treatment_expr, control_expr)
 
     results.append({
-        'gene': gene,
-        'log2_fold_change': fold_change,
-        'p_value': p_value,
-        'control_mean': control_expr.mean(),
-        'treatment_mean': treatment_expr.mean()
+        &#039;gene&#039;: gene,
+        &#039;log2_fold_change&#039;: fold_change,
+        &#039;p_value&#039;: p_value,
+        &#039;control_mean&#039;: control_expr.mean(),
+        &#039;treatment_mean&#039;: treatment_expr.mean()
     })
 
 # Create results DataFrame
@@ -540,19 +590,19 @@ de_results = pd.DataFrame(results)
 
 # Multiple testing correction (Benjamini-Hochberg)
 from statsmodels.stats.multitest import multipletests
-_, de_results['q_value'], _, _ = multipletests(
-    de_results['p_value'],
-    method='fdr_bh'
+_, de_results[&#039;q_value&#039;], _, _ = multipletests(
+    de_results[&#039;p_value&#039;],
+    method=&#039;fdr_bh&#039;
 )
 
 # Filter significant genes
 significant_genes = de_results[
-    (de_results['q_value'] &lt; 0.05) &
-    (abs(de_results['log2_fold_change']) &gt; 1)
+    (de_results[&#039;q_value&#039;] &lt; 0.05) &amp;
+    (abs(de_results[&#039;log2_fold_change&#039;]) &gt; 1)
 ]
 
-print(f"Significant genes: {len(significant_genes)}")
-significant_genes.to_csv("de_results.csv", index=False)
+print(f&quot;Significant genes: {len(significant_genes)}&quot;)
+significant_genes.to_csv(&quot;de_results.csv&quot;, index=False)
 ```
 
 **Correlation and Clustering Analysis:**
@@ -564,31 +614,31 @@ import matplotlib.pyplot as plt
 from scipy.cluster import hierarchy
 from scipy.spatial.distance import pdist
 
-gse = GEOparse.get_GEO(geo="GSE123456", destdir="./data")
-expression_df = gse.pivot_samples('VALUE')
+gse = GEOparse.get_GEO(geo=&quot;GSE123456&quot;, destdir=&quot;./data&quot;)
+expression_df = gse.pivot_samples(&#039;VALUE&#039;)
 
 # Sample correlation heatmap
 sample_corr = expression_df.corr()
 
 plt.figure(figsize=(10, 8))
-sns.heatmap(sample_corr, cmap='coolwarm', center=0,
+sns.heatmap(sample_corr, cmap=&#039;coolwarm&#039;, center=0,
             square=True, linewidths=0.5)
-plt.title("Sample Correlation Matrix")
+plt.title(&quot;Sample Correlation Matrix&quot;)
 plt.tight_layout()
-plt.savefig("sample_correlation.png", dpi=300, bbox_inches='tight')
+plt.savefig(&quot;sample_correlation.png&quot;, dpi=300, bbox_inches=&#039;tight&#039;)
 
 # Hierarchical clustering
-distances = pdist(expression_df.T, metric='correlation')
-linkage = hierarchy.linkage(distances, method='average')
+distances = pdist(expression_df.T, metric=&#039;correlation&#039;)
+linkage = hierarchy.linkage(distances, method=&#039;average&#039;)
 
 plt.figure(figsize=(12, 6))
 hierarchy.dendrogram(linkage, labels=expression_df.columns)
-plt.title("Hierarchical Clustering of Samples")
-plt.xlabel("Samples")
-plt.ylabel("Distance")
+plt.title(&quot;Hierarchical Clustering of Samples&quot;)
+plt.xlabel(&quot;Samples&quot;)
+plt.ylabel(&quot;Distance&quot;)
 plt.xticks(rotation=90)
 plt.tight_layout()
-plt.savefig("sample_clustering.png", dpi=300, bbox_inches='tight')
+plt.savefig(&quot;sample_clustering.png&quot;, dpi=300, bbox_inches=&#039;tight&#039;)
 ```
 
 ### 7. Batch Processing Multiple Datasets
@@ -600,42 +650,42 @@ import GEOparse
 import pandas as pd
 import os
 
-def batch_download_geo(gse_list, destdir="./geo_data"):
-    """Download multiple GEO series"""
+def batch_download_geo(gse_list, destdir=&quot;./geo_data&quot;):
+    &quot;&quot;&quot;Download multiple GEO series&quot;&quot;&quot;
     results = {}
 
     for gse_id in gse_list:
         try:
-            print(f"Processing {gse_id}...")
+            print(f&quot;Processing {gse_id}...&quot;)
             gse = GEOparse.get_GEO(geo=gse_id, destdir=destdir)
 
             # Extract key information
             results[gse_id] = {
-                'title': gse.metadata.get('title', ['N/A'])[0],
-                'organism': gse.metadata.get('organism', ['N/A'])[0],
-                'platform': list(gse.gpls.keys())[0] if gse.gpls else 'N/A',
-                'num_samples': len(gse.gsms),
-                'submission_date': gse.metadata.get('submission_date', ['N/A'])[0]
+                &#039;title&#039;: gse.metadata.get(&#039;title&#039;, [&#039;N/A&#039;])[0],
+                &#039;organism&#039;: gse.metadata.get(&#039;organism&#039;, [&#039;N/A&#039;])[0],
+                &#039;platform&#039;: list(gse.gpls.keys())[0] if gse.gpls else &#039;N/A&#039;,
+                &#039;num_samples&#039;: len(gse.gsms),
+                &#039;submission_date&#039;: gse.metadata.get(&#039;submission_date&#039;, [&#039;N/A&#039;])[0]
             }
 
             # Save expression data
-            if hasattr(gse, 'pivot_samples'):
-                expr_df = gse.pivot_samples('VALUE')
-                expr_df.to_csv(f"{destdir}/{gse_id}_expression.csv")
-                results[gse_id]['num_genes'] = len(expr_df)
+            if hasattr(gse, &#039;pivot_samples&#039;):
+                expr_df = gse.pivot_samples(&#039;VALUE&#039;)
+                expr_df.to_csv(f&quot;{destdir}/{gse_id}_expression.csv&quot;)
+                results[gse_id][&#039;num_genes&#039;] = len(expr_df)
 
         except Exception as e:
-            print(f"Error processing {gse_id}: {e}")
-            results[gse_id] = {'error': str(e)}
+            print(f&quot;Error processing {gse_id}: {e}&quot;)
+            results[gse_id] = {&#039;error&#039;: str(e)}
 
     # Save summary
     summary_df = pd.DataFrame(results).T
-    summary_df.to_csv(f"{destdir}/batch_summary.csv")
+    summary_df.to_csv(f&quot;{destdir}/batch_summary.csv&quot;)
 
     return results
 
 # Process multiple datasets
-gse_list = ["GSE100001", "GSE100002", "GSE100003"]
+gse_list = [&quot;GSE100001&quot;, &quot;GSE100002&quot;, &quot;GSE100003&quot;]
 results = batch_download_geo(gse_list)
 ```
 
@@ -647,20 +697,20 @@ import pandas as pd
 import numpy as np
 
 def meta_analysis_geo(gse_list, gene_of_interest):
-    """Perform meta-analysis of gene expression across studies"""
+    &quot;&quot;&quot;Perform meta-analysis of gene expression across studies&quot;&quot;&quot;
     results = []
 
     for gse_id in gse_list:
         try:
-            gse = GEOparse.get_GEO(geo=gse_id, destdir="./data")
+            gse = GEOparse.get_GEO(geo=gse_id, destdir=&quot;./data&quot;)
 
             # Get platform annotation
             gpl = list(gse.gpls.values())[0]
 
             # Find gene in platform
-            if hasattr(gpl, 'table'):
+            if hasattr(gpl, &#039;table&#039;):
                 gene_probes = gpl.table[
-                    gpl.table['Gene Symbol'].str.contains(
+                    gpl.table[&#039;Gene Symbol&#039;].str.contains(
                         gene_of_interest,
                         case=False,
                         na=False
@@ -668,28 +718,28 @@ def meta_analysis_geo(gse_list, gene_of_interest):
                 ]
 
                 if not gene_probes.empty:
-                    expr_df = gse.pivot_samples('VALUE')
+                    expr_df = gse.pivot_samples(&#039;VALUE&#039;)
 
-                    for probe_id in gene_probes['ID']:
+                    for probe_id in gene_probes[&#039;ID&#039;]:
                         if probe_id in expr_df.index:
                             expr_values = expr_df.loc[probe_id]
 
                             results.append({
-                                'study': gse_id,
-                                'probe': probe_id,
-                                'mean_expression': expr_values.mean(),
-                                'std_expression': expr_values.std(),
-                                'num_samples': len(expr_values)
+                                &#039;study&#039;: gse_id,
+                                &#039;probe&#039;: probe_id,
+                                &#039;mean_expression&#039;: expr_values.mean(),
+                                &#039;std_expression&#039;: expr_values.std(),
+                                &#039;num_samples&#039;: len(expr_values)
                             })
 
         except Exception as e:
-            print(f"Error in {gse_id}: {e}")
+            print(f&quot;Error in {gse_id}: {e}&quot;)
 
     return pd.DataFrame(results)
 
 # Meta-analysis for TP53
-gse_studies = ["GSE100001", "GSE100002", "GSE100003"]
-meta_results = meta_analysis_geo(gse_studies, "TP53")
+gse_studies = [&quot;GSE100001&quot;, &quot;GSE100002&quot;, &quot;GSE100003&quot;]
+meta_results = meta_analysis_geo(gse_studies, &quot;TP53&quot;)
 print(meta_results)
 ```
 
@@ -722,11 +772,11 @@ Set up NCBI E-utilities access:
 from Bio import Entrez
 
 # Always set your email (required by NCBI)
-Entrez.email = "your.email@example.com"
+Entrez.email = &quot;your.email@example.com&quot;
 
 # Optional: Set API key for increased rate limits
 # Get your API key from: https://www.ncbi.nlm.nih.gov/account/
-Entrez.api_key = "your_api_key_here"
+Entrez.api_key = &quot;your_api_key_here&quot;
 
 # With API key: 10 requests/second
 # Without API key: 3 requests/second
@@ -760,7 +810,7 @@ Entrez.api_key = "your_api_key_here"
 
 ## Key Concepts
 
-**SOFT (Simple Omnibus Format in Text):** GEO's primary text-based format containing metadata and data tables. Easily parsed by GEOparse.
+**SOFT (Simple Omnibus Format in Text):** GEO&#039;s primary text-based format containing metadata and data tables. Easily parsed by GEOparse.
 
 **MINiML (MIAME Notation in Markup Language):** XML format for GEO data, used for programmatic access and data exchange.
 
@@ -864,8 +914,39 @@ Consult this reference for in-depth technical details, complex query patterns, o
 - **GEO2R Tool:** https://www.ncbi.nlm.nih.gov/geo/geo2r/
 - **NCBI API Keys:** https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/
 - **Biopython Tutorial:** https://biopython.org/DIST/docs/tutorial/Tutorial.html
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>16</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

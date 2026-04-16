@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>inference-serving-sglang - AICCLI</title>
-  <meta name="description" content="inference-serving-sglang - Claude Code skill for AICCLI">
+  <meta name="description" content="Fast structured generation and serving for LLMs with RadixAttention prefix caching. Use for JSON/regex outputs, constrained decoding, agentic workflows with too">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / inference-serving-sglang</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>inference-serving-sglang</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / inference-serving-sglang
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>inference-serving-sglang</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Fast structured generation and serving for LLMs with RadixAttention prefix caching. Use for JSON/regex outputs, constrained decoding, agentic workflows with tool calls, or when you need 5× faster inference than vLLM with prefix sharing. Powers 300,000+ GPUs at xAI, AMD, NVIDIA, and LinkedIn.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/inference-serving-sglang</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/inference-serving-sglang</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/inference-serving-sglang</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: sglang
 description: Fast structured generation and serving for LLMs with RadixAttention prefix caching. Use for JSON/regex outputs, constrained decoding, agentic workflows with tool calls, or when you need 5× faster inference than vLLM with prefix sharing. Powers 300,000+ GPUs at xAI, AMD, NVIDIA, and LinkedIn.
 version: 1.0.0
@@ -80,7 +130,7 @@ High-performance serving framework for LLMs and VLMs with RadixAttention for aut
 
 **Use vLLM instead when:**
 - Simple text generation without structure
-- Don't need prefix caching
+- Don&#039;t need prefix caching
 - Want mature, widely-tested production system
 
 **Use TensorRT-LLM instead when:**
@@ -94,7 +144,7 @@ High-performance serving framework for LLMs and VLMs with RadixAttention for aut
 
 ```bash
 # pip install (recommended)
-pip install "sglang[all]"
+pip install &quot;sglang[all]&quot;
 
 # With FlashInfer (faster, CUDA 11.8/12.1)
 pip install sglang[all] flashinfer -i https://flashinfer.ai/whl/cu121/torch2.4/
@@ -102,7 +152,7 @@ pip install sglang[all] flashinfer -i https://flashinfer.ai/whl/cu121/torch2.4/
 # From source
 git clone https://github.com/sgl-project/sglang.git
 cd sglang
-pip install -e "python[all]"
+pip install -e &quot;python[all]&quot;
 ```
 
 ### Launch server
@@ -132,18 +182,18 @@ python -m sglang.launch_server \
 import sglang as sgl
 
 # Set backend
-sgl.set_default_backend(sgl.OpenAI("http://localhost:30000/v1"))
+sgl.set_default_backend(sgl.OpenAI(&quot;http://localhost:30000/v1&quot;))
 
 # Simple generation
 @sgl.function
 def simple_gen(s, question):
-    s += "Q: " + question + "\n"
-    s += "A:" + sgl.gen("answer", max_tokens=100)
+    s += &quot;Q: &quot; + question + &quot;\n&quot;
+    s += &quot;A:&quot; + sgl.gen(&quot;answer&quot;, max_tokens=100)
 
 # Run
-state = simple_gen.run(question="What is the capital of France?")
-print(state["answer"])
-# Output: "The capital of France is Paris."
+state = simple_gen.run(question=&quot;What is the capital of France?&quot;)
+print(state[&quot;answer&quot;])
+# Output: &quot;The capital of France is Paris.&quot;
 ```
 
 ### Structured JSON output
@@ -153,22 +203,22 @@ import sglang as sgl
 
 @sgl.function
 def extract_person(s, text):
-    s += f"Extract person information from: {text}\n"
-    s += "Output JSON:\n"
+    s += f&quot;Extract person information from: {text}\n&quot;
+    s += &quot;Output JSON:\n&quot;
 
     # Constrained JSON generation
     s += sgl.gen(
-        "json_output",
+        &quot;json_output&quot;,
         max_tokens=200,
-        regex=r'\{"name": "[^"]+", "age": \d+, "occupation": "[^"]+"\}'
+        regex=r&#039;\{&quot;name&quot;: &quot;[^&quot;]+&quot;, &quot;age&quot;: \d+, &quot;occupation&quot;: &quot;[^&quot;]+&quot;\}&#039;
     )
 
 # Run
 state = extract_person.run(
-    text="John Smith is a 35-year-old software engineer."
+    text=&quot;John Smith is a 35-year-old software engineer.&quot;
 )
-print(state["json_output"])
-# Output: {"name": "John Smith", "age": 35, "occupation": "software engineer"}
+print(state[&quot;json_output&quot;])
+# Output: {&quot;name&quot;: &quot;John Smith&quot;, &quot;age&quot;: 35, &quot;occupation&quot;: &quot;software engineer&quot;}
 ```
 
 ## RadixAttention (Key Innovation)
@@ -189,10 +239,10 @@ print(state["json_output"])
 **Example** (Agent with system prompt):
 
 ```
-Request 1: [SYSTEM_PROMPT] + "What's the weather?"
+Request 1: [SYSTEM_PROMPT] + &quot;What&#039;s the weather?&quot;
 → Computes full prompt (1000 tokens)
 
-Request 2: [SAME_SYSTEM_PROMPT] + "Book a flight"
+Request 2: [SAME_SYSTEM_PROMPT] + &quot;Book a flight&quot;
 → Reuses system prompt KV cache (998 tokens)
 → Only computes 2 new tokens
 → 5× faster!
@@ -205,25 +255,25 @@ Request 2: [SAME_SYSTEM_PROMPT] + "Book a flight"
 ```python
 @sgl.function
 def structured_extraction(s, article):
-    s += f"Article: {article}\n\n"
-    s += "Extract key information as JSON:\n"
+    s += f&quot;Article: {article}\n\n&quot;
+    s += &quot;Extract key information as JSON:\n&quot;
 
     # JSON schema constraint
     schema = {
-        "type": "object",
-        "properties": {
-            "title": {"type": "string"},
-            "author": {"type": "string"},
-            "summary": {"type": "string"},
-            "sentiment": {"type": "string", "enum": ["positive", "negative", "neutral"]}
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+            &quot;title&quot;: {&quot;type&quot;: &quot;string&quot;},
+            &quot;author&quot;: {&quot;type&quot;: &quot;string&quot;},
+            &quot;summary&quot;: {&quot;type&quot;: &quot;string&quot;},
+            &quot;sentiment&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: [&quot;positive&quot;, &quot;negative&quot;, &quot;neutral&quot;]}
         },
-        "required": ["title", "author", "summary", "sentiment"]
+        &quot;required&quot;: [&quot;title&quot;, &quot;author&quot;, &quot;summary&quot;, &quot;sentiment&quot;]
     }
 
-    s += sgl.gen("info", max_tokens=300, json_schema=schema)
+    s += sgl.gen(&quot;info&quot;, max_tokens=300, json_schema=schema)
 
-state = structured_extraction.run(article="...")
-print(state["info"])
+state = structured_extraction.run(article=&quot;...&quot;)
+print(state[&quot;info&quot;])
 # Output: Valid JSON matching schema
 ```
 
@@ -232,19 +282,19 @@ print(state["info"])
 ```python
 @sgl.function
 def extract_email(s, text):
-    s += f"Extract email from: {text}\n"
-    s += "Email: "
+    s += f&quot;Extract email from: {text}\n&quot;
+    s += &quot;Email: &quot;
 
     # Email regex pattern
     s += sgl.gen(
-        "email",
+        &quot;email&quot;,
         max_tokens=50,
-        regex=r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+        regex=r&#039;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&#039;
     )
 
-state = extract_email.run(text="Contact john.doe@example.com for details")
-print(state["email"])
-# Output: "john.doe@example.com"
+state = extract_email.run(text=&quot;Contact john.doe@example.com for details&quot;)
+print(state[&quot;email&quot;])
+# Output: &quot;john.doe@example.com&quot;
 ```
 
 ### Grammar-based generation
@@ -252,20 +302,20 @@ print(state["email"])
 ```python
 @sgl.function
 def generate_code(s, description):
-    s += f"Generate Python code for: {description}\n"
-    s += "```python\n"
+    s += f&quot;Generate Python code for: {description}\n&quot;
+    s += &quot;```python\n&quot;
 
     # EBNF grammar for Python
-    python_grammar = """
+    python_grammar = &quot;&quot;&quot;
     ?start: function_def
-    function_def: "def" NAME "(" [parameters] "):" suite
-    parameters: parameter ("," parameter)*
+    function_def: &quot;def&quot; NAME &quot;(&quot; [parameters] &quot;):&quot; suite
+    parameters: parameter (&quot;,&quot; parameter)*
     parameter: NAME
     suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
-    """
+    &quot;&quot;&quot;
 
-    s += sgl.gen("code", max_tokens=200, grammar=python_grammar)
-    s += "\n```"
+    s += sgl.gen(&quot;code&quot;, max_tokens=200, grammar=python_grammar)
+    s += &quot;\n```&quot;
 ```
 
 ## Agent workflows with function calling
@@ -276,24 +326,24 @@ import sglang as sgl
 # Define tools
 tools = [
     {
-        "name": "get_weather",
-        "description": "Get weather for a location",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "location": {"type": "string"}
+        &quot;name&quot;: &quot;get_weather&quot;,
+        &quot;description&quot;: &quot;Get weather for a location&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;location&quot;: {&quot;type&quot;: &quot;string&quot;}
             }
         }
     },
     {
-        "name": "book_flight",
-        "description": "Book a flight",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "from": {"type": "string"},
-                "to": {"type": "string"},
-                "date": {"type": "string"}
+        &quot;name&quot;: &quot;book_flight&quot;,
+        &quot;description&quot;: &quot;Book a flight&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;from&quot;: {&quot;type&quot;: &quot;string&quot;},
+                &quot;to&quot;: {&quot;type&quot;: &quot;string&quot;},
+                &quot;date&quot;: {&quot;type&quot;: &quot;string&quot;}
             }
         }
     }
@@ -302,30 +352,30 @@ tools = [
 @sgl.function
 def agent_workflow(s, user_query, tools):
     # System prompt (cached with RadixAttention)
-    s += "You are a helpful assistant with access to tools.\n"
-    s += f"Available tools: {tools}\n\n"
+    s += &quot;You are a helpful assistant with access to tools.\n&quot;
+    s += f&quot;Available tools: {tools}\n\n&quot;
 
     # User query
-    s += f"User: {user_query}\n"
-    s += "Assistant: "
+    s += f&quot;User: {user_query}\n&quot;
+    s += &quot;Assistant: &quot;
 
     # Generate with function calling
     s += sgl.gen(
-        "response",
+        &quot;response&quot;,
         max_tokens=200,
         tools=tools,  # SGLang handles tool call format
-        stop=["User:", "\n\n"]
+        stop=[&quot;User:&quot;, &quot;\n\n&quot;]
     )
 
 # Multiple queries reuse system prompt
 state1 = agent_workflow.run(
-    user_query="What's the weather in NYC?",
+    user_query=&quot;What&#039;s the weather in NYC?&quot;,
     tools=tools
 )
 # First call: Computes full system prompt
 
 state2 = agent_workflow.run(
-    user_query="Book a flight to LA",
+    user_query=&quot;Book a flight to LA&quot;,
     tools=tools
 )
 # Second call: Reuses system prompt (5× faster)
@@ -363,29 +413,29 @@ state2 = agent_workflow.run(
 @sgl.function
 def multi_turn_chat(s, history, new_message):
     # System prompt (always cached)
-    s += "You are a helpful AI assistant.\n\n"
+    s += &quot;You are a helpful AI assistant.\n\n&quot;
 
     # Conversation history (cached as it grows)
     for msg in history:
-        s += f"{msg['role']}: {msg['content']}\n"
+        s += f&quot;{msg[&#039;role&#039;]}: {msg[&#039;content&#039;]}\n&quot;
 
     # New user message (only new part)
-    s += f"User: {new_message}\n"
-    s += "Assistant: "
-    s += sgl.gen("response", max_tokens=200)
+    s += f&quot;User: {new_message}\n&quot;
+    s += &quot;Assistant: &quot;
+    s += sgl.gen(&quot;response&quot;, max_tokens=200)
 
 # Turn 1
 history = []
-state = multi_turn_chat.run(history=history, new_message="Hi there!")
-history.append({"role": "User", "content": "Hi there!"})
-history.append({"role": "Assistant", "content": state["response"]})
+state = multi_turn_chat.run(history=history, new_message=&quot;Hi there!&quot;)
+history.append({&quot;role&quot;: &quot;User&quot;, &quot;content&quot;: &quot;Hi there!&quot;})
+history.append({&quot;role&quot;: &quot;Assistant&quot;, &quot;content&quot;: state[&quot;response&quot;]})
 
 # Turn 2 (reuses Turn 1 KV cache)
-state = multi_turn_chat.run(history=history, new_message="What's 2+2?")
+state = multi_turn_chat.run(history=history, new_message=&quot;What&#039;s 2+2?&quot;)
 # Only computes new message (much faster!)
 
 # Turn 3 (reuses Turn 1 + Turn 2 KV cache)
-state = multi_turn_chat.run(history=history, new_message="Tell me a joke")
+state = multi_turn_chat.run(history=history, new_message=&quot;Tell me a joke&quot;)
 # Progressively faster as history grows
 ```
 
@@ -407,11 +457,11 @@ python -m sglang.launch_server \
 @sgl.function
 def describe_image(s, image_path):
     s += sgl.image(image_path)
-    s += "Describe this image in detail: "
-    s += sgl.gen("description", max_tokens=200)
+    s += &quot;Describe this image in detail: &quot;
+    s += sgl.gen(&quot;description&quot;, max_tokens=200)
 
-state = describe_image.run(image_path="photo.jpg")
-print(state["description"])
+state = describe_image.run(image_path=&quot;photo.jpg&quot;)
+print(state[&quot;description&quot;])
 ```
 
 ### Batching and parallel requests
@@ -420,9 +470,9 @@ print(state["description"])
 # Automatic batching (continuous batching)
 states = sgl.run_batch(
     [
-        simple_gen.bind(question="What is AI?"),
-        simple_gen.bind(question="What is ML?"),
-        simple_gen.bind(question="What is DL?"),
+        simple_gen.bind(question=&quot;What is AI?&quot;),
+        simple_gen.bind(question=&quot;What is ML?&quot;),
+        simple_gen.bind(question=&quot;What is DL?&quot;),
     ]
 )
 
@@ -439,24 +489,24 @@ python -m sglang.launch_server \
 
 # Use with OpenAI client
 curl http://localhost:30000/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "default",
-    "messages": [
-      {"role": "system", "content": "You are helpful"},
-      {"role": "user", "content": "Hello"}
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{
+    &quot;model&quot;: &quot;default&quot;,
+    &quot;messages&quot;: [
+      {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are helpful&quot;},
+      {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello&quot;}
     ],
-    "temperature": 0.7,
-    "max_tokens": 100
-  }'
+    &quot;temperature&quot;: 0.7,
+    &quot;max_tokens&quot;: 100
+  }&#039;
 
 # Works with OpenAI Python SDK
 from openai import OpenAI
-client = OpenAI(base_url="http://localhost:30000/v1", api_key="EMPTY")
+client = OpenAI(base_url=&quot;http://localhost:30000/v1&quot;, api_key=&quot;EMPTY&quot;)
 
 response = client.chat.completions.create(
-    model="default",
-    messages=[{"role": "user", "content": "Hello"}]
+    model=&quot;default&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello&quot;}]
 )
 ```
 
@@ -497,8 +547,46 @@ response = client.chat.completions.create(
 - **Discord**: https://discord.gg/sglang
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Inference Serving</span><span class="tag">SGLang</span><span class="tag">Structured Generation</span><span class="tag">RadixAttention</span><span class="tag">Prefix Caching</span><span class="tag">Constrained Decoding</span><span class="tag">Agents</span><span class="tag">JSON Output</span><span class="tag">Fast Inference</span><span class="tag">Production Scale</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>32</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>multimodal-audiocraft - AICCLI</title>
-  <meta name="description" content="multimodal-audiocraft - Claude Code skill for AICCLI">
+  <meta name="description" content="PyTorch library for audio generation including text-to-music (MusicGen) and text-to-sound (AudioGen). Use when you need to generate music from text descriptions">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / multimodal-audiocraft</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>multimodal-audiocraft</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / multimodal-audiocraft
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>multimodal-audiocraft</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">PyTorch library for audio generation including text-to-music (MusicGen) and text-to-sound (AudioGen). Use when you need to generate music from text descriptions, create sound effects, or perform melody-conditioned music generation.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/multimodal-audiocraft</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/multimodal-audiocraft</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/multimodal-audiocraft</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: audiocraft-audio-generation
 description: PyTorch library for audio generation including text-to-music (MusicGen) and text-to-sound (AudioGen). Use when you need to generate music from text descriptions, create sound effects, or perform melody-conditioned music generation.
 version: 1.0.0
@@ -67,7 +117,7 @@ dependencies: [audiocraft, torch&gt;=2.0.0, transformers&gt;=4.30.0]
 
 # AudioCraft: Audio Generation
 
-Comprehensive guide to using Meta's AudioCraft for text-to-music and text-to-audio generation with MusicGen, AudioGen, and EnCodec.
+Comprehensive guide to using Meta&#039;s AudioCraft for text-to-music and text-to-audio generation with MusicGen, AudioGen, and EnCodec.
 
 ## When to use AudioCraft
 
@@ -115,7 +165,7 @@ import torchaudio
 from audiocraft.models import MusicGen
 
 # Load model
-model = MusicGen.get_pretrained('facebook/musicgen-small')
+model = MusicGen.get_pretrained(&#039;facebook/musicgen-small&#039;)
 
 # Set generation parameters
 model.set_generation_params(
@@ -125,11 +175,11 @@ model.set_generation_params(
 )
 
 # Generate from text
-descriptions = ["happy upbeat electronic dance music with synths"]
+descriptions = [&quot;happy upbeat electronic dance music with synths&quot;]
 wav = model.generate(descriptions)
 
 # Save audio
-torchaudio.save("output.wav", wav[0].cpu(), sample_rate=32000)
+torchaudio.save(&quot;output.wav&quot;, wav[0].cpu(), sample_rate=32000)
 ```
 
 ### Using HuggingFace Transformers
@@ -139,16 +189,16 @@ from transformers import AutoProcessor, MusicgenForConditionalGeneration
 import scipy
 
 # Load model and processor
-processor = AutoProcessor.from_pretrained("facebook/musicgen-small")
-model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-small")
-model.to("cuda")
+processor = AutoProcessor.from_pretrained(&quot;facebook/musicgen-small&quot;)
+model = MusicgenForConditionalGeneration.from_pretrained(&quot;facebook/musicgen-small&quot;)
+model.to(&quot;cuda&quot;)
 
 # Generate music
 inputs = processor(
-    text=["80s pop track with bassy drums and synth"],
+    text=[&quot;80s pop track with bassy drums and synth&quot;],
     padding=True,
-    return_tensors="pt"
-).to("cuda")
+    return_tensors=&quot;pt&quot;
+).to(&quot;cuda&quot;)
 
 audio_values = model.generate(
     **inputs,
@@ -159,7 +209,7 @@ audio_values = model.generate(
 
 # Save
 sampling_rate = model.config.audio_encoder.sampling_rate
-scipy.io.wavfile.write("output.wav", rate=sampling_rate, data=audio_values[0, 0].cpu().numpy())
+scipy.io.wavfile.write(&quot;output.wav&quot;, rate=sampling_rate, data=audio_values[0, 0].cpu().numpy())
 ```
 
 ### Text-to-sound with AudioGen
@@ -168,15 +218,15 @@ scipy.io.wavfile.write("output.wav", rate=sampling_rate, data=audio_values[0, 0]
 from audiocraft.models import AudioGen
 
 # Load AudioGen
-model = AudioGen.get_pretrained('facebook/audiogen-medium')
+model = AudioGen.get_pretrained(&#039;facebook/audiogen-medium&#039;)
 
 model.set_generation_params(duration=5)
 
 # Generate sound effects
-descriptions = ["dog barking in a park with birds chirping"]
+descriptions = [&quot;dog barking in a park with birds chirping&quot;]
 wav = model.generate(descriptions)
 
-torchaudio.save("sound.wav", wav[0].cpu(), sample_rate=16000)
+torchaudio.save(&quot;sound.wav&quot;, wav[0].cpu(), sample_rate=16000)
 ```
 
 ## Core concepts
@@ -234,7 +284,7 @@ AudioCraft Architecture:
 from audiocraft.models import MusicGen
 import torchaudio
 
-model = MusicGen.get_pretrained('facebook/musicgen-medium')
+model = MusicGen.get_pretrained(&#039;facebook/musicgen-medium&#039;)
 
 # Configure generation
 model.set_generation_params(
@@ -247,9 +297,9 @@ model.set_generation_params(
 
 # Generate multiple samples
 descriptions = [
-    "epic orchestral soundtrack with strings and brass",
-    "chill lo-fi hip hop beat with jazzy piano",
-    "energetic rock song with electric guitar"
+    &quot;epic orchestral soundtrack with strings and brass&quot;,
+    &quot;chill lo-fi hip hop beat with jazzy piano&quot;,
+    &quot;energetic rock song with electric guitar&quot;
 ]
 
 # Generate (returns [batch, channels, samples])
@@ -257,7 +307,7 @@ wav = model.generate(descriptions)
 
 # Save each
 for i, audio in enumerate(wav):
-    torchaudio.save(f"music_{i}.wav", audio.cpu(), sample_rate=32000)
+    torchaudio.save(f&quot;music_{i}.wav&quot;, audio.cpu(), sample_rate=32000)
 ```
 
 ### Melody-conditioned generation
@@ -267,17 +317,17 @@ from audiocraft.models import MusicGen
 import torchaudio
 
 # Load melody model
-model = MusicGen.get_pretrained('facebook/musicgen-melody')
+model = MusicGen.get_pretrained(&#039;facebook/musicgen-melody&#039;)
 model.set_generation_params(duration=30)
 
 # Load melody audio
-melody, sr = torchaudio.load("melody.wav")
+melody, sr = torchaudio.load(&quot;melody.wav&quot;)
 
 # Generate with melody conditioning
-descriptions = ["acoustic guitar folk song"]
+descriptions = [&quot;acoustic guitar folk song&quot;]
 wav = model.generate_with_chroma(descriptions, melody, sr)
 
-torchaudio.save("melody_conditioned.wav", wav[0].cpu(), sample_rate=32000)
+torchaudio.save(&quot;melody_conditioned.wav&quot;, wav[0].cpu(), sample_rate=32000)
 ```
 
 ### Stereo generation
@@ -286,15 +336,15 @@ torchaudio.save("melody_conditioned.wav", wav[0].cpu(), sample_rate=32000)
 from audiocraft.models import MusicGen
 
 # Load stereo model
-model = MusicGen.get_pretrained('facebook/musicgen-stereo-medium')
+model = MusicGen.get_pretrained(&#039;facebook/musicgen-stereo-medium&#039;)
 model.set_generation_params(duration=15)
 
-descriptions = ["ambient electronic music with wide stereo panning"]
+descriptions = [&quot;ambient electronic music with wide stereo panning&quot;]
 wav = model.generate(descriptions)
 
 # wav shape: [batch, 2, samples] for stereo
-print(f"Stereo shape: {wav.shape}")  # [1, 2, 480000]
-torchaudio.save("stereo.wav", wav[0].cpu(), sample_rate=32000)
+print(f&quot;Stereo shape: {wav.shape}&quot;)  # [1, 2, 480000]
+torchaudio.save(&quot;stereo.wav&quot;, wav[0].cpu(), sample_rate=32000)
 ```
 
 ### Audio continuation
@@ -302,20 +352,20 @@ torchaudio.save("stereo.wav", wav[0].cpu(), sample_rate=32000)
 ```python
 from transformers import AutoProcessor, MusicgenForConditionalGeneration
 
-processor = AutoProcessor.from_pretrained("facebook/musicgen-medium")
-model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-medium")
+processor = AutoProcessor.from_pretrained(&quot;facebook/musicgen-medium&quot;)
+model = MusicgenForConditionalGeneration.from_pretrained(&quot;facebook/musicgen-medium&quot;)
 
 # Load audio to continue
 import torchaudio
-audio, sr = torchaudio.load("intro.wav")
+audio, sr = torchaudio.load(&quot;intro.wav&quot;)
 
 # Process with text and audio
 inputs = processor(
     audio=audio.squeeze().numpy(),
     sampling_rate=sr,
-    text=["continue with a epic chorus"],
+    text=[&quot;continue with a epic chorus&quot;],
     padding=True,
-    return_tensors="pt"
+    return_tensors=&quot;pt&quot;
 )
 
 # Generate continuation
@@ -330,7 +380,7 @@ audio_values = model.generate(**inputs, do_sample=True, guidance_scale=3, max_ne
 from audiocraft.models import MusicGen
 
 # Load style model
-model = MusicGen.get_pretrained('facebook/musicgen-style')
+model = MusicGen.get_pretrained(&#039;facebook/musicgen-style&#039;)
 
 # Configure generation with style
 model.set_generation_params(
@@ -346,10 +396,10 @@ model.set_style_conditioner_params(
 )
 
 # Load style reference
-style_audio, sr = torchaudio.load("reference_style.wav")
+style_audio, sr = torchaudio.load(&quot;reference_style.wav&quot;)
 
 # Generate with text + style
-descriptions = ["upbeat dance track"]
+descriptions = [&quot;upbeat dance track&quot;]
 wav = model.generate_with_style(descriptions, style_audio, sr)
 ```
 
@@ -374,21 +424,21 @@ wav = model.generate_with_style([None], style_audio, sr)
 from audiocraft.models import AudioGen
 import torchaudio
 
-model = AudioGen.get_pretrained('facebook/audiogen-medium')
+model = AudioGen.get_pretrained(&#039;facebook/audiogen-medium&#039;)
 model.set_generation_params(duration=10)
 
 # Generate various sounds
 descriptions = [
-    "thunderstorm with heavy rain and lightning",
-    "busy city traffic with car horns",
-    "ocean waves crashing on rocks",
-    "crackling campfire in forest"
+    &quot;thunderstorm with heavy rain and lightning&quot;,
+    &quot;busy city traffic with car horns&quot;,
+    &quot;ocean waves crashing on rocks&quot;,
+    &quot;crackling campfire in forest&quot;
 ]
 
 wav = model.generate(descriptions)
 
 for i, audio in enumerate(wav):
-    torchaudio.save(f"sound_{i}.wav", audio.cpu(), sample_rate=16000)
+    torchaudio.save(f&quot;sound_{i}.wav&quot;, audio.cpu(), sample_rate=16000)
 ```
 
 ## EnCodec usage
@@ -401,10 +451,10 @@ import torch
 import torchaudio
 
 # Load EnCodec
-model = CompressionModel.get_pretrained('facebook/encodec_32khz')
+model = CompressionModel.get_pretrained(&#039;facebook/encodec_32khz&#039;)
 
 # Load audio
-wav, sr = torchaudio.load("audio.wav")
+wav, sr = torchaudio.load(&quot;audio.wav&quot;)
 
 # Ensure correct sample rate
 if sr != 32000:
@@ -420,7 +470,7 @@ with torch.no_grad():
 with torch.no_grad():
     decoded = model.decode(codes)
 
-torchaudio.save("reconstructed.wav", decoded[0].cpu(), sample_rate=32000)
+torchaudio.save(&quot;reconstructed.wav&quot;, decoded[0].cpu(), sample_rate=32000)
 ```
 
 ## Common workflows
@@ -433,7 +483,7 @@ import torchaudio
 from audiocraft.models import MusicGen
 
 class MusicGenerator:
-    def __init__(self, model_name="facebook/musicgen-medium"):
+    def __init__(self, model_name=&quot;facebook/musicgen-medium&quot;):
         self.model = MusicGen.get_pretrained(model_name)
         self.sample_rate = 32000
 
@@ -464,11 +514,11 @@ class MusicGenerator:
 # Usage
 generator = MusicGenerator()
 audio = generator.generate(
-    "epic cinematic orchestral music",
+    &quot;epic cinematic orchestral music&quot;,
     duration=30,
     temperature=1.0
 )
-generator.save(audio, "epic_music.wav")
+generator.save(audio, &quot;epic_music.wav&quot;)
 ```
 
 ### Workflow 2: Sound design batch processing
@@ -480,43 +530,43 @@ from audiocraft.models import AudioGen
 import torchaudio
 
 def batch_generate_sounds(sound_specs, output_dir):
-    """
+    &quot;&quot;&quot;
     Generate multiple sounds from specifications.
 
     Args:
-        sound_specs: list of {"name": str, "description": str, "duration": float}
+        sound_specs: list of {&quot;name&quot;: str, &quot;description&quot;: str, &quot;duration&quot;: float}
         output_dir: output directory path
-    """
-    model = AudioGen.get_pretrained('facebook/audiogen-medium')
+    &quot;&quot;&quot;
+    model = AudioGen.get_pretrained(&#039;facebook/audiogen-medium&#039;)
     output_dir = Path(output_dir)
     output_dir.mkdir(exist_ok=True)
 
     results = []
 
     for spec in sound_specs:
-        model.set_generation_params(duration=spec.get("duration", 5))
+        model.set_generation_params(duration=spec.get(&quot;duration&quot;, 5))
 
-        wav = model.generate([spec["description"]])
+        wav = model.generate([spec[&quot;description&quot;]])
 
-        output_path = output_dir / f"{spec['name']}.wav"
+        output_path = output_dir / f&quot;{spec[&#039;name&#039;]}.wav&quot;
         torchaudio.save(str(output_path), wav[0].cpu(), sample_rate=16000)
 
         results.append({
-            "name": spec["name"],
-            "path": str(output_path),
-            "description": spec["description"]
+            &quot;name&quot;: spec[&quot;name&quot;],
+            &quot;path&quot;: str(output_path),
+            &quot;description&quot;: spec[&quot;description&quot;]
         })
 
     return results
 
 # Usage
 sounds = [
-    {"name": "explosion", "description": "massive explosion with debris", "duration": 3},
-    {"name": "footsteps", "description": "footsteps on wooden floor", "duration": 5},
-    {"name": "door", "description": "wooden door creaking and closing", "duration": 2}
+    {&quot;name&quot;: &quot;explosion&quot;, &quot;description&quot;: &quot;massive explosion with debris&quot;, &quot;duration&quot;: 3},
+    {&quot;name&quot;: &quot;footsteps&quot;, &quot;description&quot;: &quot;footsteps on wooden floor&quot;, &quot;duration&quot;: 5},
+    {&quot;name&quot;: &quot;door&quot;, &quot;description&quot;: &quot;wooden door creaking and closing&quot;, &quot;duration&quot;: 2}
 ]
 
-results = batch_generate_sounds(sounds, "sound_effects/")
+results = batch_generate_sounds(sounds, &quot;sound_effects/&quot;)
 ```
 
 ### Workflow 3: Gradio demo
@@ -527,7 +577,7 @@ import torch
 import torchaudio
 from audiocraft.models import MusicGen
 
-model = MusicGen.get_pretrained('facebook/musicgen-small')
+model = MusicGen.get_pretrained(&#039;facebook/musicgen-small&#039;)
 
 def generate_music(prompt, duration, temperature, cfg_coef):
     model.set_generation_params(
@@ -540,20 +590,20 @@ def generate_music(prompt, duration, temperature, cfg_coef):
         wav = model.generate([prompt])
 
     # Save to temp file
-    path = "temp_output.wav"
+    path = &quot;temp_output.wav&quot;
     torchaudio.save(path, wav[0].cpu(), sample_rate=32000)
     return path
 
 demo = gr.Interface(
     fn=generate_music,
     inputs=[
-        gr.Textbox(label="Music Description", placeholder="upbeat electronic dance music"),
-        gr.Slider(1, 30, value=8, label="Duration (seconds)"),
-        gr.Slider(0.5, 2.0, value=1.0, label="Temperature"),
-        gr.Slider(1.0, 10.0, value=3.0, label="CFG Coefficient")
+        gr.Textbox(label=&quot;Music Description&quot;, placeholder=&quot;upbeat electronic dance music&quot;),
+        gr.Slider(1, 30, value=8, label=&quot;Duration (seconds)&quot;),
+        gr.Slider(0.5, 2.0, value=1.0, label=&quot;Temperature&quot;),
+        gr.Slider(1.0, 10.0, value=3.0, label=&quot;CFG Coefficient&quot;)
     ],
-    outputs=gr.Audio(label="Generated Music"),
-    title="MusicGen Demo"
+    outputs=gr.Audio(label=&quot;Generated Music&quot;),
+    title=&quot;MusicGen Demo&quot;
 )
 
 demo.launch()
@@ -565,7 +615,7 @@ demo.launch()
 
 ```python
 # Use smaller model
-model = MusicGen.get_pretrained('facebook/musicgen-small')
+model = MusicGen.get_pretrained(&#039;facebook/musicgen-small&#039;)
 
 # Clear cache between generations
 torch.cuda.empty_cache()
@@ -581,7 +631,7 @@ model = model.half()
 
 ```python
 # Process multiple prompts at once (more efficient)
-descriptions = ["prompt1", "prompt2", "prompt3", "prompt4"]
+descriptions = [&quot;prompt1&quot;, &quot;prompt2&quot;, &quot;prompt3&quot;, &quot;prompt4&quot;]
 wav = model.generate(descriptions)  # Single batch
 
 # Instead of
@@ -619,8 +669,46 @@ for desc in descriptions:
 - **Paper (AudioGen)**: https://arxiv.org/abs/2209.15352
 - **HuggingFace**: https://huggingface.co/facebook/musicgen-small
 - **Demo**: https://huggingface.co/spaces/facebook/MusicGen
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Multimodal</span><span class="tag">Audio Generation</span><span class="tag">Text-to-Music</span><span class="tag">Text-to-Audio</span><span class="tag">MusicGen</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>24</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

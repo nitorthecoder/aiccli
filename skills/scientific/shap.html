@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>shap - AICCLI</title>
-  <meta name="description" content="shap - Claude Code skill for AICCLI">
+  <meta name="description" content="Model interpretability and explainability using SHAP (SHapley Additive exPlanations). Use this skill when explaining machine learning model predictions, computi">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / shap</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>shap</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / shap
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>shap</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Model interpretability and explainability using SHAP (SHapley Additive exPlanations). Use this skill when explaining machine learning model predictions, computing feature importance, generating SHAP plots (waterfall, beeswarm, bar, scatter, force, heatmap), debugging models, analyzing model bias or fairness, comparing models, or implementing explainable AI. Works with tree-based models (XGBoost, LightGBM, Random Forest), deep learning (TensorFlow, PyTorch), linear models, and any black-box model.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/shap</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/shap</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/shap</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: shap
 description: Model interpretability and explainability using SHAP (SHapley Additive exPlanations). Use this skill when explaining machine learning model predictions, computing feature importance, generating SHAP plots (waterfall, beeswarm, bar, scatter, force, heatmap), debugging models, analyzing model bias or fairness, comparing models, or implementing explainable AI. Works with tree-based models (XGBoost, LightGBM, Random Forest), deep learning (TensorFlow, PyTorch), linear models, and any black-box model.
 ---
@@ -77,17 +127,17 @@ SHAP works with all model types: tree-based models (XGBoost, LightGBM, CatBoost,
 ## When to Use This Skill
 
 **Trigger this skill when users ask about**:
-- "Explain which features are most important in my model"
-- "Generate SHAP plots" (waterfall, beeswarm, bar, scatter, force, heatmap, etc.)
-- "Why did my model make this prediction?"
-- "Calculate SHAP values for my model"
-- "Visualize feature importance using SHAP"
-- "Debug my model's behavior" or "validate my model"
-- "Check my model for bias" or "analyze fairness"
-- "Compare feature importance across models"
-- "Implement explainable AI" or "add explanations to my model"
-- "Understand feature interactions"
-- "Create model interpretation dashboard"
+- &quot;Explain which features are most important in my model&quot;
+- &quot;Generate SHAP plots&quot; (waterfall, beeswarm, bar, scatter, force, heatmap, etc.)
+- &quot;Why did my model make this prediction?&quot;
+- &quot;Calculate SHAP values for my model&quot;
+- &quot;Visualize feature importance using SHAP&quot;
+- &quot;Debug my model&#039;s behavior&quot; or &quot;validate my model&quot;
+- &quot;Check my model for bias&quot; or &quot;analyze fairness&quot;
+- &quot;Compare feature importance across models&quot;
+- &quot;Implement explainable AI&quot; or &quot;add explanations to my model&quot;
+- &quot;Understand feature interactions&quot;
+- &quot;Create model interpretation dashboard&quot;
 
 ## Quick Start Guide
 
@@ -158,10 +208,10 @@ shap.plots.force(shap_values[0])
 **For Feature Relationships**:
 ```python
 # Scatter plot - feature-prediction relationship
-shap.plots.scatter(shap_values[:, "Feature_Name"])
+shap.plots.scatter(shap_values[:, &quot;Feature_Name&quot;])
 
 # Colored by another feature to show interactions
-shap.plots.scatter(shap_values[:, "Age"], color=shap_values[:, "Education"])
+shap.plots.scatter(shap_values[:, &quot;Age&quot;], color=shap_values[:, &quot;Education&quot;])
 ```
 
 **See `references/plots.md` for comprehensive guide on all plot types.**
@@ -191,7 +241,7 @@ shap_values = explainer(X_test)
 shap.plots.beeswarm(shap_values)
 
 # Step 4: Feature relationships
-shap.plots.scatter(shap_values[:, "Most_Important_Feature"])
+shap.plots.scatter(shap_values[:, &quot;Most_Important_Feature&quot;])
 
 # Step 5: Individual explanation
 shap.plots.waterfall(shap_values[0])
@@ -271,7 +321,7 @@ shap.plots.waterfall(shap_values[0])
 
 ### SHAP Values
 
-**Definition**: SHAP values quantify each feature's contribution to a prediction, measured as the deviation from the expected model output (baseline).
+**Definition**: SHAP values quantify each feature&#039;s contribution to a prediction, measured as the deviation from the expected model output (baseline).
 
 **Properties**:
 - **Additivity**: SHAP values sum to difference between prediction and baseline
@@ -281,7 +331,7 @@ shap.plots.waterfall(shap_values[0])
 **Interpretation**:
 - Positive SHAP value → Feature pushes prediction higher
 - Negative SHAP value → Feature pushes prediction lower
-- Magnitude → Strength of feature's impact
+- Magnitude → Strength of feature&#039;s impact
 - Sum of SHAP values → Total prediction change from baseline
 
 **Example**:
@@ -296,7 +346,7 @@ Final prediction: 0.30 + 0.15 + 0.10 - 0.05 = 0.50
 
 ### Background Data / Baseline
 
-**Purpose**: Represents "typical" input to establish baseline expectations
+**Purpose**: Represents &quot;typical&quot; input to establish baseline expectations
 
 **Selection**:
 - Random sample from training data (50-1000 samples)
@@ -313,7 +363,7 @@ Final prediction: 0.30 + 0.15 + 0.10 - 0.05 = 0.50
 - **Probability**: For classification probability
 - **Log-odds**: For logistic regression (before sigmoid)
 
-**Example**: XGBoost classifiers explain margin output (log-odds) by default. To explain probabilities, use `model_output="probability"` in TreeExplainer.
+**Example**: XGBoost classifiers explain margin output (log-odds) by default. To explain probabilities, use `model_output=&quot;probability&quot;` in TreeExplainer.
 
 ## Common Patterns
 
@@ -342,13 +392,13 @@ for i in range(5):
 
 ```python
 # Define cohorts
-cohort1_mask = X_test['Group'] == 'A'
-cohort2_mask = X_test['Group'] == 'B'
+cohort1_mask = X_test[&#039;Group&#039;] == &#039;A&#039;
+cohort2_mask = X_test[&#039;Group&#039;] == &#039;B&#039;
 
 # Compare feature importance
 shap.plots.bar({
-    "Group A": shap_values[cohort1_mask],
-    "Group B": shap_values[cohort2_mask]
+    &quot;Group A&quot;: shap_values[cohort1_mask],
+    &quot;Group B&quot;: shap_values[cohort2_mask]
 })
 ```
 
@@ -361,11 +411,11 @@ error_indices = np.where(errors)[0]
 
 # Explain errors
 for idx in error_indices[:5]:
-    print(f"Sample {idx}:")
+    print(f&quot;Sample {idx}:&quot;)
     shap.plots.waterfall(shap_values[idx])
 
     # Investigate key features
-    shap.plots.scatter(shap_values[:, "Suspicious_Feature"])
+    shap.plots.scatter(shap_values[:, &quot;Suspicious_Feature&quot;])
 ```
 
 ## Performance Optimization
@@ -401,15 +451,15 @@ for i in range(0, len(X_test), batch_size):
 shap.plots.beeswarm(shap_values[:1000])
 
 # Adjust transparency for dense plots
-shap.plots.scatter(shap_values[:, "Feature"], alpha=0.3)
+shap.plots.scatter(shap_values[:, &quot;Feature&quot;], alpha=0.3)
 ```
 
 **For Production**:
 ```python
 # Cache explainer
 import joblib
-joblib.dump(explainer, 'explainer.pkl')
-explainer = joblib.load('explainer.pkl')
+joblib.dump(explainer, &#039;explainer.pkl&#039;)
+explainer = joblib.load(&#039;explainer.pkl&#039;)
 
 # Pre-compute for batch predictions
 # Only compute top N features for API responses
@@ -429,7 +479,7 @@ explainer = joblib.load('explainer.pkl')
 **Problem**: Interpreting log-odds as probabilities
 **Solution**: Check model output type; understand whether values are probabilities, log-odds, or raw outputs
 
-### Issue: Plots don't display
+### Issue: Plots don&#039;t display
 **Problem**: Matplotlib backend issues
 **Solution**: Ensure backend is set correctly; use `plt.show()` if needed
 
@@ -462,13 +512,13 @@ with mlflow.start_run():
 
     # Log plots
     shap.plots.beeswarm(shap_values, show=False)
-    mlflow.log_figure(plt.gcf(), "shap_beeswarm.png")
+    mlflow.log_figure(plt.gcf(), &quot;shap_beeswarm.png&quot;)
     plt.close()
 
     # Log feature importance metrics
     mean_abs_shap = np.abs(shap_values.values).mean(axis=0)
     for feature, importance in zip(X_test.columns, mean_abs_shap):
-        mlflow.log_metric(f"shap_{feature}", importance)
+        mlflow.log_metric(f&quot;shap_{feature}&quot;, importance)
 ```
 
 ### Production APIs
@@ -483,9 +533,9 @@ class ExplanationService:
         shap_values = self.explainer(X)
 
         return {
-            'prediction': prediction[0],
-            'base_value': shap_values.base_values[0],
-            'feature_contributions': dict(zip(X.columns, shap_values.values[0]))
+            &#039;prediction&#039;: prediction[0],
+            &#039;base_value&#039;: shap_values.base_values[0],
+            &#039;feature_contributions&#039;: dict(zip(X.columns, shap_values.values[0]))
         }
 ```
 
@@ -586,7 +636,7 @@ Includes: Mathematical foundations, proofs, comparisons, advanced topics.
 
 8. **Check for data leakage**: Unexpectedly high feature importance may indicate data quality issues
 
-9. **Consider feature correlations**: Use TreeExplainer's correlation-aware options or feature clustering for redundant features
+9. **Consider feature correlations**: Use TreeExplainer&#039;s correlation-aware options or feature clustering for redundant features
 
 10. **Remember SHAP shows association, not causation**: Use domain knowledge for causal interpretation
 
@@ -611,12 +661,43 @@ uv pip install -U shap
 
 - **Official Documentation**: https://shap.readthedocs.io/
 - **GitHub Repository**: https://github.com/slundberg/shap
-- **Original Paper**: Lundberg & Lee (2017) - "A Unified Approach to Interpreting Model Predictions"
-- **Nature MI Paper**: Lundberg et al. (2020) - "From local explanations to global understanding with explainable AI for trees"
+- **Original Paper**: Lundberg &amp; Lee (2017) - &quot;A Unified Approach to Interpreting Model Predictions&quot;
+- **Nature MI Paper**: Lundberg et al. (2020) - &quot;From local explanations to global understanding with explainable AI for trees&quot;
 
 This skill provides comprehensive coverage of SHAP for model interpretability across all use cases and model types.
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>18</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

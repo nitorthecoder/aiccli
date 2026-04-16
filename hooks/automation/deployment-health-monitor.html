@@ -4,87 +4,168 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>deployment-health-monitor - AICCLI</title>
-  <meta name="description" content="deployment-health-monitor - Claude Code hook for AICCLI">
+  <meta name="description" content="Monitor deployment status, error rates, and performance metrics, sending notifications for failed deployments or performance degradation. Tracks Vercel deployme">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../hook.html">Hook</a> / deployment-health-monitor</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>deployment-health-monitor</h1>
-      <div class="meta">
-        <span class="meta-item">Hook</span>
-        <span class="meta-item">automation</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">hooks</a> / automation / deployment-health-monitor
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🪝</div>
+      <div class="title">
+        <h1>deployment-health-monitor</h1>
+        <div class="meta">
+          <span class="badge type">Hook</span>
+          <span class="badge">automation</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>{
-  "description": "Monitor deployment status, error rates, and performance metrics, sending notifications for failed deployments or performance degradation. Tracks Vercel deployment health, monitors build success/failure rates, and provides alerts for deployment issues. Setup: Export 'export VERCEL_TOKEN=your_token' and 'export VERCEL_PROJECT_ID=your_project_id' (get from vercel.com/account/tokens and Vercel dashboard).",
-  "hooks": {
-    "PostToolUse": [
+    </div>
+
+    <p class="desc">Monitor deployment status, error rates, and performance metrics, sending notifications for failed deployments or performance degradation. Tracks Vercel deployment health, monitors build success/failure rates, and provides alerts for deployment issues. Setup: Export 'export VERCEL_TOKEN=your_token' and 'export VERCEL_PROJECT_ID=your_project_id' (get from vercel.com/account/tokens and Vercel dashboard).</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install hooks/deployment-health-monitor</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install hooks/deployment-health-monitor</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install hooks/deployment-health-monitor</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>{
+  &quot;description&quot;: &quot;Monitor deployment status, error rates, and performance metrics, sending notifications for failed deployments or performance degradation. Tracks Vercel deployment health, monitors build success/failure rates, and provides alerts for deployment issues. Setup: Export &#039;export VERCEL_TOKEN=your_token&#039; and &#039;export VERCEL_PROJECT_ID=your_project_id&#039; (get from vercel.com/account/tokens and Vercel dashboard).&quot;,
+  &quot;hooks&quot;: {
+    &quot;PostToolUse&quot;: [
       {
-        "matcher": "Bash",
-        "hooks": [
+        &quot;matcher&quot;: &quot;Bash&quot;,
+        &quot;hooks&quot;: [
           {
-            "type": "command",
-            "command": "bash -c 'input=$(cat); COMMAND=$(echo \"$input\" | jq -r \".tool_input.command // empty\"); SUCCESS=$(echo \"$input\" | jq -r \".tool_response.success // false\"); if [[ \"$COMMAND\" =~ (vercel|deploy|build) ]] && [ -n \"$VERCEL_TOKEN\" ] && [ -n \"$VERCEL_PROJECT_ID\" ]; then echo \"🏥 Deployment Health Monitor: Checking deployment status...\"; DEPLOY_DATA=$(curl -s -H \"Authorization: Bearer $VERCEL_TOKEN\" \"https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&limit=5\" 2&gt;/dev/null); if [ -n \"$DEPLOY_DATA\" ] && [ \"$DEPLOY_DATA\" != \"null\" ]; then RECENT_DEPLOYMENTS=$(echo \"$DEPLOY_DATA\" | jq -r \".deployments[]\"); TOTAL_DEPLOYMENTS=$(echo \"$DEPLOY_DATA\" | jq \".deployments | length\"); SUCCESS_COUNT=0; ERROR_COUNT=0; BUILDING_COUNT=0; echo \"📊 Recent deployment analysis ($TOTAL_DEPLOYMENTS deployments):\"; echo \"$DEPLOY_DATA\" | jq -r \".deployments[] | \\\"State: \\(.state) | Created: \\(.created | todateiso8601) | URL: \\(.url // \\\"N/A\\\")\\\"\"; for state in $(echo \"$DEPLOY_DATA\" | jq -r \".deployments[].state\"); do case \"$state\" in READY) ((SUCCESS_COUNT++));; ERROR|CANCELED) ((ERROR_COUNT++));; BUILDING|QUEUED) ((BUILDING_COUNT++));; esac; done; SUCCESS_RATE=$(( SUCCESS_COUNT * 100 / TOTAL_DEPLOYMENTS )); echo \"\" ; echo \"📈 Deployment Health Summary:\"; echo \"✅ Successful: $SUCCESS_COUNT/$TOTAL_DEPLOYMENTS ($SUCCESS_RATE%)\"; echo \"❌ Failed: $ERROR_COUNT/$TOTAL_DEPLOYMENTS\"; echo \"🔄 In Progress: $BUILDING_COUNT/$TOTAL_DEPLOYMENTS\"; if [ $ERROR_COUNT -gt 0 ]; then echo \"\" &gt;&2; echo \"🚨 DEPLOYMENT HEALTH ALERT!\" &gt;&2; echo \"Recent failures detected: $ERROR_COUNT failed deployments\" &gt;&2; echo \"Success rate: $SUCCESS_RATE%\" &gt;&2; echo \"\" &gt;&2; echo \"🔍 Failed deployments:\" &gt;&2; echo \"$DEPLOY_DATA\" | jq -r \".deployments[] | select(.state == \\\"ERROR\\\" or .state == \\\"CANCELED\\\") | \\\"❌ \\(.created | todateiso8601): \\(.url // \\\"No URL\\\")\\\"\" &gt;&2; echo \"\" &gt;&2; echo \"💡 Troubleshooting steps:\" &gt;&2; echo \"• Check Vercel dashboard for detailed error logs\" &gt;&2; echo \"• Review recent code changes\" &gt;&2; echo \"• Verify environment variables are set\" &gt;&2; echo \"• Check for build script errors\" &gt;&2; if [ $SUCCESS_RATE -lt 50 ]; then echo \"🚨 CRITICAL: Success rate below 50%!\" &gt;&2; exit 2; fi; elif [ $SUCCESS_RATE -lt 80 ]; then echo \"⚠️ Warning: Success rate below 80%\"; fi; if [ $BUILDING_COUNT -gt 2 ]; then echo \"⏳ Multiple builds in progress ($BUILDING_COUNT)\"; echo \"💡 This might indicate build queue issues\"; fi; LATEST_DEPLOY=$(echo \"$DEPLOY_DATA\" | jq -r \".deployments[0]\"); LATEST_STATE=$(echo \"$LATEST_DEPLOY\" | jq -r \".state\"); LATEST_URL=$(echo \"$LATEST_DEPLOY\" | jq -r \".url // empty\"); LATEST_CREATED=$(echo \"$LATEST_DEPLOY\" | jq -r \".created\"); if [ -n \"$LATEST_CREATED\" ] && [ \"$LATEST_CREATED\" != \"null\" ]; then MINUTES_AGO=$(( ($(date +%s) - $LATEST_CREATED/1000) / 60 )); echo \"🕒 Latest deployment: $LATEST_STATE ($MINUTES_AGO minutes ago)\"; if [ -n \"$LATEST_URL\" ]; then echo \"🌐 URL: https://$LATEST_URL\"; fi; fi; echo \"✅ Deployment health check completed\"; else echo \"❌ Unable to fetch deployment data from Vercel API\"; fi; else echo \"ℹ️ Deployment health monitoring skipped (not a deployment command or missing tokens)\"; fi'",
-            "timeout": 30
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;bash -c &#039;input=$(cat); COMMAND=$(echo \&quot;$input\&quot; | jq -r \&quot;.tool_input.command // empty\&quot;); SUCCESS=$(echo \&quot;$input\&quot; | jq -r \&quot;.tool_response.success // false\&quot;); if [[ \&quot;$COMMAND\&quot; =~ (vercel|deploy|build) ]] &amp;&amp; [ -n \&quot;$VERCEL_TOKEN\&quot; ] &amp;&amp; [ -n \&quot;$VERCEL_PROJECT_ID\&quot; ]; then echo \&quot;🏥 Deployment Health Monitor: Checking deployment status...\&quot;; DEPLOY_DATA=$(curl -s -H \&quot;Authorization: Bearer $VERCEL_TOKEN\&quot; \&quot;https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&amp;limit=5\&quot; 2&gt;/dev/null); if [ -n \&quot;$DEPLOY_DATA\&quot; ] &amp;&amp; [ \&quot;$DEPLOY_DATA\&quot; != \&quot;null\&quot; ]; then RECENT_DEPLOYMENTS=$(echo \&quot;$DEPLOY_DATA\&quot; | jq -r \&quot;.deployments[]\&quot;); TOTAL_DEPLOYMENTS=$(echo \&quot;$DEPLOY_DATA\&quot; | jq \&quot;.deployments | length\&quot;); SUCCESS_COUNT=0; ERROR_COUNT=0; BUILDING_COUNT=0; echo \&quot;📊 Recent deployment analysis ($TOTAL_DEPLOYMENTS deployments):\&quot;; echo \&quot;$DEPLOY_DATA\&quot; | jq -r \&quot;.deployments[] | \\\&quot;State: \\(.state) | Created: \\(.created | todateiso8601) | URL: \\(.url // \\\&quot;N/A\\\&quot;)\\\&quot;\&quot;; for state in $(echo \&quot;$DEPLOY_DATA\&quot; | jq -r \&quot;.deployments[].state\&quot;); do case \&quot;$state\&quot; in READY) ((SUCCESS_COUNT++));; ERROR|CANCELED) ((ERROR_COUNT++));; BUILDING|QUEUED) ((BUILDING_COUNT++));; esac; done; SUCCESS_RATE=$(( SUCCESS_COUNT * 100 / TOTAL_DEPLOYMENTS )); echo \&quot;\&quot; ; echo \&quot;📈 Deployment Health Summary:\&quot;; echo \&quot;✅ Successful: $SUCCESS_COUNT/$TOTAL_DEPLOYMENTS ($SUCCESS_RATE%)\&quot;; echo \&quot;❌ Failed: $ERROR_COUNT/$TOTAL_DEPLOYMENTS\&quot;; echo \&quot;🔄 In Progress: $BUILDING_COUNT/$TOTAL_DEPLOYMENTS\&quot;; if [ $ERROR_COUNT -gt 0 ]; then echo \&quot;\&quot; &gt;&amp;2; echo \&quot;🚨 DEPLOYMENT HEALTH ALERT!\&quot; &gt;&amp;2; echo \&quot;Recent failures detected: $ERROR_COUNT failed deployments\&quot; &gt;&amp;2; echo \&quot;Success rate: $SUCCESS_RATE%\&quot; &gt;&amp;2; echo \&quot;\&quot; &gt;&amp;2; echo \&quot;🔍 Failed deployments:\&quot; &gt;&amp;2; echo \&quot;$DEPLOY_DATA\&quot; | jq -r \&quot;.deployments[] | select(.state == \\\&quot;ERROR\\\&quot; or .state == \\\&quot;CANCELED\\\&quot;) | \\\&quot;❌ \\(.created | todateiso8601): \\(.url // \\\&quot;No URL\\\&quot;)\\\&quot;\&quot; &gt;&amp;2; echo \&quot;\&quot; &gt;&amp;2; echo \&quot;💡 Troubleshooting steps:\&quot; &gt;&amp;2; echo \&quot;• Check Vercel dashboard for detailed error logs\&quot; &gt;&amp;2; echo \&quot;• Review recent code changes\&quot; &gt;&amp;2; echo \&quot;• Verify environment variables are set\&quot; &gt;&amp;2; echo \&quot;• Check for build script errors\&quot; &gt;&amp;2; if [ $SUCCESS_RATE -lt 50 ]; then echo \&quot;🚨 CRITICAL: Success rate below 50%!\&quot; &gt;&amp;2; exit 2; fi; elif [ $SUCCESS_RATE -lt 80 ]; then echo \&quot;⚠️ Warning: Success rate below 80%\&quot;; fi; if [ $BUILDING_COUNT -gt 2 ]; then echo \&quot;⏳ Multiple builds in progress ($BUILDING_COUNT)\&quot;; echo \&quot;💡 This might indicate build queue issues\&quot;; fi; LATEST_DEPLOY=$(echo \&quot;$DEPLOY_DATA\&quot; | jq -r \&quot;.deployments[0]\&quot;); LATEST_STATE=$(echo \&quot;$LATEST_DEPLOY\&quot; | jq -r \&quot;.state\&quot;); LATEST_URL=$(echo \&quot;$LATEST_DEPLOY\&quot; | jq -r \&quot;.url // empty\&quot;); LATEST_CREATED=$(echo \&quot;$LATEST_DEPLOY\&quot; | jq -r \&quot;.created\&quot;); if [ -n \&quot;$LATEST_CREATED\&quot; ] &amp;&amp; [ \&quot;$LATEST_CREATED\&quot; != \&quot;null\&quot; ]; then MINUTES_AGO=$(( ($(date +%s) - $LATEST_CREATED/1000) / 60 )); echo \&quot;🕒 Latest deployment: $LATEST_STATE ($MINUTES_AGO minutes ago)\&quot;; if [ -n \&quot;$LATEST_URL\&quot; ]; then echo \&quot;🌐 URL: https://$LATEST_URL\&quot;; fi; fi; echo \&quot;✅ Deployment health check completed\&quot;; else echo \&quot;❌ Unable to fetch deployment data from Vercel API\&quot;; fi; else echo \&quot;ℹ️ Deployment health monitoring skipped (not a deployment command or missing tokens)\&quot;; fi&#039;&quot;,
+            &quot;timeout&quot;: 30
           }
         ]
       }
     ],
-    "SessionStart": [
+    &quot;SessionStart&quot;: [
       {
-        "matcher": "startup",
-        "hooks": [
+        &quot;matcher&quot;: &quot;startup&quot;,
+        &quot;hooks&quot;: [
           {
-            "type": "command",
-            "command": "bash -c 'if [ -n \"$VERCEL_TOKEN\" ] && [ -n \"$VERCEL_PROJECT_ID\" ]; then echo \"🏥 Deployment Health Monitor: Initial health check...\"; DEPLOY_DATA=$(curl -s -H \"Authorization: Bearer $VERCEL_TOKEN\" \"https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&limit=1\" 2&gt;/dev/null); if [ -n \"$DEPLOY_DATA\" ] && [ \"$DEPLOY_DATA\" != \"null\" ]; then LATEST_STATE=$(echo \"$DEPLOY_DATA\" | jq -r \".deployments[0].state // empty\"); LATEST_URL=$(echo \"$DEPLOY_DATA\" | jq -r \".deployments[0].url // empty\"); LATEST_CREATED=$(echo \"$DEPLOY_DATA\" | jq -r \".deployments[0].created // empty\"); if [ -n \"$LATEST_CREATED\" ] && [ \"$LATEST_CREATED\" != \"null\" ]; then MINUTES_AGO=$(( ($(date +%s) - $LATEST_CREATED/1000) / 60 )); case \"$LATEST_STATE\" in READY) echo \"✅ Latest deployment: READY ($MINUTES_AGO minutes ago)\"; if [ -n \"$LATEST_URL\" ]; then echo \"🌐 Live at: https://$LATEST_URL\"; fi;; ERROR) echo \"❌ Latest deployment: FAILED ($MINUTES_AGO minutes ago)\" &gt;&2; echo \"🔧 Check Vercel dashboard for details\" &gt;&2;; BUILDING) echo \"🔄 Latest deployment: BUILDING ($MINUTES_AGO minutes ago)\"; echo \"⏳ Build in progress...\";; QUEUED) echo \"⏳ Latest deployment: QUEUED ($MINUTES_AGO minutes ago)\";; *) echo \"❓ Latest deployment: $LATEST_STATE ($MINUTES_AGO minutes ago)\";; esac; echo \"📊 Deployment monitoring active\"; else echo \"ℹ️ No recent deployments found\"; fi; else echo \"⚠️ Unable to connect to Vercel API\"; fi; else echo \"ℹ️ Deployment health monitoring disabled (VERCEL_TOKEN or VERCEL_PROJECT_ID not set)\"; fi'",
-            "timeout": 15
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;bash -c &#039;if [ -n \&quot;$VERCEL_TOKEN\&quot; ] &amp;&amp; [ -n \&quot;$VERCEL_PROJECT_ID\&quot; ]; then echo \&quot;🏥 Deployment Health Monitor: Initial health check...\&quot;; DEPLOY_DATA=$(curl -s -H \&quot;Authorization: Bearer $VERCEL_TOKEN\&quot; \&quot;https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&amp;limit=1\&quot; 2&gt;/dev/null); if [ -n \&quot;$DEPLOY_DATA\&quot; ] &amp;&amp; [ \&quot;$DEPLOY_DATA\&quot; != \&quot;null\&quot; ]; then LATEST_STATE=$(echo \&quot;$DEPLOY_DATA\&quot; | jq -r \&quot;.deployments[0].state // empty\&quot;); LATEST_URL=$(echo \&quot;$DEPLOY_DATA\&quot; | jq -r \&quot;.deployments[0].url // empty\&quot;); LATEST_CREATED=$(echo \&quot;$DEPLOY_DATA\&quot; | jq -r \&quot;.deployments[0].created // empty\&quot;); if [ -n \&quot;$LATEST_CREATED\&quot; ] &amp;&amp; [ \&quot;$LATEST_CREATED\&quot; != \&quot;null\&quot; ]; then MINUTES_AGO=$(( ($(date +%s) - $LATEST_CREATED/1000) / 60 )); case \&quot;$LATEST_STATE\&quot; in READY) echo \&quot;✅ Latest deployment: READY ($MINUTES_AGO minutes ago)\&quot;; if [ -n \&quot;$LATEST_URL\&quot; ]; then echo \&quot;🌐 Live at: https://$LATEST_URL\&quot;; fi;; ERROR) echo \&quot;❌ Latest deployment: FAILED ($MINUTES_AGO minutes ago)\&quot; &gt;&amp;2; echo \&quot;🔧 Check Vercel dashboard for details\&quot; &gt;&amp;2;; BUILDING) echo \&quot;🔄 Latest deployment: BUILDING ($MINUTES_AGO minutes ago)\&quot;; echo \&quot;⏳ Build in progress...\&quot;;; QUEUED) echo \&quot;⏳ Latest deployment: QUEUED ($MINUTES_AGO minutes ago)\&quot;;; *) echo \&quot;❓ Latest deployment: $LATEST_STATE ($MINUTES_AGO minutes ago)\&quot;;; esac; echo \&quot;📊 Deployment monitoring active\&quot;; else echo \&quot;ℹ️ No recent deployments found\&quot;; fi; else echo \&quot;⚠️ Unable to connect to Vercel API\&quot;; fi; else echo \&quot;ℹ️ Deployment health monitoring disabled (VERCEL_TOKEN or VERCEL_PROJECT_ID not set)\&quot;; fi&#039;&quot;,
+            &quot;timeout&quot;: 15
           }
         ]
       }
     ]
   }
-}</pre></div>
+}</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>305</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

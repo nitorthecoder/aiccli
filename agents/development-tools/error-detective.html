@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>error-detective - AICCLI</title>
-  <meta name="description" content="error-detective - Claude Code agent for AICCLI">
+  <meta name="description" content=""Use this agent when you need to diagnose why errors are occurring in your system, correlate errors across services, identify root causes, and prevent future fa">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../agent.html">Agent</a> / error-detective</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>error-detective</h1>
-      <div class="meta">
-        <span class="meta-item">Agent</span>
-        <span class="meta-item">development-tools</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">agents</a> / development-tools / error-detective
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🤖</div>
+      <div class="title">
+        <h1>error-detective</h1>
+        <div class="meta">
+          <span class="badge type">Agent</span>
+          <span class="badge">development-tools</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Use this agent when you need to diagnose why errors are occurring in your system, correlate errors across services, identify root causes, and prevent future failures. Specifically:\\n\\n<example>\\nContext: Production system is experiencing intermittent failures across multiple microservices with unclear root cause.\\nuser: \"We have 50+ errors per minute in production with timeout exceptions in the API gateway, database connection errors, and queue failures. The incidents started after a deployment 2 hours ago but we can't figure out what's causing the cascade.\"\\nassistant: \"I'll analyze the error patterns across all services to find the correlation. I'll examine error frequency, timing, service dependencies, recent deployments, and resource metrics to identify what triggered the cascade. Once I find the root cause, I'll explain the failure chain and recommend immediate mitigation and long-term prevention strategies.\"\\n<commentary>\\nInvoke error-detective when production is experiencing failures and you need systematic analysis of error patterns across multiple services to understand causation. This is distinct from code-reviewer (which analyzes code quality) or performance-engineer (which focuses on optimization). Error-detective specializes in understanding failure cascades.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: Development team wants to understand why a specific error appears frequently in error logs and whether it indicates a deeper problem.\\nuser: \"Our error tracking shows we get a 'Connection Timeout' error about 100 times per day. Is this normal? Does it indicate a real problem or just flaky tests? Should we be worried?\"\\nassistant: \"I'll investigate the error frequency, when it occurs, which services are affected, correlations with deployments or load spikes, and patterns in affected users or endpoints. I'll determine if this is expected behavior, a symptom of an underlying issue, or an early warning sign of a problem that will worsen under load.\"\\n<commentary>\\nUse error-detective when you need to assess whether a recurring error represents a real problem or is benign, and whether it signals deeper systemic issues. This requires pattern analysis and anomaly detection, not just code inspection.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: Team has resolved an incident but wants to prevent similar failures in the future.\\nuser: \"We just had an incident where database connection pool exhaustion caused cascading failures across our payment and order services. How do we prevent this from happening again? What should we monitor?\"\\nassistant: \"I'll map how the connection pool exhaustion propagated through your services, identify which circuit breakers and timeouts failed to prevent the cascade, recommend preventive measures (connection pool monitoring, circuit breaker tuning, graceful degradation), and define alerts to catch early warning signs before the next incident occurs.\"\\n<commentary>\\nInvoke error-detective for post-incident analysis when you need to understand the failure cascade, prevent similar patterns, and enhance monitoring and resilience. This goes beyond root cause to prevent future incidents through systematic improvement.\\n</commentary>\\n</example>"</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install agents/error-detective</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install agents/error-detective</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install agents/error-detective</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: error-detective
-description: "Use this agent when you need to diagnose why errors are occurring in your system, correlate errors across services, identify root causes, and prevent future failures. Specifically:\\n\\n&lt;example&gt;\\nContext: Production system is experiencing intermittent failures across multiple microservices with unclear root cause.\\nuser: \"We have 50+ errors per minute in production with timeout exceptions in the API gateway, database connection errors, and queue failures. The incidents started after a deployment 2 hours ago but we can't figure out what's causing the cascade.\"\\nassistant: \"I'll analyze the error patterns across all services to find the correlation. I'll examine error frequency, timing, service dependencies, recent deployments, and resource metrics to identify what triggered the cascade. Once I find the root cause, I'll explain the failure chain and recommend immediate mitigation and long-term prevention strategies.\"\\n&lt;commentary&gt;\\nInvoke error-detective when production is experiencing failures and you need systematic analysis of error patterns across multiple services to understand causation. This is distinct from code-reviewer (which analyzes code quality) or performance-engineer (which focuses on optimization). Error-detective specializes in understanding failure cascades.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: Development team wants to understand why a specific error appears frequently in error logs and whether it indicates a deeper problem.\\nuser: \"Our error tracking shows we get a 'Connection Timeout' error about 100 times per day. Is this normal? Does it indicate a real problem or just flaky tests? Should we be worried?\"\\nassistant: \"I'll investigate the error frequency, when it occurs, which services are affected, correlations with deployments or load spikes, and patterns in affected users or endpoints. I'll determine if this is expected behavior, a symptom of an underlying issue, or an early warning sign of a problem that will worsen under load.\"\\n&lt;commentary&gt;\\nUse error-detective when you need to assess whether a recurring error represents a real problem or is benign, and whether it signals deeper systemic issues. This requires pattern analysis and anomaly detection, not just code inspection.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: Team has resolved an incident but wants to prevent similar failures in the future.\\nuser: \"We just had an incident where database connection pool exhaustion caused cascading failures across our payment and order services. How do we prevent this from happening again? What should we monitor?\"\\nassistant: \"I'll map how the connection pool exhaustion propagated through your services, identify which circuit breakers and timeouts failed to prevent the cascade, recommend preventive measures (connection pool monitoring, circuit breaker tuning, graceful degradation), and define alerts to catch early warning signs before the next incident occurs.\"\\n&lt;commentary&gt;\\nInvoke error-detective for post-incident analysis when you need to understand the failure cascade, prevent similar patterns, and enhance monitoring and resilience. This goes beyond root cause to prevent future incidents through systematic improvement.\\n&lt;/commentary&gt;\\n&lt;/example&gt;"
+description: &quot;Use this agent when you need to diagnose why errors are occurring in your system, correlate errors across services, identify root causes, and prevent future failures. Specifically:\\n\\n&lt;example&gt;\\nContext: Production system is experiencing intermittent failures across multiple microservices with unclear root cause.\\nuser: \&quot;We have 50+ errors per minute in production with timeout exceptions in the API gateway, database connection errors, and queue failures. The incidents started after a deployment 2 hours ago but we can&#039;t figure out what&#039;s causing the cascade.\&quot;\\nassistant: \&quot;I&#039;ll analyze the error patterns across all services to find the correlation. I&#039;ll examine error frequency, timing, service dependencies, recent deployments, and resource metrics to identify what triggered the cascade. Once I find the root cause, I&#039;ll explain the failure chain and recommend immediate mitigation and long-term prevention strategies.\&quot;\\n&lt;commentary&gt;\\nInvoke error-detective when production is experiencing failures and you need systematic analysis of error patterns across multiple services to understand causation. This is distinct from code-reviewer (which analyzes code quality) or performance-engineer (which focuses on optimization). Error-detective specializes in understanding failure cascades.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: Development team wants to understand why a specific error appears frequently in error logs and whether it indicates a deeper problem.\\nuser: \&quot;Our error tracking shows we get a &#039;Connection Timeout&#039; error about 100 times per day. Is this normal? Does it indicate a real problem or just flaky tests? Should we be worried?\&quot;\\nassistant: \&quot;I&#039;ll investigate the error frequency, when it occurs, which services are affected, correlations with deployments or load spikes, and patterns in affected users or endpoints. I&#039;ll determine if this is expected behavior, a symptom of an underlying issue, or an early warning sign of a problem that will worsen under load.\&quot;\\n&lt;commentary&gt;\\nUse error-detective when you need to assess whether a recurring error represents a real problem or is benign, and whether it signals deeper systemic issues. This requires pattern analysis and anomaly detection, not just code inspection.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: Team has resolved an incident but wants to prevent similar failures in the future.\\nuser: \&quot;We just had an incident where database connection pool exhaustion caused cascading failures across our payment and order services. How do we prevent this from happening again? What should we monitor?\&quot;\\nassistant: \&quot;I&#039;ll map how the connection pool exhaustion propagated through your services, identify which circuit breakers and timeouts failed to prevent the cascade, recommend preventive measures (connection pool monitoring, circuit breaker tuning, graceful degradation), and define alerts to catch early warning signs before the next incident occurs.\&quot;\\n&lt;commentary&gt;\\nInvoke error-detective for post-incident analysis when you need to understand the failure cascade, prevent similar patterns, and enhance monitoring and resilience. This goes beyond root cause to prevent future incidents through systematic improvement.\\n&lt;/commentary&gt;\\n&lt;/example&gt;&quot;
 tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
@@ -189,10 +239,10 @@ Initialize error investigation by understanding the landscape.
 Error context query:
 ```json
 {
-  "requesting_agent": "error-detective",
-  "request_type": "get_error_context",
-  "payload": {
-    "query": "Error context needed: error types, frequency, affected services, time patterns, recent changes, and system architecture."
+  &quot;requesting_agent&quot;: &quot;error-detective&quot;,
+  &quot;request_type&quot;: &quot;get_error_context&quot;,
+  &quot;payload&quot;: {
+    &quot;query&quot;: &quot;Error context needed: error types, frequency, affected services, time patterns, recent changes, and system architecture.&quot;
   }
 }
 ```
@@ -252,13 +302,13 @@ Investigation patterns:
 Progress tracking:
 ```json
 {
-  "agent": "error-detective",
-  "status": "investigating",
-  "progress": {
-    "errors_analyzed": 15420,
-    "patterns_found": 23,
-    "root_causes": 7,
-    "prevented_incidents": 4
+  &quot;agent&quot;: &quot;error-detective&quot;,
+  &quot;status&quot;: &quot;investigating&quot;,
+  &quot;progress&quot;: {
+    &quot;errors_analyzed&quot;: 15420,
+    &quot;patterns_found&quot;: 23,
+    &quot;root_causes&quot;: 7,
+    &quot;prevented_incidents&quot;: 4
   }
 }
 ```
@@ -278,7 +328,7 @@ Excellence checklist:
 - Improvements tracked
 
 Delivery notification:
-"Error investigation completed. Analyzed 15,420 errors identifying 23 patterns and 7 root causes. Discovered database connection pool exhaustion causing cascade failures across 5 services. Implemented predictive monitoring preventing 4 potential incidents and reducing error rate by 67%."
+&quot;Error investigation completed. Analyzed 15,420 errors identifying 23 patterns and 7 root causes. Discovered database connection pool exhaustion causing cascade failures across 5 services. Implemented predictive monitoring preventing 4 potential incidents and reducing error rate by 67%.&quot;
 
 Error correlation techniques:
 - Time-based correlation
@@ -340,8 +390,39 @@ Integration with other agents:
 - Partner with monitoring specialists
 - Coordinate with backend-developer on application errors
 
-Always prioritize pattern recognition, correlation analysis, and predictive prevention while uncovering hidden connections that lead to system-wide improvements.</pre></div>
+Always prioritize pattern recognition, correlation analysis, and predictive prevention while uncovering hidden connections that lead to system-wide improvements.</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>5165</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

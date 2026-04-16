@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>infrastructure-modal - AICCLI</title>
-  <meta name="description" content="infrastructure-modal - Claude Code skill for AICCLI">
+  <meta name="description" content="Serverless GPU cloud platform for running ML workloads. Use when you need on-demand GPU access without infrastructure management, deploying ML models as APIs, o">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / infrastructure-modal</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>infrastructure-modal</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / infrastructure-modal
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>infrastructure-modal</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Serverless GPU cloud platform for running ML workloads. Use when you need on-demand GPU access without infrastructure management, deploying ML models as APIs, or running batch jobs with automatic scaling.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/infrastructure-modal</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/infrastructure-modal</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/infrastructure-modal</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: modal-serverless-gpu
 description: Serverless GPU cloud platform for running ML workloads. Use when you need on-demand GPU access without infrastructure management, deploying ML models as APIs, or running batch jobs with automatic scaling.
 version: 1.0.0
@@ -67,7 +117,7 @@ dependencies: [modal&gt;=0.64.0]
 
 # Modal Serverless GPU
 
-Comprehensive guide to running ML workloads on Modal's serverless GPU cloud platform.
+Comprehensive guide to running ML workloads on Modal&#039;s serverless GPU cloud platform.
 
 ## When to use Modal
 
@@ -107,12 +157,12 @@ modal setup  # Opens browser for authentication
 ```python
 import modal
 
-app = modal.App("hello-gpu")
+app = modal.App(&quot;hello-gpu&quot;)
 
-@app.function(gpu="T4")
+@app.function(gpu=&quot;T4&quot;)
 def gpu_info():
     import subprocess
-    return subprocess.run(["nvidia-smi"], capture_output=True, text=True).stdout
+    return subprocess.run([&quot;nvidia-smi&quot;], capture_output=True, text=True).stdout
 
 @app.local_entrypoint()
 def main():
@@ -126,23 +176,23 @@ Run: `modal run hello_gpu.py`
 ```python
 import modal
 
-app = modal.App("text-generation")
-image = modal.Image.debian_slim().pip_install("transformers", "torch", "accelerate")
+app = modal.App(&quot;text-generation&quot;)
+image = modal.Image.debian_slim().pip_install(&quot;transformers&quot;, &quot;torch&quot;, &quot;accelerate&quot;)
 
-@app.cls(gpu="A10G", image=image)
+@app.cls(gpu=&quot;A10G&quot;, image=image)
 class TextGenerator:
     @modal.enter()
     def load_model(self):
         from transformers import pipeline
-        self.pipe = pipeline("text-generation", model="gpt2", device=0)
+        self.pipe = pipeline(&quot;text-generation&quot;, model=&quot;gpt2&quot;, device=0)
 
     @modal.method()
     def generate(self, prompt: str) -&gt; str:
-        return self.pipe(prompt, max_length=100)[0]["generated_text"]
+        return self.pipe(prompt, max_length=100)[0][&quot;generated_text&quot;]
 
 @app.local_entrypoint()
 def main():
-    print(TextGenerator().generate.remote("Hello, world"))
+    print(TextGenerator().generate.remote(&quot;Hello, world&quot;))
 ```
 
 ## Core concepts
@@ -186,48 +236,48 @@ def main():
 
 ```python
 # Single GPU
-@app.function(gpu="A100")
+@app.function(gpu=&quot;A100&quot;)
 
 # Specific memory variant
-@app.function(gpu="A100-80GB")
+@app.function(gpu=&quot;A100-80GB&quot;)
 
 # Multiple GPUs (up to 8)
-@app.function(gpu="H100:4")
+@app.function(gpu=&quot;H100:4&quot;)
 
 # GPU with fallbacks
-@app.function(gpu=["H100", "A100", "L40S"])
+@app.function(gpu=[&quot;H100&quot;, &quot;A100&quot;, &quot;L40S&quot;])
 
 # Any available GPU
-@app.function(gpu="any")
+@app.function(gpu=&quot;any&quot;)
 ```
 
 ## Container images
 
 ```python
 # Basic image with pip
-image = modal.Image.debian_slim(python_version="3.11").pip_install(
-    "torch==2.1.0", "transformers==4.36.0", "accelerate"
+image = modal.Image.debian_slim(python_version=&quot;3.11&quot;).pip_install(
+    &quot;torch==2.1.0&quot;, &quot;transformers==4.36.0&quot;, &quot;accelerate&quot;
 )
 
 # From CUDA base
 image = modal.Image.from_registry(
-    "nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04",
-    add_python="3.11"
-).pip_install("torch", "transformers")
+    &quot;nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04&quot;,
+    add_python=&quot;3.11&quot;
+).pip_install(&quot;torch&quot;, &quot;transformers&quot;)
 
 # With system packages
-image = modal.Image.debian_slim().apt_install("git", "ffmpeg").pip_install("whisper")
+image = modal.Image.debian_slim().apt_install(&quot;git&quot;, &quot;ffmpeg&quot;).pip_install(&quot;whisper&quot;)
 ```
 
 ## Persistent storage
 
 ```python
-volume = modal.Volume.from_name("model-cache", create_if_missing=True)
+volume = modal.Volume.from_name(&quot;model-cache&quot;, create_if_missing=True)
 
-@app.function(gpu="A10G", volumes={"/models": volume})
+@app.function(gpu=&quot;A10G&quot;, volumes={&quot;/models&quot;: volume})
 def load_model():
     import os
-    model_path = "/models/llama-7b"
+    model_path = &quot;/models/llama-7b&quot;
     if not os.path.exists(model_path):
         model = download_model()
         model.save_pretrained(model_path)
@@ -241,9 +291,9 @@ def load_model():
 
 ```python
 @app.function()
-@modal.fastapi_endpoint(method="POST")
+@modal.fastapi_endpoint(method=&quot;POST&quot;)
 def predict(text: str) -&gt; dict:
-    return {"result": model.predict(text)}
+    return {&quot;result&quot;: model.predict(text)}
 ```
 
 ### Full ASGI app
@@ -252,9 +302,9 @@ def predict(text: str) -&gt; dict:
 from fastapi import FastAPI
 web_app = FastAPI()
 
-@web_app.post("/predict")
+@web_app.post(&quot;/predict&quot;)
 async def predict(text: str):
-    return {"result": await model.predict.remote.aio(text)}
+    return {&quot;result&quot;: await model.predict.remote.aio(text)}
 
 @app.function()
 @modal.asgi_app()
@@ -289,16 +339,16 @@ modal secret create huggingface HF_TOKEN=hf_xxx
 ```
 
 ```python
-@app.function(secrets=[modal.Secret.from_name("huggingface")])
+@app.function(secrets=[modal.Secret.from_name(&quot;huggingface&quot;)])
 def download_model():
     import os
-    token = os.environ["HF_TOKEN"]
+    token = os.environ[&quot;HF_TOKEN&quot;]
 ```
 
 ## Scheduling
 
 ```python
-@app.function(schedule=modal.Cron("0 0 * * *"))  # Daily midnight
+@app.function(schedule=modal.Cron(&quot;0 0 * * *&quot;))  # Daily midnight
 def daily_job():
     pass
 
@@ -323,7 +373,7 @@ def inference():
 ### Model loading best practices
 
 ```python
-@app.cls(gpu="A100")
+@app.cls(gpu=&quot;A100&quot;)
 class Model:
     @modal.enter()  # Run once at container start
     def load(self):
@@ -353,7 +403,7 @@ def run_parallel():
 
 ```python
 @app.function(
-    gpu="A100",
+    gpu=&quot;A100&quot;,
     memory=32768,              # 32GB RAM
     cpu=4,                     # 4 CPU cores
     timeout=3600,              # 1 hour max
@@ -369,7 +419,7 @@ def my_function():
 
 ```python
 # Test locally
-if __name__ == "__main__":
+if __name__ == &quot;__main__&quot;:
     result = my_function.local()
 
 # View logs
@@ -396,8 +446,46 @@ if __name__ == "__main__":
 - **Examples**: https://github.com/modal-labs/modal-examples
 - **Pricing**: https://modal.com/pricing
 - **Discord**: https://discord.gg/modal
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Infrastructure</span><span class="tag">Serverless</span><span class="tag">GPU</span><span class="tag">Cloud</span><span class="tag">Deployment</span><span class="tag">Modal</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>23</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

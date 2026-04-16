@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>research-lookup - AICCLI</title>
-  <meta name="description" content="research-lookup - Claude Code skill for AICCLI">
+  <meta name="description" content=""Look up current research information using Perplexity's Sonar Pro Search or Sonar Reasoning Pro models through OpenRouter. Automatically selects the best model">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / research-lookup</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>research-lookup</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / research-lookup
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>research-lookup</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Look up current research information using Perplexity's Sonar Pro Search or Sonar Reasoning Pro models through OpenRouter. Automatically selects the best model based on query complexity. Search academic papers, recent studies, technical documentation, and general research information with citations."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/research-lookup</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/research-lookup</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/research-lookup</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: research-lookup
-description: "Look up current research information using Perplexity's Sonar Pro Search or Sonar Reasoning Pro models through OpenRouter. Automatically selects the best model based on query complexity. Search academic papers, recent studies, technical documentation, and general research information with citations."
+description: &quot;Look up current research information using Perplexity&#039;s Sonar Pro Search or Sonar Reasoning Pro models through OpenRouter. Automatically selects the best model based on query complexity. Search academic papers, recent studies, technical documentation, and general research information with citations.&quot;
 allowed-tools: [Read, Write, Edit, Bash]
 ---
 
@@ -65,7 +115,7 @@ allowed-tools: [Read, Write, Edit, Bash]
 
 ## Overview
 
-This skill enables real-time research information lookup using Perplexity's Sonar models through OpenRouter. It intelligently selects between **Sonar Pro Search** (fast, efficient lookup) and **Sonar Reasoning Pro** (deep analytical reasoning) based on query complexity. The skill provides access to current academic literature, recent studies, technical documentation, and general research information with proper citations and source attribution.
+This skill enables real-time research information lookup using Perplexity&#039;s Sonar models through OpenRouter. It intelligently selects between **Sonar Pro Search** (fast, efficient lookup) and **Sonar Reasoning Pro** (deep analytical reasoning) based on query complexity. The skill provides access to current academic literature, recent studies, technical documentation, and general research information with proper citations and source attribution.
 
 ## When to Use This Skill
 
@@ -93,7 +143,7 @@ If your document does not already contain schematics or diagrams:
 
 **How to generate schematics:**
 ```bash
-python scripts/generate_schematic.py "your diagram description" -o figures/output.png
+python scripts/generate_schematic.py &quot;your diagram description&quot; -o figures/output.png
 ```
 
 The AI will automatically:
@@ -123,10 +173,10 @@ For detailed guidance on creating schematics, refer to the scientific-schematics
 
 ```
 Query Examples:
-- "Recent advances in CRISPR gene editing 2024"
-- "Latest clinical trials for Alzheimer's disease treatment"
-- "Machine learning applications in drug discovery systematic review"
-- "Climate change impacts on biodiversity meta-analysis"
+- &quot;Recent advances in CRISPR gene editing 2024&quot;
+- &quot;Latest clinical trials for Alzheimer&#039;s disease treatment&quot;
+- &quot;Machine learning applications in drug discovery systematic review&quot;
+- &quot;Climate change impacts on biodiversity meta-analysis&quot;
 ```
 
 **Expected Response Format**:
@@ -142,10 +192,10 @@ Query Examples:
 
 ```
 Query Examples:
-- "Western blot protocol for protein detection"
-- "RNA sequencing library preparation methods"
-- "Statistical power analysis for clinical trials"
-- "Machine learning model evaluation metrics"
+- &quot;Western blot protocol for protein detection&quot;
+- &quot;RNA sequencing library preparation methods&quot;
+- &quot;Statistical power analysis for clinical trials&quot;
+- &quot;Machine learning model evaluation metrics&quot;
 ```
 
 **Expected Response Format**:
@@ -161,10 +211,10 @@ Query Examples:
 
 ```
 Query Examples:
-- "Prevalence of diabetes in US population 2024"
-- "Global renewable energy adoption statistics"
-- "COVID-19 vaccination rates by country"
-- "AI adoption in healthcare industry survey"
+- &quot;Prevalence of diabetes in US population 2024&quot;
+- &quot;Global renewable energy adoption statistics&quot;
+- &quot;COVID-19 vaccination rates by country&quot;
+- &quot;AI adoption in healthcare industry survey&quot;
 ```
 
 **Expected Response Format**:
@@ -180,16 +230,16 @@ Query Examples:
 
 ```
 Query Examples:
-- "Foundational papers on transformer architecture"
-- "Seminal works in quantum computing"
-- "Key studies on climate change mitigation"
-- "Landmark trials in cancer immunotherapy"
+- &quot;Foundational papers on transformer architecture&quot;
+- &quot;Seminal works in quantum computing&quot;
+- &quot;Key studies on climate change mitigation&quot;
+- &quot;Landmark trials in cancer immunotherapy&quot;
 ```
 
 **Expected Response Format**:
 - 5-10 most influential or relevant papers
 - Complete citation information (authors, title, journal, year, DOI)
-- Brief description of each paper's contribution
+- Brief description of each paper&#039;s contribution
 - Citation impact metrics when available (h-index, citation count)
 - Journal impact factors and rankings
 
@@ -212,7 +262,7 @@ This skill features **intelligent model selection** based on query complexity:
 **2. Sonar Reasoning Pro** (`perplexity/sonar-reasoning-pro`)
 - **Use Case**: Complex analytical queries requiring deep reasoning
 - **Best For**:
-  - Comparative analysis ("compare X vs Y")
+  - Comparative analysis (&quot;compare X vs Y&quot;)
   - Synthesis of multiple studies
   - Evaluating trade-offs or controversies
   - Explaining mechanisms or relationships
@@ -246,14 +296,14 @@ The skill automatically detects query complexity using these indicators:
 **Example Query Classification**:
 
 ✅ **Sonar Pro Search** (straightforward lookup):
-- "Recent advances in CRISPR gene editing 2024"
-- "Prevalence of diabetes in US population"
-- "Western blot protocol for protein detection"
+- &quot;Recent advances in CRISPR gene editing 2024&quot;
+- &quot;Prevalence of diabetes in US population&quot;
+- &quot;Western blot protocol for protein detection&quot;
 
 ✅ **Sonar Reasoning Pro** (complex analysis):
-- "Compare and contrast mRNA vaccines vs traditional vaccines for cancer treatment"
-- "Explain the mechanism underlying the relationship between gut microbiome and depression"
-- "Analyze the controversy surrounding AI in medical diagnosis and evaluate trade-offs"
+- &quot;Compare and contrast mRNA vaccines vs traditional vaccines for cancer treatment&quot;
+- &quot;Explain the mechanism underlying the relationship between gut microbiome and depression&quot;
+- &quot;Analyze the controversy surrounding AI in medical diagnosis and evaluate trade-offs&quot;
 
 ### Manual Override
 
@@ -261,10 +311,10 @@ You can force a specific model using the `force_model` parameter:
 
 ```python
 # Force Sonar Pro Search for fast lookup
-research = ResearchLookup(force_model='pro')
+research = ResearchLookup(force_model=&#039;pro&#039;)
 
 # Force Sonar Reasoning Pro for deep analysis
-research = ResearchLookup(force_model='reasoning')
+research = ResearchLookup(force_model=&#039;reasoning&#039;)
 
 # Automatic selection (default)
 research = ResearchLookup()
@@ -273,20 +323,20 @@ research = ResearchLookup()
 Command-line usage:
 ```bash
 # Force Sonar Pro Search
-python research_lookup.py "your query" --force-model pro
+python research_lookup.py &quot;your query&quot; --force-model pro
 
 # Force Sonar Reasoning Pro
-python research_lookup.py "your query" --force-model reasoning
+python research_lookup.py &quot;your query&quot; --force-model reasoning
 
 # Automatic (no flag)
-python research_lookup.py "your query"
+python research_lookup.py &quot;your query&quot;
 ```
 
 ## Technical Integration
 
 ### OpenRouter API Configuration
 
-This skill integrates with OpenRouter (openrouter.ai) to access Perplexity's Sonar models:
+This skill integrates with OpenRouter (openrouter.ai) to access Perplexity&#039;s Sonar models:
 
 **Model Specifications**:
 - **Models**: 
@@ -349,14 +399,14 @@ This skill integrates with OpenRouter (openrouter.ai) to access Perplexity's Son
 ### 2. Specific and Focused Queries
 
 **Good Queries** (will trigger appropriate model):
-- "Randomized controlled trials of mRNA vaccines for cancer treatment 2023-2024" → Sonar Pro Search
-- "Compare the efficacy and safety of mRNA vaccines vs traditional vaccines for cancer treatment" → Sonar Reasoning Pro
-- "Explain the mechanism by which CRISPR off-target effects occur and strategies to minimize them" → Sonar Reasoning Pro
+- &quot;Randomized controlled trials of mRNA vaccines for cancer treatment 2023-2024&quot; → Sonar Pro Search
+- &quot;Compare the efficacy and safety of mRNA vaccines vs traditional vaccines for cancer treatment&quot; → Sonar Reasoning Pro
+- &quot;Explain the mechanism by which CRISPR off-target effects occur and strategies to minimize them&quot; → Sonar Reasoning Pro
 
 **Poor Queries**:
-- "Tell me about AI" (too broad)
-- "Cancer research" (lacks specificity)
-- "Latest news" (too vague)
+- &quot;Tell me about AI&quot; (too broad)
+- &quot;Cancer research&quot; (lacks specificity)
+- &quot;Latest news&quot; (too vague)
 
 ### 3. Structured Query Format
 
@@ -366,17 +416,17 @@ This skill integrates with OpenRouter (openrouter.ai) to access Perplexity's Son
 ```
 
 **Examples**:
-- "CRISPR gene editing + off-target effects + 2024 + clinical trials"
-- "Quantum computing + error correction + recent advances + review papers"
-- "Renewable energy + solar efficiency + 2023-2024 + statistical data"
+- &quot;CRISPR gene editing + off-target effects + 2024 + clinical trials&quot;
+- &quot;Quantum computing + error correction + recent advances + review papers&quot;
+- &quot;Renewable energy + solar efficiency + 2023-2024 + statistical data&quot;
 
 ### 4. Follow-up Queries
 
 **Effective Follow-ups**:
-- "Show me the full citation for the Smith et al. 2024 paper"
-- "What are the limitations of this methodology?"
-- "Find similar studies using different approaches"
-- "What controversies exist in this research area?"
+- &quot;Show me the full citation for the Smith et al. 2024 paper&quot;
+- &quot;What are the limitations of this methodology?&quot;
+- &quot;Find similar studies using different approaches&quot;
+- &quot;What controversies exist in this research area?&quot;
 
 ## Integration with Scientific Writing
 
@@ -412,7 +462,7 @@ This skill enhances scientific writing by providing:
 
 ### Example 1: Simple Literature Search (Sonar Pro Search)
 
-**Query**: "Recent advances in transformer attention mechanisms 2024"
+**Query**: &quot;Recent advances in transformer attention mechanisms 2024&quot;
 
 **Model Selected**: Sonar Pro Search (straightforward lookup)
 
@@ -425,7 +475,7 @@ This skill enhances scientific writing by providing:
 
 ### Example 2: Comparative Analysis (Sonar Reasoning Pro)
 
-**Query**: "Compare and contrast the advantages and limitations of transformer-based models versus traditional RNNs for sequence modeling"
+**Query**: &quot;Compare and contrast the advantages and limitations of transformer-based models versus traditional RNNs for sequence modeling&quot;
 
 **Model Selected**: Sonar Reasoning Pro (complex analysis required)
 
@@ -439,7 +489,7 @@ This skill enhances scientific writing by providing:
 
 ### Example 3: Method Verification (Sonar Pro Search)
 
-**Query**: "Standard protocols for flow cytometry analysis"
+**Query**: &quot;Standard protocols for flow cytometry analysis&quot;
 
 **Model Selected**: Sonar Pro Search (protocol lookup)
 
@@ -452,7 +502,7 @@ This skill enhances scientific writing by providing:
 
 ### Example 4: Mechanism Explanation (Sonar Reasoning Pro)
 
-**Query**: "Explain the underlying mechanism of how mRNA vaccines trigger immune responses and why they differ from traditional vaccines"
+**Query**: &quot;Explain the underlying mechanism of how mRNA vaccines trigger immune responses and why they differ from traditional vaccines&quot;
 
 **Model Selected**: Sonar Reasoning Pro (requires causal reasoning)
 
@@ -466,7 +516,7 @@ This skill enhances scientific writing by providing:
 
 ### Example 5: Statistical Data (Sonar Pro Search)
 
-**Query**: "Global AI adoption in healthcare statistics 2024"
+**Query**: &quot;Global AI adoption in healthcare statistics 2024&quot;
 
 **Model Selected**: Sonar Pro Search (data lookup)
 
@@ -505,7 +555,7 @@ This skill enhances scientific writing by providing:
 
 **Best Practices**:
 1. Trust the automatic selection for most use cases
-2. Review query results - if Sonar Pro Search doesn't provide sufficient depth, rephrase with reasoning keywords
+2. Review query results - if Sonar Pro Search doesn&#039;t provide sufficient depth, rephrase with reasoning keywords
 3. Use batch queries strategically - combine simple lookups to minimize total query count
 4. For literature reviews, start with Sonar Pro Search for breadth, then use Sonar Reasoning Pro for synthesis
 
@@ -557,8 +607,39 @@ This skill serves as a powerful research assistant with intelligent dual-model s
 - **Complementary WebSearch**: Use alongside WebSearch for metadata verification and non-academic sources
 
 Whether you need quick fact-finding or deep analytical synthesis, this skill automatically adapts to deliver the right level of research support for your scientific writing needs.
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>84</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

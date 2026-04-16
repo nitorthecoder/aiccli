@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>rag-qdrant - AICCLI</title>
-  <meta name="description" content="rag-qdrant - Claude Code skill for AICCLI">
+  <meta name="description" content="High-performance vector similarity search engine for RAG and semantic search. Use when building production RAG systems requiring fast nearest neighbor search, h">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / rag-qdrant</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>rag-qdrant</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / rag-qdrant
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>rag-qdrant</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">High-performance vector similarity search engine for RAG and semantic search. Use when building production RAG systems requiring fast nearest neighbor search, hybrid search with filtering, or scalable vector storage with Rust-powered performance.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/rag-qdrant</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/rag-qdrant</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/rag-qdrant</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: qdrant-vector-search
 description: High-performance vector similarity search engine for RAG and semantic search. Use when building production RAG systems requiring fast nearest neighbor search, hybrid search with filtering, or scalable vector storage with Rust-powered performance.
 version: 1.0.0
@@ -117,43 +167,43 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 
 # Connect to Qdrant
-client = QdrantClient(host="localhost", port=6333)
+client = QdrantClient(host=&quot;localhost&quot;, port=6333)
 
 # Create collection
 client.create_collection(
-    collection_name="documents",
+    collection_name=&quot;documents&quot;,
     vectors_config=VectorParams(size=384, distance=Distance.COSINE)
 )
 
 # Insert vectors with payload
 client.upsert(
-    collection_name="documents",
+    collection_name=&quot;documents&quot;,
     points=[
         PointStruct(
             id=1,
             vector=[0.1, 0.2, ...],  # 384-dim vector
-            payload={"title": "Doc 1", "category": "tech"}
+            payload={&quot;title&quot;: &quot;Doc 1&quot;, &quot;category&quot;: &quot;tech&quot;}
         ),
         PointStruct(
             id=2,
             vector=[0.3, 0.4, ...],
-            payload={"title": "Doc 2", "category": "science"}
+            payload={&quot;title&quot;: &quot;Doc 2&quot;, &quot;category&quot;: &quot;science&quot;}
         )
     ]
 )
 
 # Search with filtering
 results = client.search(
-    collection_name="documents",
+    collection_name=&quot;documents&quot;,
     query_vector=[0.15, 0.25, ...],
     query_filter={
-        "must": [{"key": "category", "match": {"value": "tech"}}]
+        &quot;must&quot;: [{&quot;key&quot;: &quot;category&quot;, &quot;match&quot;: {&quot;value&quot;: &quot;tech&quot;}}]
     },
     limit=10
 )
 
 for point in results:
-    print(f"ID: {point.id}, Score: {point.score}, Payload: {point.payload}")
+    print(f&quot;ID: {point.id}, Score: {point.score}, Payload: {point.payload}&quot;)
 ```
 
 ## Core concepts
@@ -168,16 +218,16 @@ point = PointStruct(
     id=123,                              # Integer or UUID string
     vector=[0.1, 0.2, 0.3, ...],        # Dense vector
     payload={                            # Arbitrary JSON metadata
-        "title": "Document title",
-        "category": "tech",
-        "timestamp": 1699900000,
-        "tags": ["python", "ml"]
+        &quot;title&quot;: &quot;Document title&quot;,
+        &quot;category&quot;: &quot;tech&quot;,
+        &quot;timestamp&quot;: 1699900000,
+        &quot;tags&quot;: [&quot;python&quot;, &quot;ml&quot;]
     }
 )
 
 # Batch upsert (recommended)
 client.upsert(
-    collection_name="documents",
+    collection_name=&quot;documents&quot;,
     points=[point1, point2, point3],
     wait=True  # Wait for indexing
 )
@@ -190,7 +240,7 @@ from qdrant_client.models import VectorParams, Distance, HnswConfigDiff
 
 # Create with HNSW configuration
 client.create_collection(
-    collection_name="documents",
+    collection_name=&quot;documents&quot;,
     vectors_config=VectorParams(
         size=384,                        # Vector dimensions
         distance=Distance.COSINE         # COSINE, EUCLID, DOT, MANHATTAN
@@ -204,8 +254,8 @@ client.create_collection(
 )
 
 # Collection info
-info = client.get_collection("documents")
-print(f"Points: {info.points_count}, Vectors: {info.vectors_count}")
+info = client.get_collection(&quot;documents&quot;)
+print(f&quot;Points: {info.points_count}, Vectors: {info.vectors_count}&quot;)
 ```
 
 ### Distance metrics
@@ -224,11 +274,11 @@ print(f"Points: {info.points_count}, Vectors: {info.vectors_count}")
 ```python
 # Simple nearest neighbor search
 results = client.search(
-    collection_name="documents",
+    collection_name=&quot;documents&quot;,
     query_vector=[0.1, 0.2, ...],
     limit=10,
     with_payload=True,
-    with_vectors=False  # Don't return vectors (faster)
+    with_vectors=False  # Don&#039;t return vectors (faster)
 )
 ```
 
@@ -239,15 +289,15 @@ from qdrant_client.models import Filter, FieldCondition, MatchValue, Range
 
 # Complex filtering
 results = client.search(
-    collection_name="documents",
+    collection_name=&quot;documents&quot;,
     query_vector=query_embedding,
     query_filter=Filter(
         must=[
-            FieldCondition(key="category", match=MatchValue(value="tech")),
-            FieldCondition(key="timestamp", range=Range(gte=1699000000))
+            FieldCondition(key=&quot;category&quot;, match=MatchValue(value=&quot;tech&quot;)),
+            FieldCondition(key=&quot;timestamp&quot;, range=Range(gte=1699000000))
         ],
         must_not=[
-            FieldCondition(key="status", match=MatchValue(value="archived"))
+            FieldCondition(key=&quot;status&quot;, match=MatchValue(value=&quot;archived&quot;))
         ]
     ),
     limit=10
@@ -255,12 +305,12 @@ results = client.search(
 
 # Shorthand filter syntax
 results = client.search(
-    collection_name="documents",
+    collection_name=&quot;documents&quot;,
     query_vector=query_embedding,
     query_filter={
-        "must": [
-            {"key": "category", "match": {"value": "tech"}},
-            {"key": "price", "range": {"gte": 10, "lte": 100}}
+        &quot;must&quot;: [
+            {&quot;key&quot;: &quot;category&quot;, &quot;match&quot;: {&quot;value&quot;: &quot;tech&quot;}},
+            {&quot;key&quot;: &quot;price&quot;, &quot;range&quot;: {&quot;gte&quot;: 10, &quot;lte&quot;: 100}}
         ]
     },
     limit=10
@@ -274,10 +324,10 @@ from qdrant_client.models import SearchRequest
 
 # Multiple queries in one request
 results = client.search_batch(
-    collection_name="documents",
+    collection_name=&quot;documents&quot;,
     requests=[
         SearchRequest(vector=[0.1, ...], limit=5),
-        SearchRequest(vector=[0.2, ...], limit=5, filter={"must": [...]}),
+        SearchRequest(vector=[0.2, ...], limit=5, filter={&quot;must&quot;: [...]}),
         SearchRequest(vector=[0.3, ...], limit=10)
     ]
 )
@@ -293,44 +343,44 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 
 # Initialize
-encoder = SentenceTransformer("all-MiniLM-L6-v2")
-client = QdrantClient(host="localhost", port=6333)
+encoder = SentenceTransformer(&quot;all-MiniLM-L6-v2&quot;)
+client = QdrantClient(host=&quot;localhost&quot;, port=6333)
 
 # Create collection
 client.create_collection(
-    collection_name="knowledge_base",
+    collection_name=&quot;knowledge_base&quot;,
     vectors_config=VectorParams(size=384, distance=Distance.COSINE)
 )
 
 # Index documents
 documents = [
-    {"id": 1, "text": "Python is a programming language", "source": "wiki"},
-    {"id": 2, "text": "Machine learning uses algorithms", "source": "textbook"},
+    {&quot;id&quot;: 1, &quot;text&quot;: &quot;Python is a programming language&quot;, &quot;source&quot;: &quot;wiki&quot;},
+    {&quot;id&quot;: 2, &quot;text&quot;: &quot;Machine learning uses algorithms&quot;, &quot;source&quot;: &quot;textbook&quot;},
 ]
 
 points = [
     PointStruct(
-        id=doc["id"],
-        vector=encoder.encode(doc["text"]).tolist(),
-        payload={"text": doc["text"], "source": doc["source"]}
+        id=doc[&quot;id&quot;],
+        vector=encoder.encode(doc[&quot;text&quot;]).tolist(),
+        payload={&quot;text&quot;: doc[&quot;text&quot;], &quot;source&quot;: doc[&quot;source&quot;]}
     )
     for doc in documents
 ]
-client.upsert(collection_name="knowledge_base", points=points)
+client.upsert(collection_name=&quot;knowledge_base&quot;, points=points)
 
 # RAG retrieval
 def retrieve(query: str, top_k: int = 5) -&gt; list[dict]:
     query_vector = encoder.encode(query).tolist()
     results = client.search(
-        collection_name="knowledge_base",
+        collection_name=&quot;knowledge_base&quot;,
         query_vector=query_vector,
         limit=top_k
     )
-    return [{"text": r.payload["text"], "score": r.score} for r in results]
+    return [{&quot;text&quot;: r.payload[&quot;text&quot;], &quot;score&quot;: r.score} for r in results]
 
 # Use in RAG pipeline
-context = retrieve("What is Python?")
-prompt = f"Context: {context}\n\nQuestion: What is Python?"
+context = retrieve(&quot;What is Python?&quot;)
+prompt = f&quot;Context: {context}\n\nQuestion: What is Python?&quot;
 ```
 
 ### With LangChain
@@ -339,9 +389,9 @@ prompt = f"Context: {context}\n\nQuestion: What is Python?"
 from langchain_community.vectorstores import Qdrant
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-vectorstore = Qdrant.from_documents(documents, embeddings, url="http://localhost:6333", collection_name="docs")
-retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
+embeddings = HuggingFaceEmbeddings(model_name=&quot;all-MiniLM-L6-v2&quot;)
+vectorstore = Qdrant.from_documents(documents, embeddings, url=&quot;http://localhost:6333&quot;, collection_name=&quot;docs&quot;)
+retriever = vectorstore.as_retriever(search_kwargs={&quot;k&quot;: 5})
 ```
 
 ### With LlamaIndex
@@ -350,7 +400,7 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.core import VectorStoreIndex, StorageContext
 
-vector_store = QdrantVectorStore(client=client, collection_name="llama_docs")
+vector_store = QdrantVectorStore(client=client, collection_name=&quot;llama_docs&quot;)
 storage_context = StorageContext.from_defaults(vector_store=vector_store)
 index = VectorStoreIndex.from_documents(documents, storage_context=storage_context)
 query_engine = index.as_query_engine()
@@ -365,32 +415,32 @@ from qdrant_client.models import VectorParams, Distance
 
 # Collection with multiple vector types
 client.create_collection(
-    collection_name="hybrid_search",
+    collection_name=&quot;hybrid_search&quot;,
     vectors_config={
-        "dense": VectorParams(size=384, distance=Distance.COSINE),
-        "sparse": VectorParams(size=30000, distance=Distance.DOT)
+        &quot;dense&quot;: VectorParams(size=384, distance=Distance.COSINE),
+        &quot;sparse&quot;: VectorParams(size=30000, distance=Distance.DOT)
     }
 )
 
 # Insert with named vectors
 client.upsert(
-    collection_name="hybrid_search",
+    collection_name=&quot;hybrid_search&quot;,
     points=[
         PointStruct(
             id=1,
             vector={
-                "dense": dense_embedding,
-                "sparse": sparse_embedding
+                &quot;dense&quot;: dense_embedding,
+                &quot;sparse&quot;: sparse_embedding
             },
-            payload={"text": "document text"}
+            payload={&quot;text&quot;: &quot;document text&quot;}
         )
     ]
 )
 
 # Search specific vector
 results = client.search(
-    collection_name="hybrid_search",
-    query_vector=("dense", query_dense),  # Specify which vector
+    collection_name=&quot;hybrid_search&quot;,
+    query_vector=(&quot;dense&quot;, query_dense),  # Specify which vector
     limit=10
 )
 ```
@@ -402,15 +452,15 @@ from qdrant_client.models import SparseVectorParams, SparseIndexParams, SparseVe
 
 # Collection with sparse vectors
 client.create_collection(
-    collection_name="sparse_search",
+    collection_name=&quot;sparse_search&quot;,
     vectors_config={},
-    sparse_vectors_config={"text": SparseVectorParams(index=SparseIndexParams(on_disk=False))}
+    sparse_vectors_config={&quot;text&quot;: SparseVectorParams(index=SparseIndexParams(on_disk=False))}
 )
 
 # Insert sparse vector
 client.upsert(
-    collection_name="sparse_search",
-    points=[PointStruct(id=1, vector={"text": SparseVector(indices=[1, 5, 100], values=[0.5, 0.8, 0.2])}, payload={"text": "document"})]
+    collection_name=&quot;sparse_search&quot;,
+    points=[PointStruct(id=1, vector={&quot;text&quot;: SparseVector(indices=[1, 5, 100], values=[0.5, 0.8, 0.2])}, payload={&quot;text&quot;: &quot;document&quot;})]
 )
 ```
 
@@ -421,7 +471,7 @@ from qdrant_client.models import ScalarQuantization, ScalarQuantizationConfig, S
 
 # Scalar quantization (4x memory reduction)
 client.create_collection(
-    collection_name="quantized",
+    collection_name=&quot;quantized&quot;,
     vectors_config=VectorParams(size=384, distance=Distance.COSINE),
     quantization_config=ScalarQuantization(
         scalar=ScalarQuantizationConfig(
@@ -434,9 +484,9 @@ client.create_collection(
 
 # Search with rescoring
 results = client.search(
-    collection_name="quantized",
+    collection_name=&quot;quantized&quot;,
     query_vector=query,
-    search_params={"quantization": {"rescore": True}},  # Rescore top results
+    search_params={&quot;quantization&quot;: {&quot;rescore&quot;: True}},  # Rescore top results
     limit=10
 )
 ```
@@ -448,14 +498,14 @@ from qdrant_client.models import PayloadSchemaType
 
 # Create payload index for faster filtering
 client.create_payload_index(
-    collection_name="documents",
-    field_name="category",
+    collection_name=&quot;documents&quot;,
+    field_name=&quot;category&quot;,
     field_schema=PayloadSchemaType.KEYWORD
 )
 
 client.create_payload_index(
-    collection_name="documents",
-    field_name="timestamp",
+    collection_name=&quot;documents&quot;,
+    field_name=&quot;timestamp&quot;,
     field_schema=PayloadSchemaType.INTEGER
 )
 
@@ -471,8 +521,8 @@ from qdrant_client import QdrantClient
 
 # Connect to Qdrant Cloud
 client = QdrantClient(
-    url="https://your-cluster.cloud.qdrant.io",
-    api_key="your-api-key"
+    url=&quot;https://your-cluster.cloud.qdrant.io&quot;,
+    api_key=&quot;your-api-key&quot;
 )
 ```
 
@@ -481,14 +531,14 @@ client = QdrantClient(
 ```python
 # Optimize for search speed (higher recall)
 client.update_collection(
-    collection_name="documents",
+    collection_name=&quot;documents&quot;,
     hnsw_config=HnswConfigDiff(ef_construct=200, m=32)
 )
 
 # Optimize for indexing speed (bulk loads)
 client.update_collection(
-    collection_name="documents",
-    optimizer_config={"indexing_threshold": 20000}
+    collection_name=&quot;documents&quot;,
+    optimizer_config={&quot;indexing_threshold&quot;: 20000}
 )
 ```
 
@@ -507,8 +557,8 @@ client.update_collection(
 ```python
 # Create payload index for filtered fields
 client.create_payload_index(
-    collection_name="docs",
-    field_name="category",
+    collection_name=&quot;docs&quot;,
+    field_name=&quot;category&quot;,
     field_schema=PayloadSchemaType.KEYWORD
 )
 ```
@@ -517,7 +567,7 @@ client.create_payload_index(
 ```python
 # Enable quantization and on-disk storage
 client.create_collection(
-    collection_name="large_collection",
+    collection_name=&quot;large_collection&quot;,
     vectors_config=VectorParams(size=384, distance=Distance.COSINE),
     quantization_config=ScalarQuantization(...),
     on_disk_payload=True
@@ -528,7 +578,7 @@ client.create_collection(
 ```python
 # Use timeout and retry
 client = QdrantClient(
-    host="localhost",
+    host=&quot;localhost&quot;,
     port=6333,
     timeout=30,
     prefer_grpc=True  # gRPC for better performance
@@ -548,8 +598,46 @@ client = QdrantClient(
 - **Cloud**: https://cloud.qdrant.io
 - **Version**: 1.12.0+
 - **License**: Apache 2.0
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">RAG</span><span class="tag">Vector Search</span><span class="tag">Qdrant</span><span class="tag">Semantic Search</span><span class="tag">Embeddings</span><span class="tag">Similarity Search</span><span class="tag">HNSW</span><span class="tag">Production</span><span class="tag">Distributed</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>84</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

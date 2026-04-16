@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>flowio - AICCLI</title>
-  <meta name="description" content="flowio - Claude Code skill for AICCLI">
+  <meta name="description" content=""Parse FCS (Flow Cytometry Standard) files v2.0-3.1. Extract events as NumPy arrays, read metadata/channels, convert to CSV/DataFrame, for flow cytometry data p">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / flowio</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>flowio</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / flowio
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>flowio</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Parse FCS (Flow Cytometry Standard) files v2.0-3.1. Extract events as NumPy arrays, read metadata/channels, convert to CSV/DataFrame, for flow cytometry data preprocessing."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/flowio</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/flowio</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/flowio</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: flowio
-description: "Parse FCS (Flow Cytometry Standard) files v2.0-3.1. Extract events as NumPy arrays, read metadata/channels, convert to CSV/DataFrame, for flow cytometry data preprocessing."
+description: &quot;Parse FCS (Flow Cytometry Standard) files v2.0-3.1. Extract events as NumPy arrays, read metadata/channels, convert to CSV/DataFrame, for flow cytometry data preprocessing.&quot;
 ---
 
 # FlowIO: Flow Cytometry Standard File Handler
@@ -96,12 +146,12 @@ Requires Python 3.9 or later.
 from flowio import FlowData
 
 # Read FCS file
-flow_data = FlowData('experiment.fcs')
+flow_data = FlowData(&#039;experiment.fcs&#039;)
 
 # Access basic information
-print(f"FCS Version: {flow_data.version}")
-print(f"Events: {flow_data.event_count}")
-print(f"Channels: {flow_data.pnn_labels}")
+print(f&quot;FCS Version: {flow_data.version}&quot;)
+print(f&quot;Events: {flow_data.event_count}&quot;)
+print(f&quot;Channels: {flow_data.pnn_labels}&quot;)
 
 # Get event data as NumPy array
 events = flow_data.as_array()  # Shape: (events, channels)
@@ -115,10 +165,10 @@ from flowio import create_fcs
 
 # Prepare data
 data = np.array([[100, 200, 50], [150, 180, 60]])  # 2 events, 3 channels
-channels = ['FSC-A', 'SSC-A', 'FL1-A']
+channels = [&#039;FSC-A&#039;, &#039;SSC-A&#039;, &#039;FL1-A&#039;]
 
 # Create FCS file
-create_fcs('output.fcs', data, channels)
+create_fcs(&#039;output.fcs&#039;, data, channels)
 ```
 
 ## Core Workflows
@@ -133,10 +183,10 @@ The FlowData class provides the primary interface for reading FCS files.
 from flowio import FlowData
 
 # Basic reading
-flow = FlowData('sample.fcs')
+flow = FlowData(&#039;sample.fcs&#039;)
 
 # Access attributes
-version = flow.version              # '3.0', '3.1', etc.
+version = flow.version              # &#039;3.0&#039;, &#039;3.1&#039;, etc.
 event_count = flow.event_count      # Number of events
 channel_count = flow.channel_count  # Number of channels
 pnn_labels = flow.pnn_labels        # Short channel names
@@ -153,12 +203,12 @@ When only metadata is needed (no event data):
 
 ```python
 # Only parse TEXT segment, skip DATA and ANALYSIS
-flow = FlowData('sample.fcs', only_text=True)
+flow = FlowData(&#039;sample.fcs&#039;, only_text=True)
 
 # Access metadata
 metadata = flow.text  # Dictionary of TEXT segment keywords
-print(metadata.get('$DATE'))  # Acquisition date
-print(metadata.get('$CYT'))   # Instrument name
+print(metadata.get(&#039;$DATE&#039;))  # Acquisition date
+print(metadata.get(&#039;$CYT&#039;))   # Instrument name
 ```
 
 **Handling Problematic Files:**
@@ -167,20 +217,20 @@ Some FCS files have offset discrepancies or errors:
 
 ```python
 # Ignore offset discrepancies between HEADER and TEXT sections
-flow = FlowData('problematic.fcs', ignore_offset_discrepancy=True)
+flow = FlowData(&#039;problematic.fcs&#039;, ignore_offset_discrepancy=True)
 
 # Use HEADER offsets instead of TEXT offsets
-flow = FlowData('problematic.fcs', use_header_offsets=True)
+flow = FlowData(&#039;problematic.fcs&#039;, use_header_offsets=True)
 
 # Ignore offset errors entirely
-flow = FlowData('problematic.fcs', ignore_offset_error=True)
+flow = FlowData(&#039;problematic.fcs&#039;, ignore_offset_error=True)
 ```
 
 **Excluding Null Channels:**
 
 ```python
 # Exclude specific channels during parsing
-flow = FlowData('sample.fcs', null_channel_list=['Time', 'Null'])
+flow = FlowData(&#039;sample.fcs&#039;, null_channel_list=[&#039;Time&#039;, &#039;Null&#039;])
 ```
 
 ### Extracting Metadata and Channel Information
@@ -190,20 +240,20 @@ FCS files contain rich metadata in the TEXT segment.
 **Common Metadata Keywords:**
 
 ```python
-flow = FlowData('sample.fcs')
+flow = FlowData(&#039;sample.fcs&#039;)
 
 # File-level metadata
 text_dict = flow.text
-acquisition_date = text_dict.get('$DATE', 'Unknown')
-instrument = text_dict.get('$CYT', 'Unknown')
-data_type = flow.data_type  # 'I', 'F', 'D', 'A'
+acquisition_date = text_dict.get(&#039;$DATE&#039;, &#039;Unknown&#039;)
+instrument = text_dict.get(&#039;$CYT&#039;, &#039;Unknown&#039;)
+data_type = flow.data_type  # &#039;I&#039;, &#039;F&#039;, &#039;D&#039;, &#039;A&#039;
 
 # Channel metadata
 for i in range(flow.channel_count):
-    pnn = flow.pnn_labels[i]      # Short name (e.g., 'FSC-A')
-    pns = flow.pns_labels[i]      # Descriptive name (e.g., 'Forward Scatter')
+    pnn = flow.pnn_labels[i]      # Short name (e.g., &#039;FSC-A&#039;)
+    pns = flow.pns_labels[i]      # Descriptive name (e.g., &#039;Forward Scatter&#039;)
     pnr = flow.pnr_values[i]      # Range/max value
-    print(f"Channel {i}: {pnn} ({pns}), Range: {pnr}")
+    print(f&quot;Channel {i}: {pnn} ({pns}), Range: {pnr}&quot;)
 ```
 
 **Channel Type Identification:**
@@ -246,20 +296,20 @@ from flowio import create_fcs
 events = np.random.rand(10000, 5) * 1000
 
 # Define channel names
-channel_names = ['FSC-A', 'SSC-A', 'FL1-A', 'FL2-A', 'Time']
+channel_names = [&#039;FSC-A&#039;, &#039;SSC-A&#039;, &#039;FL1-A&#039;, &#039;FL2-A&#039;, &#039;Time&#039;]
 
 # Create FCS file
-create_fcs('output.fcs', events, channel_names)
+create_fcs(&#039;output.fcs&#039;, events, channel_names)
 ```
 
 **With Descriptive Channel Names:**
 
 ```python
 # Add optional descriptive names (PnS)
-channel_names = ['FSC-A', 'SSC-A', 'FL1-A', 'FL2-A', 'Time']
-descriptive_names = ['Forward Scatter', 'Side Scatter', 'FITC', 'PE', 'Time']
+channel_names = [&#039;FSC-A&#039;, &#039;SSC-A&#039;, &#039;FL1-A&#039;, &#039;FL2-A&#039;, &#039;Time&#039;]
+descriptive_names = [&#039;Forward Scatter&#039;, &#039;Side Scatter&#039;, &#039;FITC&#039;, &#039;PE&#039;, &#039;Time&#039;]
 
-create_fcs('output.fcs',
+create_fcs(&#039;output.fcs&#039;,
            events,
            channel_names,
            opt_channel_names=descriptive_names)
@@ -270,13 +320,13 @@ create_fcs('output.fcs',
 ```python
 # Add TEXT segment metadata
 metadata = {
-    '$SRC': 'Python script',
-    '$DATE': '19-OCT-2025',
-    '$CYT': 'Synthetic Instrument',
-    '$INST': 'Laboratory A'
+    &#039;$SRC&#039;: &#039;Python script&#039;,
+    &#039;$DATE&#039;: &#039;19-OCT-2025&#039;,
+    &#039;$CYT&#039;: &#039;Synthetic Instrument&#039;,
+    &#039;$INST&#039;: &#039;Laboratory A&#039;
 }
 
-create_fcs('output.fcs',
+create_fcs(&#039;output.fcs&#039;,
            events,
            channel_names,
            opt_channel_names=descriptive_names,
@@ -295,10 +345,10 @@ Modify existing FCS files and re-export them.
 from flowio import FlowData
 
 # Read original file
-flow = FlowData('original.fcs')
+flow = FlowData(&#039;original.fcs&#039;)
 
 # Write with updated metadata
-flow.write_fcs('modified.fcs', metadata={'$SRC': 'Modified data'})
+flow.write_fcs(&#039;modified.fcs&#039;, metadata={&#039;$SRC&#039;: &#039;Modified data&#039;})
 ```
 
 **Approach 2: Extract, Modify, and Recreate:**
@@ -309,14 +359,14 @@ For modifying event data:
 from flowio import FlowData, create_fcs
 
 # Read and extract data
-flow = FlowData('original.fcs')
+flow = FlowData(&#039;original.fcs&#039;)
 events = flow.as_array(preprocess=False)
 
 # Modify event data
 events[:, 0] = events[:, 0] * 1.5  # Scale first channel
 
 # Create new FCS file with modified data
-create_fcs('modified.fcs',
+create_fcs(&#039;modified.fcs&#039;,
            events,
            flow.pnn_labels,
            opt_channel_names=flow.pns_labels,
@@ -333,9 +383,9 @@ Some FCS files contain multiple datasets in a single file.
 from flowio import FlowData, MultipleDataSetsError
 
 try:
-    flow = FlowData('sample.fcs')
+    flow = FlowData(&#039;sample.fcs&#039;)
 except MultipleDataSetsError:
-    print("File contains multiple datasets")
+    print(&quot;File contains multiple datasets&quot;)
     # Use read_multiple_data_sets() instead
 ```
 
@@ -345,20 +395,20 @@ except MultipleDataSetsError:
 from flowio import read_multiple_data_sets
 
 # Read all datasets from file
-datasets = read_multiple_data_sets('multi_dataset.fcs')
+datasets = read_multiple_data_sets(&#039;multi_dataset.fcs&#039;)
 
-print(f"Found {len(datasets)} datasets")
+print(f&quot;Found {len(datasets)} datasets&quot;)
 
 # Process each dataset
 for i, dataset in enumerate(datasets):
-    print(f"\nDataset {i}:")
-    print(f"  Events: {dataset.event_count}")
-    print(f"  Channels: {dataset.pnn_labels}")
+    print(f&quot;\nDataset {i}:&quot;)
+    print(f&quot;  Events: {dataset.event_count}&quot;)
+    print(f&quot;  Channels: {dataset.pnn_labels}&quot;)
 
     # Get event data for this dataset
     events = dataset.as_array()
-    print(f"  Shape: {events.shape}")
-    print(f"  Mean values: {events.mean(axis=0)}")
+    print(f&quot;  Shape: {events.shape}&quot;)
+    print(f&quot;  Mean values: {events.mean(axis=0)}&quot;)
 ```
 
 **Reading Specific Dataset:**
@@ -367,12 +417,12 @@ for i, dataset in enumerate(datasets):
 from flowio import FlowData
 
 # Read first dataset (nextdata_offset=0)
-first_dataset = FlowData('multi.fcs', nextdata_offset=0)
+first_dataset = FlowData(&#039;multi.fcs&#039;, nextdata_offset=0)
 
 # Read second dataset using NEXTDATA offset from first
-next_offset = int(first_dataset.text['$NEXTDATA'])
+next_offset = int(first_dataset.text[&#039;$NEXTDATA&#039;])
 if next_offset &gt; 0:
-    second_dataset = FlowData('multi.fcs', nextdata_offset=next_offset)
+    second_dataset = FlowData(&#039;multi.fcs&#039;, nextdata_offset=next_offset)
 ```
 
 ## Data Preprocessing
@@ -383,7 +433,7 @@ FlowIO applies standard FCS preprocessing transformations when `preprocess=True`
 
 1. **Gain Scaling:** Multiply values by PnG (gain) keyword
 2. **Logarithmic Transformation:** Apply PnE exponential transformation if present
-   - Formula: `value = a * 10^(b * raw_value)` where PnE = "a,b"
+   - Formula: `value = a * 10^(b * raw_value)` where PnE = &quot;a,b&quot;
 3. **Time Scaling:** Convert time values to appropriate units
 
 **Controlling Preprocessing:**
@@ -409,27 +459,27 @@ from flowio import (
 )
 
 try:
-    flow = FlowData('sample.fcs')
+    flow = FlowData(&#039;sample.fcs&#039;)
     events = flow.as_array()
 
 except FCSParsingError as e:
-    print(f"Failed to parse FCS file: {e}")
+    print(f&quot;Failed to parse FCS file: {e}&quot;)
     # Try with relaxed parsing
-    flow = FlowData('sample.fcs', ignore_offset_error=True)
+    flow = FlowData(&#039;sample.fcs&#039;, ignore_offset_error=True)
 
 except DataOffsetDiscrepancyError as e:
-    print(f"Offset discrepancy detected: {e}")
+    print(f&quot;Offset discrepancy detected: {e}&quot;)
     # Use ignore_offset_discrepancy parameter
-    flow = FlowData('sample.fcs', ignore_offset_discrepancy=True)
+    flow = FlowData(&#039;sample.fcs&#039;, ignore_offset_discrepancy=True)
 
 except MultipleDataSetsError as e:
-    print(f"Multiple datasets detected: {e}")
+    print(f&quot;Multiple datasets detected: {e}&quot;)
     # Use read_multiple_data_sets instead
     from flowio import read_multiple_data_sets
-    datasets = read_multiple_data_sets('sample.fcs')
+    datasets = read_multiple_data_sets(&#039;sample.fcs&#039;)
 
 except Exception as e:
-    print(f"Unexpected error: {e}")
+    print(f&quot;Unexpected error: {e}&quot;)
 ```
 
 ## Common Use Cases
@@ -441,28 +491,28 @@ Quick exploration of FCS file structure:
 ```python
 from flowio import FlowData
 
-flow = FlowData('unknown.fcs')
+flow = FlowData(&#039;unknown.fcs&#039;)
 
-print("=" * 50)
-print(f"File: {flow.name}")
-print(f"Version: {flow.version}")
-print(f"Size: {flow.file_size:,} bytes")
-print("=" * 50)
+print(&quot;=&quot; * 50)
+print(f&quot;File: {flow.name}&quot;)
+print(f&quot;Version: {flow.version}&quot;)
+print(f&quot;Size: {flow.file_size:,} bytes&quot;)
+print(&quot;=&quot; * 50)
 
-print(f"\nEvents: {flow.event_count:,}")
-print(f"Channels: {flow.channel_count}")
+print(f&quot;\nEvents: {flow.event_count:,}&quot;)
+print(f&quot;Channels: {flow.channel_count}&quot;)
 
-print("\nChannel Information:")
+print(&quot;\nChannel Information:&quot;)
 for i, (pnn, pns) in enumerate(zip(flow.pnn_labels, flow.pns_labels)):
-    ch_type = "scatter" if i in flow.scatter_indices else \
-              "fluoro" if i in flow.fluoro_indices else \
-              "time" if i == flow.time_index else "other"
-    print(f"  [{i}] {pnn:10s} | {pns:30s} | {ch_type}")
+    ch_type = &quot;scatter&quot; if i in flow.scatter_indices else \
+              &quot;fluoro&quot; if i in flow.fluoro_indices else \
+              &quot;time&quot; if i == flow.time_index else &quot;other&quot;
+    print(f&quot;  [{i}] {pnn:10s} | {pns:30s} | {ch_type}&quot;)
 
-print("\nKey Metadata:")
-for key in ['$DATE', '$BTIM', '$ETIM', '$CYT', '$INST', '$SRC']:
-    value = flow.text.get(key, 'N/A')
-    print(f"  {key:15s}: {value}")
+print(&quot;\nKey Metadata:&quot;)
+for key in [&#039;$DATE&#039;, &#039;$BTIM&#039;, &#039;$ETIM&#039;, &#039;$CYT&#039;, &#039;$INST&#039;, &#039;$SRC&#039;]:
+    value = flow.text.get(key, &#039;N/A&#039;)
+    print(f&quot;  {key:15s}: {value}&quot;)
 ```
 
 ### Batch Processing Multiple Files
@@ -475,7 +525,7 @@ from flowio import FlowData
 import pandas as pd
 
 # Find all FCS files
-fcs_files = list(Path('data/').glob('*.fcs'))
+fcs_files = list(Path(&#039;data/&#039;).glob(&#039;*.fcs&#039;))
 
 # Extract summary information
 summaries = []
@@ -483,14 +533,14 @@ for fcs_path in fcs_files:
     try:
         flow = FlowData(str(fcs_path), only_text=True)
         summaries.append({
-            'filename': fcs_path.name,
-            'version': flow.version,
-            'events': flow.event_count,
-            'channels': flow.channel_count,
-            'date': flow.text.get('$DATE', 'N/A')
+            &#039;filename&#039;: fcs_path.name,
+            &#039;version&#039;: flow.version,
+            &#039;events&#039;: flow.event_count,
+            &#039;channels&#039;: flow.channel_count,
+            &#039;date&#039;: flow.text.get(&#039;$DATE&#039;, &#039;N/A&#039;)
         })
     except Exception as e:
-        print(f"Error processing {fcs_path.name}: {e}")
+        print(f&quot;Error processing {fcs_path.name}: {e}&quot;)
 
 # Create summary DataFrame
 df = pd.DataFrame(summaries)
@@ -506,7 +556,7 @@ from flowio import FlowData
 import pandas as pd
 
 # Read FCS file
-flow = FlowData('sample.fcs')
+flow = FlowData(&#039;sample.fcs&#039;)
 
 # Convert to DataFrame
 df = pd.DataFrame(
@@ -515,12 +565,12 @@ df = pd.DataFrame(
 )
 
 # Add metadata as attributes
-df.attrs['fcs_version'] = flow.version
-df.attrs['instrument'] = flow.text.get('$CYT', 'Unknown')
+df.attrs[&#039;fcs_version&#039;] = flow.version
+df.attrs[&#039;instrument&#039;] = flow.text.get(&#039;$CYT&#039;, &#039;Unknown&#039;)
 
 # Export to CSV
-df.to_csv('output.csv', index=False)
-print(f"Exported {len(df)} events to CSV")
+df.to_csv(&#039;output.csv&#039;, index=False)
+print(f&quot;Exported {len(df)} events to CSV&quot;)
 ```
 
 ### Filtering Events and Re-exporting
@@ -532,7 +582,7 @@ from flowio import FlowData, create_fcs
 import numpy as np
 
 # Read original file
-flow = FlowData('sample.fcs')
+flow = FlowData(&#039;sample.fcs&#039;)
 events = flow.as_array(preprocess=False)
 
 # Apply filtering (example: threshold on first channel)
@@ -541,15 +591,15 @@ threshold = 500
 mask = events[:, fsc_idx] &gt; threshold
 filtered_events = events[mask]
 
-print(f"Original events: {len(events)}")
-print(f"Filtered events: {len(filtered_events)}")
+print(f&quot;Original events: {len(events)}&quot;)
+print(f&quot;Filtered events: {len(filtered_events)}&quot;)
 
 # Create new FCS file with filtered data
-create_fcs('filtered.fcs',
+create_fcs(&#039;filtered.fcs&#039;,
            filtered_events,
            flow.pnn_labels,
            opt_channel_names=flow.pns_labels,
-           metadata={**flow.text, '$SRC': 'Filtered data'})
+           metadata={**flow.text, &#039;$SRC&#039;: &#039;Filtered data&#039;})
 ```
 
 ### Extracting Specific Channels
@@ -560,7 +610,7 @@ Extract and process specific channels:
 from flowio import FlowData
 import numpy as np
 
-flow = FlowData('sample.fcs')
+flow = FlowData(&#039;sample.fcs&#039;)
 events = flow.as_array()
 
 # Extract fluorescence channels only
@@ -568,16 +618,16 @@ fluoro_indices = flow.fluoro_indices
 fluoro_data = events[:, fluoro_indices]
 fluoro_names = [flow.pnn_labels[i] for i in fluoro_indices]
 
-print(f"Fluorescence channels: {fluoro_names}")
-print(f"Shape: {fluoro_data.shape}")
+print(f&quot;Fluorescence channels: {fluoro_names}&quot;)
+print(f&quot;Shape: {fluoro_data.shape}&quot;)
 
 # Calculate statistics per channel
 for i, name in enumerate(fluoro_names):
     channel_data = fluoro_data[:, i]
-    print(f"\n{name}:")
-    print(f"  Mean: {channel_data.mean():.2f}")
-    print(f"  Median: {np.median(channel_data):.2f}")
-    print(f"  Std Dev: {channel_data.std():.2f}")
+    print(f&quot;\n{name}:&quot;)
+    print(f&quot;  Mean: {channel_data.mean():.2f}&quot;)
+    print(f&quot;  Median: {np.median(channel_data):.2f}&quot;)
+    print(f&quot;  Std Dev: {channel_data.std():.2f}&quot;)
 ```
 
 ## Best Practices
@@ -633,16 +683,16 @@ import pandas as pd
 df = pd.DataFrame(flow.as_array(), columns=flow.pnn_labels)
 ```
 
-**FlowKit Integration:** For advanced analysis (compensation, gating, FlowJo support), use FlowKit library which builds on FlowIO's parsing capabilities
+**FlowKit Integration:** For advanced analysis (compensation, gating, FlowJo support), use FlowKit library which builds on FlowIO&#039;s parsing capabilities
 
-**Web Applications:** FlowIO's minimal dependencies make it ideal for web backend services processing FCS uploads
+**Web Applications:** FlowIO&#039;s minimal dependencies make it ideal for web backend services processing FCS uploads
 
 ## Troubleshooting
 
-**Problem:** "Offset discrepancy error"
+**Problem:** &quot;Offset discrepancy error&quot;
 **Solution:** Use `ignore_offset_discrepancy=True` parameter
 
-**Problem:** "Multiple datasets error"
+**Problem:** &quot;Multiple datasets error&quot;
 **Solution:** Use `read_multiple_data_sets()` function instead of FlowData constructor
 
 **Problem:** Out of memory with large files
@@ -652,13 +702,44 @@ df = pd.DataFrame(flow.as_array(), columns=flow.pnn_labels)
 **Solution:** Check for null channels; use `null_channel_list` parameter to exclude them
 
 **Problem:** Cannot modify event data in place
-**Solution:** FlowIO doesn't support direct modification; extract data, modify, then use `create_fcs()` to save
+**Solution:** FlowIO doesn&#039;t support direct modification; extract data, modify, then use `create_fcs()` to save
 
 ## Summary
 
 FlowIO provides essential FCS file handling capabilities for flow cytometry workflows. Use it for parsing, metadata extraction, and file creation. For simple file operations and data extraction, FlowIO is sufficient. For complex analysis including compensation and gating, integrate with FlowKit or other specialized tools.
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>4</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

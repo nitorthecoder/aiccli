@@ -4,67 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>pymc - AICCLI</title>
-  <meta name="description" content="pymc - Claude Code skill for AICCLI">
+  <meta name="description" content=""Bayesian modeling with PyMC. Build hierarchical models, MCMC (NUTS), variational inference, LOO/WAIC comparison, posterior checks, for probabilistic programmin">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / pymc</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>pymc</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / pymc
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>pymc</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Bayesian modeling with PyMC. Build hierarchical models, MCMC (NUTS), variational inference, LOO/WAIC comparison, posterior checks, for probabilistic programming and inference."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pymc</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/pymc</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/pymc</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: pymc-bayesian-modeling
-description: "Bayesian modeling with PyMC. Build hierarchical models, MCMC (NUTS), variational inference, LOO/WAIC comparison, posterior checks, for probabilistic programming and inference."
+description: &quot;Bayesian modeling with PyMC. Build hierarchical models, MCMC (NUTS), variational inference, LOO/WAIC comparison, posterior checks, for probabilistic programming and inference.&quot;
 ---
 
 # PyMC Bayesian Modeling
 
 ## Overview
 
-PyMC is a Python library for Bayesian modeling and probabilistic programming. Build, fit, validate, and compare Bayesian models using PyMC's modern API (version 5.x+), including hierarchical models, MCMC sampling (NUTS), variational inference, and model comparison (LOO, WAIC).
+PyMC is a Python library for Bayesian modeling and probabilistic programming. Build, fit, validate, and compare Bayesian models using PyMC&#039;s modern API (version 5.x+), including hierarchical models, MCMC sampling (NUTS), variational inference, and model comparison (LOO, WAIC).
 
 ## When to Use This Skill
 
@@ -109,21 +159,21 @@ X_scaled = (X - X_mean) / X_std
 
 ```python
 coords = {
-    'predictors': ['var1', 'var2', 'var3'],
-    'obs_id': np.arange(len(y))
+    &#039;predictors&#039;: [&#039;var1&#039;, &#039;var2&#039;, &#039;var3&#039;],
+    &#039;obs_id&#039;: np.arange(len(y))
 }
 
 with pm.Model(coords=coords) as model:
     # Priors
-    alpha = pm.Normal('alpha', mu=0, sigma=1)
-    beta = pm.Normal('beta', mu=0, sigma=1, dims='predictors')
-    sigma = pm.HalfNormal('sigma', sigma=1)
+    alpha = pm.Normal(&#039;alpha&#039;, mu=0, sigma=1)
+    beta = pm.Normal(&#039;beta&#039;, mu=0, sigma=1, dims=&#039;predictors&#039;)
+    sigma = pm.HalfNormal(&#039;sigma&#039;, sigma=1)
 
     # Linear predictor
     mu = alpha + pm.math.dot(X_scaled, beta)
 
     # Likelihood
-    y_obs = pm.Normal('y_obs', mu=mu, sigma=sigma, observed=y, dims='obs_id')
+    y_obs = pm.Normal(&#039;y_obs&#039;, mu=mu, sigma=sigma, observed=y, dims=&#039;obs_id&#039;)
 ```
 
 **Key practices:**
@@ -141,7 +191,7 @@ with model:
     prior_pred = pm.sample_prior_predictive(samples=1000, random_seed=42)
 
 # Visualize
-az.plot_ppc(prior_pred, group='prior')
+az.plot_ppc(prior_pred, group=&#039;prior&#039;)
 ```
 
 **Check:**
@@ -163,7 +213,7 @@ with model:
         chains=4,
         target_accept=0.9,
         random_seed=42,
-        idata_kwargs={'log_likelihood': True}  # For model comparison
+        idata_kwargs={&#039;log_likelihood&#039;: True}  # For model comparison
     )
 ```
 
@@ -181,7 +231,7 @@ with model:
 ```python
 from scripts.model_diagnostics import check_diagnostics
 
-results = check_diagnostics(idata, var_names=['alpha', 'beta', 'sigma'])
+results = check_diagnostics(idata, var_names=[&#039;alpha&#039;, &#039;beta&#039;, &#039;sigma&#039;])
 ```
 
 **Check:**
@@ -216,13 +266,13 @@ az.plot_ppc(idata)
 
 ```python
 # Summary statistics
-print(az.summary(idata, var_names=['alpha', 'beta', 'sigma']))
+print(az.summary(idata, var_names=[&#039;alpha&#039;, &#039;beta&#039;, &#039;sigma&#039;]))
 
 # Posterior distributions
-az.plot_posterior(idata, var_names=['alpha', 'beta', 'sigma'])
+az.plot_posterior(idata, var_names=[&#039;alpha&#039;, &#039;beta&#039;, &#039;sigma&#039;])
 
 # Coefficient estimates
-az.plot_forest(idata, var_names=['beta'], combined=True)
+az.plot_forest(idata, var_names=[&#039;beta&#039;], combined=True)
 ```
 
 ### 8. Make Predictions
@@ -232,16 +282,16 @@ X_new = ...  # New predictor values
 X_new_scaled = (X_new - X_mean) / X_std
 
 with model:
-    pm.set_data({'X_scaled': X_new_scaled})
+    pm.set_data({&#039;X_scaled&#039;: X_new_scaled})
     post_pred = pm.sample_posterior_predictive(
         idata.posterior,
-        var_names=['y_obs'],
+        var_names=[&#039;y_obs&#039;],
         random_seed=42
     )
 
 # Extract prediction intervals
-y_pred_mean = post_pred.posterior_predictive['y_obs'].mean(dim=['chain', 'draw'])
-y_pred_hdi = az.hdi(post_pred.posterior_predictive, var_names=['y_obs'])
+y_pred_mean = post_pred.posterior_predictive[&#039;y_obs&#039;].mean(dim=[&#039;chain&#039;, &#039;draw&#039;])
+y_pred_hdi = az.hdi(post_pred.posterior_predictive, var_names=[&#039;y_obs&#039;])
 ```
 
 ## Common Model Patterns
@@ -252,12 +302,12 @@ For continuous outcomes with linear relationships:
 
 ```python
 with pm.Model() as linear_model:
-    alpha = pm.Normal('alpha', mu=0, sigma=10)
-    beta = pm.Normal('beta', mu=0, sigma=10, shape=n_predictors)
-    sigma = pm.HalfNormal('sigma', sigma=1)
+    alpha = pm.Normal(&#039;alpha&#039;, mu=0, sigma=10)
+    beta = pm.Normal(&#039;beta&#039;, mu=0, sigma=10, shape=n_predictors)
+    sigma = pm.HalfNormal(&#039;sigma&#039;, sigma=1)
 
     mu = alpha + pm.math.dot(X, beta)
-    y = pm.Normal('y', mu=mu, sigma=sigma, observed=y_obs)
+    y = pm.Normal(&#039;y&#039;, mu=mu, sigma=sigma, observed=y_obs)
 ```
 
 **Use template:** `assets/linear_regression_template.py`
@@ -268,11 +318,11 @@ For binary outcomes:
 
 ```python
 with pm.Model() as logistic_model:
-    alpha = pm.Normal('alpha', mu=0, sigma=10)
-    beta = pm.Normal('beta', mu=0, sigma=10, shape=n_predictors)
+    alpha = pm.Normal(&#039;alpha&#039;, mu=0, sigma=10)
+    beta = pm.Normal(&#039;beta&#039;, mu=0, sigma=10, shape=n_predictors)
 
     logit_p = alpha + pm.math.dot(X, beta)
-    y = pm.Bernoulli('y', logit_p=logit_p, observed=y_obs)
+    y = pm.Bernoulli(&#039;y&#039;, logit_p=logit_p, observed=y_obs)
 ```
 
 ### Hierarchical Models
@@ -280,19 +330,19 @@ with pm.Model() as logistic_model:
 For grouped data (use non-centered parameterization):
 
 ```python
-with pm.Model(coords={'groups': group_names}) as hierarchical_model:
+with pm.Model(coords={&#039;groups&#039;: group_names}) as hierarchical_model:
     # Hyperpriors
-    mu_alpha = pm.Normal('mu_alpha', mu=0, sigma=10)
-    sigma_alpha = pm.HalfNormal('sigma_alpha', sigma=1)
+    mu_alpha = pm.Normal(&#039;mu_alpha&#039;, mu=0, sigma=10)
+    sigma_alpha = pm.HalfNormal(&#039;sigma_alpha&#039;, sigma=1)
 
     # Group-level (non-centered)
-    alpha_offset = pm.Normal('alpha_offset', mu=0, sigma=1, dims='groups')
-    alpha = pm.Deterministic('alpha', mu_alpha + sigma_alpha * alpha_offset, dims='groups')
+    alpha_offset = pm.Normal(&#039;alpha_offset&#039;, mu=0, sigma=1, dims=&#039;groups&#039;)
+    alpha = pm.Deterministic(&#039;alpha&#039;, mu_alpha + sigma_alpha * alpha_offset, dims=&#039;groups&#039;)
 
     # Observation-level
     mu = alpha[group_idx]
-    sigma = pm.HalfNormal('sigma', sigma=1)
-    y = pm.Normal('y', mu=mu, sigma=sigma, observed=y_obs)
+    sigma = pm.HalfNormal(&#039;sigma&#039;, sigma=1)
+    y = pm.Normal(&#039;y&#039;, mu=mu, sigma=sigma, observed=y_obs)
 ```
 
 **Use template:** `assets/hierarchical_model_template.py`
@@ -305,11 +355,11 @@ For count data:
 
 ```python
 with pm.Model() as poisson_model:
-    alpha = pm.Normal('alpha', mu=0, sigma=10)
-    beta = pm.Normal('beta', mu=0, sigma=10, shape=n_predictors)
+    alpha = pm.Normal(&#039;alpha&#039;, mu=0, sigma=10)
+    beta = pm.Normal(&#039;beta&#039;, mu=0, sigma=10, shape=n_predictors)
 
     log_lambda = alpha + pm.math.dot(X, beta)
-    y = pm.Poisson('y', mu=pm.math.exp(log_lambda), observed=y_obs)
+    y = pm.Poisson(&#039;y&#039;, mu=pm.math.exp(log_lambda), observed=y_obs)
 ```
 
 For overdispersed counts, use `NegativeBinomial` instead.
@@ -320,11 +370,11 @@ For autoregressive processes:
 
 ```python
 with pm.Model() as ar_model:
-    sigma = pm.HalfNormal('sigma', sigma=1)
-    rho = pm.Normal('rho', mu=0, sigma=0.5, shape=ar_order)
+    sigma = pm.HalfNormal(&#039;sigma&#039;, sigma=1)
+    rho = pm.Normal(&#039;rho&#039;, mu=0, sigma=0.5, shape=ar_order)
     init_dist = pm.Normal.dist(mu=0, sigma=sigma)
 
-    y = pm.AR('y', rho=rho, sigma=sigma, init_dist=init_dist, observed=y_obs)
+    y = pm.AR(&#039;y&#039;, rho=rho, sigma=sigma, init_dist=init_dist, observed=y_obs)
 ```
 
 ## Model Comparison
@@ -338,13 +388,13 @@ from scripts.model_comparison import compare_models, check_loo_reliability
 
 # Fit models with log_likelihood
 models = {
-    'Model1': idata1,
-    'Model2': idata2,
-    'Model3': idata3
+    &#039;Model1&#039;: idata1,
+    &#039;Model2&#039;: idata2,
+    &#039;Model3&#039;: idata3
 }
 
 # Compare using LOO
-comparison = compare_models(models, ic='loo')
+comparison = compare_models(models, ic=&#039;loo&#039;)
 
 # Check reliability
 check_loo_reliability(models)
@@ -367,7 +417,7 @@ When models are similar, average predictions:
 ```python
 from scripts.model_comparison import model_averaging
 
-averaged_pred, weights = model_averaging(models, var_name='y_obs')
+averaged_pred, weights = model_averaging(models, var_name=&#039;y_obs&#039;)
 ```
 
 ## Distribution Selection Guide
@@ -375,41 +425,41 @@ averaged_pred, weights = model_averaging(models, var_name='y_obs')
 ### For Priors
 
 **Scale parameters** (σ, τ):
-- `pm.HalfNormal('sigma', sigma=1)` - Default choice
-- `pm.Exponential('sigma', lam=1)` - Alternative
-- `pm.Gamma('sigma', alpha=2, beta=1)` - More informative
+- `pm.HalfNormal(&#039;sigma&#039;, sigma=1)` - Default choice
+- `pm.Exponential(&#039;sigma&#039;, lam=1)` - Alternative
+- `pm.Gamma(&#039;sigma&#039;, alpha=2, beta=1)` - More informative
 
 **Unbounded parameters**:
-- `pm.Normal('theta', mu=0, sigma=1)` - For standardized data
-- `pm.StudentT('theta', nu=3, mu=0, sigma=1)` - Robust to outliers
+- `pm.Normal(&#039;theta&#039;, mu=0, sigma=1)` - For standardized data
+- `pm.StudentT(&#039;theta&#039;, nu=3, mu=0, sigma=1)` - Robust to outliers
 
 **Positive parameters**:
-- `pm.LogNormal('theta', mu=0, sigma=1)`
-- `pm.Gamma('theta', alpha=2, beta=1)`
+- `pm.LogNormal(&#039;theta&#039;, mu=0, sigma=1)`
+- `pm.Gamma(&#039;theta&#039;, alpha=2, beta=1)`
 
 **Probabilities**:
-- `pm.Beta('p', alpha=2, beta=2)` - Weakly informative
-- `pm.Uniform('p', lower=0, upper=1)` - Non-informative (use sparingly)
+- `pm.Beta(&#039;p&#039;, alpha=2, beta=2)` - Weakly informative
+- `pm.Uniform(&#039;p&#039;, lower=0, upper=1)` - Non-informative (use sparingly)
 
 **Correlation matrices**:
-- `pm.LKJCorr('corr', n=n_vars, eta=2)` - eta=1 uniform, eta&gt;1 prefers identity
+- `pm.LKJCorr(&#039;corr&#039;, n=n_vars, eta=2)` - eta=1 uniform, eta&gt;1 prefers identity
 
 ### For Likelihoods
 
 **Continuous outcomes**:
-- `pm.Normal('y', mu=mu, sigma=sigma)` - Default for continuous data
-- `pm.StudentT('y', nu=nu, mu=mu, sigma=sigma)` - Robust to outliers
+- `pm.Normal(&#039;y&#039;, mu=mu, sigma=sigma)` - Default for continuous data
+- `pm.StudentT(&#039;y&#039;, nu=nu, mu=mu, sigma=sigma)` - Robust to outliers
 
 **Count data**:
-- `pm.Poisson('y', mu=lambda)` - Equidispersed counts
-- `pm.NegativeBinomial('y', mu=mu, alpha=alpha)` - Overdispersed counts
-- `pm.ZeroInflatedPoisson('y', psi=psi, mu=mu)` - Excess zeros
+- `pm.Poisson(&#039;y&#039;, mu=lambda)` - Equidispersed counts
+- `pm.NegativeBinomial(&#039;y&#039;, mu=mu, alpha=alpha)` - Overdispersed counts
+- `pm.ZeroInflatedPoisson(&#039;y&#039;, psi=psi, mu=mu)` - Excess zeros
 
 **Binary outcomes**:
-- `pm.Bernoulli('y', p=p)` or `pm.Bernoulli('y', logit_p=logit_p)`
+- `pm.Bernoulli(&#039;y&#039;, p=p)` or `pm.Bernoulli(&#039;y&#039;, logit_p=logit_p)`
 
 **Categorical outcomes**:
-- `pm.Categorical('y', p=probs)`
+- `pm.Categorical(&#039;y&#039;, p=probs)`
 
 **See:** `references/distributions.md` for comprehensive distribution reference
 
@@ -440,7 +490,7 @@ Fast approximation for exploration or initialization:
 
 ```python
 with model:
-    approx = pm.fit(n=20000, method='advi')
+    approx = pm.fit(n=20000, method=&#039;advi&#039;)
 
     # Use for initialization
     start = approx.sample(return_inferencedata=False)[0]
@@ -463,8 +513,8 @@ from scripts.model_diagnostics import create_diagnostic_report
 
 create_diagnostic_report(
     idata,
-    var_names=['alpha', 'beta', 'sigma'],
-    output_dir='diagnostics/'
+    var_names=[&#039;alpha&#039;, &#039;beta&#039;, &#039;sigma&#039;],
+    output_dir=&#039;diagnostics/&#039;
 )
 ```
 
@@ -583,11 +633,11 @@ This skill includes:
 
 ### Model Building
 ```python
-with pm.Model(coords={'var': names}) as model:
+with pm.Model(coords={&#039;var&#039;: names}) as model:
     # Priors
-    param = pm.Normal('param', mu=0, sigma=1, dims='var')
+    param = pm.Normal(&#039;param&#039;, mu=0, sigma=1, dims=&#039;var&#039;)
     # Likelihood
-    y = pm.Normal('y', mu=..., sigma=..., observed=data)
+    y = pm.Normal(&#039;y&#039;, mu=..., sigma=..., observed=data)
 ```
 
 ### Sampling
@@ -604,13 +654,13 @@ check_diagnostics(idata)
 ### Model Comparison
 ```python
 from scripts.model_comparison import compare_models
-compare_models({'m1': idata1, 'm2': idata2}, ic='loo')
+compare_models({&#039;m1&#039;: idata1, &#039;m2&#039;: idata2}, ic=&#039;loo&#039;)
 ```
 
 ### Predictions
 ```python
 with model:
-    pm.set_data({'X': X_new})
+    pm.set_data({&#039;X&#039;: X_new})
     pred = pm.sample_posterior_predictive(idata.posterior)
 ```
 
@@ -618,11 +668,42 @@ with model:
 
 - PyMC integrates with ArviZ for visualization and diagnostics
 - Use `pm.model_to_graphviz(model)` to visualize model structure
-- Save results with `idata.to_netcdf('results.nc')`
-- Load with `az.from_netcdf('results.nc')`
+- Save results with `idata.to_netcdf(&#039;results.nc&#039;)`
+- Load with `az.from_netcdf(&#039;results.nc&#039;)`
 - For very large models, consider minibatch ADVI or data subsampling
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>14</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>playwright-skill - AICCLI</title>
-  <meta name="description" content="playwright-skill - Claude Code skill for AICCLI">
+  <meta name="description" content="Complete browser automation with Playwright. Auto-detects dev servers, writes clean test scripts to /tmp. Test pages, fill forms, take screenshots, check respon">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / playwright-skill</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>playwright-skill</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">utilities</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / utilities / playwright-skill
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>playwright-skill</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">utilities</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Complete browser automation with Playwright. Auto-detects dev servers, writes clean test scripts to /tmp. Test pages, fill forms, take screenshots, check responsive design, validate UX, test login flows, check links, automate any browser task. Use when user wants to test websites, automate browser interactions, validate web functionality, or perform any browser-based testing.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/playwright-skill</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/playwright-skill</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/playwright-skill</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: playwright-skill
 description: Complete browser automation with Playwright. Auto-detects dev servers, writes clean test scripts to /tmp. Test pages, fill forms, take screenshots, check responsive design, validate UX, test login flows, check links, automate any browser task. Use when user wants to test websites, automate browser interactions, validate web functionality, or perform any browser-based testing.
 ---
@@ -71,14 +121,14 @@ Common installation paths:
 
 # Playwright Browser Automation
 
-General-purpose browser automation skill. I'll write custom Playwright code for any automation task you request and execute it via the universal executor.
+General-purpose browser automation skill. I&#039;ll write custom Playwright code for any automation task you request and execute it via the universal executor.
 
 **CRITICAL WORKFLOW - Follow these steps in order:**
 
 1. **Auto-detect dev servers** - For localhost testing, ALWAYS run server detection FIRST:
 
    ```bash
-   cd $SKILL_DIR && node -e "require('./lib/helpers').detectDevServers().then(servers =&gt; console.log(JSON.stringify(servers)))"
+   cd $SKILL_DIR &amp;&amp; node -e &quot;require(&#039;./lib/helpers&#039;).detectDevServers().then(servers =&gt; console.log(JSON.stringify(servers)))&quot;
    ```
 
    - If **1 server found**: Use it automatically, inform user
@@ -95,8 +145,8 @@ General-purpose browser automation skill. I'll write custom Playwright code for 
 
 1. You describe what you want to test/automate
 2. I auto-detect running dev servers (or ask for URL if testing external site)
-3. I write custom Playwright code in `/tmp/playwright-test-*.js` (won't clutter your project)
-4. I execute it via: `cd $SKILL_DIR && node run.js /tmp/playwright-test-*.js`
+3. I write custom Playwright code in `/tmp/playwright-test-*.js` (won&#039;t clutter your project)
+4. I execute it via: `cd $SKILL_DIR &amp;&amp; node run.js /tmp/playwright-test-*.js`
 5. Results displayed in real-time, browser window visible for debugging
 6. Test files auto-cleaned from /tmp by your OS
 
@@ -114,27 +164,27 @@ This installs Playwright and Chromium browser. Only needed once.
 **Step 1: Detect dev servers (for localhost testing)**
 
 ```bash
-cd $SKILL_DIR && node -e "require('./lib/helpers').detectDevServers().then(s =&gt; console.log(JSON.stringify(s)))"
+cd $SKILL_DIR &amp;&amp; node -e &quot;require(&#039;./lib/helpers&#039;).detectDevServers().then(s =&gt; console.log(JSON.stringify(s)))&quot;
 ```
 
 **Step 2: Write test script to /tmp with URL parameter**
 
 ```javascript
 // /tmp/playwright-test-page.js
-const { chromium } = require('playwright');
+const { chromium } = require(&#039;playwright&#039;);
 
 // Parameterized URL (detected or user-provided)
-const TARGET_URL = 'http://localhost:3001'; // &lt;-- Auto-detected or from user
+const TARGET_URL = &#039;http://localhost:3001&#039;; // &lt;-- Auto-detected or from user
 
 (async () =&gt; {
   const browser = await chromium.launch({ headless: false });
   const page = await browser.newPage();
 
   await page.goto(TARGET_URL);
-  console.log('Page loaded:', await page.title());
+  console.log(&#039;Page loaded:&#039;, await page.title());
 
-  await page.screenshot({ path: '/tmp/screenshot.png', fullPage: true });
-  console.log('📸 Screenshot saved to /tmp/screenshot.png');
+  await page.screenshot({ path: &#039;/tmp/screenshot.png&#039;, fullPage: true });
+  console.log(&#039;📸 Screenshot saved to /tmp/screenshot.png&#039;);
 
   await browser.close();
 })();
@@ -143,7 +193,7 @@ const TARGET_URL = 'http://localhost:3001'; // &lt;-- Auto-detected or from user
 **Step 3: Execute from skill directory**
 
 ```bash
-cd $SKILL_DIR && node run.js /tmp/playwright-test-page.js
+cd $SKILL_DIR &amp;&amp; node run.js /tmp/playwright-test-page.js
 ```
 
 ## Common Patterns
@@ -152,9 +202,9 @@ cd $SKILL_DIR && node run.js /tmp/playwright-test-page.js
 
 ```javascript
 // /tmp/playwright-test-responsive.js
-const { chromium } = require('playwright');
+const { chromium } = require(&#039;playwright&#039;);
 
-const TARGET_URL = 'http://localhost:3001'; // Auto-detected
+const TARGET_URL = &#039;http://localhost:3001&#039;; // Auto-detected
 
 (async () =&gt; {
   const browser = await chromium.launch({ headless: false, slowMo: 100 });
@@ -163,12 +213,12 @@ const TARGET_URL = 'http://localhost:3001'; // Auto-detected
   // Desktop test
   await page.setViewportSize({ width: 1920, height: 1080 });
   await page.goto(TARGET_URL);
-  console.log('Desktop - Title:', await page.title());
-  await page.screenshot({ path: '/tmp/desktop.png', fullPage: true });
+  console.log(&#039;Desktop - Title:&#039;, await page.title());
+  await page.screenshot({ path: &#039;/tmp/desktop.png&#039;, fullPage: true });
 
   // Mobile test
   await page.setViewportSize({ width: 375, height: 667 });
-  await page.screenshot({ path: '/tmp/mobile.png', fullPage: true });
+  await page.screenshot({ path: &#039;/tmp/mobile.png&#039;, fullPage: true });
 
   await browser.close();
 })();
@@ -178,9 +228,9 @@ const TARGET_URL = 'http://localhost:3001'; // Auto-detected
 
 ```javascript
 // /tmp/playwright-test-login.js
-const { chromium } = require('playwright');
+const { chromium } = require(&#039;playwright&#039;);
 
-const TARGET_URL = 'http://localhost:3001'; // Auto-detected
+const TARGET_URL = &#039;http://localhost:3001&#039;; // Auto-detected
 
 (async () =&gt; {
   const browser = await chromium.launch({ headless: false });
@@ -188,13 +238,13 @@ const TARGET_URL = 'http://localhost:3001'; // Auto-detected
 
   await page.goto(`${TARGET_URL}/login`);
 
-  await page.fill('input[name="email"]', 'test@example.com');
-  await page.fill('input[name="password"]', 'password123');
-  await page.click('button[type="submit"]');
+  await page.fill(&#039;input[name=&quot;email&quot;]&#039;, &#039;test@example.com&#039;);
+  await page.fill(&#039;input[name=&quot;password&quot;]&#039;, &#039;password123&#039;);
+  await page.click(&#039;button[type=&quot;submit&quot;]&#039;);
 
   // Wait for redirect
-  await page.waitForURL('**/dashboard');
-  console.log('✅ Login successful, redirected to dashboard');
+  await page.waitForURL(&#039;**/dashboard&#039;);
+  console.log(&#039;✅ Login successful, redirected to dashboard&#039;);
 
   await browser.close();
 })();
@@ -204,9 +254,9 @@ const TARGET_URL = 'http://localhost:3001'; // Auto-detected
 
 ```javascript
 // /tmp/playwright-test-form.js
-const { chromium } = require('playwright');
+const { chromium } = require(&#039;playwright&#039;);
 
-const TARGET_URL = 'http://localhost:3001'; // Auto-detected
+const TARGET_URL = &#039;http://localhost:3001&#039;; // Auto-detected
 
 (async () =&gt; {
   const browser = await chromium.launch({ headless: false, slowMo: 50 });
@@ -214,14 +264,14 @@ const TARGET_URL = 'http://localhost:3001'; // Auto-detected
 
   await page.goto(`${TARGET_URL}/contact`);
 
-  await page.fill('input[name="name"]', 'John Doe');
-  await page.fill('input[name="email"]', 'john@example.com');
-  await page.fill('textarea[name="message"]', 'Test message');
-  await page.click('button[type="submit"]');
+  await page.fill(&#039;input[name=&quot;name&quot;]&#039;, &#039;John Doe&#039;);
+  await page.fill(&#039;input[name=&quot;email&quot;]&#039;, &#039;john@example.com&#039;);
+  await page.fill(&#039;textarea[name=&quot;message&quot;]&#039;, &#039;Test message&#039;);
+  await page.click(&#039;button[type=&quot;submit&quot;]&#039;);
 
   // Verify submission
-  await page.waitForSelector('.success-message');
-  console.log('✅ Form submitted successfully');
+  await page.waitForSelector(&#039;.success-message&#039;);
+  console.log(&#039;✅ Form submitted successfully&#039;);
 
   await browser.close();
 })();
@@ -230,19 +280,19 @@ const TARGET_URL = 'http://localhost:3001'; // Auto-detected
 ### Check for Broken Links
 
 ```javascript
-const { chromium } = require('playwright');
+const { chromium } = require(&#039;playwright&#039;);
 
 (async () =&gt; {
   const browser = await chromium.launch({ headless: false });
   const page = await browser.newPage();
 
-  await page.goto('http://localhost:3000');
+  await page.goto(&#039;http://localhost:3000&#039;);
 
-  const links = await page.locator('a[href^="http"]').all();
+  const links = await page.locator(&#039;a[href^=&quot;http&quot;]&#039;).all();
   const results = { working: 0, broken: [] };
 
   for (const link of links) {
-    const href = await link.getAttribute('href');
+    const href = await link.getAttribute(&#039;href&#039;);
     try {
       const response = await page.request.head(href);
       if (response.ok()) {
@@ -265,26 +315,26 @@ const { chromium } = require('playwright');
 ### Take Screenshot with Error Handling
 
 ```javascript
-const { chromium } = require('playwright');
+const { chromium } = require(&#039;playwright&#039;);
 
 (async () =&gt; {
   const browser = await chromium.launch({ headless: false });
   const page = await browser.newPage();
 
   try {
-    await page.goto('http://localhost:3000', {
-      waitUntil: 'networkidle',
+    await page.goto(&#039;http://localhost:3000&#039;, {
+      waitUntil: &#039;networkidle&#039;,
       timeout: 10000,
     });
 
     await page.screenshot({
-      path: '/tmp/screenshot.png',
+      path: &#039;/tmp/screenshot.png&#039;,
       fullPage: true,
     });
 
-    console.log('📸 Screenshot saved to /tmp/screenshot.png');
+    console.log(&#039;📸 Screenshot saved to /tmp/screenshot.png&#039;);
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error(&#039;❌ Error:&#039;, error.message);
   } finally {
     await browser.close();
   }
@@ -295,18 +345,18 @@ const { chromium } = require('playwright');
 
 ```javascript
 // /tmp/playwright-test-responsive-full.js
-const { chromium } = require('playwright');
+const { chromium } = require(&#039;playwright&#039;);
 
-const TARGET_URL = 'http://localhost:3001'; // Auto-detected
+const TARGET_URL = &#039;http://localhost:3001&#039;; // Auto-detected
 
 (async () =&gt; {
   const browser = await chromium.launch({ headless: false });
   const page = await browser.newPage();
 
   const viewports = [
-    { name: 'Desktop', width: 1920, height: 1080 },
-    { name: 'Tablet', width: 768, height: 1024 },
-    { name: 'Mobile', width: 375, height: 667 },
+    { name: &#039;Desktop&#039;, width: 1920, height: 1080 },
+    { name: &#039;Tablet&#039;, width: 768, height: 1024 },
+    { name: &#039;Mobile&#039;, width: 375, height: 667 },
   ];
 
   for (const viewport of viewports) {
@@ -328,7 +378,7 @@ const TARGET_URL = 'http://localhost:3001'; // Auto-detected
     });
   }
 
-  console.log('✅ All viewports tested');
+  console.log(&#039;✅ All viewports tested&#039;);
   await browser.close();
 })();
 ```
@@ -339,14 +389,14 @@ For quick one-off tasks, you can execute code inline without creating files:
 
 ```bash
 # Take a quick screenshot
-cd $SKILL_DIR && node run.js "
+cd $SKILL_DIR &amp;&amp; node run.js &quot;
 const browser = await chromium.launch({ headless: false });
 const page = await browser.newPage();
-await page.goto('http://localhost:3001');
-await page.screenshot({ path: '/tmp/quick-screenshot.png', fullPage: true });
-console.log('Screenshot saved');
+await page.goto(&#039;http://localhost:3001&#039;);
+await page.screenshot({ path: &#039;/tmp/quick-screenshot.png&#039;, fullPage: true });
+console.log(&#039;Screenshot saved&#039;);
 await browser.close();
-"
+&quot;
 ```
 
 **When to use inline vs files:**
@@ -359,26 +409,26 @@ await browser.close();
 Optional utility functions in `lib/helpers.js`:
 
 ```javascript
-const helpers = require('./lib/helpers');
+const helpers = require(&#039;./lib/helpers&#039;);
 
 // Detect running dev servers (CRITICAL - use this first!)
 const servers = await helpers.detectDevServers();
-console.log('Found servers:', servers);
+console.log(&#039;Found servers:&#039;, servers);
 
 // Safe click with retry
-await helpers.safeClick(page, 'button.submit', { retries: 3 });
+await helpers.safeClick(page, &#039;button.submit&#039;, { retries: 3 });
 
 // Safe type with clear
-await helpers.safeType(page, '#username', 'testuser');
+await helpers.safeType(page, &#039;#username&#039;, &#039;testuser&#039;);
 
 // Take timestamped screenshot
-await helpers.takeScreenshot(page, 'test-result');
+await helpers.takeScreenshot(page, &#039;test-result&#039;);
 
 // Handle cookie banners
 await helpers.handleCookieBanner(page);
 
 // Extract table data
-const data = await helpers.extractTableData(page, 'table.results');
+const data = await helpers.extractTableData(page, &#039;table.results&#039;);
 ```
 
 See `lib/helpers.js` for full list.
@@ -397,14 +447,14 @@ Configure custom headers for all HTTP requests via environment variables. Useful
 
 ```bash
 PW_HEADER_NAME=X-Automated-By PW_HEADER_VALUE=playwright-skill \
-  cd $SKILL_DIR && node run.js /tmp/my-script.js
+  cd $SKILL_DIR &amp;&amp; node run.js /tmp/my-script.js
 ```
 
 **Multiple headers (JSON format):**
 
 ```bash
-PW_EXTRA_HEADERS='{"X-Automated-By":"playwright-skill","X-Debug":"true"}' \
-  cd $SKILL_DIR && node run.js /tmp/my-script.js
+PW_EXTRA_HEADERS=&#039;{&quot;X-Automated-By&quot;:&quot;playwright-skill&quot;,&quot;X-Debug&quot;:&quot;true&quot;}&#039; \
+  cd $SKILL_DIR &amp;&amp; node run.js /tmp/my-script.js
 ```
 
 ### How It Works
@@ -429,9 +479,9 @@ const context = await browser.newContext(
 
 For comprehensive Playwright API documentation, see [API_REFERENCE.md](API_REFERENCE.md):
 
-- Selectors & Locators best practices
-- Network interception & API mocking
-- Authentication & session management
+- Selectors &amp; Locators best practices
+- Network interception &amp; API mocking
+- Authentication &amp; session management
 - Visual regression testing
 - Mobile device emulation
 - Performance testing
@@ -442,61 +492,61 @@ For comprehensive Playwright API documentation, see [API_REFERENCE.md](API_REFER
 
 - **CRITICAL: Detect servers FIRST** - Always run `detectDevServers()` before writing test code for localhost testing
 - **Custom headers** - Use `PW_HEADER_NAME`/`PW_HEADER_VALUE` env vars to identify automated traffic to your backend
-- **Use /tmp for test files** - Write to `/tmp/playwright-test-*.js`, never to skill directory or user's project
+- **Use /tmp for test files** - Write to `/tmp/playwright-test-*.js`, never to skill directory or user&#039;s project
 - **Parameterize URLs** - Put detected/provided URL in a `TARGET_URL` constant at the top of every script
 - **DEFAULT: Visible browser** - Always use `headless: false` unless user explicitly asks for headless mode
-- **Headless mode** - Only use `headless: true` when user specifically requests "headless" or "background" execution
+- **Headless mode** - Only use `headless: true` when user specifically requests &quot;headless&quot; or &quot;background&quot; execution
 - **Slow down:** Use `slowMo: 100` to make actions visible and easier to follow
 - **Wait strategies:** Use `waitForURL`, `waitForSelector`, `waitForLoadState` instead of fixed timeouts
 - **Error handling:** Always use try-catch for robust automation
-- **Console output:** Use `console.log()` to track progress and show what's happening
+- **Console output:** Use `console.log()` to track progress and show what&#039;s happening
 
 ## Troubleshooting
 
 **Playwright not installed:**
 
 ```bash
-cd $SKILL_DIR && npm run setup
+cd $SKILL_DIR &amp;&amp; npm run setup
 ```
 
 **Module not found:**
 Ensure running from skill directory via `run.js` wrapper
 
-**Browser doesn't open:**
+**Browser doesn&#039;t open:**
 Check `headless: false` and ensure display available
 
 **Element not found:**
-Add wait: `await page.waitForSelector('.element', { timeout: 10000 })`
+Add wait: `await page.waitForSelector(&#039;.element&#039;, { timeout: 10000 })`
 
 ## Example Usage
 
 ```
-User: "Test if the marketing page looks good"
+User: &quot;Test if the marketing page looks good&quot;
 
-Claude: I'll test the marketing page across multiple viewports. Let me first detect running servers...
+Claude: I&#039;ll test the marketing page across multiple viewports. Let me first detect running servers...
 [Runs: detectDevServers()]
 [Output: Found server on port 3001]
 I found your dev server running on http://localhost:3001
 
 [Writes custom automation script to /tmp/playwright-test-marketing.js with URL parameterized]
-[Runs: cd $SKILL_DIR && node run.js /tmp/playwright-test-marketing.js]
+[Runs: cd $SKILL_DIR &amp;&amp; node run.js /tmp/playwright-test-marketing.js]
 [Shows results with screenshots from /tmp/]
 ```
 
 ```
-User: "Check if login redirects correctly"
+User: &quot;Check if login redirects correctly&quot;
 
-Claude: I'll test the login flow. First, let me check for running servers...
+Claude: I&#039;ll test the login flow. First, let me check for running servers...
 [Runs: detectDevServers()]
 [Output: Found servers on ports 3000 and 3001]
 I found 2 dev servers. Which one should I test?
 - http://localhost:3000
 - http://localhost:3001
 
-User: "Use 3001"
+User: &quot;Use 3001&quot;
 
 [Writes login automation to /tmp/playwright-test-login.js]
-[Runs: cd $SKILL_DIR && node run.js /tmp/playwright-test-login.js]
+[Runs: cd $SKILL_DIR &amp;&amp; node run.js /tmp/playwright-test-login.js]
 [Reports: ✅ Login successful, redirected to /dashboard]
 ```
 
@@ -508,8 +558,39 @@ User: "Use 3001"
 - Test scripts written to `/tmp` for automatic cleanup (no clutter)
 - Code executes reliably with proper module resolution via `run.js`
 - Progressive disclosure - API_REFERENCE.md loaded only when advanced features needed
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>203</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

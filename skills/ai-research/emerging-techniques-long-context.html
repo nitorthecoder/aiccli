@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>emerging-techniques-long-context - AICCLI</title>
-  <meta name="description" content="emerging-techniques-long-context - Claude Code skill for AICCLI">
+  <meta name="description" content="Extend context windows of transformer models using RoPE, YaRN, ALiBi, and position interpolation techniques. Use when processing long documents (32k-128k+ token">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / emerging-techniques-long-context</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>emerging-techniques-long-context</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / emerging-techniques-long-context
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>emerging-techniques-long-context</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Extend context windows of transformer models using RoPE, YaRN, ALiBi, and position interpolation techniques. Use when processing long documents (32k-128k+ tokens), extending pre-trained models beyond original context limits, or implementing efficient positional encodings. Covers rotary embeddings, attention biases, interpolation methods, and extrapolation strategies for LLMs.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/emerging-techniques-long-context</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/emerging-techniques-long-context</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/emerging-techniques-long-context</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: long-context
 description: Extend context windows of transformer models using RoPE, YaRN, ALiBi, and position interpolation techniques. Use when processing long documents (32k-128k+ tokens), extending pre-trained models beyond original context limits, or implementing efficient positional encodings. Covers rotary embeddings, attention biases, interpolation methods, and extrapolation strategies for LLMs.
 version: 1.0.0
@@ -104,13 +154,13 @@ import torch
 import torch.nn as nn
 
 class RotaryEmbedding(nn.Module):
-    """Rotary Position Embeddings (RoPE)."""
+    &quot;&quot;&quot;Rotary Position Embeddings (RoPE).&quot;&quot;&quot;
 
     def __init__(self, dim, max_seq_len=8192, base=10000):
         super().__init__()
         # Compute inverse frequencies
         inv_freq = 1.0 / (base ** (torch.arange(0, dim, 2).float() / dim))
-        self.register_buffer("inv_freq", inv_freq)
+        self.register_buffer(&quot;inv_freq&quot;, inv_freq)
         self.max_seq_len = max_seq_len
 
     def forward(self, seq_len, device):
@@ -125,12 +175,12 @@ class RotaryEmbedding(nn.Module):
         return emb.cos(), emb.sin()
 
 def rotate_half(x):
-    """Rotate half the hidden dimensions."""
+    &quot;&quot;&quot;Rotate half the hidden dimensions.&quot;&quot;&quot;
     x1, x2 = x.chunk(2, dim=-1)
     return torch.cat((-x2, x1), dim=-1)
 
 def apply_rotary_pos_emb(q, k, cos, sin):
-    """Apply rotary embeddings to queries and keys."""
+    &quot;&quot;&quot;Apply rotary embeddings to queries and keys.&quot;&quot;&quot;
     # q, k shape: (batch, heads, seq_len, dim)
     q_embed = (q * cos) + (rotate_half(q) * sin)
     k_embed = (k * cos) + (rotate_half(k) * sin)
@@ -138,7 +188,7 @@ def apply_rotary_pos_emb(q, k, cos, sin):
 
 # Usage
 rope = RotaryEmbedding(dim=64, max_seq_len=8192)
-cos, sin = rope(seq_len=2048, device='cuda')
+cos, sin = rope(seq_len=2048, device=&#039;cuda&#039;)
 
 # In attention layer
 q_rotated, k_rotated = apply_rotary_pos_emb(query, key, cos, sin)
@@ -148,7 +198,7 @@ q_rotated, k_rotated = apply_rotary_pos_emb(query, key, cos, sin)
 
 ```python
 def get_alibi_slopes(num_heads):
-    """Get ALiBi slope values for each attention head."""
+    &quot;&quot;&quot;Get ALiBi slope values for each attention head.&quot;&quot;&quot;
     def get_slopes_power_of_2(n):
         start = 2 ** (-(2 ** -(math.log2(n) - 3)))
         ratio = start
@@ -166,7 +216,7 @@ def get_alibi_slopes(num_heads):
         return slopes
 
 def create_alibi_bias(seq_len, num_heads):
-    """Create ALiBi attention bias."""
+    &quot;&quot;&quot;Create ALiBi attention bias.&quot;&quot;&quot;
     # Distance matrix
     context_position = torch.arange(seq_len)
     memory_position = torch.arange(seq_len)
@@ -182,7 +232,7 @@ def create_alibi_bias(seq_len, num_heads):
 # Usage in attention
 num_heads = 8
 seq_len = 2048
-alibi_bias = create_alibi_bias(seq_len, num_heads).to('cuda')
+alibi_bias = create_alibi_bias(seq_len, num_heads).to(&#039;cuda&#039;)
 
 # Add bias to attention scores
 # attn_scores shape: (batch, num_heads, seq_len, seq_len)
@@ -196,19 +246,19 @@ attn_weights = torch.softmax(attn_scores, dim=-1)
 from transformers import LlamaForCausalLM, LlamaTokenizer
 
 # Original context: 2048 tokens
-model = LlamaForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf")
+model = LlamaForCausalLM.from_pretrained(&quot;meta-llama/Llama-2-7b-hf&quot;)
 
 # Extend to 32k with position interpolation
 # Modify RoPE base frequency
 model.config.rope_scaling = {
-    "type": "linear",
-    "factor": 16.0  # 2048 * 16 = 32768
+    &quot;type&quot;: &quot;linear&quot;,
+    &quot;factor&quot;: 16.0  # 2048 * 16 = 32768
 }
 
 # Or use dynamic scaling
 model.config.rope_scaling = {
-    "type": "dynamic",
-    "factor": 16.0
+    &quot;type&quot;: &quot;dynamic&quot;,
+    &quot;factor&quot;: 16.0
 }
 
 # Fine-tune with long documents (minimal steps needed)
@@ -248,12 +298,12 @@ where θ_j = base^(-2j/d) for j ∈ [0, d/2)
 ```python
 # YaRN configuration
 yarn_config = {
-    "scale": 16,                    # Extension factor
-    "original_max_position": 2048,  # Base context
-    "extrapolation_factor": 1.0,    # NTK parameter
-    "attn_factor": 1.0,             # Attention scaling
-    "beta_fast": 32,                # High-frequency scale
-    "beta_slow": 1,                 # Low-frequency scale
+    &quot;scale&quot;: 16,                    # Extension factor
+    &quot;original_max_position&quot;: 2048,  # Base context
+    &quot;extrapolation_factor&quot;: 1.0,    # NTK parameter
+    &quot;attn_factor&quot;: 1.0,             # Attention scaling
+    &quot;beta_fast&quot;: 32,                # High-frequency scale
+    &quot;beta_slow&quot;: 1,                 # Low-frequency scale
 }
 ```
 
@@ -320,26 +370,26 @@ scaled_position[i] = i / extension_factor
 from transformers import AutoModelForCausalLM, AutoConfig
 
 # RoPE with YaRN scaling
-config = AutoConfig.from_pretrained("mistralai/Mistral-7B-v0.1")
+config = AutoConfig.from_pretrained(&quot;mistralai/Mistral-7B-v0.1&quot;)
 config.rope_scaling = {
-    "type": "yarn",
-    "factor": 8.0,
-    "original_max_position_embeddings": 8192,
-    "attention_factor": 1.0
+    &quot;type&quot;: &quot;yarn&quot;,
+    &quot;factor&quot;: 8.0,
+    &quot;original_max_position_embeddings&quot;: 8192,
+    &quot;attention_factor&quot;: 1.0
 }
 
 model = AutoModelForCausalLM.from_config(config)
 
 # Position interpolation (simpler)
 config.rope_scaling = {
-    "type": "linear",
-    "factor": 4.0
+    &quot;type&quot;: &quot;linear&quot;,
+    &quot;factor&quot;: 4.0
 }
 
 # Dynamic scaling (adjusts based on input length)
 config.rope_scaling = {
-    "type": "dynamic",
-    "factor": 8.0
+    &quot;type&quot;: &quot;dynamic&quot;,
+    &quot;factor&quot;: 8.0
 }
 ```
 
@@ -347,7 +397,7 @@ config.rope_scaling = {
 
 ```python
 class LongContextAttention(nn.Module):
-    """Multi-head attention with RoPE."""
+    &quot;&quot;&quot;Multi-head attention with RoPE.&quot;&quot;&quot;
 
     def __init__(self, hidden_size, num_heads, max_seq_len=32768):
         super().__init__()
@@ -403,11 +453,11 @@ from transformers import Trainer, TrainingArguments
 
 # Extend model config
 model.config.max_position_embeddings = 32768
-model.config.rope_scaling = {"type": "linear", "factor": 16.0}
+model.config.rope_scaling = {&quot;type&quot;: &quot;linear&quot;, &quot;factor&quot;: 16.0}
 
 # Training args (minimal steps needed)
 training_args = TrainingArguments(
-    output_dir="./llama-32k",
+    output_dir=&quot;./llama-32k&quot;,
     num_train_epochs=1,
     max_steps=1000,           # Only 1000 steps!
     per_device_train_batch_size=1,
@@ -453,16 +503,16 @@ python scripts/train.py \
 
 ```python
 # For NEW models (training from scratch)
-use_method = "ALiBi"  # Best extrapolation, lowest memory
+use_method = &quot;ALiBi&quot;  # Best extrapolation, lowest memory
 
 # For EXTENDING existing RoPE models
-use_method = "YaRN"  # Most efficient extension (10× less data)
+use_method = &quot;YaRN&quot;  # Most efficient extension (10× less data)
 
 # For QUICK extension with minimal compute
-use_method = "Position Interpolation"  # 1000 steps
+use_method = &quot;Position Interpolation&quot;  # 1000 steps
 
 # For MODERATE extension with good efficiency
-use_method = "Linear RoPE Scaling"  # Built-in, simple
+use_method = &quot;Linear RoPE Scaling&quot;  # Built-in, simple
 ```
 
 ### 2. Scaling Factor Selection
@@ -487,14 +537,14 @@ steps_needed = 100 * scaling_factor  # Rough estimate
 ```python
 # ✅ Good: Long documents matching target length
 train_data = [
-    {"text": long_doc_32k_tokens},  # Full 32k
-    {"text": long_doc_24k_tokens},  # Varied lengths
-    {"text": long_doc_16k_tokens},
+    {&quot;text&quot;: long_doc_32k_tokens},  # Full 32k
+    {&quot;text&quot;: long_doc_24k_tokens},  # Varied lengths
+    {&quot;text&quot;: long_doc_16k_tokens},
 ]
 
-# ❌ Bad: Short documents (won't learn long context)
+# ❌ Bad: Short documents (won&#039;t learn long context)
 train_data = [
-    {"text": short_doc_2k_tokens},
+    {&quot;text&quot;: short_doc_2k_tokens},
 ]
 
 # Use datasets like:
@@ -508,15 +558,15 @@ train_data = [
 
 ```python
 # ❌ Bad: Applying position interpolation without fine-tuning
-model.config.rope_scaling = {"type": "linear", "factor": 16.0}
+model.config.rope_scaling = {&quot;type&quot;: &quot;linear&quot;, &quot;factor&quot;: 16.0}
 # Model will perform poorly without fine-tuning!
 
 # ✅ Good: Fine-tune after scaling
-model.config.rope_scaling = {"type": "linear", "factor": 16.0}
+model.config.rope_scaling = {&quot;type&quot;: &quot;linear&quot;, &quot;factor&quot;: 16.0}
 fine_tune(model, long_documents, steps=1000)
 
 # ❌ Bad: Too aggressive scaling without data
-scale_to_1M_tokens()  # Won't work without massive fine-tuning
+scale_to_1M_tokens()  # Won&#039;t work without massive fine-tuning
 
 # ✅ Good: Incremental scaling
 # 8k → 16k → 32k → 64k (fine-tune at each step)
@@ -531,15 +581,15 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Load long-context model
 model = AutoModelForCausalLM.from_pretrained(
-    "togethercomputer/LLaMA-2-7B-32K",  # 32k context
+    &quot;togethercomputer/LLaMA-2-7B-32K&quot;,  # 32k context
     torch_dtype=torch.float16,
-    device_map="auto"
+    device_map=&quot;auto&quot;
 )
-tokenizer = AutoTokenizer.from_pretrained("togethercomputer/LLaMA-2-7B-32K")
+tokenizer = AutoTokenizer.from_pretrained(&quot;togethercomputer/LLaMA-2-7B-32K&quot;)
 
 # Process long document
-long_text = "..." * 30000  # 30k tokens
-inputs = tokenizer(long_text, return_tensors="pt", truncation=False).to('cuda')
+long_text = &quot;...&quot; * 30000  # 30k tokens
+inputs = tokenizer(long_text, return_tensors=&quot;pt&quot;, truncation=False).to(&#039;cuda&#039;)
 
 # Generate
 outputs = model.generate(
@@ -559,8 +609,8 @@ model.gradient_checkpointing_enable()
 
 # Use Flash Attention 2
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-2-7b-hf",
-    attn_implementation="flash_attention_2",  # 2-3× faster
+    &quot;meta-llama/Llama-2-7b-hf&quot;,
+    attn_implementation=&quot;flash_attention_2&quot;,  # 2-3× faster
     torch_dtype=torch.float16
 )
 
@@ -568,7 +618,7 @@ model = AutoModelForCausalLM.from_pretrained(
 from vllm import LLM
 
 llm = LLM(
-    model="togethercomputer/LLaMA-2-7B-32K",
+    model=&quot;togethercomputer/LLaMA-2-7B-32K&quot;,
     max_model_len=32768,  # 32k context
     gpu_memory_utilization=0.9
 )
@@ -591,8 +641,46 @@ llm = LLM(
 - `references/fine_tuning.md` - Complete fine-tuning guide for context extension
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Emerging Techniques</span><span class="tag">Long Context</span><span class="tag">RoPE</span><span class="tag">YaRN</span><span class="tag">ALiBi</span><span class="tag">Position Interpolation</span><span class="tag">Extended Context</span><span class="tag">Rotary Embeddings</span><span class="tag">Attention Bias</span><span class="tag">Context Extension</span><span class="tag">Positional Encoding</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>87</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

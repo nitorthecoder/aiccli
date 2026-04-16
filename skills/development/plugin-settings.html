@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>plugin-settings - AICCLI</title>
-  <meta name="description" content="plugin-settings - Claude Code skill for AICCLI">
+  <meta name="description" content="This skill should be used when the user asks about "plugin settings", "store plugin configuration", "user-configurable plugin", ".local.md files", "plugin state">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / plugin-settings</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>plugin-settings</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / plugin-settings
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>plugin-settings</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">This skill should be used when the user asks about "plugin settings", "store plugin configuration", "user-configurable plugin", ".local.md files", "plugin state files", "read YAML frontmatter", "per-project plugin settings", or wants to make plugin behavior configurable. Documents the .claude/plugin-name.local.md pattern for storing plugin-specific configuration with YAML frontmatter and markdown content.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/plugin-settings</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/plugin-settings</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/plugin-settings</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: Plugin Settings
-description: This skill should be used when the user asks about "plugin settings", "store plugin configuration", "user-configurable plugin", ".local.md files", "plugin state files", "read YAML frontmatter", "per-project plugin settings", or wants to make plugin behavior configurable. Documents the .claude/plugin-name.local.md pattern for storing plugin-specific configuration with YAML frontmatter and markdown content.
+description: This skill should be used when the user asks about &quot;plugin settings&quot;, &quot;store plugin configuration&quot;, &quot;user-configurable plugin&quot;, &quot;.local.md files&quot;, &quot;plugin state files&quot;, &quot;read YAML frontmatter&quot;, &quot;per-project plugin settings&quot;, or wants to make plugin behavior configurable. Documents the .claude/plugin-name.local.md pattern for storing plugin-specific configuration with YAML frontmatter and markdown content.
 version: 0.1.0
 ---
 
@@ -84,7 +134,7 @@ enabled: true
 setting1: value1
 setting2: value2
 numeric_setting: 42
-list_setting: ["item1", "item2"]
+list_setting: [&quot;item1&quot;, &quot;item2&quot;]
 ---
 
 # Additional Context
@@ -125,27 +175,27 @@ Contact @team-lead with questions.
 set -euo pipefail
 
 # Define state file path
-STATE_FILE=".claude/my-plugin.local.md"
+STATE_FILE=&quot;.claude/my-plugin.local.md&quot;
 
-# Quick exit if file doesn't exist
-if [[ ! -f "$STATE_FILE" ]]; then
+# Quick exit if file doesn&#039;t exist
+if [[ ! -f &quot;$STATE_FILE&quot; ]]; then
   exit 0  # Plugin not configured, skip
 fi
 
 # Parse YAML frontmatter (between --- markers)
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$STATE_FILE")
+FRONTMATTER=$(sed -n &#039;/^---$/,/^---$/{ /^---$/d; p; }&#039; &quot;$STATE_FILE&quot;)
 
 # Extract individual fields
-ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//' | sed 's/^"\(.*\)"$/\1/')
-STRICT_MODE=$(echo "$FRONTMATTER" | grep '^strict_mode:' | sed 's/strict_mode: *//' | sed 's/^"\(.*\)"$/\1/')
+ENABLED=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^enabled:&#039; | sed &#039;s/enabled: *//&#039; | sed &#039;s/^&quot;\(.*\)&quot;$/\1/&#039;)
+STRICT_MODE=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^strict_mode:&#039; | sed &#039;s/strict_mode: *//&#039; | sed &#039;s/^&quot;\(.*\)&quot;$/\1/&#039;)
 
 # Check if enabled
-if [[ "$ENABLED" != "true" ]]; then
+if [[ &quot;$ENABLED&quot; != &quot;true&quot; ]]; then
   exit 0  # Disabled
 fi
 
 # Use configuration in hook logic
-if [[ "$STRICT_MODE" == "true" ]]; then
+if [[ &quot;$STRICT_MODE&quot; == &quot;true&quot; ]]; then
   # Apply strict validation
   # ...
 fi
@@ -160,7 +210,7 @@ Commands can read settings files to customize behavior:
 ```markdown
 ---
 description: Process data with plugin
-allowed-tools: ["Read", "Bash"]
+allowed-tools: [&quot;Read&quot;, &quot;Bash&quot;]
 ---
 
 # Process Command
@@ -196,25 +246,25 @@ If present, parse YAML frontmatter and adapt behavior according to:
 
 ```bash
 # Extract everything between --- markers
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
+FRONTMATTER=$(sed -n &#039;/^---$/,/^---$/{ /^---$/d; p; }&#039; &quot;$FILE&quot;)
 ```
 
 ### Read Individual Fields
 
 **String fields:**
 ```bash
-VALUE=$(echo "$FRONTMATTER" | grep '^field_name:' | sed 's/field_name: *//' | sed 's/^"\(.*\)"$/\1/')
+VALUE=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^field_name:&#039; | sed &#039;s/field_name: *//&#039; | sed &#039;s/^&quot;\(.*\)&quot;$/\1/&#039;)
 ```
 
 **Boolean fields:**
 ```bash
-ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//')
-# Compare: if [[ "$ENABLED" == "true" ]]; then
+ENABLED=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^enabled:&#039; | sed &#039;s/enabled: *//&#039;)
+# Compare: if [[ &quot;$ENABLED&quot; == &quot;true&quot; ]]; then
 ```
 
 **Numeric fields:**
 ```bash
-MAX=$(echo "$FRONTMATTER" | grep '^max_value:' | sed 's/max_value: *//')
+MAX=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^max_value:&#039; | sed &#039;s/max_value: *//&#039;)
 # Use: if [[ $MAX -gt 100 ]]; then
 ```
 
@@ -224,7 +274,7 @@ Extract content after second `---`:
 
 ```bash
 # Get everything after closing ---
-BODY=$(awk '/^---$/{i++; next} i&gt;=2' "$FILE")
+BODY=$(awk &#039;/^---$/{i++; next} i&gt;=2&#039; &quot;$FILE&quot;)
 ```
 
 ## Common Patterns
@@ -235,18 +285,18 @@ Use settings file to control hook activation:
 
 ```bash
 #!/bin/bash
-STATE_FILE=".claude/security-scan.local.md"
+STATE_FILE=&quot;.claude/security-scan.local.md&quot;
 
 # Quick exit if not configured
-if [[ ! -f "$STATE_FILE" ]]; then
+if [[ ! -f &quot;$STATE_FILE&quot; ]]; then
   exit 0
 fi
 
 # Read enabled flag
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$STATE_FILE")
-ENABLED=$(echo "$FRONTMATTER" | grep '^enabled:' | sed 's/enabled: *//')
+FRONTMATTER=$(sed -n &#039;/^---$/,/^---$/{ /^---$/d; p; }&#039; &quot;$STATE_FILE&quot;)
+ENABLED=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^enabled:&#039; | sed &#039;s/enabled: *//&#039;)
 
-if [[ "$ENABLED" != "true" ]]; then
+if [[ &quot;$ENABLED&quot; != &quot;true&quot; ]]; then
   exit 0  # Disabled
 fi
 
@@ -268,7 +318,7 @@ task_number: 3.5
 pr_number: 1234
 coordinator_session: team-leader
 enabled: true
-dependencies: ["Task 3.4"]
+dependencies: [&quot;Task 3.4&quot;]
 ---
 
 # Task Assignment
@@ -284,11 +334,11 @@ Implement JWT authentication for the API.
 Read from hooks to coordinate agents:
 
 ```bash
-AGENT_NAME=$(echo "$FRONTMATTER" | grep '^agent_name:' | sed 's/agent_name: *//')
-COORDINATOR=$(echo "$FRONTMATTER" | grep '^coordinator_session:' | sed 's/coordinator_session: *//')
+AGENT_NAME=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^agent_name:&#039; | sed &#039;s/agent_name: *//&#039;)
+COORDINATOR=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^coordinator_session:&#039; | sed &#039;s/coordinator_session: *//&#039;)
 
 # Send notification to coordinator
-tmux send-keys -t "$COORDINATOR" "Agent $AGENT_NAME completed task" Enter
+tmux send-keys -t &quot;$COORDINATOR&quot; &quot;Agent $AGENT_NAME completed task&quot; Enter
 ```
 
 ### Pattern 3: Configuration-Driven Behavior
@@ -298,7 +348,7 @@ tmux send-keys -t "$COORDINATOR" "Agent $AGENT_NAME completed task" Enter
 ---
 validation_level: strict
 max_file_size: 1000000
-allowed_extensions: [".js", ".ts", ".tsx"]
+allowed_extensions: [&quot;.js&quot;, &quot;.ts&quot;, &quot;.tsx&quot;]
 enable_logging: true
 ---
 
@@ -311,9 +361,9 @@ All writes validated against security policies.
 Use in hooks or commands:
 
 ```bash
-LEVEL=$(echo "$FRONTMATTER" | grep '^validation_level:' | sed 's/validation_level: *//')
+LEVEL=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^validation_level:&#039; | sed &#039;s/validation_level: *//&#039;)
 
-case "$LEVEL" in
+case &quot;$LEVEL&quot; in
   strict)
     # Apply strict validation
     ;;
@@ -376,7 +426,7 @@ After creating or editing, restart Claude Code for changes to take effect.
 - Match plugin name exactly
 - Use `.local.md` suffix for user-local files
 
-❌ **DON'T:**
+❌ **DON&#039;T:**
 - Use different directory (not `.claude/`)
 - Use inconsistent naming
 - Use `.md` without `.local` (might be committed)
@@ -394,10 +444,10 @@ Document this in plugin README.
 
 ### Defaults
 
-Provide sensible defaults when settings file doesn't exist:
+Provide sensible defaults when settings file doesn&#039;t exist:
 
 ```bash
-if [[ ! -f "$STATE_FILE" ]]; then
+if [[ ! -f &quot;$STATE_FILE&quot; ]]; then
   # Use defaults
   ENABLED=true
   MODE=standard
@@ -412,11 +462,11 @@ fi
 Validate settings values:
 
 ```bash
-MAX=$(echo "$FRONTMATTER" | grep '^max_value:' | sed 's/max_value: *//')
+MAX=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^max_value:&#039; | sed &#039;s/max_value: *//&#039;)
 
 # Validate numeric range
-if ! [[ "$MAX" =~ ^[0-9]+$ ]] || [[ $MAX -lt 1 ]] || [[ $MAX -gt 100 ]]; then
-  echo "⚠️  Invalid max_value in settings (must be 1-100)" &gt;&2
+if ! [[ &quot;$MAX&quot; =~ ^[0-9]+$ ]] || [[ $MAX -lt 1 ]] || [[ $MAX -gt 100 ]]; then
+  echo &quot;⚠️  Invalid max_value in settings (must be 1-100)&quot; &gt;&amp;2
   MAX=10  # Use default
 fi
 ```
@@ -447,12 +497,12 @@ When writing settings files from user input:
 
 ```bash
 # Escape quotes in user input
-SAFE_VALUE=$(echo "$USER_INPUT" | sed 's/"/\\"/g')
+SAFE_VALUE=$(echo &quot;$USER_INPUT&quot; | sed &#039;s/&quot;/\\&quot;/g&#039;)
 
 # Write to file
-cat &gt; "$STATE_FILE" &lt;&lt;EOF
+cat &gt; &quot;$STATE_FILE&quot; &lt;&lt;EOF
 ---
-user_setting: "$SAFE_VALUE"
+user_setting: &quot;$SAFE_VALUE&quot;
 ---
 EOF
 ```
@@ -462,11 +512,11 @@ EOF
 If settings contain file paths:
 
 ```bash
-FILE_PATH=$(echo "$FRONTMATTER" | grep '^data_file:' | sed 's/data_file: *//')
+FILE_PATH=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^data_file:&#039; | sed &#039;s/data_file: *//&#039;)
 
 # Check for path traversal
-if [[ "$FILE_PATH" == *".."* ]]; then
-  echo "⚠️  Invalid path in settings (path traversal)" &gt;&2
+if [[ &quot;$FILE_PATH&quot; == *&quot;..&quot;* ]]; then
+  echo &quot;⚠️  Invalid path in settings (path traversal)&quot; &gt;&amp;2
   exit 2
 fi
 ```
@@ -490,7 +540,7 @@ task_number: 3.5
 pr_number: 1234
 coordinator_session: team-leader
 enabled: true
-dependencies: ["Task 3.4"]
+dependencies: [&quot;Task 3.4&quot;]
 additional_instructions: Use JWT tokens, not sessions
 ---
 
@@ -513,7 +563,7 @@ Coordinate with auth-agent on shared types.
 ---
 iteration: 1
 max_iterations: 10
-completion_promise: "All tests passing and build successful"
+completion_promise: &quot;All tests passing and build successful&quot;
 ---
 
 Fix all the linting errors in the project.
@@ -541,23 +591,23 @@ project-root/
 
 ```bash
 # Extract frontmatter
-FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$FILE")
+FRONTMATTER=$(sed -n &#039;/^---$/,/^---$/{ /^---$/d; p; }&#039; &quot;$FILE&quot;)
 
 # Read field
-VALUE=$(echo "$FRONTMATTER" | grep '^field:' | sed 's/field: *//' | sed 's/^"\(.*\)"$/\1/')
+VALUE=$(echo &quot;$FRONTMATTER&quot; | grep &#039;^field:&#039; | sed &#039;s/field: *//&#039; | sed &#039;s/^&quot;\(.*\)&quot;$/\1/&#039;)
 ```
 
 ### Body Parsing
 
 ```bash
 # Extract body (after second ---)
-BODY=$(awk '/^---$/{i++; next} i&gt;=2' "$FILE")
+BODY=$(awk &#039;/^---$/{i++; next} i&gt;=2&#039; &quot;$FILE&quot;)
 ```
 
 ### Quick Exit Pattern
 
 ```bash
-if [[ ! -f ".claude/my-plugin.local.md" ]]; then
+if [[ ! -f &quot;.claude/my-plugin.local.md&quot; ]]; then
   exit 0  # Not configured
 fi
 ```
@@ -598,9 +648,40 @@ To add settings to a plugin:
 6. Document settings in plugin README with template
 7. Remind users that changes require Claude Code restart
 
-Focus on keeping settings simple and providing good defaults when settings file doesn't exist.
-</pre></div>
+Focus on keeping settings simple and providing good defaults when settings file doesn&#039;t exist.
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>23</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>0.1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

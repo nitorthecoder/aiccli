@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>pdb-database - AICCLI</title>
-  <meta name="description" content="pdb-database - Claude Code skill for AICCLI">
+  <meta name="description" content=""Access RCSB PDB for 3D protein/nucleic acid structures. Search by text/sequence/structure, download coordinates (PDB/mmCIF), retrieve metadata, for structural ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / pdb-database</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>pdb-database</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / pdb-database
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>pdb-database</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Access RCSB PDB for 3D protein/nucleic acid structures. Search by text/sequence/structure, download coordinates (PDB/mmCIF), retrieve metadata, for structural biology and drug discovery."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pdb-database</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/pdb-database</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/pdb-database</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: pdb-database
-description: "Access RCSB PDB for 3D protein/nucleic acid structures. Search by text/sequence/structure, download coordinates (PDB/mmCIF), retrieve metadata, for structural biology and drug discovery."
+description: &quot;Access RCSB PDB for 3D protein/nucleic acid structures. Search by text/sequence/structure, download coordinates (PDB/mmCIF), retrieve metadata, for structural biology and drug discovery.&quot;
 ---
 
 # PDB Database
@@ -84,9 +134,9 @@ Find PDB entries using various search criteria:
 **Text Search:** Search by protein name, keywords, or descriptions
 ```python
 from rcsbapi.search import TextQuery
-query = TextQuery("hemoglobin")
+query = TextQuery(&quot;hemoglobin&quot;)
 results = list(query())
-print(f"Found {len(results)} structures")
+print(f&quot;Found {len(results)} structures&quot;)
 ```
 
 **Attribute Search:** Query specific properties (organism, resolution, method, etc.)
@@ -97,8 +147,8 @@ from rcsbapi.search.attrs import rcsb_entity_source_organism
 # Find human protein structures
 query = AttributeQuery(
     attribute=rcsb_entity_source_organism.scientific_name,
-    operator="exact_match",
-    value="Homo sapiens"
+    operator=&quot;exact_match&quot;,
+    value=&quot;Homo sapiens&quot;
 )
 results = list(query())
 ```
@@ -108,7 +158,7 @@ results = list(query())
 from rcsbapi.search import SequenceQuery
 
 query = SequenceQuery(
-    value="MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHHYREQIKRVKDSEDVPMVLVGNKCDLPSRTVDTKQAQDLARSYGIPFIETSAKTRQGVDDAFYTLVREIRKHKEKMSKDGKKKKKKSKTKCVIM",
+    value=&quot;MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHHYREQIKRVKDSEDVPMVLVGNKCDLPSRTVDTKQAQDLARSYGIPFIETSAKTRQGVDDAFYTLVREIRKHKEKMSKDGKKKKKKSKTKCVIM&quot;,
     evalue_cutoff=0.1,
     identity_cutoff=0.9
 )
@@ -120,8 +170,8 @@ results = list(query())
 from rcsbapi.search import StructSimilarityQuery
 
 query = StructSimilarityQuery(
-    structure_search_type="entry",
-    entry_id="4HHB"  # Hemoglobin
+    structure_search_type=&quot;entry&quot;,
+    entry_id=&quot;4HHB&quot;  # Hemoglobin
 )
 results = list(query())
 ```
@@ -134,15 +184,15 @@ from rcsbapi.search.attrs import rcsb_entry_info
 # High-resolution human proteins
 query1 = AttributeQuery(
     attribute=rcsb_entity_source_organism.scientific_name,
-    operator="exact_match",
-    value="Homo sapiens"
+    operator=&quot;exact_match&quot;,
+    value=&quot;Homo sapiens&quot;
 )
 query2 = AttributeQuery(
     attribute=rcsb_entry_info.resolution_combined,
-    operator="less",
+    operator=&quot;less&quot;,
     value=2.0
 )
-combined_query = query1 & query2  # AND operation
+combined_query = query1 &amp; query2  # AND operation
 results = list(combined_query())
 ```
 
@@ -155,16 +205,16 @@ Access detailed information about specific PDB entries:
 from rcsbapi.data import Schema, fetch
 
 # Get entry-level data
-entry_data = fetch("4HHB", schema=Schema.ENTRY)
-print(entry_data["struct"]["title"])
-print(entry_data["exptl"][0]["method"])
+entry_data = fetch(&quot;4HHB&quot;, schema=Schema.ENTRY)
+print(entry_data[&quot;struct&quot;][&quot;title&quot;])
+print(entry_data[&quot;exptl&quot;][0][&quot;method&quot;])
 ```
 
 **Polymer Entity Information:**
 ```python
 # Get protein/nucleic acid information
-entity_data = fetch("4HHB_1", schema=Schema.POLYMER_ENTITY)
-print(entity_data["entity_poly"]["pdbx_seq_one_letter_code"])
+entity_data = fetch(&quot;4HHB_1&quot;, schema=Schema.POLYMER_ENTITY)
+print(entity_data[&quot;entity_poly&quot;][&quot;pdbx_seq_one_letter_code&quot;])
 ```
 
 **Using GraphQL for Flexible Queries:**
@@ -172,9 +222,9 @@ print(entity_data["entity_poly"]["pdbx_seq_one_letter_code"])
 from rcsbapi.data import fetch
 
 # Custom GraphQL query
-query = """
+query = &quot;&quot;&quot;
 {
-  entry(entry_id: "4HHB") {
+  entry(entry_id: &quot;4HHB&quot;) {
     struct {
       title
     }
@@ -187,8 +237,8 @@ query = """
     }
   }
 }
-"""
-data = fetch(query_type="graphql", query=query)
+&quot;&quot;&quot;
+data = fetch(query_type=&quot;graphql&quot;, query=query)
 ```
 
 ### 3. Downloading Structure Files
@@ -205,18 +255,18 @@ Retrieve coordinate files in various formats:
 ```python
 import requests
 
-pdb_id = "4HHB"
+pdb_id = &quot;4HHB&quot;
 
 # Download PDB format
-pdb_url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
+pdb_url = f&quot;https://files.rcsb.org/download/{pdb_id}.pdb&quot;
 response = requests.get(pdb_url)
-with open(f"{pdb_id}.pdb", "w") as f:
+with open(f&quot;{pdb_id}.pdb&quot;, &quot;w&quot;) as f:
     f.write(response.text)
 
 # Download mmCIF format
-cif_url = f"https://files.rcsb.org/download/{pdb_id}.cif"
+cif_url = f&quot;https://files.rcsb.org/download/{pdb_id}.cif&quot;
 response = requests.get(cif_url)
-with open(f"{pdb_id}.cif", "w") as f:
+with open(f&quot;{pdb_id}.cif&quot;, &quot;w&quot;) as f:
     f.write(response.text)
 ```
 
@@ -230,7 +280,7 @@ Use BioPython or other structural biology libraries to work with downloaded file
 from Bio.PDB import PDBParser
 
 parser = PDBParser()
-structure = parser.get_structure("protein", "4HHB.pdb")
+structure = parser.get_structure(&quot;protein&quot;, &quot;4HHB.pdb&quot;)
 
 # Iterate through atoms
 for model in structure:
@@ -245,15 +295,15 @@ for model in structure:
 from rcsbapi.data import fetch, Schema
 
 # Get experimental details
-data = fetch("4HHB", schema=Schema.ENTRY)
+data = fetch(&quot;4HHB&quot;, schema=Schema.ENTRY)
 
-resolution = data.get("rcsb_entry_info", {}).get("resolution_combined")
-method = data.get("exptl", [{}])[0].get("method")
-deposition_date = data.get("rcsb_accession_info", {}).get("deposit_date")
+resolution = data.get(&quot;rcsb_entry_info&quot;, {}).get(&quot;resolution_combined&quot;)
+method = data.get(&quot;exptl&quot;, [{}])[0].get(&quot;method&quot;)
+deposition_date = data.get(&quot;rcsb_accession_info&quot;, {}).get(&quot;deposit_date&quot;)
 
-print(f"Resolution: {resolution} Å")
-print(f"Method: {method}")
-print(f"Deposited: {deposition_date}")
+print(f&quot;Resolution: {resolution} Å&quot;)
+print(f&quot;Method: {method}&quot;)
+print(f&quot;Deposited: {deposition_date}&quot;)
 ```
 
 ### 5. Batch Operations
@@ -263,25 +313,25 @@ Process multiple structures efficiently:
 ```python
 from rcsbapi.data import fetch, Schema
 
-pdb_ids = ["4HHB", "1MBN", "1GZX"]  # Hemoglobin, myoglobin, etc.
+pdb_ids = [&quot;4HHB&quot;, &quot;1MBN&quot;, &quot;1GZX&quot;]  # Hemoglobin, myoglobin, etc.
 
 results = {}
 for pdb_id in pdb_ids:
     try:
         data = fetch(pdb_id, schema=Schema.ENTRY)
         results[pdb_id] = {
-            "title": data["struct"]["title"],
-            "resolution": data.get("rcsb_entry_info", {}).get("resolution_combined"),
-            "organism": data.get("rcsb_entity_source_organism", [{}])[0].get("scientific_name")
+            &quot;title&quot;: data[&quot;struct&quot;][&quot;title&quot;],
+            &quot;resolution&quot;: data.get(&quot;rcsb_entry_info&quot;, {}).get(&quot;resolution_combined&quot;),
+            &quot;organism&quot;: data.get(&quot;rcsb_entity_source_organism&quot;, [{}])[0].get(&quot;scientific_name&quot;)
         }
     except Exception as e:
-        print(f"Error fetching {pdb_id}: {e}")
+        print(f&quot;Error fetching {pdb_id}: {e}&quot;)
 
 # Display results
 for pdb_id, info in results.items():
-    print(f"\n{pdb_id}: {info['title']}")
-    print(f"  Resolution: {info['resolution']} Å")
-    print(f"  Organism: {info['organism']}")
+    print(f&quot;\n{pdb_id}: {info[&#039;title&#039;]}&quot;)
+    print(f&quot;  Resolution: {info[&#039;resolution&#039;]} Å&quot;)
+    print(f&quot;  Organism: {info[&#039;organism&#039;]}&quot;)
 ```
 
 ## Python Package Installation
@@ -326,7 +376,7 @@ The `rcsb-api` package provides unified access to both Search and Data APIs thro
 
 ## Key Concepts
 
-**PDB ID:** Unique 4-character identifier (e.g., "4HHB") for each structure entry. AlphaFold and ModelArchive entries start with "AF_" or "MA_" prefixes.
+**PDB ID:** Unique 4-character identifier (e.g., &quot;4HHB&quot;) for each structure entry. AlphaFold and ModelArchive entries start with &quot;AF_&quot; or &quot;MA_&quot; prefixes.
 
 **mmCIF/PDBx:** Modern file format that uses key-value structure, replacing legacy PDB format for large structures.
 
@@ -358,8 +408,39 @@ Use this reference when you need in-depth information about API capabilities, co
 - **Python Package Docs:** https://rcsbapi.readthedocs.io/
 - **Data API Documentation:** https://data.rcsb.org/
 - **GitHub Repository:** https://github.com/rcsb/py-rcsb-api
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>8</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

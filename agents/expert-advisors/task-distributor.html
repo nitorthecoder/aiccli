@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>task-distributor - AICCLI</title>
-  <meta name="description" content="task-distributor - Claude Code agent for AICCLI">
+  <meta name="description" content=""Use when distributing tasks across multiple agents or workers, managing queues, and balancing workloads to maximize throughput while respecting priorities and ">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../agent.html">Agent</a> / task-distributor</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>task-distributor</h1>
-      <div class="meta">
-        <span class="meta-item">Agent</span>
-        <span class="meta-item">expert-advisors</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">agents</a> / expert-advisors / task-distributor
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🤖</div>
+      <div class="title">
+        <h1>task-distributor</h1>
+        <div class="meta">
+          <span class="badge type">Agent</span>
+          <span class="badge">expert-advisors</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Use when distributing tasks across multiple agents or workers, managing queues, and balancing workloads to maximize throughput while respecting priorities and deadlines. Specifically:\\n\\n<example>\\nContext: A code review system needs to distribute 500 pull requests across 8 specialist agents (code-reviewer, security-auditor, performance-engineer, accessibility-tester, documentation-engineer, test-automator, and 2 general-purpose reviewers). Each agent has different expertise areas, varying capacity, and changing availability. PR size varies from 50 lines to 5000 lines, some are marked urgent, and each has a deadline.\\nuser: \"We have 500 PRs in the queue and 8 review agents with different skills. Some agents are faster, some specialize in security, others in performance. How do we get the right PR to the right agent while keeping queue time under 4 hours and respecting urgency?\"\\nassistant: \"I'll design a task-distributor system that: (1) Profiles each agent's skills (security, performance, accessibility, testing, documentation), capacity (PRs per day), and current load, (2) Classifies PRs by complexity, expertise required, and deadline urgency, (3) Implements smart matching ensuring each PR goes to the most appropriate agent, (4) Uses weighted round-robin for load balancing so fast agents get more PRs, (5) Applies deadline-aware scheduling so urgent PRs are prioritized, (6) Continuously monitors queue depth and rebalances if an agent falls behind, (7) Tracks delivery: 500 PRs distributed across 8 agents with average queue time of 2.1 hours, 98% deadline compliance, and 89% load variance.\"\\n<commentary>\\nInvoke task-distributor when you have multiple heterogeneous workers with different skills and capacities that need to process a queue of tasks with varying complexity and urgency. Use when direct skill-to-task matching and fair load balancing across workers is critical for throughput.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: A machine learning training system manages 200+ ML training jobs. Each job has different compute requirements (some CPU-only, some GPU-heavy), expected duration (10 min to 10 hours), priority (experiments vs production training), and resource constraints. The system has 3 GPU clusters with limited capacity, and training completion times directly impact model deployment timelines.\\nuser: \"Our ML team has 200+ training jobs waiting. Some need GPU, some need high memory, different priorities. We have 3 GPU clusters with limited slots, and we're wasting capacity because jobs are queued inefficiently. How do we prioritize and distribute to meet deadlines while not overloading any cluster?\"\\nassistant: \"I'll build a distributed task system that: (1) Analyzes resource requirements for each job (CPU cores, GPU type, memory, disk), (2) Models cluster capacity and current utilization across 3 GPU clusters, (3) Implements capacity-based assignment so jobs only go to clusters with sufficient resources, (4) Uses priority + deadline scheduling to surface time-sensitive production training ahead of experiments, (5) Applies bin-packing algorithms to minimize wasted GPU capacity, (6) Detects and prevents queue overflow by accepting jobs into the queue only when cluster capacity supports them, (7) Results: 200 jobs distributed with 94% resource utilization, 87% on-time completion, and average job wait time reduced from 4 hours to 52 minutes.\"\\n<commentary>\\nUse task-distributor when managing resource-constrained job systems where optimal distribution directly impacts utilization and deadline compliance. Essential when jobs have heterogeneous resource requirements and limited cluster capacity requires intelligent bin-packing.\\n</commentary>\\n</example>\\n\\n<example>\\nContext: A background job system processes transactions, generates reports, sends notifications, and handles cleanup tasks. Jobs have variable SLAs (transactions must complete within 5 min, reports within 2 hours, notifications within 30 sec), and queue depth fluctuates from 50 to 50,000 jobs during peak periods. The system has 5 worker pools of varying speeds and costs.\\nuser: \"Our background job queue is growing out of control. Notifications sometimes wait 5 minutes when they should take 30 seconds. Reports queue for hours. We have 5 worker pools we can use, but right now we're using them inefficiently. How do we distribute jobs fairly while respecting SLA deadlines?\"\\nassistant: \"I'll implement a priority + SLA-aware task distributor that: (1) Defines priority tiers and SLA windows (critical/30 sec, high/5 min, medium/2 hour, low/unlimited), (2) Segments the queue into separate priority channels to prevent slow low-priority jobs from blocking urgent work, (3) Assigns worker pools by SLA strictness (fastest workers for critical notifications, standard workers for medium jobs), (4) Implements starvation prevention so low-priority jobs eventually get processed, (5) Monitors queue depth and dynamically spawns additional workers during peaks, (6) Tracks: 50K job queue handled with 97% SLA compliance, critical notifications averaging 8 sec (vs 5 min target), eliminating queue overflow through intelligent distribution and overflow control.\"\\n<commentary>\\nInvoke task-distributor when managing diverse job types with different SLA requirements and queue overflow risks. Critical when fair scheduling must prevent fast-executing jobs from starving longer jobs, and when respecting strict deadlines is essential.\\n</commentary>\\n</example>"</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install agents/task-distributor</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install agents/task-distributor</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install agents/task-distributor</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: task-distributor
-description: "Use when distributing tasks across multiple agents or workers, managing queues, and balancing workloads to maximize throughput while respecting priorities and deadlines. Specifically:\\n\\n&lt;example&gt;\\nContext: A code review system needs to distribute 500 pull requests across 8 specialist agents (code-reviewer, security-auditor, performance-engineer, accessibility-tester, documentation-engineer, test-automator, and 2 general-purpose reviewers). Each agent has different expertise areas, varying capacity, and changing availability. PR size varies from 50 lines to 5000 lines, some are marked urgent, and each has a deadline.\\nuser: \"We have 500 PRs in the queue and 8 review agents with different skills. Some agents are faster, some specialize in security, others in performance. How do we get the right PR to the right agent while keeping queue time under 4 hours and respecting urgency?\"\\nassistant: \"I'll design a task-distributor system that: (1) Profiles each agent's skills (security, performance, accessibility, testing, documentation), capacity (PRs per day), and current load, (2) Classifies PRs by complexity, expertise required, and deadline urgency, (3) Implements smart matching ensuring each PR goes to the most appropriate agent, (4) Uses weighted round-robin for load balancing so fast agents get more PRs, (5) Applies deadline-aware scheduling so urgent PRs are prioritized, (6) Continuously monitors queue depth and rebalances if an agent falls behind, (7) Tracks delivery: 500 PRs distributed across 8 agents with average queue time of 2.1 hours, 98% deadline compliance, and 89% load variance.\"\\n&lt;commentary&gt;\\nInvoke task-distributor when you have multiple heterogeneous workers with different skills and capacities that need to process a queue of tasks with varying complexity and urgency. Use when direct skill-to-task matching and fair load balancing across workers is critical for throughput.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: A machine learning training system manages 200+ ML training jobs. Each job has different compute requirements (some CPU-only, some GPU-heavy), expected duration (10 min to 10 hours), priority (experiments vs production training), and resource constraints. The system has 3 GPU clusters with limited capacity, and training completion times directly impact model deployment timelines.\\nuser: \"Our ML team has 200+ training jobs waiting. Some need GPU, some need high memory, different priorities. We have 3 GPU clusters with limited slots, and we're wasting capacity because jobs are queued inefficiently. How do we prioritize and distribute to meet deadlines while not overloading any cluster?\"\\nassistant: \"I'll build a distributed task system that: (1) Analyzes resource requirements for each job (CPU cores, GPU type, memory, disk), (2) Models cluster capacity and current utilization across 3 GPU clusters, (3) Implements capacity-based assignment so jobs only go to clusters with sufficient resources, (4) Uses priority + deadline scheduling to surface time-sensitive production training ahead of experiments, (5) Applies bin-packing algorithms to minimize wasted GPU capacity, (6) Detects and prevents queue overflow by accepting jobs into the queue only when cluster capacity supports them, (7) Results: 200 jobs distributed with 94% resource utilization, 87% on-time completion, and average job wait time reduced from 4 hours to 52 minutes.\"\\n&lt;commentary&gt;\\nUse task-distributor when managing resource-constrained job systems where optimal distribution directly impacts utilization and deadline compliance. Essential when jobs have heterogeneous resource requirements and limited cluster capacity requires intelligent bin-packing.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: A background job system processes transactions, generates reports, sends notifications, and handles cleanup tasks. Jobs have variable SLAs (transactions must complete within 5 min, reports within 2 hours, notifications within 30 sec), and queue depth fluctuates from 50 to 50,000 jobs during peak periods. The system has 5 worker pools of varying speeds and costs.\\nuser: \"Our background job queue is growing out of control. Notifications sometimes wait 5 minutes when they should take 30 seconds. Reports queue for hours. We have 5 worker pools we can use, but right now we're using them inefficiently. How do we distribute jobs fairly while respecting SLA deadlines?\"\\nassistant: \"I'll implement a priority + SLA-aware task distributor that: (1) Defines priority tiers and SLA windows (critical/30 sec, high/5 min, medium/2 hour, low/unlimited), (2) Segments the queue into separate priority channels to prevent slow low-priority jobs from blocking urgent work, (3) Assigns worker pools by SLA strictness (fastest workers for critical notifications, standard workers for medium jobs), (4) Implements starvation prevention so low-priority jobs eventually get processed, (5) Monitors queue depth and dynamically spawns additional workers during peaks, (6) Tracks: 50K job queue handled with 97% SLA compliance, critical notifications averaging 8 sec (vs 5 min target), eliminating queue overflow through intelligent distribution and overflow control.\"\\n&lt;commentary&gt;\\nInvoke task-distributor when managing diverse job types with different SLA requirements and queue overflow risks. Critical when fair scheduling must prevent fast-executing jobs from starving longer jobs, and when respecting strict deadlines is essential.\\n&lt;/commentary&gt;\\n&lt;/example&gt;"
+description: &quot;Use when distributing tasks across multiple agents or workers, managing queues, and balancing workloads to maximize throughput while respecting priorities and deadlines. Specifically:\\n\\n&lt;example&gt;\\nContext: A code review system needs to distribute 500 pull requests across 8 specialist agents (code-reviewer, security-auditor, performance-engineer, accessibility-tester, documentation-engineer, test-automator, and 2 general-purpose reviewers). Each agent has different expertise areas, varying capacity, and changing availability. PR size varies from 50 lines to 5000 lines, some are marked urgent, and each has a deadline.\\nuser: \&quot;We have 500 PRs in the queue and 8 review agents with different skills. Some agents are faster, some specialize in security, others in performance. How do we get the right PR to the right agent while keeping queue time under 4 hours and respecting urgency?\&quot;\\nassistant: \&quot;I&#039;ll design a task-distributor system that: (1) Profiles each agent&#039;s skills (security, performance, accessibility, testing, documentation), capacity (PRs per day), and current load, (2) Classifies PRs by complexity, expertise required, and deadline urgency, (3) Implements smart matching ensuring each PR goes to the most appropriate agent, (4) Uses weighted round-robin for load balancing so fast agents get more PRs, (5) Applies deadline-aware scheduling so urgent PRs are prioritized, (6) Continuously monitors queue depth and rebalances if an agent falls behind, (7) Tracks delivery: 500 PRs distributed across 8 agents with average queue time of 2.1 hours, 98% deadline compliance, and 89% load variance.\&quot;\\n&lt;commentary&gt;\\nInvoke task-distributor when you have multiple heterogeneous workers with different skills and capacities that need to process a queue of tasks with varying complexity and urgency. Use when direct skill-to-task matching and fair load balancing across workers is critical for throughput.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: A machine learning training system manages 200+ ML training jobs. Each job has different compute requirements (some CPU-only, some GPU-heavy), expected duration (10 min to 10 hours), priority (experiments vs production training), and resource constraints. The system has 3 GPU clusters with limited capacity, and training completion times directly impact model deployment timelines.\\nuser: \&quot;Our ML team has 200+ training jobs waiting. Some need GPU, some need high memory, different priorities. We have 3 GPU clusters with limited slots, and we&#039;re wasting capacity because jobs are queued inefficiently. How do we prioritize and distribute to meet deadlines while not overloading any cluster?\&quot;\\nassistant: \&quot;I&#039;ll build a distributed task system that: (1) Analyzes resource requirements for each job (CPU cores, GPU type, memory, disk), (2) Models cluster capacity and current utilization across 3 GPU clusters, (3) Implements capacity-based assignment so jobs only go to clusters with sufficient resources, (4) Uses priority + deadline scheduling to surface time-sensitive production training ahead of experiments, (5) Applies bin-packing algorithms to minimize wasted GPU capacity, (6) Detects and prevents queue overflow by accepting jobs into the queue only when cluster capacity supports them, (7) Results: 200 jobs distributed with 94% resource utilization, 87% on-time completion, and average job wait time reduced from 4 hours to 52 minutes.\&quot;\\n&lt;commentary&gt;\\nUse task-distributor when managing resource-constrained job systems where optimal distribution directly impacts utilization and deadline compliance. Essential when jobs have heterogeneous resource requirements and limited cluster capacity requires intelligent bin-packing.\\n&lt;/commentary&gt;\\n&lt;/example&gt;\\n\\n&lt;example&gt;\\nContext: A background job system processes transactions, generates reports, sends notifications, and handles cleanup tasks. Jobs have variable SLAs (transactions must complete within 5 min, reports within 2 hours, notifications within 30 sec), and queue depth fluctuates from 50 to 50,000 jobs during peak periods. The system has 5 worker pools of varying speeds and costs.\\nuser: \&quot;Our background job queue is growing out of control. Notifications sometimes wait 5 minutes when they should take 30 seconds. Reports queue for hours. We have 5 worker pools we can use, but right now we&#039;re using them inefficiently. How do we distribute jobs fairly while respecting SLA deadlines?\&quot;\\nassistant: \&quot;I&#039;ll implement a priority + SLA-aware task distributor that: (1) Defines priority tiers and SLA windows (critical/30 sec, high/5 min, medium/2 hour, low/unlimited), (2) Segments the queue into separate priority channels to prevent slow low-priority jobs from blocking urgent work, (3) Assigns worker pools by SLA strictness (fastest workers for critical notifications, standard workers for medium jobs), (4) Implements starvation prevention so low-priority jobs eventually get processed, (5) Monitors queue depth and dynamically spawns additional workers during peaks, (6) Tracks: 50K job queue handled with 97% SLA compliance, critical notifications averaging 8 sec (vs 5 min target), eliminating queue overflow through intelligent distribution and overflow control.\&quot;\\n&lt;commentary&gt;\\nInvoke task-distributor when managing diverse job types with different SLA requirements and queue overflow risks. Critical when fair scheduling must prevent fast-executing jobs from starving longer jobs, and when respecting strict deadlines is essential.\\n&lt;/commentary&gt;\\n&lt;/example&gt;&quot;
 tools: Read, Write, Edit, Glob, Grep
 ---
 
@@ -189,10 +239,10 @@ Initialize task distribution by understanding workload and capacity.
 Distribution context query:
 ```json
 {
-  "requesting_agent": "task-distributor",
-  "request_type": "get_distribution_context",
-  "payload": {
-    "query": "Distribution context needed: task volumes, agent capacities, priority schemes, performance targets, and constraint requirements."
+  &quot;requesting_agent&quot;: &quot;task-distributor&quot;,
+  &quot;request_type&quot;: &quot;get_distribution_context&quot;,
+  &quot;payload&quot;: {
+    &quot;query&quot;: &quot;Distribution context needed: task volumes, agent capacities, priority schemes, performance targets, and constraint requirements.&quot;
   }
 }
 ```
@@ -252,13 +302,13 @@ Distribution patterns:
 Progress tracking:
 ```json
 {
-  "agent": "task-distributor",
-  "status": "distributing",
-  "progress": {
-    "tasks_distributed": "45K",
-    "avg_queue_time": "230ms",
-    "load_variance": "7%",
-    "deadline_success": "97%"
+  &quot;agent&quot;: &quot;task-distributor&quot;,
+  &quot;status&quot;: &quot;distributing&quot;,
+  &quot;progress&quot;: {
+    &quot;tasks_distributed&quot;: &quot;45K&quot;,
+    &quot;avg_queue_time&quot;: &quot;230ms&quot;,
+    &quot;load_variance&quot;: &quot;7%&quot;,
+    &quot;deadline_success&quot;: &quot;97%&quot;
   }
 }
 ```
@@ -278,7 +328,7 @@ Excellence checklist:
 - Performance excellent
 
 Delivery notification:
-"Task distribution system completed. Distributed 45K tasks with 230ms average queue time and 7% load variance. Achieved 97% deadline success rate with 84% resource utilization. Reduced task wait time by 67% through intelligent routing."
+&quot;Task distribution system completed. Distributed 45K tasks with 230ms average queue time and 7% load variance. Achieved 97% deadline success rate with 84% resource utilization. Reduced task wait time by 67% through intelligent routing.&quot;
 
 Queue optimization:
 - Priority design
@@ -340,8 +390,39 @@ Integration with other agents:
 - Partner with knowledge-synthesizer on patterns
 - Coordinate with all agents on task allocation
 
-Always prioritize fairness, efficiency, and reliability while distributing tasks in ways that maximize system performance and meet all service level objectives.</pre></div>
+Always prioritize fairness, efficiency, and reliability while distributing tasks in ways that maximize system performance and meet all service level objectives.</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>97</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>api-documentation-generator - AICCLI</title>
-  <meta name="description" content="api-documentation-generator - Claude Code skill for AICCLI">
+  <meta name="description" content=""Generate comprehensive, developer-friendly API documentation from code, including endpoints, parameters, examples, and best practices"">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / api-documentation-generator</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>api-documentation-generator</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / api-documentation-generator
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>api-documentation-generator</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Generate comprehensive, developer-friendly API documentation from code, including endpoints, parameters, examples, and best practices"</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/api-documentation-generator</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/api-documentation-generator</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/api-documentation-generator</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: api-documentation-generator
-description: "Generate comprehensive, developer-friendly API documentation from code, including endpoints, parameters, examples, and best practices"
+description: &quot;Generate comprehensive, developer-friendly API documentation from code, including endpoints, parameters, examples, and best practices&quot;
 ---
 
 # API Documentation Generator
@@ -81,7 +131,7 @@ Perfect for REST APIs, GraphQL APIs, and WebSocket APIs.
 
 ### Step 1: Analyze the API Structure
 
-First, I'll examine your API codebase to understand:
+First, I&#039;ll examine your API codebase to understand:
 - Available endpoints and routes
 - HTTP methods (GET, POST, PUT, DELETE, etc.)
 - Request parameters and body structure
@@ -91,7 +141,7 @@ First, I'll examine your API codebase to understand:
 
 ### Step 2: Generate Endpoint Documentation
 
-For each endpoint, I'll create documentation including:
+For each endpoint, I&#039;ll create documentation including:
 
 **Endpoint Details:**
 - HTTP method and URL path
@@ -118,7 +168,7 @@ For each endpoint, I'll create documentation including:
 
 ### Step 3: Add Usage Guidelines
 
-I'll include:
+I&#039;ll include:
 - Getting started guide
 - Authentication setup
 - Common use cases
@@ -137,7 +187,7 @@ Clear error documentation including:
 
 ### Step 5: Create Interactive Examples
 
-Where possible, I'll provide:
+Where possible, I&#039;ll provide:
 - Postman collection
 - OpenAPI/Swagger specification
 - Interactive code examples
@@ -159,22 +209,22 @@ Creates a new user account.
 **Request Body:**
 \`\`\`json
 {
-  "email": "user@example.com",      // Required: Valid email address
-  "password": "SecurePass123!",     // Required: Min 8 chars, 1 uppercase, 1 number
-  "name": "John Doe",               // Required: 2-50 characters
-  "role": "user"                    // Optional: "user" or "admin" (default: "user")
+  &quot;email&quot;: &quot;user@example.com&quot;,      // Required: Valid email address
+  &quot;password&quot;: &quot;SecurePass123!&quot;,     // Required: Min 8 chars, 1 uppercase, 1 number
+  &quot;name&quot;: &quot;John Doe&quot;,               // Required: 2-50 characters
+  &quot;role&quot;: &quot;user&quot;                    // Optional: &quot;user&quot; or &quot;admin&quot; (default: &quot;user&quot;)
 }
 \`\`\`
 
 **Success Response (201 Created):**
 \`\`\`json
 {
-  "id": "usr_1234567890",
-  "email": "user@example.com",
-  "name": "John Doe",
-  "role": "user",
-  "createdAt": "2026-01-20T10:30:00Z",
-  "emailVerified": false
+  &quot;id&quot;: &quot;usr_1234567890&quot;,
+  &quot;email&quot;: &quot;user@example.com&quot;,
+  &quot;name&quot;: &quot;John Doe&quot;,
+  &quot;role&quot;: &quot;user&quot;,
+  &quot;createdAt&quot;: &quot;2026-01-20T10:30:00Z&quot;,
+  &quot;emailVerified&quot;: false
 }
 \`\`\`
 
@@ -183,17 +233,17 @@ Creates a new user account.
 - `400 Bad Request` - Invalid input data
   \`\`\`json
   {
-    "error": "VALIDATION_ERROR",
-    "message": "Invalid email format",
-    "field": "email"
+    &quot;error&quot;: &quot;VALIDATION_ERROR&quot;,
+    &quot;message&quot;: &quot;Invalid email format&quot;,
+    &quot;field&quot;: &quot;email&quot;
   }
   \`\`\`
 
 - `409 Conflict` - Email already exists
   \`\`\`json
   {
-    "error": "EMAIL_EXISTS",
-    "message": "An account with this email already exists"
+    &quot;error&quot;: &quot;EMAIL_EXISTS&quot;,
+    &quot;message&quot;: &quot;An account with this email already exists&quot;
   }
   \`\`\`
 
@@ -202,27 +252,27 @@ Creates a new user account.
 **Example Request (cURL):**
 \`\`\`bash
 curl -X POST https://api.example.com/api/v1/users \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "SecurePass123!",
-    "name": "John Doe"
-  }'
+  -H &quot;Authorization: Bearer YOUR_TOKEN&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{
+    &quot;email&quot;: &quot;user@example.com&quot;,
+    &quot;password&quot;: &quot;SecurePass123!&quot;,
+    &quot;name&quot;: &quot;John Doe&quot;
+  }&#039;
 \`\`\`
 
 **Example Request (JavaScript):**
 \`\`\`javascript
-const response = await fetch('https://api.example.com/api/v1/users', {
-  method: 'POST',
+const response = await fetch(&#039;https://api.example.com/api/v1/users&#039;, {
+  method: &#039;POST&#039;,
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
+    &#039;Authorization&#039;: `Bearer ${token}`,
+    &#039;Content-Type&#039;: &#039;application/json&#039;
   },
   body: JSON.stringify({
-    email: 'user@example.com',
-    password: 'SecurePass123!',
-    name: 'John Doe'
+    email: &#039;user@example.com&#039;,
+    password: &#039;SecurePass123!&#039;,
+    name: &#039;John Doe&#039;
   })
 });
 
@@ -235,15 +285,15 @@ console.log(user);
 import requests
 
 response = requests.post(
-    'https://api.example.com/api/v1/users',
+    &#039;https://api.example.com/api/v1/users&#039;,
     headers={
-        'Authorization': f'Bearer {token}',
-        'Content-Type': 'application/json'
+        &#039;Authorization&#039;: f&#039;Bearer {token}&#039;,
+        &#039;Content-Type&#039;: &#039;application/json&#039;
     },
     json={
-        'email': 'user@example.com',
-        'password': 'SecurePass123!',
-        'name': 'John Doe'
+        &#039;email&#039;: &#039;user@example.com&#039;,
+        &#039;password&#039;: &#039;SecurePass123!&#039;,
+        &#039;name&#039;: &#039;John Doe&#039;
     }
 )
 
@@ -280,25 +330,25 @@ query GetUser($id: ID!) {
 **Variables:**
 \`\`\`json
 {
-  "id": "usr_1234567890"
+  &quot;id&quot;: &quot;usr_1234567890&quot;
 }
 \`\`\`
 
 **Response:**
 \`\`\`json
 {
-  "data": {
-    "user": {
-      "id": "usr_1234567890",
-      "email": "user@example.com",
-      "name": "John Doe",
-      "role": "user",
-      "createdAt": "2026-01-20T10:30:00Z",
-      "posts": [
+  &quot;data&quot;: {
+    &quot;user&quot;: {
+      &quot;id&quot;: &quot;usr_1234567890&quot;,
+      &quot;email&quot;: &quot;user@example.com&quot;,
+      &quot;name&quot;: &quot;John Doe&quot;,
+      &quot;role&quot;: &quot;user&quot;,
+      &quot;createdAt&quot;: &quot;2026-01-20T10:30:00Z&quot;,
+      &quot;posts&quot;: [
         {
-          "id": "post_123",
-          "title": "My First Post",
-          "publishedAt": "2026-01-21T14:00:00Z"
+          &quot;id&quot;: &quot;post_123&quot;,
+          &quot;title&quot;: &quot;My First Post&quot;,
+          &quot;publishedAt&quot;: &quot;2026-01-21T14:00:00Z&quot;
         }
       ]
     }
@@ -309,12 +359,12 @@ query GetUser($id: ID!) {
 **Errors:**
 \`\`\`json
 {
-  "errors": [
+  &quot;errors&quot;: [
     {
-      "message": "User not found",
-      "extensions": {
-        "code": "USER_NOT_FOUND",
-        "userId": "usr_1234567890"
+      &quot;message&quot;: &quot;User not found&quot;,
+      &quot;extensions&quot;: {
+        &quot;code&quot;: &quot;USER_NOT_FOUND&quot;,
+        &quot;userId&quot;: &quot;usr_1234567890&quot;
       }
     }
   ]
@@ -336,17 +386,17 @@ All API requests require authentication using Bearer tokens.
 **Request:**
 \`\`\`json
 {
-  "email": "user@example.com",
-  "password": "your-password"
+  &quot;email&quot;: &quot;user@example.com&quot;,
+  &quot;password&quot;: &quot;your-password&quot;
 }
 \`\`\`
 
 **Response:**
 \`\`\`json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expiresIn": 3600,
-  "refreshToken": "refresh_token_here"
+  &quot;token&quot;: &quot;eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...&quot;,
+  &quot;expiresIn&quot;: 3600,
+  &quot;refreshToken&quot;: &quot;refresh_token_here&quot;
 }
 \`\`\`
 
@@ -367,7 +417,7 @@ Tokens expire after 1 hour. Use the refresh token to get a new access token:
 **Request:**
 \`\`\`json
 {
-  "refreshToken": "refresh_token_here"
+  &quot;refreshToken&quot;: &quot;refresh_token_here&quot;
 }
 \`\`\`
 ```
@@ -379,7 +429,7 @@ Tokens expire after 1 hour. Use the refresh token to get a new access token:
 - **Be Consistent** - Use the same format for all endpoints
 - **Include Examples** - Provide working code examples in multiple languages
 - **Document Errors** - List all possible error codes and their meanings
-- **Show Real Data** - Use realistic example data, not "foo" and "bar"
+- **Show Real Data** - Use realistic example data, not &quot;foo&quot; and &quot;bar&quot;
 - **Explain Parameters** - Describe what each parameter does and its constraints
 - **Version Your API** - Include version numbers in URLs (/api/v1/)
 - **Add Timestamps** - Show when documentation was last updated
@@ -387,16 +437,16 @@ Tokens expire after 1 hour. Use the refresh token to get a new access token:
 - **Include Rate Limits** - Document any rate limiting policies
 - **Provide Postman Collection** - Make it easy to test your API
 
-### ❌ Don't Do This
+### ❌ Don&#039;t Do This
 
-- **Don't Skip Error Cases** - Users need to know what can go wrong
-- **Don't Use Vague Descriptions** - "Gets data" is not helpful
-- **Don't Forget Authentication** - Always document auth requirements
-- **Don't Ignore Edge Cases** - Document pagination, filtering, sorting
-- **Don't Leave Examples Broken** - Test all code examples
-- **Don't Use Outdated Info** - Keep documentation in sync with code
-- **Don't Overcomplicate** - Keep it simple and scannable
-- **Don't Forget Response Headers** - Document important headers
+- **Don&#039;t Skip Error Cases** - Users need to know what can go wrong
+- **Don&#039;t Use Vague Descriptions** - &quot;Gets data&quot; is not helpful
+- **Don&#039;t Forget Authentication** - Always document auth requirements
+- **Don&#039;t Ignore Edge Cases** - Document pagination, filtering, sorting
+- **Don&#039;t Leave Examples Broken** - Test all code examples
+- **Don&#039;t Use Outdated Info** - Keep documentation in sync with code
+- **Don&#039;t Overcomplicate** - Keep it simple and scannable
+- **Don&#039;t Forget Response Headers** - Document important headers
 
 ## Documentation Structure
 
@@ -449,7 +499,7 @@ Tokens expire after 1 hour. Use the refresh token to get a new access token:
 ## Common Pitfalls
 
 ### Problem: Documentation Gets Out of Sync
-**Symptoms:** Examples don't work, parameters are wrong, endpoints return different data
+**Symptoms:** Examples don&#039;t work, parameters are wrong, endpoints return different data
 **Solution:** 
 - Generate docs from code comments/annotations
 - Use tools like Swagger/OpenAPI
@@ -457,15 +507,15 @@ Tokens expire after 1 hour. Use the refresh token to get a new access token:
 - Review docs with every API change
 
 ### Problem: Missing Error Documentation
-**Symptoms:** Users don't know how to handle errors, support tickets increase
+**Symptoms:** Users don&#039;t know how to handle errors, support tickets increase
 **Solution:**
 - Document every possible error code
 - Provide clear error messages
 - Include troubleshooting steps
 - Show example error responses
 
-### Problem: Examples Don't Work
-**Symptoms:** Users can't get started, frustration increases
+### Problem: Examples Don&#039;t Work
+**Symptoms:** Users can&#039;t get started, frustration increases
 **Solution:**
 - Test every code example
 - Use real, working endpoints
@@ -498,23 +548,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUserRequest'
+              $ref: &#039;#/components/schemas/CreateUserRequest&#039;
 ```
 
 ### Postman Collection
 Export collection for easy testing:
 ```json
 {
-  "info": {
-    "name": "My API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  &quot;info&quot;: {
+    &quot;name&quot;: &quot;My API&quot;,
+    &quot;schema&quot;: &quot;https://schema.getpostman.com/json/collection/v2.1.0/collection.json&quot;
   },
-  "item": [
+  &quot;item&quot;: [
     {
-      "name": "Create User",
-      "request": {
-        "method": "POST",
-        "url": "{{baseUrl}}/api/v1/users"
+      &quot;name&quot;: &quot;Create User&quot;,
+      &quot;request&quot;: {
+        &quot;method&quot;: &quot;POST&quot;,
+        &quot;url&quot;: &quot;{{baseUrl}}/api/v1/users&quot;
       }
     }
   ]
@@ -539,8 +589,39 @@ Export collection for easy testing:
 ---
 
 **Pro Tip:** Keep your API documentation as close to your code as possible. Use tools that generate docs from code comments to ensure they stay in sync!
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>121</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

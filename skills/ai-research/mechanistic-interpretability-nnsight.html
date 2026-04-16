@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mechanistic-interpretability-nnsight - AICCLI</title>
-  <meta name="description" content="mechanistic-interpretability-nnsight - Claude Code skill for AICCLI">
+  <meta name="description" content="Provides guidance for interpreting and manipulating neural network internals using nnsight with optional NDIF remote execution. Use when needing to run interpre">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / mechanistic-interpretability-nnsight</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>mechanistic-interpretability-nnsight</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / mechanistic-interpretability-nnsight
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>mechanistic-interpretability-nnsight</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Provides guidance for interpreting and manipulating neural network internals using nnsight with optional NDIF remote execution. Use when needing to run interpretability experiments on massive models (70B+) without local GPU resources, or when working with any PyTorch architecture.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/mechanistic-interpretability-nnsight</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/mechanistic-interpretability-nnsight</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/mechanistic-interpretability-nnsight</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: nnsight-remote-interpretability
 description: Provides guidance for interpreting and manipulating neural network internals using nnsight with optional NDIF remote execution. Use when needing to run interpretability experiments on massive models (70B+) without local GPU resources, or when working with any PyTorch architecture.
 version: 1.0.0
@@ -78,11 +128,11 @@ nnsight (/ɛn.saɪt/) enables researchers to interpret and manipulate the intern
 
 ```python
 # Local execution (small model)
-with model.trace("Hello world"):
+with model.trace(&quot;Hello world&quot;):
     hidden = model.transformer.h[5].output[0].save()
 
 # Remote execution (massive model) - same code!
-with model.trace("Hello world", remote=True):
+with model.trace(&quot;Hello world&quot;, remote=True):
     hidden = model.model.layers[40].output[0].save()
 ```
 
@@ -98,7 +148,7 @@ with model.trace("Hello world", remote=True):
 **Consider alternatives when:**
 - You want consistent API across models → Use **TransformerLens**
 - You need declarative, shareable interventions → Use **pyvene**
-- You're training SAEs → Use **SAELens**
+- You&#039;re training SAEs → Use **SAELens**
 - You only work with small models locally → **TransformerLens** may be simpler
 
 ## Installation
@@ -108,7 +158,7 @@ with model.trace("Hello world", remote=True):
 pip install nnsight
 
 # For vLLM support
-pip install "nnsight[vllm]"
+pip install &quot;nnsight[vllm]&quot;
 ```
 
 For remote NDIF execution, sign up at [login.ndif.us](https://login.ndif.us) for an API key.
@@ -121,10 +171,10 @@ For remote NDIF execution, sign up at [login.ndif.us](https://login.ndif.us) for
 from nnsight import LanguageModel
 
 # Load model (uses HuggingFace under the hood)
-model = LanguageModel("openai-community/gpt2", device_map="auto")
+model = LanguageModel(&quot;openai-community/gpt2&quot;, device_map=&quot;auto&quot;)
 
 # For larger models
-model = LanguageModel("meta-llama/Llama-3.1-8B", device_map="auto")
+model = LanguageModel(&quot;meta-llama/Llama-3.1-8B&quot;, device_map=&quot;auto&quot;)
 ```
 
 ### Tracing Context
@@ -134,10 +184,10 @@ The `trace` context manager enables deferred execution - operations are collecte
 ```python
 from nnsight import LanguageModel
 
-model = LanguageModel("gpt2", device_map="auto")
+model = LanguageModel(&quot;gpt2&quot;, device_map=&quot;auto&quot;)
 
-with model.trace("The Eiffel Tower is in") as tracer:
-    # Access any module's output
+with model.trace(&quot;The Eiffel Tower is in&quot;) as tracer:
+    # Access any module&#039;s output
     hidden_states = model.transformer.h[5].output[0].save()
 
     # Access attention patterns
@@ -158,7 +208,7 @@ print(hidden_states.shape)  # [batch, seq, hidden]
 Inside `trace`, module accesses return Proxy objects that record operations:
 
 ```python
-with model.trace("Hello"):
+with model.trace(&quot;Hello&quot;):
     # These are all Proxy objects - operations are deferred
     h5_out = model.transformer.h[5].output[0]  # Proxy
     h5_mean = h5_out.mean(dim=-1)              # Proxy
@@ -173,9 +223,9 @@ with model.trace("Hello"):
 from nnsight import LanguageModel
 import torch
 
-model = LanguageModel("gpt2", device_map="auto")
+model = LanguageModel(&quot;gpt2&quot;, device_map=&quot;auto&quot;)
 
-prompt = "The capital of France is"
+prompt = &quot;The capital of France is&quot;
 
 with model.trace(prompt) as tracer:
     # 1. Collect activations from multiple layers
@@ -196,14 +246,14 @@ with model.trace(prompt) as tracer:
 
 # 4. Analyze outside context
 for i, layer_out in enumerate(layer_outputs):
-    print(f"Layer {i} output shape: {layer_out.shape}")
-    print(f"Layer {i} norm: {layer_out.norm().item():.3f}")
+    print(f&quot;Layer {i} output shape: {layer_out.shape}&quot;)
+    print(f&quot;Layer {i} norm: {layer_out.norm().item():.3f}&quot;)
 
 # 5. Find top predictions
 probs = torch.softmax(logits[0, -1], dim=-1)
 top_tokens = probs.topk(5)
 for token, prob in zip(top_tokens.indices, top_tokens.values):
-    print(f"{model.tokenizer.decode(token)}: {prob.item():.3f}")
+    print(f&quot;{model.tokenizer.decode(token)}: {prob.item():.3f}&quot;)
 ```
 
 ### Checklist
@@ -221,10 +271,10 @@ for token, prob in zip(top_tokens.indices, top_tokens.values):
 from nnsight import LanguageModel
 import torch
 
-model = LanguageModel("gpt2", device_map="auto")
+model = LanguageModel(&quot;gpt2&quot;, device_map=&quot;auto&quot;)
 
-clean_prompt = "The Eiffel Tower is in"
-corrupted_prompt = "The Colosseum is in"
+clean_prompt = &quot;The Eiffel Tower is in&quot;
+corrupted_prompt = &quot;The Colosseum is in&quot;
 
 # 1. Get clean activations
 with model.trace(clean_prompt) as tracer:
@@ -238,19 +288,19 @@ with model.trace(corrupted_prompt) as tracer:
     patched_logits = model.output.save()
 
 # 3. Compare predictions
-paris_token = model.tokenizer.encode(" Paris")[0]
-rome_token = model.tokenizer.encode(" Rome")[0]
+paris_token = model.tokenizer.encode(&quot; Paris&quot;)[0]
+rome_token = model.tokenizer.encode(&quot; Rome&quot;)[0]
 
 patched_probs = torch.softmax(patched_logits[0, -1], dim=-1)
-print(f"Paris prob: {patched_probs[paris_token].item():.3f}")
-print(f"Rome prob: {patched_probs[rome_token].item():.3f}")
+print(f&quot;Paris prob: {patched_probs[paris_token].item():.3f}&quot;)
+print(f&quot;Rome prob: {patched_probs[rome_token].item():.3f}&quot;)
 ```
 
 ### Systematic Patching Sweep
 
 ```python
 def patch_layer_position(layer, position, clean_cache, corrupted_prompt):
-    """Patch single layer/position from clean to corrupted."""
+    &quot;&quot;&quot;Patch single layer/position from clean to corrupted.&quot;&quot;&quot;
     with model.trace(corrupted_prompt) as tracer:
         # Get current activation
         current = model.transformer.h[layer].output[0]
@@ -280,20 +330,20 @@ Run the same experiments on massive models without local GPUs.
 from nnsight import LanguageModel
 
 # 1. Load large model (will run remotely)
-model = LanguageModel("meta-llama/Llama-3.1-70B")
+model = LanguageModel(&quot;meta-llama/Llama-3.1-70B&quot;)
 
 # 2. Same code, just add remote=True
-with model.trace("The meaning of life is", remote=True) as tracer:
+with model.trace(&quot;The meaning of life is&quot;, remote=True) as tracer:
     # Access internals of 70B model!
     layer_40_out = model.model.layers[40].output[0].save()
     logits = model.output.save()
 
 # 3. Results returned from NDIF
-print(f"Layer 40 shape: {layer_40_out.shape}")
+print(f&quot;Layer 40 shape: {layer_40_out.shape}&quot;)
 
 # 4. Generation with interventions
 with model.trace(remote=True) as tracer:
-    with tracer.invoke("What is 2+2?"):
+    with tracer.invoke(&quot;What is 2+2?&quot;):
         # Intervene during generation
         model.model.layers[20].output[0][:, -1, :] *= 1.5
 
@@ -308,11 +358,11 @@ with model.trace(remote=True) as tracer:
 
 ```python
 import os
-os.environ["NDIF_API_KEY"] = "your_key"
+os.environ[&quot;NDIF_API_KEY&quot;] = &quot;your_key&quot;
 
 # Or configure directly
 from nnsight import CONFIG
-CONFIG.API_KEY = "your_key"
+CONFIG.API_KEY = &quot;your_key&quot;
 ```
 
 ### Available Models on NDIF
@@ -328,20 +378,20 @@ Share activations between different inputs in a single trace.
 ```python
 from nnsight import LanguageModel
 
-model = LanguageModel("gpt2", device_map="auto")
+model = LanguageModel(&quot;gpt2&quot;, device_map=&quot;auto&quot;)
 
 with model.trace() as tracer:
     # First prompt
-    with tracer.invoke("The cat sat on the"):
+    with tracer.invoke(&quot;The cat sat on the&quot;):
         cat_hidden = model.transformer.h[6].output[0].save()
 
-    # Second prompt - inject cat's activations
-    with tracer.invoke("The dog ran through the"):
-        # Replace with cat's activations at layer 6
+    # Second prompt - inject cat&#039;s activations
+    with tracer.invoke(&quot;The dog ran through the&quot;):
+        # Replace with cat&#039;s activations at layer 6
         model.transformer.h[6].output[0][:] = cat_hidden
         dog_with_cat = model.output.save()
 
-# The dog prompt now has cat's internal representations
+# The dog prompt now has cat&#039;s internal representations
 ```
 
 ## Workflow 5: Gradient-Based Analysis
@@ -352,9 +402,9 @@ Access gradients during backward pass.
 from nnsight import LanguageModel
 import torch
 
-model = LanguageModel("gpt2", device_map="auto")
+model = LanguageModel(&quot;gpt2&quot;, device_map=&quot;auto&quot;)
 
-with model.trace("The quick brown fox") as tracer:
+with model.trace(&quot;The quick brown fox&quot;) as tracer:
     # Save activations and enable gradient
     hidden = model.transformer.h[5].output[0].save()
     hidden.retain_grad()
@@ -362,7 +412,7 @@ with model.trace("The quick brown fox") as tracer:
     logits = model.output
 
     # Compute loss on specific token
-    target_token = model.tokenizer.encode(" jumps")[0]
+    target_token = model.tokenizer.encode(&quot; jumps&quot;)[0]
     loss = -logits[0, -1, target_token]
 
     # Backward pass
@@ -370,13 +420,13 @@ with model.trace("The quick brown fox") as tracer:
 
 # Access gradients
 grad = hidden.grad
-print(f"Gradient shape: {grad.shape}")
-print(f"Gradient norm: {grad.norm().item():.3f}")
+print(f&quot;Gradient shape: {grad.shape}&quot;)
+print(f&quot;Gradient norm: {grad.norm().item():.3f}&quot;)
 ```
 
 **Note**: Gradient access not supported for vLLM or remote execution.
 
-## Common Issues & Solutions
+## Common Issues &amp; Solutions
 
 ### Issue: Module path differs between models
 ```python
@@ -393,13 +443,13 @@ print(model._model)  # See actual module names
 ### Issue: Forgetting to save
 ```python
 # WRONG: Value not accessible outside trace
-with model.trace("Hello"):
+with model.trace(&quot;Hello&quot;):
     hidden = model.transformer.h[5].output[0]  # Not saved!
 
 print(hidden)  # Error or wrong value
 
 # RIGHT: Call .save()
-with model.trace("Hello"):
+with model.trace(&quot;Hello&quot;):
     hidden = model.transformer.h[5].output[0].save()
 
 print(hidden)  # Works!
@@ -408,15 +458,15 @@ print(hidden)  # Works!
 ### Issue: Remote timeout
 ```python
 # For long operations, increase timeout
-with model.trace("prompt", remote=True, timeout=300) as tracer:
+with model.trace(&quot;prompt&quot;, remote=True, timeout=300) as tracer:
     # Long operation...
 ```
 
 ### Issue: Memory with many saved activations
 ```python
 # Only save what you need
-with model.trace("prompt"):
-    # Don't save everything
+with model.trace(&quot;prompt&quot;):
+    # Don&#039;t save everything
     for i in range(100):
         model.transformer.h[i].output[0].save()  # Memory heavy!
 
@@ -428,9 +478,9 @@ with model.trace("prompt"):
 
 ### Issue: vLLM gradient limitation
 ```python
-# vLLM doesn't support gradients
+# vLLM doesn&#039;t support gradients
 # Use standard execution for gradient analysis
-model = LanguageModel("gpt2", device_map="auto")  # Not vLLM
+model = LanguageModel(&quot;gpt2&quot;, device_map=&quot;auto&quot;)  # Not vLLM
 ```
 
 ## Key API Reference
@@ -491,8 +541,46 @@ nnsight works with any PyTorch model:
 - **Custom architectures**: Any nn.Module
 
 The key is knowing the module structure to access the right components.
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">nnsight</span><span class="tag">NDIF</span><span class="tag">Remote Execution</span><span class="tag">Mechanistic Interpretability</span><span class="tag">Model Internals</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>10</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>pydicom - AICCLI</title>
-  <meta name="description" content="pydicom - Claude Code skill for AICCLI">
+  <meta name="description" content="Python library for working with DICOM (Digital Imaging and Communications in Medicine) files. Use this skill when reading, writing, or modifying medical imaging">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / pydicom</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>pydicom</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / pydicom
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>pydicom</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Python library for working with DICOM (Digital Imaging and Communications in Medicine) files. Use this skill when reading, writing, or modifying medical imaging data in DICOM format, extracting pixel data from medical images (CT, MRI, X-ray, ultrasound), anonymizing DICOM files, working with DICOM metadata and tags, converting DICOM images to other formats, handling compressed DICOM data, or processing medical imaging datasets. Applies to tasks involving medical image analysis, PACS systems, radiology workflows, and healthcare imaging applications.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pydicom</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/pydicom</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/pydicom</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: pydicom
 description: Python library for working with DICOM (Digital Imaging and Communications in Medicine) files. Use this skill when reading, writing, or modifying medical imaging data in DICOM format, extracting pixel data from medical images (CT, MRI, X-ray, ultrasound), anonymizing DICOM files, working with DICOM metadata and tags, converting DICOM images to other formats, handling compressed DICOM data, or processing medical imaging datasets. Applies to tasks involving medical image analysis, PACS systems, radiology workflows, and healthcare imaging applications.
 ---
@@ -107,12 +157,12 @@ Read a DICOM file using `pydicom.dcmread()`:
 import pydicom
 
 # Read a DICOM file
-ds = pydicom.dcmread('path/to/file.dcm')
+ds = pydicom.dcmread(&#039;path/to/file.dcm&#039;)
 
 # Access metadata
-print(f"Patient Name: {ds.PatientName}")
-print(f"Study Date: {ds.StudyDate}")
-print(f"Modality: {ds.Modality}")
+print(f&quot;Patient Name: {ds.PatientName}&quot;)
+print(f&quot;Study Date: {ds.StudyDate}&quot;)
+print(f&quot;Modality: {ds.Modality}&quot;)
 
 # Display all elements
 print(ds)
@@ -122,7 +172,7 @@ print(ds)
 - `dcmread()` returns a `Dataset` object
 - Access data elements using attribute notation (e.g., `ds.PatientName`) or tag notation (e.g., `ds[0x0010, 0x0010]`)
 - Use `ds.file_meta` to access file metadata like Transfer Syntax UID
-- Handle missing attributes with `getattr(ds, 'AttributeName', default_value)` or `hasattr(ds, 'AttributeName')`
+- Handle missing attributes with `getattr(ds, &#039;AttributeName&#039;, default_value)` or `hasattr(ds, &#039;AttributeName&#039;)`
 
 ### Working with Pixel Data
 
@@ -134,27 +184,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Read DICOM file
-ds = pydicom.dcmread('image.dcm')
+ds = pydicom.dcmread(&#039;image.dcm&#039;)
 
 # Get pixel array (requires numpy)
 pixel_array = ds.pixel_array
 
 # Image information
-print(f"Shape: {pixel_array.shape}")
-print(f"Data type: {pixel_array.dtype}")
-print(f"Rows: {ds.Rows}, Columns: {ds.Columns}")
+print(f&quot;Shape: {pixel_array.shape}&quot;)
+print(f&quot;Data type: {pixel_array.dtype}&quot;)
+print(f&quot;Rows: {ds.Rows}, Columns: {ds.Columns}&quot;)
 
 # Apply windowing for display (CT/MRI)
-if hasattr(ds, 'WindowCenter') and hasattr(ds, 'WindowWidth'):
+if hasattr(ds, &#039;WindowCenter&#039;) and hasattr(ds, &#039;WindowWidth&#039;):
     from pydicom.pixel_data_handlers.util import apply_voi_lut
     windowed_image = apply_voi_lut(pixel_array, ds)
 else:
     windowed_image = pixel_array
 
 # Display image
-plt.imshow(windowed_image, cmap='gray')
-plt.title(f"{ds.Modality} - {ds.StudyDescription}")
-plt.axis('off')
+plt.imshow(windowed_image, cmap=&#039;gray&#039;)
+plt.title(f&quot;{ds.Modality} - {ds.StudyDescription}&quot;)
+plt.axis(&#039;off&#039;)
 plt.show()
 ```
 
@@ -162,12 +212,12 @@ plt.show()
 
 ```python
 # RGB images have shape (rows, columns, 3)
-if ds.PhotometricInterpretation == 'RGB':
+if ds.PhotometricInterpretation == &#039;RGB&#039;:
     rgb_image = ds.pixel_array
     plt.imshow(rgb_image)
-elif ds.PhotometricInterpretation == 'YBR_FULL':
+elif ds.PhotometricInterpretation == &#039;YBR_FULL&#039;:
     from pydicom.pixel_data_handlers.util import convert_color_space
-    rgb_image = convert_color_space(ds.pixel_array, 'YBR_FULL', 'RGB')
+    rgb_image = convert_color_space(ds.pixel_array, &#039;YBR_FULL&#039;, &#039;RGB&#039;)
     plt.imshow(rgb_image)
 ```
 
@@ -175,12 +225,12 @@ elif ds.PhotometricInterpretation == 'YBR_FULL':
 
 ```python
 # For multi-frame DICOM files
-if hasattr(ds, 'NumberOfFrames') and ds.NumberOfFrames &gt; 1:
+if hasattr(ds, &#039;NumberOfFrames&#039;) and ds.NumberOfFrames &gt; 1:
     frames = ds.pixel_array  # Shape: (num_frames, rows, columns)
-    print(f"Number of frames: {frames.shape[0]}")
+    print(f&quot;Number of frames: {frames.shape[0]}&quot;)
 
     # Display specific frame
-    plt.imshow(frames[0], cmap='gray')
+    plt.imshow(frames[0], cmap=&#039;gray&#039;)
 ```
 
 ### Converting DICOM to Image Formats
@@ -192,7 +242,7 @@ from PIL import Image
 import pydicom
 import numpy as np
 
-ds = pydicom.dcmread('input.dcm')
+ds = pydicom.dcmread(&#039;input.dcm&#039;)
 pixel_array = ds.pixel_array
 
 # Normalize to 0-255 range
@@ -202,7 +252,7 @@ if pixel_array.dtype != np.uint8:
 
 # Save as PNG
 image = Image.fromarray(pixel_array)
-image.save('output.png')
+image.save(&#039;output.png&#039;)
 ```
 
 Use the script: `python scripts/dicom_to_image.py input.dcm output.png`
@@ -215,26 +265,26 @@ Modify DICOM data elements:
 import pydicom
 from datetime import datetime
 
-ds = pydicom.dcmread('input.dcm')
+ds = pydicom.dcmread(&#039;input.dcm&#039;)
 
 # Modify existing elements
-ds.PatientName = "Doe^John"
-ds.StudyDate = datetime.now().strftime('%Y%m%d')
-ds.StudyDescription = "Modified Study"
+ds.PatientName = &quot;Doe^John&quot;
+ds.StudyDate = datetime.now().strftime(&#039;%Y%m%d&#039;)
+ds.StudyDescription = &quot;Modified Study&quot;
 
 # Add new elements
 ds.SeriesNumber = 1
-ds.SeriesDescription = "New Series"
+ds.SeriesDescription = &quot;New Series&quot;
 
 # Remove elements
-if hasattr(ds, 'PatientComments'):
-    delattr(ds, 'PatientComments')
+if hasattr(ds, &#039;PatientComments&#039;):
+    delattr(ds, &#039;PatientComments&#039;)
 # Or using del
-if 'PatientComments' in ds:
+if &#039;PatientComments&#039; in ds:
     del ds.PatientComments
 
 # Save modified file
-ds.save_as('modified.dcm')
+ds.save_as(&#039;modified.dcm&#039;)
 ```
 
 ### Anonymizing DICOM Files
@@ -245,34 +295,34 @@ Remove or replace patient identifiable information:
 import pydicom
 from datetime import datetime
 
-ds = pydicom.dcmread('input.dcm')
+ds = pydicom.dcmread(&#039;input.dcm&#039;)
 
 # Tags commonly containing PHI (Protected Health Information)
 tags_to_anonymize = [
-    'PatientName', 'PatientID', 'PatientBirthDate',
-    'PatientSex', 'PatientAge', 'PatientAddress',
-    'InstitutionName', 'InstitutionAddress',
-    'ReferringPhysicianName', 'PerformingPhysicianName',
-    'OperatorsName', 'StudyDescription', 'SeriesDescription',
+    &#039;PatientName&#039;, &#039;PatientID&#039;, &#039;PatientBirthDate&#039;,
+    &#039;PatientSex&#039;, &#039;PatientAge&#039;, &#039;PatientAddress&#039;,
+    &#039;InstitutionName&#039;, &#039;InstitutionAddress&#039;,
+    &#039;ReferringPhysicianName&#039;, &#039;PerformingPhysicianName&#039;,
+    &#039;OperatorsName&#039;, &#039;StudyDescription&#039;, &#039;SeriesDescription&#039;,
 ]
 
 # Remove or replace sensitive data
 for tag in tags_to_anonymize:
     if hasattr(ds, tag):
-        if tag in ['PatientName', 'PatientID']:
-            setattr(ds, tag, 'ANONYMOUS')
-        elif tag == 'PatientBirthDate':
-            setattr(ds, tag, '19000101')
+        if tag in [&#039;PatientName&#039;, &#039;PatientID&#039;]:
+            setattr(ds, tag, &#039;ANONYMOUS&#039;)
+        elif tag == &#039;PatientBirthDate&#039;:
+            setattr(ds, tag, &#039;19000101&#039;)
         else:
             delattr(ds, tag)
 
 # Update dates to maintain temporal relationships
-if hasattr(ds, 'StudyDate'):
+if hasattr(ds, &#039;StudyDate&#039;):
     # Shift dates by a random offset
-    ds.StudyDate = '20000101'
+    ds.StudyDate = &#039;20000101&#039;
 
 # Keep pixel data intact
-ds.save_as('anonymized.dcm')
+ds.save_as(&#039;anonymized.dcm&#039;)
 ```
 
 Use the provided script: `python scripts/anonymize_dicom.py input.dcm output.dcm`
@@ -294,20 +344,20 @@ file_meta.MediaStorageSOPInstanceUID = pydicom.uid.generate_uid()
 file_meta.TransferSyntaxUID = pydicom.uid.ExplicitVRLittleEndian
 
 # Create the FileDataset instance
-ds = FileDataset('new_dicom.dcm', {}, file_meta=file_meta, preamble=b"\0" * 128)
+ds = FileDataset(&#039;new_dicom.dcm&#039;, {}, file_meta=file_meta, preamble=b&quot;\0&quot; * 128)
 
 # Add required DICOM elements
-ds.PatientName = "Test^Patient"
-ds.PatientID = "123456"
-ds.Modality = "CT"
-ds.StudyDate = datetime.now().strftime('%Y%m%d')
-ds.StudyTime = datetime.now().strftime('%H%M%S')
+ds.PatientName = &quot;Test^Patient&quot;
+ds.PatientID = &quot;123456&quot;
+ds.Modality = &quot;CT&quot;
+ds.StudyDate = datetime.now().strftime(&#039;%Y%m%d&#039;)
+ds.StudyTime = datetime.now().strftime(&#039;%H%M%S&#039;)
 ds.ContentDate = ds.StudyDate
 ds.ContentTime = ds.StudyTime
 
 # Add image-specific elements
 ds.SamplesPerPixel = 1
-ds.PhotometricInterpretation = "MONOCHROME2"
+ds.PhotometricInterpretation = &quot;MONOCHROME2&quot;
 ds.Rows = 512
 ds.Columns = 512
 ds.BitsAllocated = 16
@@ -326,7 +376,7 @@ ds.SeriesInstanceUID = pydicom.uid.generate_uid()
 ds.StudyInstanceUID = pydicom.uid.generate_uid()
 
 # Save the file
-ds.save_as('new_dicom.dcm')
+ds.save_as(&#039;new_dicom.dcm&#039;)
 ```
 
 ### Compression and Decompression
@@ -337,20 +387,20 @@ Handle compressed DICOM files:
 import pydicom
 
 # Read compressed DICOM file
-ds = pydicom.dcmread('compressed.dcm')
+ds = pydicom.dcmread(&#039;compressed.dcm&#039;)
 
 # Check transfer syntax
-print(f"Transfer Syntax: {ds.file_meta.TransferSyntaxUID}")
-print(f"Transfer Syntax Name: {ds.file_meta.TransferSyntaxUID.name}")
+print(f&quot;Transfer Syntax: {ds.file_meta.TransferSyntaxUID}&quot;)
+print(f&quot;Transfer Syntax Name: {ds.file_meta.TransferSyntaxUID.name}&quot;)
 
 # Decompress and save as uncompressed
 ds.decompress()
-ds.save_as('uncompressed.dcm', write_like_original=False)
+ds.save_as(&#039;uncompressed.dcm&#039;, write_like_original=False)
 
 # Or compress when saving (requires appropriate encoder)
-ds_uncompressed = pydicom.dcmread('uncompressed.dcm')
+ds_uncompressed = pydicom.dcmread(&#039;uncompressed.dcm&#039;)
 ds_uncompressed.compress(pydicom.uid.JPEGBaseline8Bit)
-ds_uncompressed.save_as('compressed_jpeg.dcm')
+ds_uncompressed.save_as(&#039;compressed_jpeg.dcm&#039;)
 ```
 
 **Common transfer syntaxes:**
@@ -369,12 +419,12 @@ Handle nested data structures:
 ```python
 import pydicom
 
-ds = pydicom.dcmread('file.dcm')
+ds = pydicom.dcmread(&#039;file.dcm&#039;)
 
 # Access sequences
-if 'ReferencedStudySequence' in ds:
+if &#039;ReferencedStudySequence&#039; in ds:
     for item in ds.ReferencedStudySequence:
-        print(f"Referenced SOP Instance UID: {item.ReferencedSOPInstanceUID}")
+        print(f&quot;Referenced SOP Instance UID: {item.ReferencedSOPInstanceUID}&quot;)
 
 # Create a sequence
 from pydicom.sequence import Sequence
@@ -396,10 +446,10 @@ import numpy as np
 from pathlib import Path
 
 # Read all DICOM files in a directory
-dicom_dir = Path('dicom_series/')
+dicom_dir = Path(&#039;dicom_series/&#039;)
 slices = []
 
-for file_path in dicom_dir.glob('*.dcm'):
+for file_path in dicom_dir.glob(&#039;*.dcm&#039;):
     ds = pydicom.dcmread(file_path)
     slices.append(ds)
 
@@ -409,12 +459,12 @@ slices.sort(key=lambda x: float(x.ImagePositionPatient[2]))
 
 # Create 3D volume
 volume = np.stack([s.pixel_array for s in slices])
-print(f"Volume shape: {volume.shape}")  # (num_slices, rows, columns)
+print(f&quot;Volume shape: {volume.shape}&quot;)  # (num_slices, rows, columns)
 
 # Get spacing information for proper scaling
 pixel_spacing = slices[0].PixelSpacing  # [row_spacing, col_spacing]
 slice_thickness = slices[0].SliceThickness
-print(f"Voxel size: {pixel_spacing[0]}x{pixel_spacing[1]}x{slice_thickness} mm")
+print(f&quot;Voxel size: {pixel_spacing[0]}x{pixel_spacing[1]}x{slice_thickness} mm&quot;)
 ```
 
 ## Helper Scripts
@@ -453,11 +503,11 @@ Detailed reference information is available in the `references/` directory:
 
 ## Common Issues and Solutions
 
-**Issue: "Unable to decode pixel data"**
+**Issue: &quot;Unable to decode pixel data&quot;**
 - Solution: Install additional compression handlers: `uv pip install pylibjpeg pylibjpeg-libjpeg python-gdcm`
 
-**Issue: "AttributeError" when accessing tags**
-- Solution: Check if attribute exists with `hasattr(ds, 'AttributeName')` or use `ds.get('AttributeName', default)`
+**Issue: &quot;AttributeError&quot; when accessing tags**
+- Solution: Check if attribute exists with `hasattr(ds, &#039;AttributeName&#039;)` or use `ds.get(&#039;AttributeName&#039;, default)`
 
 **Issue: Incorrect image display (too dark/bright)**
 - Solution: Apply VOI LUT windowing: `apply_voi_lut(pixel_array, ds)` or manually adjust with `WindowCenter` and `WindowWidth`
@@ -483,8 +533,39 @@ Official pydicom documentation: https://pydicom.github.io/pydicom/dev/
 - Tutorials: https://pydicom.github.io/pydicom/dev/tutorials/index.html
 - API Reference: https://pydicom.github.io/pydicom/dev/reference/index.html
 - Examples: https://pydicom.github.io/pydicom/dev/auto_examples/index.html
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>22</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

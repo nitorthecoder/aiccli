@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>json-canvas - AICCLI</title>
-  <meta name="description" content="json-canvas - Claude Code skill for AICCLI">
+  <meta name="description" content="Create and edit JSON Canvas files (.canvas) with nodes, edges, groups, and connections. Use when working with .canvas files, creating visual canvases, mind maps">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / json-canvas</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>json-canvas</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">document-processing</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / document-processing / json-canvas
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>json-canvas</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">document-processing</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Create and edit JSON Canvas files (.canvas) with nodes, edges, groups, and connections. Use when working with .canvas files, creating visual canvases, mind maps, flowcharts, or when the user mentions Canvas files in Obsidian.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/json-canvas</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/json-canvas</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/json-canvas</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: json-canvas
 description: Create and edit JSON Canvas files (.canvas) with nodes, edges, groups, and connections. Use when working with .canvas files, creating visual canvases, mind maps, flowcharts, or when the user mentions Canvas files in Obsidian.
 ---
@@ -74,8 +124,8 @@ A canvas file contains two top-level arrays:
 
 ```json
 {
-  "nodes": [],
-  "edges": []
+  &quot;nodes&quot;: [],
+  &quot;edges&quot;: []
 }
 ```
 
@@ -116,13 +166,13 @@ Text nodes contain Markdown content.
 
 ```json
 {
-  "id": "6f0ad84f44ce9c17",
-  "type": "text",
-  "x": 0,
-  "y": 0,
-  "width": 400,
-  "height": 200,
-  "text": "# Hello World\n\nThis is **Markdown** content."
+  &quot;id&quot;: &quot;6f0ad84f44ce9c17&quot;,
+  &quot;type&quot;: &quot;text&quot;,
+  &quot;x&quot;: 0,
+  &quot;y&quot;: 0,
+  &quot;width&quot;: 400,
+  &quot;height&quot;: 200,
+  &quot;text&quot;: &quot;# Hello World\n\nThis is **Markdown** content.&quot;
 }
 ```
 
@@ -136,26 +186,26 @@ File nodes reference files or attachments (images, videos, PDFs, notes, etc.).
 
 ```json
 {
-  "id": "a1b2c3d4e5f67890",
-  "type": "file",
-  "x": 500,
-  "y": 0,
-  "width": 400,
-  "height": 300,
-  "file": "Attachments/diagram.png"
+  &quot;id&quot;: &quot;a1b2c3d4e5f67890&quot;,
+  &quot;type&quot;: &quot;file&quot;,
+  &quot;x&quot;: 500,
+  &quot;y&quot;: 0,
+  &quot;width&quot;: 400,
+  &quot;height&quot;: 300,
+  &quot;file&quot;: &quot;Attachments/diagram.png&quot;
 }
 ```
 
 ```json
 {
-  "id": "b2c3d4e5f6789012",
-  "type": "file",
-  "x": 500,
-  "y": 400,
-  "width": 400,
-  "height": 300,
-  "file": "Notes/Project Overview.md",
-  "subpath": "#Implementation"
+  &quot;id&quot;: &quot;b2c3d4e5f6789012&quot;,
+  &quot;type&quot;: &quot;file&quot;,
+  &quot;x&quot;: 500,
+  &quot;y&quot;: 400,
+  &quot;width&quot;: 400,
+  &quot;height&quot;: 300,
+  &quot;file&quot;: &quot;Notes/Project Overview.md&quot;,
+  &quot;subpath&quot;: &quot;#Implementation&quot;
 }
 ```
 
@@ -170,13 +220,13 @@ Link nodes display external URLs.
 
 ```json
 {
-  "id": "c3d4e5f678901234",
-  "type": "link",
-  "x": 1000,
-  "y": 0,
-  "width": 400,
-  "height": 200,
-  "url": "https://obsidian.md"
+  &quot;id&quot;: &quot;c3d4e5f678901234&quot;,
+  &quot;type&quot;: &quot;link&quot;,
+  &quot;x&quot;: 1000,
+  &quot;y&quot;: 0,
+  &quot;width&quot;: 400,
+  &quot;height&quot;: 200,
+  &quot;url&quot;: &quot;https://obsidian.md&quot;
 }
 ```
 
@@ -190,28 +240,28 @@ Group nodes are visual containers for organizing other nodes.
 
 ```json
 {
-  "id": "d4e5f6789012345a",
-  "type": "group",
-  "x": -50,
-  "y": -50,
-  "width": 1000,
-  "height": 600,
-  "label": "Project Overview",
-  "color": "4"
+  &quot;id&quot;: &quot;d4e5f6789012345a&quot;,
+  &quot;type&quot;: &quot;group&quot;,
+  &quot;x&quot;: -50,
+  &quot;y&quot;: -50,
+  &quot;width&quot;: 1000,
+  &quot;height&quot;: 600,
+  &quot;label&quot;: &quot;Project Overview&quot;,
+  &quot;color&quot;: &quot;4&quot;
 }
 ```
 
 ```json
 {
-  "id": "e5f67890123456ab",
-  "type": "group",
-  "x": 0,
-  "y": 700,
-  "width": 800,
-  "height": 500,
-  "label": "Resources",
-  "background": "Attachments/background.png",
-  "backgroundStyle": "cover"
+  &quot;id&quot;: &quot;e5f67890123456ab&quot;,
+  &quot;type&quot;: &quot;group&quot;,
+  &quot;x&quot;: 0,
+  &quot;y&quot;: 700,
+  &quot;width&quot;: 800,
+  &quot;height&quot;: 500,
+  &quot;label&quot;: &quot;Resources&quot;,
+  &quot;background&quot;: &quot;Attachments/background.png&quot;,
+  &quot;backgroundStyle&quot;: &quot;cover&quot;
 }
 ```
 
@@ -235,23 +285,23 @@ Edges are lines connecting nodes.
 
 ```json
 {
-  "id": "f67890123456789a",
-  "fromNode": "6f0ad84f44ce9c17",
-  "toNode": "a1b2c3d4e5f67890"
+  &quot;id&quot;: &quot;f67890123456789a&quot;,
+  &quot;fromNode&quot;: &quot;6f0ad84f44ce9c17&quot;,
+  &quot;toNode&quot;: &quot;a1b2c3d4e5f67890&quot;
 }
 ```
 
 ```json
 {
-  "id": "0123456789abcdef",
-  "fromNode": "6f0ad84f44ce9c17",
-  "fromSide": "right",
-  "fromEnd": "none",
-  "toNode": "b2c3d4e5f6789012",
-  "toSide": "left",
-  "toEnd": "arrow",
-  "color": "1",
-  "label": "leads to"
+  &quot;id&quot;: &quot;0123456789abcdef&quot;,
+  &quot;fromNode&quot;: &quot;6f0ad84f44ce9c17&quot;,
+  &quot;fromSide&quot;: &quot;right&quot;,
+  &quot;fromEnd&quot;: &quot;none&quot;,
+  &quot;toNode&quot;: &quot;b2c3d4e5f6789012&quot;,
+  &quot;toSide&quot;: &quot;left&quot;,
+  &quot;toEnd&quot;: &quot;arrow&quot;,
+  &quot;color&quot;: &quot;1&quot;,
+  &quot;label&quot;: &quot;leads to&quot;
 }
 ```
 
@@ -291,7 +341,7 @@ The `canvasColor` type can be specified in two ways:
 
 ```json
 {
-  "color": "#FF0000"
+  &quot;color&quot;: &quot;#FF0000&quot;
 }
 ```
 
@@ -299,18 +349,18 @@ The `canvasColor` type can be specified in two ways:
 
 ```json
 {
-  "color": "1"
+  &quot;color&quot;: &quot;1&quot;
 }
 ```
 
 | Preset | Color |
 |--------|-------|
-| `"1"` | Red |
-| `"2"` | Orange |
-| `"3"` | Yellow |
-| `"4"` | Green |
-| `"5"` | Cyan |
-| `"6"` | Purple |
+| `&quot;1&quot;` | Red |
+| `&quot;2&quot;` | Orange |
+| `&quot;3&quot;` | Yellow |
+| `&quot;4&quot;` | Green |
+| `&quot;5&quot;` | Cyan |
+| `&quot;6&quot;` | Purple |
 
 Note: Specific color values for presets are intentionally undefined, allowing applications to use their own brand colors.
 
@@ -320,49 +370,49 @@ Note: Specific color values for presets are intentionally undefined, allowing ap
 
 ```json
 {
-  "nodes": [
+  &quot;nodes&quot;: [
     {
-      "id": "8a9b0c1d2e3f4a5b",
-      "type": "text",
-      "x": 0,
-      "y": 0,
-      "width": 300,
-      "height": 150,
-      "text": "# Main Idea\n\nThis is the central concept."
+      &quot;id&quot;: &quot;8a9b0c1d2e3f4a5b&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 0,
+      &quot;y&quot;: 0,
+      &quot;width&quot;: 300,
+      &quot;height&quot;: 150,
+      &quot;text&quot;: &quot;# Main Idea\n\nThis is the central concept.&quot;
     },
     {
-      "id": "1a2b3c4d5e6f7a8b",
-      "type": "text",
-      "x": 400,
-      "y": -100,
-      "width": 250,
-      "height": 100,
-      "text": "## Supporting Point A\n\nDetails here."
+      &quot;id&quot;: &quot;1a2b3c4d5e6f7a8b&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 400,
+      &quot;y&quot;: -100,
+      &quot;width&quot;: 250,
+      &quot;height&quot;: 100,
+      &quot;text&quot;: &quot;## Supporting Point A\n\nDetails here.&quot;
     },
     {
-      "id": "2b3c4d5e6f7a8b9c",
-      "type": "text",
-      "x": 400,
-      "y": 100,
-      "width": 250,
-      "height": 100,
-      "text": "## Supporting Point B\n\nMore details."
+      &quot;id&quot;: &quot;2b3c4d5e6f7a8b9c&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 400,
+      &quot;y&quot;: 100,
+      &quot;width&quot;: 250,
+      &quot;height&quot;: 100,
+      &quot;text&quot;: &quot;## Supporting Point B\n\nMore details.&quot;
     }
   ],
-  "edges": [
+  &quot;edges&quot;: [
     {
-      "id": "3c4d5e6f7a8b9c0d",
-      "fromNode": "8a9b0c1d2e3f4a5b",
-      "fromSide": "right",
-      "toNode": "1a2b3c4d5e6f7a8b",
-      "toSide": "left"
+      &quot;id&quot;: &quot;3c4d5e6f7a8b9c0d&quot;,
+      &quot;fromNode&quot;: &quot;8a9b0c1d2e3f4a5b&quot;,
+      &quot;fromSide&quot;: &quot;right&quot;,
+      &quot;toNode&quot;: &quot;1a2b3c4d5e6f7a8b&quot;,
+      &quot;toSide&quot;: &quot;left&quot;
     },
     {
-      "id": "4d5e6f7a8b9c0d1e",
-      "fromNode": "8a9b0c1d2e3f4a5b",
-      "fromSide": "right",
-      "toNode": "2b3c4d5e6f7a8b9c",
-      "toSide": "left"
+      &quot;id&quot;: &quot;4d5e6f7a8b9c0d1e&quot;,
+      &quot;fromNode&quot;: &quot;8a9b0c1d2e3f4a5b&quot;,
+      &quot;fromSide&quot;: &quot;right&quot;,
+      &quot;toNode&quot;: &quot;2b3c4d5e6f7a8b9c&quot;,
+      &quot;toSide&quot;: &quot;left&quot;
     }
   ]
 }
@@ -372,67 +422,67 @@ Note: Specific color values for presets are intentionally undefined, allowing ap
 
 ```json
 {
-  "nodes": [
+  &quot;nodes&quot;: [
     {
-      "id": "5e6f7a8b9c0d1e2f",
-      "type": "group",
-      "x": 0,
-      "y": 0,
-      "width": 300,
-      "height": 500,
-      "label": "To Do",
-      "color": "1"
+      &quot;id&quot;: &quot;5e6f7a8b9c0d1e2f&quot;,
+      &quot;type&quot;: &quot;group&quot;,
+      &quot;x&quot;: 0,
+      &quot;y&quot;: 0,
+      &quot;width&quot;: 300,
+      &quot;height&quot;: 500,
+      &quot;label&quot;: &quot;To Do&quot;,
+      &quot;color&quot;: &quot;1&quot;
     },
     {
-      "id": "6f7a8b9c0d1e2f3a",
-      "type": "group",
-      "x": 350,
-      "y": 0,
-      "width": 300,
-      "height": 500,
-      "label": "In Progress",
-      "color": "3"
+      &quot;id&quot;: &quot;6f7a8b9c0d1e2f3a&quot;,
+      &quot;type&quot;: &quot;group&quot;,
+      &quot;x&quot;: 350,
+      &quot;y&quot;: 0,
+      &quot;width&quot;: 300,
+      &quot;height&quot;: 500,
+      &quot;label&quot;: &quot;In Progress&quot;,
+      &quot;color&quot;: &quot;3&quot;
     },
     {
-      "id": "7a8b9c0d1e2f3a4b",
-      "type": "group",
-      "x": 700,
-      "y": 0,
-      "width": 300,
-      "height": 500,
-      "label": "Done",
-      "color": "4"
+      &quot;id&quot;: &quot;7a8b9c0d1e2f3a4b&quot;,
+      &quot;type&quot;: &quot;group&quot;,
+      &quot;x&quot;: 700,
+      &quot;y&quot;: 0,
+      &quot;width&quot;: 300,
+      &quot;height&quot;: 500,
+      &quot;label&quot;: &quot;Done&quot;,
+      &quot;color&quot;: &quot;4&quot;
     },
     {
-      "id": "8b9c0d1e2f3a4b5c",
-      "type": "text",
-      "x": 20,
-      "y": 50,
-      "width": 260,
-      "height": 80,
-      "text": "## Task 1\n\nImplement feature X"
+      &quot;id&quot;: &quot;8b9c0d1e2f3a4b5c&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 20,
+      &quot;y&quot;: 50,
+      &quot;width&quot;: 260,
+      &quot;height&quot;: 80,
+      &quot;text&quot;: &quot;## Task 1\n\nImplement feature X&quot;
     },
     {
-      "id": "9c0d1e2f3a4b5c6d",
-      "type": "text",
-      "x": 370,
-      "y": 50,
-      "width": 260,
-      "height": 80,
-      "text": "## Task 2\n\nReview PR #123",
-      "color": "2"
+      &quot;id&quot;: &quot;9c0d1e2f3a4b5c6d&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 370,
+      &quot;y&quot;: 50,
+      &quot;width&quot;: 260,
+      &quot;height&quot;: 80,
+      &quot;text&quot;: &quot;## Task 2\n\nReview PR #123&quot;,
+      &quot;color&quot;: &quot;2&quot;
     },
     {
-      "id": "0d1e2f3a4b5c6d7e",
-      "type": "text",
-      "x": 720,
-      "y": 50,
-      "width": 260,
-      "height": 80,
-      "text": "## Task 3\n\n~~Setup CI/CD~~"
+      &quot;id&quot;: &quot;0d1e2f3a4b5c6d7e&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 720,
+      &quot;y&quot;: 50,
+      &quot;width&quot;: 260,
+      &quot;height&quot;: 80,
+      &quot;text&quot;: &quot;## Task 3\n\n~~Setup CI/CD~~&quot;
     }
   ],
-  "edges": []
+  &quot;edges&quot;: []
 }
 ```
 
@@ -440,88 +490,88 @@ Note: Specific color values for presets are intentionally undefined, allowing ap
 
 ```json
 {
-  "nodes": [
+  &quot;nodes&quot;: [
     {
-      "id": "1e2f3a4b5c6d7e8f",
-      "type": "text",
-      "x": 300,
-      "y": 200,
-      "width": 400,
-      "height": 200,
-      "text": "# Research Topic\n\n## Key Questions\n\n- How does X affect Y?\n- What are the implications?",
-      "color": "5"
+      &quot;id&quot;: &quot;1e2f3a4b5c6d7e8f&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 300,
+      &quot;y&quot;: 200,
+      &quot;width&quot;: 400,
+      &quot;height&quot;: 200,
+      &quot;text&quot;: &quot;# Research Topic\n\n## Key Questions\n\n- How does X affect Y?\n- What are the implications?&quot;,
+      &quot;color&quot;: &quot;5&quot;
     },
     {
-      "id": "2f3a4b5c6d7e8f9a",
-      "type": "file",
-      "x": 0,
-      "y": 0,
-      "width": 250,
-      "height": 150,
-      "file": "Literature/Paper A.pdf"
+      &quot;id&quot;: &quot;2f3a4b5c6d7e8f9a&quot;,
+      &quot;type&quot;: &quot;file&quot;,
+      &quot;x&quot;: 0,
+      &quot;y&quot;: 0,
+      &quot;width&quot;: 250,
+      &quot;height&quot;: 150,
+      &quot;file&quot;: &quot;Literature/Paper A.pdf&quot;
     },
     {
-      "id": "3a4b5c6d7e8f9a0b",
-      "type": "file",
-      "x": 0,
-      "y": 200,
-      "width": 250,
-      "height": 150,
-      "file": "Notes/Meeting Notes.md",
-      "subpath": "#Key Insights"
+      &quot;id&quot;: &quot;3a4b5c6d7e8f9a0b&quot;,
+      &quot;type&quot;: &quot;file&quot;,
+      &quot;x&quot;: 0,
+      &quot;y&quot;: 200,
+      &quot;width&quot;: 250,
+      &quot;height&quot;: 150,
+      &quot;file&quot;: &quot;Notes/Meeting Notes.md&quot;,
+      &quot;subpath&quot;: &quot;#Key Insights&quot;
     },
     {
-      "id": "4b5c6d7e8f9a0b1c",
-      "type": "link",
-      "x": 0,
-      "y": 400,
-      "width": 250,
-      "height": 100,
-      "url": "https://example.com/research"
+      &quot;id&quot;: &quot;4b5c6d7e8f9a0b1c&quot;,
+      &quot;type&quot;: &quot;link&quot;,
+      &quot;x&quot;: 0,
+      &quot;y&quot;: 400,
+      &quot;width&quot;: 250,
+      &quot;height&quot;: 100,
+      &quot;url&quot;: &quot;https://example.com/research&quot;
     },
     {
-      "id": "5c6d7e8f9a0b1c2d",
-      "type": "file",
-      "x": 750,
-      "y": 150,
-      "width": 300,
-      "height": 250,
-      "file": "Attachments/diagram.png"
+      &quot;id&quot;: &quot;5c6d7e8f9a0b1c2d&quot;,
+      &quot;type&quot;: &quot;file&quot;,
+      &quot;x&quot;: 750,
+      &quot;y&quot;: 150,
+      &quot;width&quot;: 300,
+      &quot;height&quot;: 250,
+      &quot;file&quot;: &quot;Attachments/diagram.png&quot;
     }
   ],
-  "edges": [
+  &quot;edges&quot;: [
     {
-      "id": "6d7e8f9a0b1c2d3e",
-      "fromNode": "2f3a4b5c6d7e8f9a",
-      "fromSide": "right",
-      "toNode": "1e2f3a4b5c6d7e8f",
-      "toSide": "left",
-      "label": "supports"
+      &quot;id&quot;: &quot;6d7e8f9a0b1c2d3e&quot;,
+      &quot;fromNode&quot;: &quot;2f3a4b5c6d7e8f9a&quot;,
+      &quot;fromSide&quot;: &quot;right&quot;,
+      &quot;toNode&quot;: &quot;1e2f3a4b5c6d7e8f&quot;,
+      &quot;toSide&quot;: &quot;left&quot;,
+      &quot;label&quot;: &quot;supports&quot;
     },
     {
-      "id": "7e8f9a0b1c2d3e4f",
-      "fromNode": "3a4b5c6d7e8f9a0b",
-      "fromSide": "right",
-      "toNode": "1e2f3a4b5c6d7e8f",
-      "toSide": "left",
-      "label": "informs"
+      &quot;id&quot;: &quot;7e8f9a0b1c2d3e4f&quot;,
+      &quot;fromNode&quot;: &quot;3a4b5c6d7e8f9a0b&quot;,
+      &quot;fromSide&quot;: &quot;right&quot;,
+      &quot;toNode&quot;: &quot;1e2f3a4b5c6d7e8f&quot;,
+      &quot;toSide&quot;: &quot;left&quot;,
+      &quot;label&quot;: &quot;informs&quot;
     },
     {
-      "id": "8f9a0b1c2d3e4f5a",
-      "fromNode": "4b5c6d7e8f9a0b1c",
-      "fromSide": "right",
-      "toNode": "1e2f3a4b5c6d7e8f",
-      "toSide": "left",
-      "toEnd": "arrow",
-      "color": "6"
+      &quot;id&quot;: &quot;8f9a0b1c2d3e4f5a&quot;,
+      &quot;fromNode&quot;: &quot;4b5c6d7e8f9a0b1c&quot;,
+      &quot;fromSide&quot;: &quot;right&quot;,
+      &quot;toNode&quot;: &quot;1e2f3a4b5c6d7e8f&quot;,
+      &quot;toSide&quot;: &quot;left&quot;,
+      &quot;toEnd&quot;: &quot;arrow&quot;,
+      &quot;color&quot;: &quot;6&quot;
     },
     {
-      "id": "9a0b1c2d3e4f5a6b",
-      "fromNode": "1e2f3a4b5c6d7e8f",
-      "fromSide": "right",
-      "toNode": "5c6d7e8f9a0b1c2d",
-      "toSide": "left",
-      "label": "visualized by"
+      &quot;id&quot;: &quot;9a0b1c2d3e4f5a6b&quot;,
+      &quot;fromNode&quot;: &quot;1e2f3a4b5c6d7e8f&quot;,
+      &quot;fromSide&quot;: &quot;right&quot;,
+      &quot;toNode&quot;: &quot;5c6d7e8f9a0b1c2d&quot;,
+      &quot;toSide&quot;: &quot;left&quot;,
+      &quot;label&quot;: &quot;visualized by&quot;
     }
   ]
 }
@@ -531,114 +581,114 @@ Note: Specific color values for presets are intentionally undefined, allowing ap
 
 ```json
 {
-  "nodes": [
+  &quot;nodes&quot;: [
     {
-      "id": "a0b1c2d3e4f5a6b7",
-      "type": "text",
-      "x": 200,
-      "y": 0,
-      "width": 150,
-      "height": 60,
-      "text": "**Start**",
-      "color": "4"
+      &quot;id&quot;: &quot;a0b1c2d3e4f5a6b7&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 200,
+      &quot;y&quot;: 0,
+      &quot;width&quot;: 150,
+      &quot;height&quot;: 60,
+      &quot;text&quot;: &quot;**Start**&quot;,
+      &quot;color&quot;: &quot;4&quot;
     },
     {
-      "id": "b1c2d3e4f5a6b7c8",
-      "type": "text",
-      "x": 200,
-      "y": 100,
-      "width": 150,
-      "height": 60,
-      "text": "Step 1:\nGather data"
+      &quot;id&quot;: &quot;b1c2d3e4f5a6b7c8&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 200,
+      &quot;y&quot;: 100,
+      &quot;width&quot;: 150,
+      &quot;height&quot;: 60,
+      &quot;text&quot;: &quot;Step 1:\nGather data&quot;
     },
     {
-      "id": "c2d3e4f5a6b7c8d9",
-      "type": "text",
-      "x": 200,
-      "y": 200,
-      "width": 150,
-      "height": 80,
-      "text": "**Decision**\n\nIs data valid?",
-      "color": "3"
+      &quot;id&quot;: &quot;c2d3e4f5a6b7c8d9&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 200,
+      &quot;y&quot;: 200,
+      &quot;width&quot;: 150,
+      &quot;height&quot;: 80,
+      &quot;text&quot;: &quot;**Decision**\n\nIs data valid?&quot;,
+      &quot;color&quot;: &quot;3&quot;
     },
     {
-      "id": "d3e4f5a6b7c8d9e0",
-      "type": "text",
-      "x": 400,
-      "y": 200,
-      "width": 150,
-      "height": 60,
-      "text": "Process data"
+      &quot;id&quot;: &quot;d3e4f5a6b7c8d9e0&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 400,
+      &quot;y&quot;: 200,
+      &quot;width&quot;: 150,
+      &quot;height&quot;: 60,
+      &quot;text&quot;: &quot;Process data&quot;
     },
     {
-      "id": "e4f5a6b7c8d9e0f1",
-      "type": "text",
-      "x": 0,
-      "y": 200,
-      "width": 150,
-      "height": 60,
-      "text": "Request new data",
-      "color": "1"
+      &quot;id&quot;: &quot;e4f5a6b7c8d9e0f1&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 0,
+      &quot;y&quot;: 200,
+      &quot;width&quot;: 150,
+      &quot;height&quot;: 60,
+      &quot;text&quot;: &quot;Request new data&quot;,
+      &quot;color&quot;: &quot;1&quot;
     },
     {
-      "id": "f5a6b7c8d9e0f1a2",
-      "type": "text",
-      "x": 400,
-      "y": 320,
-      "width": 150,
-      "height": 60,
-      "text": "**End**",
-      "color": "4"
+      &quot;id&quot;: &quot;f5a6b7c8d9e0f1a2&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;x&quot;: 400,
+      &quot;y&quot;: 320,
+      &quot;width&quot;: 150,
+      &quot;height&quot;: 60,
+      &quot;text&quot;: &quot;**End**&quot;,
+      &quot;color&quot;: &quot;4&quot;
     }
   ],
-  "edges": [
+  &quot;edges&quot;: [
     {
-      "id": "a6b7c8d9e0f1a2b3",
-      "fromNode": "a0b1c2d3e4f5a6b7",
-      "fromSide": "bottom",
-      "toNode": "b1c2d3e4f5a6b7c8",
-      "toSide": "top"
+      &quot;id&quot;: &quot;a6b7c8d9e0f1a2b3&quot;,
+      &quot;fromNode&quot;: &quot;a0b1c2d3e4f5a6b7&quot;,
+      &quot;fromSide&quot;: &quot;bottom&quot;,
+      &quot;toNode&quot;: &quot;b1c2d3e4f5a6b7c8&quot;,
+      &quot;toSide&quot;: &quot;top&quot;
     },
     {
-      "id": "b7c8d9e0f1a2b3c4",
-      "fromNode": "b1c2d3e4f5a6b7c8",
-      "fromSide": "bottom",
-      "toNode": "c2d3e4f5a6b7c8d9",
-      "toSide": "top"
+      &quot;id&quot;: &quot;b7c8d9e0f1a2b3c4&quot;,
+      &quot;fromNode&quot;: &quot;b1c2d3e4f5a6b7c8&quot;,
+      &quot;fromSide&quot;: &quot;bottom&quot;,
+      &quot;toNode&quot;: &quot;c2d3e4f5a6b7c8d9&quot;,
+      &quot;toSide&quot;: &quot;top&quot;
     },
     {
-      "id": "c8d9e0f1a2b3c4d5",
-      "fromNode": "c2d3e4f5a6b7c8d9",
-      "fromSide": "right",
-      "toNode": "d3e4f5a6b7c8d9e0",
-      "toSide": "left",
-      "label": "Yes",
-      "color": "4"
+      &quot;id&quot;: &quot;c8d9e0f1a2b3c4d5&quot;,
+      &quot;fromNode&quot;: &quot;c2d3e4f5a6b7c8d9&quot;,
+      &quot;fromSide&quot;: &quot;right&quot;,
+      &quot;toNode&quot;: &quot;d3e4f5a6b7c8d9e0&quot;,
+      &quot;toSide&quot;: &quot;left&quot;,
+      &quot;label&quot;: &quot;Yes&quot;,
+      &quot;color&quot;: &quot;4&quot;
     },
     {
-      "id": "d9e0f1a2b3c4d5e6",
-      "fromNode": "c2d3e4f5a6b7c8d9",
-      "fromSide": "left",
-      "toNode": "e4f5a6b7c8d9e0f1",
-      "toSide": "right",
-      "label": "No",
-      "color": "1"
+      &quot;id&quot;: &quot;d9e0f1a2b3c4d5e6&quot;,
+      &quot;fromNode&quot;: &quot;c2d3e4f5a6b7c8d9&quot;,
+      &quot;fromSide&quot;: &quot;left&quot;,
+      &quot;toNode&quot;: &quot;e4f5a6b7c8d9e0f1&quot;,
+      &quot;toSide&quot;: &quot;right&quot;,
+      &quot;label&quot;: &quot;No&quot;,
+      &quot;color&quot;: &quot;1&quot;
     },
     {
-      "id": "e0f1a2b3c4d5e6f7",
-      "fromNode": "e4f5a6b7c8d9e0f1",
-      "fromSide": "top",
-      "fromEnd": "none",
-      "toNode": "b1c2d3e4f5a6b7c8",
-      "toSide": "left",
-      "toEnd": "arrow"
+      &quot;id&quot;: &quot;e0f1a2b3c4d5e6f7&quot;,
+      &quot;fromNode&quot;: &quot;e4f5a6b7c8d9e0f1&quot;,
+      &quot;fromSide&quot;: &quot;top&quot;,
+      &quot;fromEnd&quot;: &quot;none&quot;,
+      &quot;toNode&quot;: &quot;b1c2d3e4f5a6b7c8&quot;,
+      &quot;toSide&quot;: &quot;left&quot;,
+      &quot;toEnd&quot;: &quot;arrow&quot;
     },
     {
-      "id": "f1a2b3c4d5e6f7a8",
-      "fromNode": "d3e4f5a6b7c8d9e0",
-      "fromSide": "bottom",
-      "toNode": "f5a6b7c8d9e0f1a2",
-      "toSide": "top"
+      &quot;id&quot;: &quot;f1a2b3c4d5e6f7a8&quot;,
+      &quot;fromNode&quot;: &quot;d3e4f5a6b7c8d9e0&quot;,
+      &quot;fromSide&quot;: &quot;bottom&quot;,
+      &quot;toNode&quot;: &quot;f5a6b7c8d9e0f1a2&quot;,
+      &quot;toSide&quot;: &quot;top&quot;
     }
   ]
 }
@@ -649,9 +699,9 @@ Note: Specific color values for presets are intentionally undefined, allowing ap
 Node and edge IDs must be unique strings. Obsidian generates 16-character hexadecimal IDs:
 
 ```json
-"id": "6f0ad84f44ce9c17"
-"id": "a3b2c1d0e9f8g7h6"
-"id": "1234567890abcdef"
+&quot;id&quot;: &quot;6f0ad84f44ce9c17&quot;
+&quot;id&quot;: &quot;a3b2c1d0e9f8g7h6&quot;
+&quot;id&quot;: &quot;1234567890abcdef&quot;
 ```
 
 This format is a 16-character lowercase hex string (64-bit random value).
@@ -691,15 +741,46 @@ This format is a 16-character lowercase hex string (64-bit random value).
 5. `backgroundStyle` must be one of: `cover`, `ratio`, `repeat`
 6. `fromSide`, `toSide` must be one of: `top`, `right`, `bottom`, `left`
 7. `fromEnd`, `toEnd` must be one of: `none`, `arrow`
-8. Color presets must be `"1"` through `"6"` or valid hex color
+8. Color presets must be `&quot;1&quot;` through `&quot;6&quot;` or valid hex color
 
 ## References
 
 - [JSON Canvas Spec 1.0](https://jsoncanvas.org/spec/1.0/)
 - [JSON Canvas GitHub](https://github.com/obsidianmd/jsoncanvas)
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>60</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

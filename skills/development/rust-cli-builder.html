@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>rust-cli-builder - AICCLI</title>
-  <meta name="description" content="rust-cli-builder - Claude Code skill for AICCLI">
+  <meta name="description" content="Plan and build production-ready Rust CLI tools using clap for argument parsing, with subcommands, config file support, colored output, and proper error handling">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / rust-cli-builder</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>rust-cli-builder</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / rust-cli-builder
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>rust-cli-builder</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Plan and build production-ready Rust CLI tools using clap for argument parsing, with subcommands, config file support, colored output, and proper error handling. Uses interview-driven planning to clarify commands, input/output formats, and distribution strategy before writing any code.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/rust-cli-builder</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/rust-cli-builder</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/rust-cli-builder</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: rust-cli-builder
 description: Plan and build production-ready Rust CLI tools using clap for argument parsing, with subcommands, config file support, colored output, and proper error handling. Uses interview-driven planning to clarify commands, input/output formats, and distribution strategy before writing any code.
 tags: [rust, cli, clap, terminal, command-line, devtools]
@@ -84,7 +134,7 @@ Enter plan mode. Before writing any code, explore the existing project:
 - Check if clap is using derive macros or builder pattern
 - Identify existing subcommand structure
 - Look for existing error types, config structs, and output formatting
-- Check if there's a `src/lib.rs` separating library logic from CLI
+- Check if there&#039;s a `src/lib.rs` separating library logic from CLI
 
 ### If starting from scratch
 - Check the workspace for any existing Rust projects or workspace `Cargo.toml`
@@ -98,70 +148,70 @@ Use AskUserQuestion to clarify requirements. Ask in rounds.
 ### Round 1: Tool purpose and commands
 
 ```
-Question: "What kind of CLI tool are you building?"
-Header: "Tool type"
+Question: &quot;What kind of CLI tool are you building?&quot;
+Header: &quot;Tool type&quot;
 Options:
-  - "Single command (like ripgrep, curl)" — One main action with flags and arguments
-  - "Multi-command (like git, cargo)" — Multiple subcommands under one binary
-  - "Interactive REPL (like psql)" — Persistent session with a prompt loop
-  - "Pipeline tool (like jq, sed)" — Reads stdin, transforms, writes stdout
+  - &quot;Single command (like ripgrep, curl)&quot; — One main action with flags and arguments
+  - &quot;Multi-command (like git, cargo)&quot; — Multiple subcommands under one binary
+  - &quot;Interactive REPL (like psql)&quot; — Persistent session with a prompt loop
+  - &quot;Pipeline tool (like jq, sed)&quot; — Reads stdin, transforms, writes stdout
 
-Question: "What will the tool operate on?"
-Header: "Input"
+Question: &quot;What will the tool operate on?&quot;
+Header: &quot;Input&quot;
 Options:
-  - "Files/directories" — Read, process, or generate files
-  - "Network/API" — HTTP requests, TCP connections, API calls
-  - "System resources" — Processes, hardware info, OS config
-  - "Data streams (stdin/stdout)" — Pipe-friendly text/binary processing
+  - &quot;Files/directories&quot; — Read, process, or generate files
+  - &quot;Network/API&quot; — HTTP requests, TCP connections, API calls
+  - &quot;System resources&quot; — Processes, hardware info, OS config
+  - &quot;Data streams (stdin/stdout)&quot; — Pipe-friendly text/binary processing
 ```
 
 ### Round 2: Subcommands (if multi-command)
 
 ```
-Question: "Describe the subcommands you need (e.g., 'init', 'build', 'deploy')"
-Header: "Commands"
+Question: &quot;Describe the subcommands you need (e.g., &#039;init&#039;, &#039;build&#039;, &#039;deploy&#039;)&quot;
+Header: &quot;Commands&quot;
 Options:
-  - "2-3 subcommands (I'll describe them)" — Small focused tool
-  - "4-8 subcommands with groups" — Medium tool, may need command groups
-  - "I have a rough list, help me design the API" — Collaborative command design
+  - &quot;2-3 subcommands (I&#039;ll describe them)&quot; — Small focused tool
+  - &quot;4-8 subcommands with groups&quot; — Medium tool, may need command groups
+  - &quot;I have a rough list, help me design the API&quot; — Collaborative command design
 ```
 
 ### Round 3: Configuration and output
 
 ```
-Question: "How should the tool be configured?"
-Header: "Config"
+Question: &quot;How should the tool be configured?&quot;
+Header: &quot;Config&quot;
 Options:
-  - "CLI flags only (Recommended)" — All config via command-line arguments
-  - "Config file (TOML)" — Load defaults from ~/.config/toolname/config.toml
-  - "Config file + CLI overrides" — Config file for defaults, flags override specific values
-  - "Environment variables + flags" — Env vars for secrets, flags for everything else
+  - &quot;CLI flags only (Recommended)&quot; — All config via command-line arguments
+  - &quot;Config file (TOML)&quot; — Load defaults from ~/.config/toolname/config.toml
+  - &quot;Config file + CLI overrides&quot; — Config file for defaults, flags override specific values
+  - &quot;Environment variables + flags&quot; — Env vars for secrets, flags for everything else
 
-Question: "What output format does the tool need?"
-Header: "Output"
+Question: &quot;What output format does the tool need?&quot;
+Header: &quot;Output&quot;
 Options:
-  - "Human-readable (colored text)" — Pretty terminal output with colors and formatting
-  - "Machine-readable (JSON)" — Structured output for piping to other tools
-  - "Both (--format flag)" — Default human, --json or --format=json for machines
-  - "Minimal (exit codes only)" — Success/failure via exit code, errors to stderr
+  - &quot;Human-readable (colored text)&quot; — Pretty terminal output with colors and formatting
+  - &quot;Machine-readable (JSON)&quot; — Structured output for piping to other tools
+  - &quot;Both (--format flag)&quot; — Default human, --json or --format=json for machines
+  - &quot;Minimal (exit codes only)&quot; — Success/failure via exit code, errors to stderr
 ```
 
 ### Round 4: Async and error handling
 
 ```
-Question: "Does the tool need async operations?"
-Header: "Async"
+Question: &quot;Does the tool need async operations?&quot;
+Header: &quot;Async&quot;
 Options:
-  - "No — synchronous is fine (Recommended)" — File I/O, computation, simple operations
-  - "Yes — tokio (network I/O)" — HTTP requests, concurrent connections, async file I/O
-  - "Yes — tokio multi-threaded" — Heavy parallelism, multiple concurrent tasks
+  - &quot;No — synchronous is fine (Recommended)&quot; — File I/O, computation, simple operations
+  - &quot;Yes — tokio (network I/O)&quot; — HTTP requests, concurrent connections, async file I/O
+  - &quot;Yes — tokio multi-threaded&quot; — Heavy parallelism, multiple concurrent tasks
 
-Question: "How should errors be presented to users?"
-Header: "Errors"
+Question: &quot;How should errors be presented to users?&quot;
+Header: &quot;Errors&quot;
 Options:
-  - "Simple messages (anyhow) (Recommended)" — Human-readable error chains, good for most CLIs
-  - "Typed errors (thiserror)" — Custom error enum with specific variants for each failure
-  - "Both (thiserror for lib, anyhow for bin)" — Library code is typed, CLI wraps with anyhow
+  - &quot;Simple messages (anyhow) (Recommended)&quot; — Human-readable error chains, good for most CLIs
+  - &quot;Typed errors (thiserror)&quot; — Custom error enum with specific variants for each failure
+  - &quot;Both (thiserror for lib, anyhow for bin)&quot; — Library code is typed, CLI wraps with anyhow
 ```
 
 ## Phase 3: Plan (ExitPlanMode)
@@ -186,23 +236,23 @@ After approval, implement following this order:
 
 ```toml
 [package]
-name = "toolname"
-version = "0.1.0"
-edition = "2021"
-description = "Short description of the tool"
+name = &quot;toolname&quot;
+version = &quot;0.1.0&quot;
+edition = &quot;2021&quot;
+description = &quot;Short description of the tool&quot;
 
 [dependencies]
-clap = { version = "4", features = ["derive", "env"] }
-serde = { version = "1", features = ["derive"] }
-anyhow = "1"
+clap = { version = &quot;4&quot;, features = [&quot;derive&quot;, &quot;env&quot;] }
+serde = { version = &quot;1&quot;, features = [&quot;derive&quot;] }
+anyhow = &quot;1&quot;
 # Add based on interview:
-# thiserror = "2"              # if typed errors
-# tokio = { version = "1", features = ["full"] }  # if async
-# serde_json = "1"             # if JSON output
-# toml = "0.8"                 # if TOML config
-# colored = "2"                # if colored output
-# indicatif = "0.17"           # if progress bars
-# dirs = "5"                   # if config file (~/.config/)
+# thiserror = &quot;2&quot;              # if typed errors
+# tokio = { version = &quot;1&quot;, features = [&quot;full&quot;] }  # if async
+# serde_json = &quot;1&quot;             # if JSON output
+# toml = &quot;0.8&quot;                 # if TOML config
+# colored = &quot;2&quot;                # if colored output
+# indicatif = &quot;0.17&quot;           # if progress bars
+# dirs = &quot;5&quot;                   # if config file (~/.config/)
 ```
 
 ### Step 2: CLI definition with clap derive
@@ -212,14 +262,14 @@ use clap::{Parser, Subcommand};
 
 /// Short one-line description of the tool
 #[derive(Parser, Debug)]
-#[command(name = "toolname", version, about, long_about = None)]
+#[command(name = &quot;toolname&quot;, version, about, long_about = None)]
 pub struct Cli {
     /// Increase verbosity (-v, -vv, -vvv)
     #[arg(short, long, action = clap::ArgAction::Count, global = true)]
     pub verbose: u8,
 
     /// Output format
-    #[arg(long, default_value = "text", global = true)]
+    #[arg(long, default_value = &quot;text&quot;, global = true)]
     pub format: OutputFormat,
 
     /// Path to config file
@@ -238,7 +288,7 @@ pub enum Commands {
         name: String,
 
         /// Template to use
-        #[arg(short, long, default_value = "default")]
+        #[arg(short, long, default_value = &quot;default&quot;)]
         template: String,
     },
 
@@ -270,11 +320,11 @@ pub enum OutputFormat {
 // With anyhow (simple approach):
 use anyhow::{Context, Result};
 
-fn load_config(path: &Path) -&gt; Result&lt;Config&gt; {
+fn load_config(path: &amp;Path) -&gt; Result&lt;Config&gt; {
     let content = std::fs::read_to_string(path)
-        .with_context(|| format!("Failed to read config file: {}", path.display()))?;
-    let config: Config = toml::from_str(&content)
-        .context("Invalid TOML in config file")?;
+        .with_context(|| format!(&quot;Failed to read config file: {}&quot;, path.display()))?;
+    let config: Config = toml::from_str(&amp;content)
+        .context(&quot;Invalid TOML in config file&quot;)?;
     Ok(config)
 }
 
@@ -283,16 +333,16 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum AppError {
-    #[error("Config file not found: {path}")]
+    #[error(&quot;Config file not found: {path}&quot;)]
     ConfigNotFound { path: std::path::PathBuf },
 
-    #[error("Invalid config: {0}")]
+    #[error(&quot;Invalid config: {0}&quot;)]
     InvalidConfig(#[from] toml::de::Error),
 
-    #[error("Network error: {0}")]
+    #[error(&quot;Network error: {0}&quot;)]
     Network(#[from] reqwest::Error),
 
-    #[error("{0}")]
+    #[error(&quot;{0}&quot;)]
     Custom(String),
 }
 ```
@@ -311,7 +361,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn load(explicit_path: Option&lt;&Path&gt;) -&gt; anyhow::Result&lt;Self&gt; {
+    pub fn load(explicit_path: Option&lt;&amp;Path&gt;) -&gt; anyhow::Result&lt;Self&gt; {
         let path = match explicit_path {
             Some(p) =&gt; p.to_path_buf(),
             None =&gt; Self::default_path(),
@@ -321,16 +371,16 @@ impl Config {
             return Ok(Config::default());
         }
 
-        let content = std::fs::read_to_string(&path)?;
-        let config: Config = toml::from_str(&content)?;
+        let content = std::fs::read_to_string(&amp;path)?;
+        let config: Config = toml::from_str(&amp;content)?;
         Ok(config)
     }
 
     fn default_path() -&gt; PathBuf {
         dirs::config_dir()
-            .unwrap_or_else(|| PathBuf::from("."))
-            .join("toolname")
-            .join("config.toml")
+            .unwrap_or_else(|| PathBuf::from(&quot;.&quot;))
+            .join(&quot;toolname&quot;)
+            .join(&quot;config.toml&quot;)
     }
 }
 ```
@@ -350,40 +400,40 @@ impl Output {
         Self { format, verbose }
     }
 
-    pub fn success(&self, msg: &str) {
+    pub fn success(&amp;self, msg: &amp;str) {
         match self.format {
-            OutputFormat::Text =&gt; eprintln!("{} {}", "✓".green().bold(), msg),
+            OutputFormat::Text =&gt; eprintln!(&quot;{} {}&quot;, &quot;✓&quot;.green().bold(), msg),
             OutputFormat::Json =&gt; {} // JSON output goes to stdout only
         }
     }
 
-    pub fn error(&self, msg: &str) {
+    pub fn error(&amp;self, msg: &amp;str) {
         match self.format {
-            OutputFormat::Text =&gt; eprintln!("{} {}", "✗".red().bold(), msg),
+            OutputFormat::Text =&gt; eprintln!(&quot;{} {}&quot;, &quot;✗&quot;.red().bold(), msg),
             OutputFormat::Json =&gt; {
-                let err = serde_json::json!({"error": msg});
-                println!("{}", serde_json::to_string(&err).unwrap());
+                let err = serde_json::json!({&quot;error&quot;: msg});
+                println!(&quot;{}&quot;, serde_json::to_string(&amp;err).unwrap());
             }
         }
     }
 
-    pub fn info(&self, msg: &str) {
+    pub fn info(&amp;self, msg: &amp;str) {
         if self.verbose &gt;= 1 {
             match self.format {
-                OutputFormat::Text =&gt; eprintln!("{} {}", "ℹ".blue(), msg),
+                OutputFormat::Text =&gt; eprintln!(&quot;{} {}&quot;, &quot;ℹ&quot;.blue(), msg),
                 OutputFormat::Json =&gt; {}
             }
         }
     }
 
-    pub fn data&lt;T: serde::Serialize&gt;(&self, data: &T) {
+    pub fn data&lt;T: serde::Serialize&gt;(&amp;self, data: &amp;T) {
         match self.format {
             OutputFormat::Text =&gt; {
                 // Pretty print for humans — customize per subcommand
-                println!("{:#?}", data);
+                println!(&quot;{:#?}&quot;, data);
             }
             OutputFormat::Json =&gt; {
-                println!("{}", serde_json::to_string_pretty(data).unwrap());
+                println!(&quot;{}&quot;, serde_json::to_string_pretty(data).unwrap());
             }
         }
     }
@@ -402,16 +452,16 @@ fn main() -&gt; anyhow::Result&lt;()&gt; {
 
     match cli.command {
         Commands::Init { name, template } =&gt; {
-            cmd_init(&name, &template, &config, &output)?;
+            cmd_init(&amp;name, &amp;template, &amp;config, &amp;output)?;
         }
         Commands::Build { release, output_dir } =&gt; {
             let dir = output_dir
                 .or(config.output_dir.clone())
-                .unwrap_or_else(|| PathBuf::from("./dist"));
-            cmd_build(release, &dir, &output)?;
+                .unwrap_or_else(|| PathBuf::from(&quot;./dist&quot;));
+            cmd_build(release, &amp;dir, &amp;output)?;
         }
         Commands::Status =&gt; {
-            cmd_status(&config, &output)?;
+            cmd_status(&amp;config, &amp;output)?;
         }
     }
 
@@ -426,24 +476,24 @@ fn main() -&gt; anyhow::Result&lt;()&gt; {
 ### Step 7: Subcommand implementations
 
 ```rust
-fn cmd_init(name: &str, template: &str, config: &Config, out: &Output) -&gt; anyhow::Result&lt;()&gt; {
-    let template = if template == "default" {
-        config.default_template.as_deref().unwrap_or("default")
+fn cmd_init(name: &amp;str, template: &amp;str, config: &amp;Config, out: &amp;Output) -&gt; anyhow::Result&lt;()&gt; {
+    let template = if template == &quot;default&quot; {
+        config.default_template.as_deref().unwrap_or(&quot;default&quot;)
     } else {
         template
     };
 
-    out.info(&format!("Using template: {}", template));
+    out.info(&amp;format!(&quot;Using template: {}&quot;, template));
 
     let project_dir = Path::new(name);
     if project_dir.exists() {
-        anyhow::bail!("Directory '{}' already exists", name);
+        anyhow::bail!(&quot;Directory &#039;{}&#039; already exists&quot;, name);
     }
 
     std::fs::create_dir_all(project_dir)?;
     // ... scaffold project files based on template
 
-    out.success(&format!("Created project '{}' with template '{}'", name, template));
+    out.success(&amp;format!(&quot;Created project &#039;{}&#039; with template &#039;{}&#039;&quot;, name, template));
     Ok(())
 }
 ```
@@ -463,12 +513,12 @@ mod tests {
 
     #[test]
     fn test_config_parse_toml() {
-        let toml_str = r#"
-            default_template = "react"
-            output_dir = "./build"
-        "#;
+        let toml_str = r#&quot;
+            default_template = &quot;react&quot;
+            output_dir = &quot;./build&quot;
+        &quot;#;
         let config: Config = toml::from_str(toml_str).unwrap();
-        assert_eq!(config.default_template.unwrap(), "react");
+        assert_eq!(config.default_template.unwrap(), &quot;react&quot;);
     }
 }
 
@@ -478,19 +528,19 @@ use predicates::prelude::*;
 
 #[test]
 fn test_help_flag() {
-    Command::cargo_bin("toolname")
+    Command::cargo_bin(&quot;toolname&quot;)
         .unwrap()
-        .arg("--help")
+        .arg(&quot;--help&quot;)
         .assert()
         .success()
-        .stdout(predicate::str::contains("Usage:"));
+        .stdout(predicate::str::contains(&quot;Usage:&quot;));
 }
 
 #[test]
 fn test_version_flag() {
-    Command::cargo_bin("toolname")
+    Command::cargo_bin(&quot;toolname&quot;)
         .unwrap()
-        .arg("--version")
+        .arg(&quot;--version&quot;)
         .assert()
         .success();
 }
@@ -498,11 +548,11 @@ fn test_version_flag() {
 #[test]
 fn test_init_creates_directory() {
     let dir = tempfile::tempdir().unwrap();
-    let project_name = dir.path().join("test-project");
+    let project_name = dir.path().join(&quot;test-project&quot;);
 
-    Command::cargo_bin("toolname")
+    Command::cargo_bin(&quot;toolname&quot;)
         .unwrap()
-        .args(["init", project_name.to_str().unwrap()])
+        .args([&quot;init&quot;, project_name.to_str().unwrap()])
         .assert()
         .success();
 
@@ -513,22 +563,22 @@ fn test_init_creates_directory() {
 fn test_init_existing_directory_fails() {
     let dir = tempfile::tempdir().unwrap();
 
-    Command::cargo_bin("toolname")
+    Command::cargo_bin(&quot;toolname&quot;)
         .unwrap()
-        .args(["init", dir.path().to_str().unwrap()])
+        .args([&quot;init&quot;, dir.path().to_str().unwrap()])
         .assert()
         .failure()
-        .stderr(predicate::str::contains("already exists"));
+        .stderr(predicate::str::contains(&quot;already exists&quot;));
 }
 
 #[test]
 fn test_json_output_format() {
-    Command::cargo_bin("toolname")
+    Command::cargo_bin(&quot;toolname&quot;)
         .unwrap()
-        .args(["--format", "json", "status"])
+        .args([&quot;--format&quot;, &quot;json&quot;, &quot;status&quot;])
         .assert()
         .success()
-        .stdout(predicate::str::starts_with("{"));
+        .stdout(predicate::str::starts_with(&quot;{&quot;));
 }
 ```
 
@@ -558,12 +608,12 @@ toolname/
 Keep clap structs and argument parsing in `cli.rs`. Put business logic in `commands/`. This makes the core logic testable without invoking the CLI.
 
 ### Use stderr for status, stdout for data
-Human-readable messages (progress, success, errors) go to `stderr`. Machine-readable data goes to `stdout`. This lets users pipe output cleanly: `toolname status --format json | jq '.items'`.
+Human-readable messages (progress, success, errors) go to `stderr`. Machine-readable data goes to `stdout`. This lets users pipe output cleanly: `toolname status --format json | jq &#039;.items&#039;`.
 
 ### Respect NO_COLOR
 Check the `NO_COLOR` environment variable and disable colors when set:
 ```rust
-if std::env::var("NO_COLOR").is_ok() {
+if std::env::var(&quot;NO_COLOR&quot;).is_ok() {
     colored::control::set_override(false);
 }
 ```
@@ -575,23 +625,61 @@ Use meaningful exit codes: 0 for success, 1 for general errors, 2 for usage erro
 
 ```toml
 [dev-dependencies]
-assert_cmd = "2"
-predicates = "3"
-tempfile = "3"
+assert_cmd = &quot;2&quot;
+predicates = &quot;3&quot;
+tempfile = &quot;3&quot;
 ```
 
 ## Checklist before finishing
 
 - [ ] `clap` derive structs have doc comments (they become --help text)
 - [ ] All subcommands have short and long descriptions
-- [ ] Config file has sensible defaults and doesn't error when missing
+- [ ] Config file has sensible defaults and doesn&#039;t error when missing
 - [ ] `--format json` outputs valid, parseable JSON to stdout
 - [ ] Errors show context (file paths, what went wrong, how to fix it)
 - [ ] Integration tests verify CLI behavior end-to-end
 - [ ] `cargo clippy` passes with no warnings
 - [ ] `cargo fmt` has been run
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">rust</span><span class="tag">cli</span><span class="tag">clap</span><span class="tag">terminal</span><span class="tag">command-line</span><span class="tag">devtools</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>15</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

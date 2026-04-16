@@ -4,138 +4,219 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>git-flow-settings - AICCLI</title>
-  <meta name="description" content="git-flow-settings - Claude Code setting for AICCLI">
+  <meta name="description" content="Complete Git Flow configuration with statusline, permissions, environment variables, and workflow enforcement. Displays real-time Git Flow status, prevents dire">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../setting.html">Setting</a> / git-flow-settings</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>git-flow-settings</h1>
-      <div class="meta">
-        <span class="meta-item">Setting</span>
-        <span class="meta-item">git</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">settings</a> / git / git-flow-settings
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚙️</div>
+      <div class="title">
+        <h1>git-flow-settings</h1>
+        <div class="meta">
+          <span class="badge type">Setting</span>
+          <span class="badge">git</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>{
-  "description": "Complete Git Flow configuration with statusline, permissions, environment variables, and workflow enforcement. Displays real-time Git Flow status, prevents direct pushes to main/develop, allows feature/release/hotfix operations, and configures Git Flow branch naming conventions. Perfect for teams following Git Flow branching strategy.",
-  "statusLine": {
-    "type": "command",
-    "command": "bash -c 'if ! git rev-parse --git-dir &gt;/dev/null 2&gt;&1; then echo \"Not a git repository\"; exit 0; fi; BRANCH=$(git branch --show-current 2&gt;/dev/null); if [ -z \"$BRANCH\" ]; then echo \"Detached HEAD\"; exit 0; fi; ICON=\"📁\"; TARGET=\"\"; if [[ $BRANCH == feature/* ]]; then ICON=\"🌿\"; TARGET=\"→ develop\"; elif [[ $BRANCH == release/* ]]; then ICON=\"🚀\"; TARGET=\"→ main\"; elif [[ $BRANCH == hotfix/* ]]; then ICON=\"🔥\"; TARGET=\"→ main+develop\"; elif [[ $BRANCH == \"develop\" ]]; then ICON=\"🔀\"; elif [[ $BRANCH == \"main\" ]]; then ICON=\"🏠\"; fi; AHEAD=$(git rev-list --count @{u}..HEAD 2&gt;/dev/null || echo \"0\"); BEHIND=$(git rev-list --count HEAD..@{u} 2&gt;/dev/null || echo \"0\"); SYNC=\"\"; if [ \"$AHEAD\" -gt 0 ]; then SYNC=\" ↑$AHEAD\"; fi; if [ \"$BEHIND\" -gt 0 ]; then SYNC=\"$SYNC ↓$BEHIND\"; fi; MODIFIED=$(git status --porcelain 2&gt;/dev/null | grep \"^ M\" | wc -l | tr -d \" \"); ADDED=$(git status --porcelain 2&gt;/dev/null | grep \"^??\" | wc -l | tr -d \" \"); DELETED=$(git status --porcelain 2&gt;/dev/null | grep \"^ D\" | wc -l | tr -d \" \"); CHANGES=\"\"; if [ \"$MODIFIED\" -gt 0 ]; then CHANGES=\" ●$MODIFIED\"; fi; if [ \"$ADDED\" -gt 0 ]; then CHANGES=\"$CHANGES ✚$ADDED\"; fi; if [ \"$DELETED\" -gt 0 ]; then CHANGES=\"$CHANGES ✖$DELETED\"; fi; if [ -n \"$TARGET\" ]; then echo \"$ICON $BRANCH$SYNC$CHANGES | 🎯 $TARGET\"; else echo \"$ICON $BRANCH$SYNC$CHANGES\"; fi'"
+    </div>
+
+    <p class="desc">Complete Git Flow configuration with statusline, permissions, environment variables, and workflow enforcement. Displays real-time Git Flow status, prevents direct pushes to main/develop, allows feature/release/hotfix operations, and configures Git Flow branch naming conventions. Perfect for teams following Git Flow branching strategy.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install settings/git-flow-settings</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install settings/git-flow-settings</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install settings/git-flow-settings</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>{
+  &quot;description&quot;: &quot;Complete Git Flow configuration with statusline, permissions, environment variables, and workflow enforcement. Displays real-time Git Flow status, prevents direct pushes to main/develop, allows feature/release/hotfix operations, and configures Git Flow branch naming conventions. Perfect for teams following Git Flow branching strategy.&quot;,
+  &quot;statusLine&quot;: {
+    &quot;type&quot;: &quot;command&quot;,
+    &quot;command&quot;: &quot;bash -c &#039;if ! git rev-parse --git-dir &gt;/dev/null 2&gt;&amp;1; then echo \&quot;Not a git repository\&quot;; exit 0; fi; BRANCH=$(git branch --show-current 2&gt;/dev/null); if [ -z \&quot;$BRANCH\&quot; ]; then echo \&quot;Detached HEAD\&quot;; exit 0; fi; ICON=\&quot;📁\&quot;; TARGET=\&quot;\&quot;; if [[ $BRANCH == feature/* ]]; then ICON=\&quot;🌿\&quot;; TARGET=\&quot;→ develop\&quot;; elif [[ $BRANCH == release/* ]]; then ICON=\&quot;🚀\&quot;; TARGET=\&quot;→ main\&quot;; elif [[ $BRANCH == hotfix/* ]]; then ICON=\&quot;🔥\&quot;; TARGET=\&quot;→ main+develop\&quot;; elif [[ $BRANCH == \&quot;develop\&quot; ]]; then ICON=\&quot;🔀\&quot;; elif [[ $BRANCH == \&quot;main\&quot; ]]; then ICON=\&quot;🏠\&quot;; fi; AHEAD=$(git rev-list --count @{u}..HEAD 2&gt;/dev/null || echo \&quot;0\&quot;); BEHIND=$(git rev-list --count HEAD..@{u} 2&gt;/dev/null || echo \&quot;0\&quot;); SYNC=\&quot;\&quot;; if [ \&quot;$AHEAD\&quot; -gt 0 ]; then SYNC=\&quot; ↑$AHEAD\&quot;; fi; if [ \&quot;$BEHIND\&quot; -gt 0 ]; then SYNC=\&quot;$SYNC ↓$BEHIND\&quot;; fi; MODIFIED=$(git status --porcelain 2&gt;/dev/null | grep \&quot;^ M\&quot; | wc -l | tr -d \&quot; \&quot;); ADDED=$(git status --porcelain 2&gt;/dev/null | grep \&quot;^??\&quot; | wc -l | tr -d \&quot; \&quot;); DELETED=$(git status --porcelain 2&gt;/dev/null | grep \&quot;^ D\&quot; | wc -l | tr -d \&quot; \&quot;); CHANGES=\&quot;\&quot;; if [ \&quot;$MODIFIED\&quot; -gt 0 ]; then CHANGES=\&quot; ●$MODIFIED\&quot;; fi; if [ \&quot;$ADDED\&quot; -gt 0 ]; then CHANGES=\&quot;$CHANGES ✚$ADDED\&quot;; fi; if [ \&quot;$DELETED\&quot; -gt 0 ]; then CHANGES=\&quot;$CHANGES ✖$DELETED\&quot;; fi; if [ -n \&quot;$TARGET\&quot; ]; then echo \&quot;$ICON $BRANCH$SYNC$CHANGES | 🎯 $TARGET\&quot;; else echo \&quot;$ICON $BRANCH$SYNC$CHANGES\&quot;; fi&#039;&quot;
   },
-  "permissions": {
-    "deny": [
-      "Bash(git push origin main:*)",
-      "Bash(git push origin develop:*)",
-      "Bash(git push --force:*)",
-      "Bash(git push -f:*)",
-      "Bash(git reset --hard:*)",
-      "Bash(git rebase -i:*)"
+  &quot;permissions&quot;: {
+    &quot;deny&quot;: [
+      &quot;Bash(git push origin main:*)&quot;,
+      &quot;Bash(git push origin develop:*)&quot;,
+      &quot;Bash(git push --force:*)&quot;,
+      &quot;Bash(git push -f:*)&quot;,
+      &quot;Bash(git reset --hard:*)&quot;,
+      &quot;Bash(git rebase -i:*)&quot;
     ],
-    "allow": [
-      "Bash(git status:*)",
-      "Bash(git diff:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git log:*)",
-      "Bash(git branch:*)",
-      "Bash(git checkout:*)",
-      "Bash(git pull:*)",
-      "Bash(git fetch:*)",
-      "Bash(git merge:*)",
-      "Bash(git tag:*)",
-      "Bash(git push origin feature/*:*)",
-      "Bash(git push origin release/*:*)",
-      "Bash(git push origin hotfix/*:*)",
-      "Bash(git push --tags:*)",
-      "Bash(git push -u:*)",
-      "Bash(git flow:*)",
-      "Bash(gh pr:*)",
-      "Bash(gh issue:*)",
-      "Bash(npm test:*)",
-      "Bash(npm run:*)"
+    &quot;allow&quot;: [
+      &quot;Bash(git status:*)&quot;,
+      &quot;Bash(git diff:*)&quot;,
+      &quot;Bash(git add:*)&quot;,
+      &quot;Bash(git commit:*)&quot;,
+      &quot;Bash(git log:*)&quot;,
+      &quot;Bash(git branch:*)&quot;,
+      &quot;Bash(git checkout:*)&quot;,
+      &quot;Bash(git pull:*)&quot;,
+      &quot;Bash(git fetch:*)&quot;,
+      &quot;Bash(git merge:*)&quot;,
+      &quot;Bash(git tag:*)&quot;,
+      &quot;Bash(git push origin feature/*:*)&quot;,
+      &quot;Bash(git push origin release/*:*)&quot;,
+      &quot;Bash(git push origin hotfix/*:*)&quot;,
+      &quot;Bash(git push --tags:*)&quot;,
+      &quot;Bash(git push -u:*)&quot;,
+      &quot;Bash(git flow:*)&quot;,
+      &quot;Bash(gh pr:*)&quot;,
+      &quot;Bash(gh issue:*)&quot;,
+      &quot;Bash(npm test:*)&quot;,
+      &quot;Bash(npm run:*)&quot;
     ]
   },
-  "env": {
-    "GIT_FLOW_MAIN_BRANCH": "main",
-    "GIT_FLOW_DEVELOP_BRANCH": "develop",
-    "GIT_FLOW_PREFIX_FEATURE": "feature/",
-    "GIT_FLOW_PREFIX_RELEASE": "release/",
-    "GIT_FLOW_PREFIX_HOTFIX": "hotfix/",
-    "GIT_FLOW_VERSION_TAG_PREFIX": "v"
+  &quot;env&quot;: {
+    &quot;GIT_FLOW_MAIN_BRANCH&quot;: &quot;main&quot;,
+    &quot;GIT_FLOW_DEVELOP_BRANCH&quot;: &quot;develop&quot;,
+    &quot;GIT_FLOW_PREFIX_FEATURE&quot;: &quot;feature/&quot;,
+    &quot;GIT_FLOW_PREFIX_RELEASE&quot;: &quot;release/&quot;,
+    &quot;GIT_FLOW_PREFIX_HOTFIX&quot;: &quot;hotfix/&quot;,
+    &quot;GIT_FLOW_VERSION_TAG_PREFIX&quot;: &quot;v&quot;
   },
-  "hooks": {
-    "PreToolUse": [
+  &quot;hooks&quot;: {
+    &quot;PreToolUse&quot;: [
       {
-        "matcher": "Bash",
-        "hooks": [
+        &quot;matcher&quot;: &quot;Bash&quot;,
+        &quot;hooks&quot;: [
           {
-            "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_COMMAND\" | grep -q 'git checkout -b'; then BRANCH_NAME=$(echo \"$CLAUDE_TOOL_COMMAND\" | sed -n 's/.*git checkout -b \\([^ ]*\\).*/\\1/p'); if [[ -n \"$BRANCH_NAME\" ]] && [[ \"$BRANCH_NAME\" != \"main\" ]] && [[ \"$BRANCH_NAME\" != \"develop\" ]]; then if [[ ! \"$BRANCH_NAME\" =~ ^(feature|release|hotfix)/ ]]; then echo \"❌ Invalid Git Flow branch name: $BRANCH_NAME\"; echo \"\"; echo \"Git Flow branches must follow these patterns:\"; echo \"  • feature/&lt;descriptive-name&gt;\"; echo \"  • release/v&lt;MAJOR&gt;.&lt;MINOR&gt;.&lt;PATCH&gt;\"; echo \"  • hotfix/&lt;descriptive-name&gt;\"; echo \"\"; echo \"Examples:\"; echo \"  ✅ feature/user-authentication\"; echo \"  ✅ release/v1.2.0\"; echo \"  ✅ hotfix/critical-security-fix\"; echo \"\"; echo \"Invalid:\"; echo \"  ❌ $BRANCH_NAME (missing Git Flow prefix)\"; echo \"  ❌ feat/something (use 'feature/' not 'feat/')\"; echo \"  ❌ fix/bug (use 'hotfix/' not 'fix/')\"; echo \"\"; echo \"💡 Use Git Flow commands instead:\"; echo \"  /feature &lt;name&gt;  - Create feature branch\"; echo \"  /release &lt;version&gt; - Create release branch\"; echo \"  /hotfix &lt;name&gt;   - Create hotfix branch\"; exit 1; fi; if [[ \"$BRANCH_NAME\" =~ ^release/ ]] && [[ ! \"$BRANCH_NAME\" =~ ^release/v[0-9]+\\.[0-9]+\\.[0-9]+(-.+)?$ ]]; then echo \"❌ Invalid release version: $BRANCH_NAME\"; echo \"\"; echo \"Release branches must follow semantic versioning:\"; echo \"  release/vMAJOR.MINOR.PATCH[-prerelease]\"; echo \"\"; echo \"Valid examples:\"; echo \"  ✅ release/v1.0.0\"; echo \"  ✅ release/v2.1.3\"; echo \"  ✅ release/v1.0.0-beta.1\"; echo \"\"; echo \"Invalid:\"; echo \"  ❌ release/1.0.0 (missing 'v' prefix)\"; echo \"  ❌ release/v1.0 (incomplete version)\"; echo \"  ❌ $BRANCH_NAME\"; echo \"\"; echo \"💡 Use: /release v1.2.0\"; exit 1; fi; fi; fi"
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;if echo \&quot;$CLAUDE_TOOL_COMMAND\&quot; | grep -q &#039;git checkout -b&#039;; then BRANCH_NAME=$(echo \&quot;$CLAUDE_TOOL_COMMAND\&quot; | sed -n &#039;s/.*git checkout -b \\([^ ]*\\).*/\\1/p&#039;); if [[ -n \&quot;$BRANCH_NAME\&quot; ]] &amp;&amp; [[ \&quot;$BRANCH_NAME\&quot; != \&quot;main\&quot; ]] &amp;&amp; [[ \&quot;$BRANCH_NAME\&quot; != \&quot;develop\&quot; ]]; then if [[ ! \&quot;$BRANCH_NAME\&quot; =~ ^(feature|release|hotfix)/ ]]; then echo \&quot;❌ Invalid Git Flow branch name: $BRANCH_NAME\&quot;; echo \&quot;\&quot;; echo \&quot;Git Flow branches must follow these patterns:\&quot;; echo \&quot;  • feature/&lt;descriptive-name&gt;\&quot;; echo \&quot;  • release/v&lt;MAJOR&gt;.&lt;MINOR&gt;.&lt;PATCH&gt;\&quot;; echo \&quot;  • hotfix/&lt;descriptive-name&gt;\&quot;; echo \&quot;\&quot;; echo \&quot;Examples:\&quot;; echo \&quot;  ✅ feature/user-authentication\&quot;; echo \&quot;  ✅ release/v1.2.0\&quot;; echo \&quot;  ✅ hotfix/critical-security-fix\&quot;; echo \&quot;\&quot;; echo \&quot;Invalid:\&quot;; echo \&quot;  ❌ $BRANCH_NAME (missing Git Flow prefix)\&quot;; echo \&quot;  ❌ feat/something (use &#039;feature/&#039; not &#039;feat/&#039;)\&quot;; echo \&quot;  ❌ fix/bug (use &#039;hotfix/&#039; not &#039;fix/&#039;)\&quot;; echo \&quot;\&quot;; echo \&quot;💡 Use Git Flow commands instead:\&quot;; echo \&quot;  /feature &lt;name&gt;  - Create feature branch\&quot;; echo \&quot;  /release &lt;version&gt; - Create release branch\&quot;; echo \&quot;  /hotfix &lt;name&gt;   - Create hotfix branch\&quot;; exit 1; fi; if [[ \&quot;$BRANCH_NAME\&quot; =~ ^release/ ]] &amp;&amp; [[ ! \&quot;$BRANCH_NAME\&quot; =~ ^release/v[0-9]+\\.[0-9]+\\.[0-9]+(-.+)?$ ]]; then echo \&quot;❌ Invalid release version: $BRANCH_NAME\&quot;; echo \&quot;\&quot;; echo \&quot;Release branches must follow semantic versioning:\&quot;; echo \&quot;  release/vMAJOR.MINOR.PATCH[-prerelease]\&quot;; echo \&quot;\&quot;; echo \&quot;Valid examples:\&quot;; echo \&quot;  ✅ release/v1.0.0\&quot;; echo \&quot;  ✅ release/v2.1.3\&quot;; echo \&quot;  ✅ release/v1.0.0-beta.1\&quot;; echo \&quot;\&quot;; echo \&quot;Invalid:\&quot;; echo \&quot;  ❌ release/1.0.0 (missing &#039;v&#039; prefix)\&quot;; echo \&quot;  ❌ release/v1.0 (incomplete version)\&quot;; echo \&quot;  ❌ $BRANCH_NAME\&quot;; echo \&quot;\&quot;; echo \&quot;💡 Use: /release v1.2.0\&quot;; exit 1; fi; fi; fi&quot;
           }
         ]
       },
       {
-        "matcher": "Bash(git commit:*)",
-        "hooks": [
+        &quot;matcher&quot;: &quot;Bash(git commit:*)&quot;,
+        &quot;hooks&quot;: [
           {
-            "type": "command",
-            "command": "COMMIT_MSG=$(echo \"$CLAUDE_TOOL_COMMAND\" | grep -oP '(?&lt;=-m \")[^\"]+' | head -1); if [[ -n \"$COMMIT_MSG\" ]] && [[ ! \"$COMMIT_MSG\" =~ ^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\\(.+\\))?:\\  ]]; then echo \"❌ Invalid commit message format\"; echo \"\"; echo \"Commit messages must follow Conventional Commits:\"; echo \"  type(scope): description\"; echo \"\"; echo \"Types:\"; echo \"  feat:     New feature\"; echo \"  fix:      Bug fix\"; echo \"  docs:     Documentation changes\"; echo \"  style:    Code style changes (formatting)\"; echo \"  refactor: Code refactoring\"; echo \"  perf:     Performance improvements\"; echo \"  test:     Adding or updating tests\"; echo \"  chore:    Maintenance tasks\"; echo \"  ci:       CI/CD changes\"; echo \"  build:    Build system changes\"; echo \"  revert:   Revert previous commit\"; echo \"\"; echo \"Examples:\"; echo \"  ✅ feat: add user authentication\"; echo \"  ✅ feat(auth): implement JWT tokens\"; echo \"  ✅ fix: resolve memory leak in parser\"; echo \"  ✅ fix(api): handle null responses\"; echo \"  ✅ docs: update API documentation\"; echo \"  ❌ Added new feature (no type)\"; echo \"  ❌ feat:add feature (missing space)\"; echo \"  ❌ feature: add login (wrong type)\"; echo \"\"; echo \"Your message: $COMMIT_MSG\"; exit 1; fi"
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;COMMIT_MSG=$(echo \&quot;$CLAUDE_TOOL_COMMAND\&quot; | grep -oP &#039;(?&lt;=-m \&quot;)[^\&quot;]+&#039; | head -1); if [[ -n \&quot;$COMMIT_MSG\&quot; ]] &amp;&amp; [[ ! \&quot;$COMMIT_MSG\&quot; =~ ^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\\(.+\\))?:\\  ]]; then echo \&quot;❌ Invalid commit message format\&quot;; echo \&quot;\&quot;; echo \&quot;Commit messages must follow Conventional Commits:\&quot;; echo \&quot;  type(scope): description\&quot;; echo \&quot;\&quot;; echo \&quot;Types:\&quot;; echo \&quot;  feat:     New feature\&quot;; echo \&quot;  fix:      Bug fix\&quot;; echo \&quot;  docs:     Documentation changes\&quot;; echo \&quot;  style:    Code style changes (formatting)\&quot;; echo \&quot;  refactor: Code refactoring\&quot;; echo \&quot;  perf:     Performance improvements\&quot;; echo \&quot;  test:     Adding or updating tests\&quot;; echo \&quot;  chore:    Maintenance tasks\&quot;; echo \&quot;  ci:       CI/CD changes\&quot;; echo \&quot;  build:    Build system changes\&quot;; echo \&quot;  revert:   Revert previous commit\&quot;; echo \&quot;\&quot;; echo \&quot;Examples:\&quot;; echo \&quot;  ✅ feat: add user authentication\&quot;; echo \&quot;  ✅ feat(auth): implement JWT tokens\&quot;; echo \&quot;  ✅ fix: resolve memory leak in parser\&quot;; echo \&quot;  ✅ fix(api): handle null responses\&quot;; echo \&quot;  ✅ docs: update API documentation\&quot;; echo \&quot;  ❌ Added new feature (no type)\&quot;; echo \&quot;  ❌ feat:add feature (missing space)\&quot;; echo \&quot;  ❌ feature: add login (wrong type)\&quot;; echo \&quot;\&quot;; echo \&quot;Your message: $COMMIT_MSG\&quot;; exit 1; fi&quot;
           }
         ]
       },
       {
-        "matcher": "Bash(git push:*)",
-        "hooks": [
+        &quot;matcher&quot;: &quot;Bash(git push:*)&quot;,
+        &quot;hooks&quot;: [
           {
-            "type": "command",
-            "command": "PUSH_CMD=\"$CLAUDE_TOOL_COMMAND\"; CURRENT_BRANCH=$(git branch --show-current 2&gt;/dev/null); if [[ \"$PUSH_CMD\" =~ (origin[[:space:]]+main|origin[[:space:]]+develop|main|develop) ]] || [[ \"$CURRENT_BRANCH\" == \"main\" || \"$CURRENT_BRANCH\" == \"develop\" ]]; then if [[ \"$PUSH_CMD\" != *\"--force\"* ]] && ([[ \"$CURRENT_BRANCH\" == \"main\" ]] || [[ \"$CURRENT_BRANCH\" == \"develop\" ]] || [[ \"$PUSH_CMD\" =~ origin[[:space:]]main ]] || [[ \"$PUSH_CMD\" =~ origin[[:space:]]develop ]]); then echo \"❌ Direct push to main/develop is not allowed!\"; echo \"\"; echo \"Protected branches:\"; echo \"  - main (production)\"; echo \"  - develop (integration)\"; echo \"\"; echo \"Git Flow workflow:\"; echo \"  1. Create a feature branch:\"; echo \"     /feature &lt;name&gt;\"; echo \"\"; echo \"  2. Make your changes and commit\"; echo \"\"; echo \"  3. Push feature branch:\"; echo \"     git push origin feature/&lt;name&gt;\"; echo \"\"; echo \"  4. Create pull request:\"; echo \"     gh pr create\"; echo \"\"; echo \"  5. After approval, merge with:\"; echo \"     /finish\"; echo \"\"; echo \"For releases:\"; echo \"  /release &lt;version&gt; → PR → /finish\"; echo \"\"; echo \"For hotfixes:\"; echo \"  /hotfix &lt;name&gt; → PR → /finish\"; echo \"\"; echo \"Current branch: $CURRENT_BRANCH\"; exit 1; fi; fi"
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;PUSH_CMD=\&quot;$CLAUDE_TOOL_COMMAND\&quot;; CURRENT_BRANCH=$(git branch --show-current 2&gt;/dev/null); if [[ \&quot;$PUSH_CMD\&quot; =~ (origin[[:space:]]+main|origin[[:space:]]+develop|main|develop) ]] || [[ \&quot;$CURRENT_BRANCH\&quot; == \&quot;main\&quot; || \&quot;$CURRENT_BRANCH\&quot; == \&quot;develop\&quot; ]]; then if [[ \&quot;$PUSH_CMD\&quot; != *\&quot;--force\&quot;* ]] &amp;&amp; ([[ \&quot;$CURRENT_BRANCH\&quot; == \&quot;main\&quot; ]] || [[ \&quot;$CURRENT_BRANCH\&quot; == \&quot;develop\&quot; ]] || [[ \&quot;$PUSH_CMD\&quot; =~ origin[[:space:]]main ]] || [[ \&quot;$PUSH_CMD\&quot; =~ origin[[:space:]]develop ]]); then echo \&quot;❌ Direct push to main/develop is not allowed!\&quot;; echo \&quot;\&quot;; echo \&quot;Protected branches:\&quot;; echo \&quot;  - main (production)\&quot;; echo \&quot;  - develop (integration)\&quot;; echo \&quot;\&quot;; echo \&quot;Git Flow workflow:\&quot;; echo \&quot;  1. Create a feature branch:\&quot;; echo \&quot;     /feature &lt;name&gt;\&quot;; echo \&quot;\&quot;; echo \&quot;  2. Make your changes and commit\&quot;; echo \&quot;\&quot;; echo \&quot;  3. Push feature branch:\&quot;; echo \&quot;     git push origin feature/&lt;name&gt;\&quot;; echo \&quot;\&quot;; echo \&quot;  4. Create pull request:\&quot;; echo \&quot;     gh pr create\&quot;; echo \&quot;\&quot;; echo \&quot;  5. After approval, merge with:\&quot;; echo \&quot;     /finish\&quot;; echo \&quot;\&quot;; echo \&quot;For releases:\&quot;; echo \&quot;  /release &lt;version&gt; → PR → /finish\&quot;; echo \&quot;\&quot;; echo \&quot;For hotfixes:\&quot;; echo \&quot;  /hotfix &lt;name&gt; → PR → /finish\&quot;; echo \&quot;\&quot;; echo \&quot;Current branch: $CURRENT_BRANCH\&quot;; exit 1; fi; fi&quot;
           }
         ]
       }
     ]
   }
 }
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>139</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

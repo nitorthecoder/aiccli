@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>citation-management - AICCLI</title>
-  <meta name="description" content="citation-management - Claude Code skill for AICCLI">
+  <meta name="description" content="Comprehensive citation management for academic research. Search Google Scholar and PubMed for papers, extract accurate metadata, validate citations, and generat">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / citation-management</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>citation-management</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / citation-management
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>citation-management</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Comprehensive citation management for academic research. Search Google Scholar and PubMed for papers, extract accurate metadata, validate citations, and generate properly formatted BibTeX entries. This skill should be used when you need to find papers, verify citation information, convert DOIs to BibTeX, or ensure reference accuracy in scientific writing.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/citation-management</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/citation-management</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/citation-management</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: citation-management
 description: Comprehensive citation management for academic research. Search Google Scholar and PubMed for papers, extract accurate metadata, validate citations, and generate properly formatted BibTeX entries. This skill should be used when you need to find papers, verify citation information, convert DOIs to BibTeX, or ensure reference accuracy in scientific writing.
 allowed-tools: [Read, Write, Edit, Bash]
@@ -96,7 +146,7 @@ If your document does not already contain schematics or diagrams:
 
 **How to generate schematics:**
 ```bash
-python scripts/generate_schematic.py "your diagram description" -o figures/output.png
+python scripts/generate_schematic.py &quot;your diagram description&quot; -o figures/output.png
 ```
 
 The AI will automatically:
@@ -132,12 +182,12 @@ Google Scholar provides the most comprehensive coverage across disciplines.
 **Basic Search**:
 ```bash
 # Search for papers on a topic
-python scripts/search_google_scholar.py "CRISPR gene editing" \
+python scripts/search_google_scholar.py &quot;CRISPR gene editing&quot; \
   --limit 50 \
   --output results.json
 
 # Search with year filter
-python scripts/search_google_scholar.py "machine learning protein folding" \
+python scripts/search_google_scholar.py &quot;machine learning protein folding&quot; \
   --year-start 2020 \
   --year-end 2024 \
   --limit 100 \
@@ -145,9 +195,9 @@ python scripts/search_google_scholar.py "machine learning protein folding" \
 ```
 
 **Advanced Search Strategies** (see `references/google_scholar_search.md`):
-- Use quotation marks for exact phrases: `"deep learning"`
+- Use quotation marks for exact phrases: `&quot;deep learning&quot;`
 - Search by author: `author:LeCun`
-- Search in title: `intitle:"neural networks"`
+- Search in title: `intitle:&quot;neural networks&quot;`
 - Exclude terms: `machine learning -survey`
 - Find highly cited papers using sort options
 - Filter by date ranges to get recent work
@@ -156,7 +206,7 @@ python scripts/search_google_scholar.py "machine learning protein folding" \
 - Use specific, targeted search terms
 - Include key technical terms and acronyms
 - Filter by recent years for fast-moving fields
-- Check "Cited by" to find seminal papers
+- Check &quot;Cited by&quot; to find seminal papers
 - Export top results for further analysis
 
 #### PubMed Search
@@ -166,25 +216,25 @@ PubMed specializes in biomedical and life sciences literature (35+ million citat
 **Basic Search**:
 ```bash
 # Search PubMed
-python scripts/search_pubmed.py "Alzheimer's disease treatment" \
+python scripts/search_pubmed.py &quot;Alzheimer&#039;s disease treatment&quot; \
   --limit 100 \
   --output alzheimers.json
 
 # Search with MeSH terms and filters
 python scripts/search_pubmed.py \
-  --query '"Alzheimer Disease"[MeSH] AND "Drug Therapy"[MeSH]' \
+  --query &#039;&quot;Alzheimer Disease&quot;[MeSH] AND &quot;Drug Therapy&quot;[MeSH]&#039; \
   --date-start 2020 \
   --date-end 2024 \
-  --publication-types "Clinical Trial,Review" \
+  --publication-types &quot;Clinical Trial,Review&quot; \
   --output alzheimers_trials.json
 ```
 
 **Advanced PubMed Queries** (see `references/pubmed_search.md`):
-- Use MeSH terms: `"Diabetes Mellitus"[MeSH]`
-- Field tags: `"cancer"[Title]`, `"Smith J"[Author]`
+- Use MeSH terms: `&quot;Diabetes Mellitus&quot;[MeSH]`
+- Field tags: `&quot;cancer&quot;[Title]`, `&quot;Smith J&quot;[Author]`
 - Boolean operators: `AND`, `OR`, `NOT`
 - Date filters: `2020:2024[Publication Date]`
-- Publication types: `"Review"[Publication Type]`
+- Publication types: `&quot;Review&quot;[Publication Type]`
 - Combine with E-utilities API for automation
 
 **Best Practices**:
@@ -228,7 +278,7 @@ python scripts/extract_metadata.py --pmid 34265844
 python scripts/extract_metadata.py --arxiv 2103.14030
 
 # Extract from URL
-python scripts/extract_metadata.py --url "https://www.nature.com/articles/s41586-021-03819-2"
+python scripts/extract_metadata.py --url &quot;https://www.nature.com/articles/s41586-021-03819-2&quot;
 
 # Batch extraction from file (mixed identifiers)
 python scripts/extract_metadata.py --input identifiers.txt --output citations.bib
@@ -406,28 +456,28 @@ python scripts/validate_citations.py references.bib \
 **Validation Output**:
 ```json
 {
-  "total_entries": 150,
-  "valid_entries": 145,
-  "errors": [
+  &quot;total_entries&quot;: 150,
+  &quot;valid_entries&quot;: 145,
+  &quot;errors&quot;: [
     {
-      "citation_key": "Smith2023",
-      "error_type": "missing_field",
-      "field": "journal",
-      "severity": "high"
+      &quot;citation_key&quot;: &quot;Smith2023&quot;,
+      &quot;error_type&quot;: &quot;missing_field&quot;,
+      &quot;field&quot;: &quot;journal&quot;,
+      &quot;severity&quot;: &quot;high&quot;
     },
     {
-      "citation_key": "Jones2022",
-      "error_type": "invalid_doi",
-      "doi": "10.1234/broken",
-      "severity": "high"
+      &quot;citation_key&quot;: &quot;Jones2022&quot;,
+      &quot;error_type&quot;: &quot;invalid_doi&quot;,
+      &quot;doi&quot;: &quot;10.1234/broken&quot;,
+      &quot;severity&quot;: &quot;high&quot;
     }
   ],
-  "warnings": [
+  &quot;warnings&quot;: [
     {
-      "citation_key": "Brown2021",
-      "warning_type": "possible_duplicate",
-      "duplicate_of": "Brown2021a",
-      "severity": "medium"
+      &quot;citation_key&quot;: &quot;Brown2021&quot;,
+      &quot;warning_type&quot;: &quot;possible_duplicate&quot;,
+      &quot;duplicate_of&quot;: &quot;Brown2021a&quot;,
+      &quot;severity&quot;: &quot;medium&quot;
     }
   ]
 }
@@ -442,7 +492,7 @@ Complete workflow for creating a bibliography:
 ```bash
 # 1. Search for papers on your topic
 python scripts/search_pubmed.py \
-  '"CRISPR-Cas Systems"[MeSH] AND "Gene Editing"[MeSH]' \
+  &#039;&quot;CRISPR-Cas Systems&quot;[MeSH] AND &quot;Gene Editing&quot;[MeSH]&#039; \
   --date-start 2020 \
   --limit 200 \
   --output crispr_papers.json
@@ -507,12 +557,12 @@ python scripts/format_bibtex.py my_review_references.bib \
 **Finding Seminal Papers**:
 - Sort by citation count (most cited first)
 - Look for review articles for overview
-- Check "Cited by" for impact assessment
+- Check &quot;Cited by&quot; for impact assessment
 - Use citation alerts for tracking new citations
 
 **Advanced Operators** (full list in `references/google_scholar_search.md`):
 ```
-"exact phrase"           # Exact phrase matching
+&quot;exact phrase&quot;           # Exact phrase matching
 author:lastname          # Search by author
 intitle:keyword          # Search in title only
 source:journal           # Search specific journal
@@ -524,16 +574,16 @@ OR                       # Alternative terms
 **Example Searches**:
 ```
 # Find recent reviews on a topic
-"CRISPR" intitle:review 2023..2024
+&quot;CRISPR&quot; intitle:review 2023..2024
 
 # Find papers by specific author on topic
-author:Church "synthetic biology"
+author:Church &quot;synthetic biology&quot;
 
 # Find highly cited foundational work
-"deep learning" 2012..2015 sort:citations
+&quot;deep learning&quot; 2012..2015 sort:citations
 
 # Exclude surveys and focus on methods
-"protein folding" -survey -review intitle:method
+&quot;protein folding&quot; -survey -review intitle:method
 ```
 
 ### PubMed Best Practices
@@ -542,7 +592,7 @@ author:Church "synthetic biology"
 MeSH (Medical Subject Headings) provides controlled vocabulary for precise searching.
 
 1. **Find MeSH terms** at https://meshb.nlm.nih.gov/search
-2. **Use in queries**: `"Diabetes Mellitus, Type 2"[MeSH]`
+2. **Use in queries**: `&quot;Diabetes Mellitus, Type 2&quot;[MeSH]`
 3. **Combine with keywords** for comprehensive coverage
 
 **Field Tags**:
@@ -559,14 +609,14 @@ MeSH (Medical Subject Headings) provides controlled vocabulary for precise searc
 **Building Complex Queries**:
 ```bash
 # Clinical trials on diabetes treatment published recently
-"Diabetes Mellitus, Type 2"[MeSH] AND "Drug Therapy"[MeSH] 
-AND "Clinical Trial"[Publication Type] AND 2020:2024[Publication Date]
+&quot;Diabetes Mellitus, Type 2&quot;[MeSH] AND &quot;Drug Therapy&quot;[MeSH] 
+AND &quot;Clinical Trial&quot;[Publication Type] AND 2020:2024[Publication Date]
 
 # Reviews on CRISPR in specific journal
-"CRISPR-Cas Systems"[MeSH] AND "Nature"[Journal] AND "Review"[Publication Type]
+&quot;CRISPR-Cas Systems&quot;[MeSH] AND &quot;Nature&quot;[Journal] AND &quot;Review&quot;[Publication Type]
 
-# Specific author's recent work
-"Smith AB"[Author] AND cancer[Title/Abstract] AND 2022:2024[Publication Date]
+# Specific author&#039;s recent work
+&quot;Smith AB&quot;[Author] AND cancer[Title/Abstract] AND 2022:2024[Publication Date]
 ```
 
 **E-utilities for Automation**:
@@ -594,10 +644,10 @@ Search Google Scholar and export results.
 **Usage**:
 ```bash
 # Basic search
-python scripts/search_google_scholar.py "quantum computing"
+python scripts/search_google_scholar.py &quot;quantum computing&quot;
 
 # Advanced search with filters
-python scripts/search_google_scholar.py "quantum computing" \
+python scripts/search_google_scholar.py &quot;quantum computing&quot; \
   --year-start 2020 \
   --year-end 2024 \
   --limit 100 \
@@ -605,7 +655,7 @@ python scripts/search_google_scholar.py "quantum computing" \
   --output quantum_papers.json
 
 # Export directly to BibTeX
-python scripts/search_google_scholar.py "machine learning" \
+python scripts/search_google_scholar.py &quot;machine learning&quot; \
   --limit 50 \
   --format bibtex \
   --output ml_papers.bib
@@ -625,19 +675,19 @@ Search PubMed using E-utilities API.
 **Usage**:
 ```bash
 # Simple keyword search
-python scripts/search_pubmed.py "CRISPR gene editing"
+python scripts/search_pubmed.py &quot;CRISPR gene editing&quot;
 
 # Complex query with filters
 python scripts/search_pubmed.py \
-  --query '"CRISPR-Cas Systems"[MeSH] AND "therapeutic"[Title/Abstract]' \
+  --query &#039;&quot;CRISPR-Cas Systems&quot;[MeSH] AND &quot;therapeutic&quot;[Title/Abstract]&#039; \
   --date-start 2020-01-01 \
   --date-end 2024-12-31 \
-  --publication-types "Clinical Trial,Review" \
+  --publication-types &quot;Clinical Trial,Review&quot; \
   --limit 200 \
   --output crispr_therapeutic.json
 
 # Export to BibTeX
-python scripts/search_pubmed.py "Alzheimer's disease" \
+python scripts/search_pubmed.py &quot;Alzheimer&#039;s disease&quot; \
   --limit 100 \
   --format bibtex \
   --output alzheimers.bib
@@ -667,7 +717,7 @@ python scripts/extract_metadata.py --arxiv 2103.14030
 
 # From URL
 python scripts/extract_metadata.py \
-  --url "https://www.nature.com/articles/s41586-021-03819-2"
+  --url &quot;https://www.nature.com/articles/s41586-021-03819-2&quot;
 
 # Batch processing (file with one identifier per line)
 python scripts/extract_metadata.py \
@@ -793,7 +843,7 @@ python scripts/doi_to_bibtex.py 10.1038/nature12345 --clipboard
    - Combine results for completeness
 
 3. **Leverage citations**:
-   - Check "Cited by" for seminal papers
+   - Check &quot;Cited by&quot; for seminal papers
    - Review references from key papers
    - Use citation networks to discover related work
 
@@ -903,12 +953,12 @@ python scripts/doi_to_bibtex.py 10.1038/nature12345 --clipboard
 
 ```bash
 # Step 1: Find key papers on your topic
-python scripts/search_google_scholar.py "transformer neural networks" \
+python scripts/search_google_scholar.py &quot;transformer neural networks&quot; \
   --year-start 2017 \
   --limit 50 \
   --output transformers_gs.json
 
-python scripts/search_pubmed.py "deep learning medical imaging" \
+python scripts/search_pubmed.py &quot;deep learning medical imaging&quot; \
   --date-start 2020 \
   --limit 50 \
   --output medical_dl_pm.json
@@ -943,7 +993,7 @@ python scripts/validate_citations.py formatted.bib \
   --output final_references.bib
 
 # Step 7: Review any issues
-cat validation.json | grep -A 3 '"errors"'
+cat validation.json | grep -A 3 &#039;&quot;errors&quot;&#039;
 
 # Step 8: Use in LaTeX
 # \bibliography{final_references}
@@ -1004,7 +1054,7 @@ cat final_validation.json
 
 ```bash
 # Find highly cited papers on a topic
-python scripts/search_google_scholar.py "AlphaFold protein structure" \
+python scripts/search_google_scholar.py &quot;AlphaFold protein structure&quot; \
   --year-start 2020 \
   --year-end 2024 \
   --sort-by citations \
@@ -1136,8 +1186,39 @@ The citation-management skill provides:
 
 Use this skill to maintain accurate, complete citations throughout your research and ensure publication-ready bibliographies.
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>160</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

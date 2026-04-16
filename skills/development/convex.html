@@ -4,63 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>convex - AICCLI</title>
-  <meta name="description" content="convex - Claude Code skill for AICCLI">
+  <meta name="description" content=""Convex reactive backend expert: schema design, TypeScript functions, real-time subscriptions, auth, file storage, scheduling, and deployment."">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / convex</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>convex</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / convex
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>convex</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Convex reactive backend expert: schema design, TypeScript functions, real-time subscriptions, auth, file storage, scheduling, and deployment."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/convex</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/convex</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/convex</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: convex
-description: "Convex reactive backend expert: schema design, TypeScript functions, real-time subscriptions, auth, file storage, scheduling, and deployment."
+description: &quot;Convex reactive backend expert: schema design, TypeScript functions, real-time subscriptions, auth, file storage, scheduling, and deployment.&quot;
 risk: safe
-source: "https://docs.convex.dev"
-date_added: "2026-02-27"
+source: &quot;https://docs.convex.dev&quot;
+date_added: &quot;2026-02-27&quot;
 ---
 
 # Convex
@@ -102,7 +152,7 @@ Convex is a **document-relational** database with a fully managed backend. Key d
 
 ```bash
 npx create-next-app@latest my-app
-cd my-app && npm install convex
+cd my-app &amp;&amp; npm install convex
 npx convex dev
 ```
 
@@ -142,8 +192,8 @@ my-app/
 Define your schema in `convex/schema.ts` using the validator library:
 
 ```typescript
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { defineSchema, defineTable } from &quot;convex/server&quot;;
+import { v } from &quot;convex/values&quot;;
 
 export default defineSchema({
   users: defineTable({
@@ -152,17 +202,17 @@ export default defineSchema({
     avatarUrl: v.optional(v.string()),
     tokenIdentifier: v.string(),
   })
-    .index("by_token", ["tokenIdentifier"])
-    .index("by_email", ["email"]),
+    .index(&quot;by_token&quot;, [&quot;tokenIdentifier&quot;])
+    .index(&quot;by_email&quot;, [&quot;email&quot;]),
 
   messages: defineTable({
-    authorId: v.id("users"),
-    channelId: v.id("channels"),
+    authorId: v.id(&quot;users&quot;),
+    channelId: v.id(&quot;channels&quot;),
     body: v.string(),
-    attachmentId: v.optional(v.id("_storage")),
+    attachmentId: v.optional(v.id(&quot;_storage&quot;)),
   })
-    .index("by_channel", ["channelId"])
-    .searchIndex("search_body", { searchField: "body" }),
+    .index(&quot;by_channel&quot;, [&quot;channelId&quot;])
+    .searchIndex(&quot;search_body&quot;, { searchField: &quot;body&quot; }),
 
   channels: defineTable({
     name: v.string(),
@@ -181,12 +231,12 @@ export default defineSchema({
 | `v.bigint()`                      | `bigint`              |                                                |
 | `v.boolean()`                     | `boolean`             |                                                |
 | `v.null()`                        | `null`                |                                                |
-| `v.id("tableName")`               | `Id&lt;"tableName"&gt;`     | Document reference                             |
+| `v.id(&quot;tableName&quot;)`               | `Id&lt;&quot;tableName&quot;&gt;`     | Document reference                             |
 | `v.array(v.string())`             | `string[]`            |                                                |
 | `v.object({...})`                 | `{...}`               | Nested objects                                 |
 | `v.optional(v.string())`          | `string \| undefined` |                                                |
 | `v.union(v.string(), v.number())` | `string \| number`    |                                                |
-| `v.literal("active")`             | `"active"`            | Literal types                                  |
+| `v.literal(&quot;active&quot;)`             | `&quot;active&quot;`            | Literal types                                  |
 | `v.bytes()`                       | `ArrayBuffer`         | Binary data                                    |
 | `v.float64()`                     | `number`              | Explicit 64-bit float (used in vector indexes) |
 | `v.any()`                         | `any`                 | Escape hatch                                   |
@@ -195,28 +245,28 @@ export default defineSchema({
 
 ```typescript
 // Single-field index
-defineTable({ email: v.string() }).index("by_email", ["email"]);
+defineTable({ email: v.string() }).index(&quot;by_email&quot;, [&quot;email&quot;]);
 
 // Compound index (order matters for range queries)
 defineTable({
   orgId: v.string(),
   createdAt: v.number(),
-}).index("by_org_and_date", ["orgId", "createdAt"]);
+}).index(&quot;by_org_and_date&quot;, [&quot;orgId&quot;, &quot;createdAt&quot;]);
 
 // Full-text search index
-defineTable({ body: v.string(), channelId: v.id("channels") }).searchIndex(
-  "search_body",
+defineTable({ body: v.string(), channelId: v.id(&quot;channels&quot;) }).searchIndex(
+  &quot;search_body&quot;,
   {
-    searchField: "body",
-    filterFields: ["channelId"],
+    searchField: &quot;body&quot;,
+    filterFields: [&quot;channelId&quot;],
   },
 );
 
 // Vector search index (for AI/embeddings)
 defineTable({ embedding: v.array(v.float64()), text: v.string() }).vectorIndex(
-  "by_embedding",
+  &quot;by_embedding&quot;,
   {
-    vectorField: "embedding",
+    vectorField: &quot;embedding&quot;,
     dimensions: 1536,
   },
 );
@@ -229,25 +279,25 @@ defineTable({ embedding: v.array(v.float64()), text: v.string() }).vectorIndex(
 Queries are reactive — clients automatically get updates when data changes.
 
 ````typescript
-import { query } from "./_generated/server";
-import { v } from "convex/values";
+import { query } from &quot;./_generated/server&quot;;
+import { v } from &quot;convex/values&quot;;
 
 // Simple query — list all tasks
 export const list = query({
   args: {},
   handler: async (ctx) =&gt; {
-    return await ctx.db.query("tasks").collect();
+    return await ctx.db.query(&quot;tasks&quot;).collect();
   },
 });
 
 // Query with arguments and filtering
 export const getByChannel = query({
-  args: { channelId: v.id("channels") },
+  args: { channelId: v.id(&quot;channels&quot;) },
   handler: async (ctx, args) =&gt; {
     return await ctx.db
-      .query("messages")
-      .withIndex("by_channel", (q) =&gt; q.eq("channelId", args.channelId))
-      .order("desc")
+      .query(&quot;messages&quot;)
+      .withIndex(&quot;by_channel&quot;, (q) =&gt; q.eq(&quot;channelId&quot;, args.channelId))
+      .order(&quot;desc&quot;)
       .take(50);
   },
 });
@@ -260,9 +310,9 @@ export const getMyProfile = query({
     if (!identity) return null;
 
     return await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) =&gt;
-        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      .query(&quot;users&quot;)
+      .withIndex(&quot;by_token&quot;, (q) =&gt;
+        q.eq(&quot;tokenIdentifier&quot;, identity.tokenIdentifier),
       )
       .unique();
   },
@@ -273,8 +323,8 @@ export const getMyProfile = query({
 Use cursor-based pagination for lists or infinite scroll UIs.
 
 ```typescript
-import { query } from "./_generated/server";
-import { paginationOptsValidator } from "convex/server";
+import { query } from &quot;./_generated/server&quot;;
+import { paginationOptsValidator } from &quot;convex/server&quot;;
 
 export const listPaginated = query({
   args: {
@@ -282,8 +332,8 @@ export const listPaginated = query({
   },
   handler: async (ctx, args) =&gt; {
     return await ctx.db
-      .query("messages")
-      .order("desc")
+      .query(&quot;messages&quot;)
+      .order(&quot;desc&quot;)
       .paginate(args.paginationOpts);
   },
 });
@@ -294,14 +344,14 @@ export const listPaginated = query({
 Mutations run as ACID transactions with serializable isolation.
 
 ```typescript
-import { mutation } from "./_generated/server";
-import { v } from "convex/values";
+import { mutation } from &quot;./_generated/server&quot;;
+import { v } from &quot;convex/values&quot;;
 
 // Insert a document
 export const create = mutation({
   args: { text: v.string(), isCompleted: v.boolean() },
   handler: async (ctx, args) =&gt; {
-    const taskId = await ctx.db.insert("tasks", {
+    const taskId = await ctx.db.insert(&quot;tasks&quot;, {
       text: args.text,
       isCompleted: args.isCompleted,
     });
@@ -311,7 +361,7 @@ export const create = mutation({
 
 // Update a document
 export const update = mutation({
-  args: { id: v.id("tasks"), isCompleted: v.boolean() },
+  args: { id: v.id(&quot;tasks&quot;), isCompleted: v.boolean() },
   handler: async (ctx, args) =&gt; {
     await ctx.db.patch(args.id, { isCompleted: args.isCompleted });
   },
@@ -319,7 +369,7 @@ export const update = mutation({
 
 // Delete a document
 export const remove = mutation({
-  args: { id: v.id("tasks") },
+  args: { id: v.id(&quot;tasks&quot;) },
   handler: async (ctx, args) =&gt; {
     await ctx.db.delete(args.id);
   },
@@ -328,15 +378,15 @@ export const remove = mutation({
 // Multi-document transaction (automatically atomic)
 export const transferCredits = mutation({
   args: {
-    fromUserId: v.id("users"),
-    toUserId: v.id("users"),
+    fromUserId: v.id(&quot;users&quot;),
+    toUserId: v.id(&quot;users&quot;),
     amount: v.number(),
   },
   handler: async (ctx, args) =&gt; {
     const fromUser = await ctx.db.get(args.fromUserId);
     const toUser = await ctx.db.get(args.toUserId);
-    if (!fromUser || !toUser) throw new Error("User not found");
-    if (fromUser.credits &lt; args.amount) throw new Error("Insufficient credits");
+    if (!fromUser || !toUser) throw new Error(&quot;User not found&quot;);
+    if (fromUser.credits &lt; args.amount) throw new Error(&quot;Insufficient credits&quot;);
 
     await ctx.db.patch(args.fromUserId, {
       credits: fromUser.credits - args.amount,
@@ -348,34 +398,34 @@ export const transferCredits = mutation({
 });
 ````
 
-### Actions (External APIs & Side Effects)
+### Actions (External APIs &amp; Side Effects)
 
 Actions can call third-party services but cannot directly access the database — they must use `ctx.runQuery` and `ctx.runMutation`.
 
 ```typescript
-import { action } from "./_generated/server";
-import { v } from "convex/values";
-import { api } from "./_generated/api";
+import { action } from &quot;./_generated/server&quot;;
+import { v } from &quot;convex/values&quot;;
+import { api } from &quot;./_generated/api&quot;;
 
 export const sendEmail = action({
   args: { to: v.string(), subject: v.string(), body: v.string() },
   handler: async (ctx, args) =&gt; {
     // Call external API
-    const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
-      method: "POST",
+    const response = await fetch(&quot;https://api.sendgrid.com/v3/mail/send&quot;, {
+      method: &quot;POST&quot;,
       headers: {
         Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
-        "Content-Type": "application/json",
+        &quot;Content-Type&quot;: &quot;application/json&quot;,
       },
       body: JSON.stringify({
         personalizations: [{ to: [{ email: args.to }] }],
-        from: { email: "noreply@example.com" },
+        from: { email: &quot;noreply@example.com&quot; },
         subject: args.subject,
-        content: [{ type: "text/plain", value: args.body }],
+        content: [{ type: &quot;text/plain&quot;, value: args.body }],
       }),
     });
 
-    if (!response.ok) throw new Error("Failed to send email");
+    if (!response.ok) throw new Error(&quot;Failed to send email&quot;);
 
     // Write result back to database via mutation
     await ctx.runMutation(api.emails.recordSent, {
@@ -388,16 +438,16 @@ export const sendEmail = action({
 
 // Generate AI embeddings
 export const generateEmbedding = action({
-  args: { text: v.string(), documentId: v.id("documents") },
+  args: { text: v.string(), documentId: v.id(&quot;documents&quot;) },
   handler: async (ctx, args) =&gt; {
-    const response = await fetch("https://api.openai.com/v1/embeddings", {
-      method: "POST",
+    const response = await fetch(&quot;https://api.openai.com/v1/embeddings&quot;, {
+      method: &quot;POST&quot;,
       headers: {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
+        &quot;Content-Type&quot;: &quot;application/json&quot;,
       },
       body: JSON.stringify({
-        model: "text-embedding-3-small",
+        model: &quot;text-embedding-3-small&quot;,
         input: args.text,
       }),
     });
@@ -414,25 +464,25 @@ export const generateEmbedding = action({
 ### HTTP Actions (Webhooks)
 
 ```typescript
-import { httpRouter } from "convex/server";
-import { httpAction } from "./_generated/server";
-import { api } from "./_generated/api";
+import { httpRouter } from &quot;convex/server&quot;;
+import { httpAction } from &quot;./_generated/server&quot;;
+import { api } from &quot;./_generated/api&quot;;
 
 const http = httpRouter();
 
 http.route({
-  path: "/webhooks/stripe",
-  method: "POST",
+  path: &quot;/webhooks/stripe&quot;,
+  method: &quot;POST&quot;,
   handler: httpAction(async (ctx, request) =&gt; {
     const body = await request.text();
-    const signature = request.headers.get("stripe-signature");
+    const signature = request.headers.get(&quot;stripe-signature&quot;);
 
     // Verify webhook signature here...
 
     const event = JSON.parse(body);
     await ctx.runMutation(api.payments.handleWebhook, { event });
 
-    return new Response("OK", { status: 200 });
+    return new Response(&quot;OK&quot;, { status: 200 });
   }),
 });
 
@@ -445,9 +495,9 @@ export default http;
 
 ```typescript
 // app/ConvexClientProvider.tsx
-"use client";
-import { ConvexProvider, ConvexReactClient } from "convex/react";
-import { ReactNode } from "react";
+&quot;use client&quot;;
+import { ConvexProvider, ConvexReactClient } from &quot;convex/react&quot;;
+import { ReactNode } from &quot;react&quot;;
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -458,11 +508,11 @@ export function ConvexClientProvider({ children }: { children: ReactNode }) {
 
 ```typescript
 // app/layout.tsx — wrap children
-import { ConvexClientProvider } from "./ConvexClientProvider";
+import { ConvexClientProvider } from &quot;./ConvexClientProvider&quot;;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    &lt;html lang="en"&gt;
+    &lt;html lang=&quot;en&quot;&gt;
       &lt;body&gt;
         &lt;ConvexClientProvider&gt;{children}&lt;/ConvexClientProvider&gt;
       &lt;/body&gt;
@@ -473,9 +523,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ```typescript
 // Component using Convex hooks
-"use client";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
+&quot;use client&quot;;
+import { useQuery, useMutation } from &quot;convex/react&quot;;
+import { api } from &quot;@/convex/_generated/api&quot;;
 
 export function TaskList() {
   // Reactive query — auto-updates when data changes
@@ -490,7 +540,7 @@ export function TaskList() {
       {tasks.map((task) =&gt; (
         &lt;div key={task._id}&gt;
           &lt;input
-            type="checkbox"
+            type=&quot;checkbox&quot;
             checked={task.isCompleted}
             onChange={() =&gt;
               toggleTask({ id: task._id, isCompleted: !task.isCompleted })
@@ -499,7 +549,7 @@ export function TaskList() {
           {task.text}
         &lt;/div&gt;
       ))}
-      &lt;button onClick={() =&gt; addTask({ text: "New task", isCompleted: false })}&gt;
+      &lt;button onClick={() =&gt; addTask({ text: &quot;New task&quot;, isCompleted: false })}&gt;
         Add Task
       &lt;/button&gt;
     &lt;/div&gt;
@@ -509,9 +559,9 @@ export function TaskList() {
 
 ```typescript
 // Component using Paginated Queries
-"use client";
-import { usePaginatedQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
+&quot;use client&quot;;
+import { usePaginatedQuery } from &quot;convex/react&quot;;
+import { api } from &quot;@/convex/_generated/api&quot;;
 
 export function MessageLog() {
   const { results, status, loadMore } = usePaginatedQuery(
@@ -526,9 +576,9 @@ export function MessageLog() {
         &lt;div key={msg._id}&gt;{msg.body}&lt;/div&gt;
       ))}
 
-      {status === "LoadingFirstPage" && &lt;p&gt;Loading...&lt;/p&gt;}
+      {status === &quot;LoadingFirstPage&quot; &amp;&amp; &lt;p&gt;Loading...&lt;/p&gt;}
 
-      {status === "CanLoadMore" && (
+      {status === &quot;CanLoadMore&quot; &amp;&amp; (
         &lt;button onClick={() =&gt; loadMore(20)}&gt;Load More&lt;/button&gt;
       )}
     &lt;/div&gt;
@@ -542,10 +592,10 @@ Convex provides a robust, native authentication library (`@convex-dev/auth`) fea
 
 ```typescript
 // app/ConvexClientProvider.tsx
-"use client";
-import { ConvexAuthProvider } from "@convex-dev/auth/react";
-import { ConvexReactClient } from "convex/react";
-import { ReactNode } from "react";
+&quot;use client&quot;;
+import { ConvexAuthProvider } from &quot;@convex-dev/auth/react&quot;;
+import { ConvexReactClient } from &quot;convex/react&quot;;
+import { ReactNode } from &quot;react&quot;;
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -560,11 +610,11 @@ export function ConvexClientProvider({ children }: { children: ReactNode }) {
 
 ```typescript
 // Client-side sign in
-import { useAuthActions } from "@convex-dev/auth/react";
+import { useAuthActions } from &quot;@convex-dev/auth/react&quot;;
 
 export function Login() {
   const { signIn } = useAuthActions();
-  return &lt;button onClick={() =&gt; signIn("github")}&gt;Sign in with GitHub&lt;/button&gt;;
+  return &lt;button onClick={() =&gt; signIn(&quot;github&quot;)}&gt;Sign in with GitHub&lt;/button&gt;;
 }
 ```
 
@@ -574,10 +624,10 @@ If you prefer a hosted third-party solution like Clerk:
 
 ```typescript
 // app/ConvexClientProvider.tsx
-"use client";
-import { ConvexProviderWithClerk } from "convex/react-clerk";
-import { ClerkProvider, useAuth } from "@clerk/nextjs";
-import { ConvexReactClient } from "convex/react";
+&quot;use client&quot;;
+import { ConvexProviderWithClerk } from &quot;convex/react-clerk&quot;;
+import { ClerkProvider, useAuth } from &quot;@clerk/nextjs&quot;;
+import { ConvexReactClient } from &quot;convex/react&quot;;
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -606,16 +656,16 @@ Better Auth provides email/password, social logins, two-factor authentication, a
 
 ### Angular Integration
 
-Convex does not have an official Angular client library, but Angular apps can use the core `convex` package directly with Angular's Dependency Injection and Signals.
+Convex does not have an official Angular client library, but Angular apps can use the core `convex` package directly with Angular&#039;s Dependency Injection and Signals.
 
 ```typescript
 // services/convex.service.ts
-import { Injectable, signal, effect, OnDestroy } from "@angular/core";
-import { ConvexClient } from "convex/browser";
-import { api } from "../../convex/_generated/api";
-import { FunctionReturnType } from "convex/server";
+import { Injectable, signal, effect, OnDestroy } from &quot;@angular/core&quot;;
+import { ConvexClient } from &quot;convex/browser&quot;;
+import { api } from &quot;../../convex/_generated/api&quot;;
+import { FunctionReturnType } from &quot;convex/server&quot;;
 
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: &quot;root&quot; })
 export class ConvexService implements OnDestroy {
   private client = new ConvexClient(environment.convexUrl);
 
@@ -646,11 +696,11 @@ export class ConvexService implements OnDestroy {
 
 ```typescript
 // Component usage
-import { Component, inject } from "@angular/core";
-import { ConvexService } from "./services/convex.service";
+import { Component, inject } from &quot;@angular/core&quot;;
+import { ConvexService } from &quot;./services/convex.service&quot;;
 
 @Component({
-  selector: "app-task-list",
+  selector: &quot;app-task-list&quot;,
   template: `
     @if (convex.tasks(); as tasks) {
       @for (task of tasks; track task._id) {
@@ -659,7 +709,7 @@ import { ConvexService } from "./services/convex.service";
     } @else {
       &lt;p&gt;Loading...&lt;/p&gt;
     }
-    &lt;button (click)="convex.addTask('New task')"&gt;Add Task&lt;/button&gt;
+    &lt;button (click)=&quot;convex.addTask(&#039;New task&#039;)&quot;&gt;Add Task&lt;/button&gt;
   `,
 })
 export class TaskListComponent {
@@ -669,16 +719,16 @@ export class TaskListComponent {
 
 &gt; **Note:** The community library `@robmanganelly/ngx-convex` provides a more Angular-native experience with React-like hooks adapted for Angular DI and Signals.
 
-## Scheduling & Cron Jobs
+## Scheduling &amp; Cron Jobs
 
 ### One-off Scheduled Functions
 
 ```typescript
-import { mutation } from "./_generated/server";
-import { api } from "./_generated/api";
+import { mutation } from &quot;./_generated/server&quot;;
+import { api } from &quot;./_generated/api&quot;;
 
 export const sendReminder = mutation({
-  args: { userId: v.id("users"), message: v.string(), delayMs: v.number() },
+  args: { userId: v.id(&quot;users&quot;), message: v.string(), delayMs: v.number() },
   handler: async (ctx, args) =&gt; {
     await ctx.scheduler.runAfter(args.delayMs, api.notifications.send, {
       userId: args.userId,
@@ -692,16 +742,16 @@ export const sendReminder = mutation({
 
 ```typescript
 // convex/crons.ts
-import { cronJobs } from "convex/server";
-import { api } from "./_generated/api";
+import { cronJobs } from &quot;convex/server&quot;;
+import { api } from &quot;./_generated/api&quot;;
 
 const crons = cronJobs();
 
-crons.interval("clear old logs", { hours: 24 }, api.logs.clearOld);
+crons.interval(&quot;clear old logs&quot;, { hours: 24 }, api.logs.clearOld);
 
 crons.cron(
-  "weekly digest",
-  "0 9 * * 1", // Every Monday at 9 AM
+  &quot;weekly digest&quot;,
+  &quot;0 9 * * 1&quot;, // Every Monday at 9 AM
   api.emails.sendWeeklyDigest,
 );
 
@@ -721,9 +771,9 @@ export const generateUploadUrl = mutation({
 
 // Save file reference after upload (mutation)
 export const saveFile = mutation({
-  args: { storageId: v.id("_storage"), name: v.string() },
+  args: { storageId: v.id(&quot;_storage&quot;), name: v.string() },
   handler: async (ctx, args) =&gt; {
-    await ctx.db.insert("files", {
+    await ctx.db.insert(&quot;files&quot;, {
       storageId: args.storageId,
       name: args.name,
     });
@@ -732,7 +782,7 @@ export const saveFile = mutation({
 
 // Get a URL to serve a file (query)
 export const getFileUrl = query({
-  args: { storageId: v.id("_storage") },
+  args: { storageId: v.id(&quot;_storage&quot;) },
   handler: async (ctx, args) =&gt; {
     return await ctx.storage.getUrl(args.storageId);
   },
@@ -760,7 +810,7 @@ Access in actions (NOT in queries or mutations):
 const apiKey = process.env.OPENAI_API_KEY;
 ```
 
-## Deployment & CLI
+## Deployment &amp; CLI
 
 ```bash
 # Development (watches for changes, syncs to dev deployment)
@@ -791,11 +841,11 @@ npx convex logs
 - ✅ Use indexes for queries — avoids full table scans
 - ✅ Use compound indexes with equality filters first, range filter last
 - ✅ Rely on native determinism — `Date.now()` and `Math.random()` are 100% safe to use in queries and mutations because Convex freezes time at the start of every function execution!
-- ✅ Use `v.id("tableName")` for document references instead of plain strings
+- ✅ Use `v.id(&quot;tableName&quot;)` for document references instead of plain strings
 - ✅ Use actions for external API calls (never call external APIs from queries or mutations)
 - ✅ Use `ctx.runQuery` / `ctx.runMutation` from actions — never access `ctx.db` directly in actions
 - ✅ Add argument validators to all functions — they enforce runtime type safety
-- ✅ Return `null` when a document isn't found instead of throwing an error unless missing is exceptional
+- ✅ Return `null` when a document isn&#039;t found instead of throwing an error unless missing is exceptional
 - ✅ Prefer `withIndex` over `.filter()` for query performance
 
 ## Anti-Patterns to Avoid
@@ -810,19 +860,19 @@ npx convex logs
 
 ## Common Pitfalls
 
-- **Problem:** "Query returns `undefined` on first render"
+- **Problem:** &quot;Query returns `undefined` on first render&quot;
   **Solution:** This is expected — Convex queries are async. Check for `undefined` before rendering (this means loading, not empty).
 
-- **Problem:** "Mutation throws `Document not found`"
+- **Problem:** &quot;Mutation throws `Document not found`&quot;
   **Solution:** Documents may have been deleted between your read and write due to optimistic concurrency. Re-read inside the mutation.
 
-- **Problem:** "`process.env` is undefined in query/mutation"
+- **Problem:** &quot;`process.env` is undefined in query/mutation&quot;
   **Solution:** Environment variables are only accessible in **actions** (not queries or mutations) because queries/mutations run in the deterministic transaction engine.
 
-- **Problem:** "Function handler is too slow"
+- **Problem:** &quot;Function handler is too slow&quot;
   **Solution:** Add indexes for your query patterns. Use `withIndex()` instead of `.filter()`. For complex operations, break into smaller mutations.
 
-- **Problem:** "Schema push fails with existing data"
+- **Problem:** &quot;Schema push fails with existing data&quot;
   **Solution:** Convex validates existing data against new schemas. Either migrate existing documents first, or use `v.optional()` for new fields.
 
 ## Limitations
@@ -852,8 +902,39 @@ npx convex logs
 - [GitHub](https://github.com/get-convex/convex-backend)
 - [Discord Community](https://convex.dev/community)
 - [Convex Chef (AI Starter)](https://chef.convex.dev)
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>0</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

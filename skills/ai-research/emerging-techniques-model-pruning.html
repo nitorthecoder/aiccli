@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>emerging-techniques-model-pruning - AICCLI</title>
-  <meta name="description" content="emerging-techniques-model-pruning - Claude Code skill for AICCLI">
+  <meta name="description" content="Reduce LLM size and accelerate inference using pruning techniques like Wanda and SparseGPT. Use when compressing models without retraining, achieving 50% sparsi">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / emerging-techniques-model-pruning</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>emerging-techniques-model-pruning</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / emerging-techniques-model-pruning
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>emerging-techniques-model-pruning</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Reduce LLM size and accelerate inference using pruning techniques like Wanda and SparseGPT. Use when compressing models without retraining, achieving 50% sparsity with minimal accuracy loss, or enabling faster inference on hardware accelerators. Covers unstructured pruning, structured pruning, N:M sparsity, magnitude pruning, and one-shot methods.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/emerging-techniques-model-pruning</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/emerging-techniques-model-pruning</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/emerging-techniques-model-pruning</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: model-pruning
 description: Reduce LLM size and accelerate inference using pruning techniques like Wanda and SparseGPT. Use when compressing models without retraining, achieving 50% sparsity with minimal accuracy loss, or enabling faster inference on hardware accelerators. Covers unstructured pruning, structured pruning, N:M sparsity, magnitude pruning, and one-shot methods.
 version: 1.0.0
@@ -109,27 +159,27 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Load model
 model = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-2-7b-hf",
+    &quot;meta-llama/Llama-2-7b-hf&quot;,
     torch_dtype=torch.float16,
-    device_map="cuda"
+    device_map=&quot;cuda&quot;
 )
-tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-hf")
+tokenizer = AutoTokenizer.from_pretrained(&quot;meta-llama/Llama-2-7b-hf&quot;)
 
 # Calibration data (small dataset for activation statistics)
 calib_data = [
-    "The quick brown fox jumps over the lazy dog.",
-    "Machine learning is transforming the world.",
-    "Artificial intelligence powers modern applications.",
+    &quot;The quick brown fox jumps over the lazy dog.&quot;,
+    &quot;Machine learning is transforming the world.&quot;,
+    &quot;Artificial intelligence powers modern applications.&quot;,
 ]
 
 # Wanda pruning function
 def wanda_prune(model, calib_data, sparsity=0.5):
-    """
+    &quot;&quot;&quot;
     Wanda: Prune by weight magnitude × input activation.
 
     Args:
         sparsity: Fraction of weights to prune (0.5 = 50%)
-    """
+    &quot;&quot;&quot;
     # 1. Collect activation statistics
     activations = {}
 
@@ -149,7 +199,7 @@ def wanda_prune(model, calib_data, sparsity=0.5):
     model.eval()
     with torch.no_grad():
         for text in calib_data:
-            inputs = tokenizer(text, return_tensors="pt").to(model.device)
+            inputs = tokenizer(text, return_tensors=&quot;pt&quot;).to(model.device)
             model(**inputs)
 
     # Remove hooks
@@ -180,7 +230,7 @@ def wanda_prune(model, calib_data, sparsity=0.5):
 pruned_model = wanda_prune(model, calib_data, sparsity=0.5)
 
 # Save
-pruned_model.save_pretrained("./llama-2-7b-wanda-50")
+pruned_model.save_pretrained(&quot;./llama-2-7b-wanda-50&quot;)
 ```
 
 ### SparseGPT (Second-Order Pruning)
@@ -191,7 +241,7 @@ pruned_model.save_pretrained("./llama-2-7b-wanda-50")
 from sparsegpt import SparseGPT
 
 # Load model
-model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-hf")
+model = AutoModelForCausalLM.from_pretrained(&quot;meta-llama/Llama-2-7b-hf&quot;)
 
 # Initialize SparseGPT
 pruner = SparseGPT(model)
@@ -215,12 +265,12 @@ pruned_model = pruner.prune(
 
 ```python
 def nm_prune(weight, n=2, m=4):
-    """
+    &quot;&quot;&quot;
     N:M pruning: Keep N weights per M consecutive weights.
     Example: 2:4 = keep 2 out of every 4 weights.
 
     Compatible with NVIDIA sparse tensor cores (2:4, 4:8).
-    """
+    &quot;&quot;&quot;
     # Reshape weight into groups of M
     shape = weight.shape
     weight_flat = weight.flatten()
@@ -322,7 +372,7 @@ importance = weight^2 / diag(Hessian)
 
 ```python
 def gradual_prune(model, initial_sparsity=0.0, final_sparsity=0.5, num_steps=100):
-    """Gradually increase sparsity during training."""
+    &quot;&quot;&quot;Gradually increase sparsity during training.&quot;&quot;&quot;
     for step in range(num_steps):
         # Current sparsity
         current_sparsity = initial_sparsity + (final_sparsity - initial_sparsity) * (step / num_steps)
@@ -345,15 +395,15 @@ def gradual_prune(model, initial_sparsity=0.0, final_sparsity=0.5, num_steps=100
 
 ```python
 def layer_wise_prune(model, sparsity_per_layer):
-    """Different sparsity for different layers."""
+    &quot;&quot;&quot;Different sparsity for different layers.&quot;&quot;&quot;
     # Early layers: Less pruning (more important)
     # Late layers: More pruning (less critical)
 
     sparsity_schedule = {
-        "layer.0": 0.3,   # 30% sparsity
-        "layer.1": 0.4,
-        "layer.2": 0.5,
-        "layer.3": 0.6,   # 60% sparsity
+        &quot;layer.0&quot;: 0.3,   # 30% sparsity
+        &quot;layer.1&quot;: 0.4,
+        &quot;layer.2&quot;: 0.5,
+        &quot;layer.3&quot;: 0.6,   # 60% sparsity
     }
 
     for name, module in model.named_modules():
@@ -372,7 +422,7 @@ def layer_wise_prune(model, sparsity_per_layer):
 
 ```python
 def iterative_prune_finetune(model, target_sparsity=0.5, iterations=5):
-    """Prune gradually with fine-tuning between iterations."""
+    &quot;&quot;&quot;Prune gradually with fine-tuning between iterations.&quot;&quot;&quot;
     current_sparsity = 0.0
     sparsity_increment = target_sparsity / iterations
 
@@ -399,27 +449,27 @@ def iterative_prune_finetune(model, target_sparsity=0.5, iterations=5):
 from transformers import Trainer, TrainingArguments
 
 def production_pruning_pipeline(
-    model_name="meta-llama/Llama-2-7b-hf",
+    model_name=&quot;meta-llama/Llama-2-7b-hf&quot;,
     target_sparsity=0.5,
-    method="wanda",  # or "sparsegpt"
+    method=&quot;wanda&quot;,  # or &quot;sparsegpt&quot;
 ):
     # 1. Load model
     model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     # 2. Load calibration data
-    calib_dataset = load_dataset("wikitext", "wikitext-2-raw-v1", split="train[:1000]")
+    calib_dataset = load_dataset(&quot;wikitext&quot;, &quot;wikitext-2-raw-v1&quot;, split=&quot;train[:1000]&quot;)
 
     # 3. Apply pruning
-    if method == "wanda":
+    if method == &quot;wanda&quot;:
         pruned_model = wanda_prune(model, calib_dataset, sparsity=target_sparsity)
-    elif method == "sparsegpt":
+    elif method == &quot;sparsegpt&quot;:
         pruner = SparseGPT(model)
         pruned_model = pruner.prune(calib_dataset, sparsity=target_sparsity)
 
     # 4. (Optional) Fine-tune to recover accuracy
     training_args = TrainingArguments(
-        output_dir="./pruned-model",
+        output_dir=&quot;./pruned-model&quot;,
         num_train_epochs=1,
         per_device_train_batch_size=4,
         learning_rate=1e-5,
@@ -435,16 +485,16 @@ def production_pruning_pipeline(
     trainer.train()
 
     # 5. Save
-    pruned_model.save_pretrained("./pruned-llama-7b-50")
-    tokenizer.save_pretrained("./pruned-llama-7b-50")
+    pruned_model.save_pretrained(&quot;./pruned-llama-7b-50&quot;)
+    tokenizer.save_pretrained(&quot;./pruned-llama-7b-50&quot;)
 
     return pruned_model
 
 # Usage
 pruned_model = production_pruning_pipeline(
-    model_name="meta-llama/Llama-2-7b-hf",
+    model_name=&quot;meta-llama/Llama-2-7b-hf&quot;,
     target_sparsity=0.5,
-    method="wanda"
+    method=&quot;wanda&quot;
 )
 ```
 
@@ -455,21 +505,21 @@ from lm_eval import evaluator
 
 # Evaluate pruned vs original model
 original_results = evaluator.simple_evaluate(
-    model="hf",
-    model_args="pretrained=meta-llama/Llama-2-7b-hf",
-    tasks=["arc_easy", "hellaswag", "winogrande"],
+    model=&quot;hf&quot;,
+    model_args=&quot;pretrained=meta-llama/Llama-2-7b-hf&quot;,
+    tasks=[&quot;arc_easy&quot;, &quot;hellaswag&quot;, &quot;winogrande&quot;],
 )
 
 pruned_results = evaluator.simple_evaluate(
-    model="hf",
-    model_args="pretrained=./pruned-llama-7b-50",
-    tasks=["arc_easy", "hellaswag", "winogrande"],
+    model=&quot;hf&quot;,
+    model_args=&quot;pretrained=./pruned-llama-7b-50&quot;,
+    tasks=[&quot;arc_easy&quot;, &quot;hellaswag&quot;, &quot;winogrande&quot;],
 )
 
 # Compare
-print(f"Original: {original_results['results']['arc_easy']['acc']:.3f}")
-print(f"Pruned:   {pruned_results['results']['arc_easy']['acc']:.3f}")
-print(f"Degradation: {(original_results - pruned_results):.3f}")
+print(f&quot;Original: {original_results[&#039;results&#039;][&#039;arc_easy&#039;][&#039;acc&#039;]:.3f}&quot;)
+print(f&quot;Pruned:   {pruned_results[&#039;results&#039;][&#039;arc_easy&#039;][&#039;acc&#039;]:.3f}&quot;)
+print(f&quot;Degradation: {(original_results - pruned_results):.3f}&quot;)
 
 # Typical results at 50% sparsity:
 # - Wanda: &lt;1% accuracy loss
@@ -500,15 +550,15 @@ sparsity = 0.9  # 90%, significant degradation
 ```python
 # One-shot, no retraining → Wanda or SparseGPT
 if no_retraining_budget:
-    use_method = "wanda"  # Faster
+    use_method = &quot;wanda&quot;  # Faster
 
 # Best quality → SparseGPT
 if need_best_quality:
-    use_method = "sparsegpt"  # More accurate
+    use_method = &quot;sparsegpt&quot;  # More accurate
 
 # Hardware speedup → N:M structured
 if need_speedup:
-    use_method = "nm_prune"  # 2:4 or 4:8
+    use_method = &quot;nm_prune&quot;  # 2:4 or 4:8
 ```
 
 ### 3. Avoid Common Pitfalls
@@ -550,8 +600,46 @@ iterative_prune(model, target=0.9, steps=10)
 - **NVIDIA Sparse Tensor Cores**: https://developer.nvidia.com/blog/accelerating-inference-with-sparsity-using-ampere-and-tensorrt/
 
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Emerging Techniques</span><span class="tag">Model Pruning</span><span class="tag">Wanda</span><span class="tag">SparseGPT</span><span class="tag">Sparsity</span><span class="tag">Model Compression</span><span class="tag">N:M Sparsity</span><span class="tag">One-Shot Pruning</span><span class="tag">Structured Pruning</span><span class="tag">Unstructured Pruning</span><span class="tag">Fast Inference</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>57</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

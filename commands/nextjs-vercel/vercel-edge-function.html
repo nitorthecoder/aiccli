@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>vercel-edge-function - AICCLI</title>
-  <meta name="description" content="vercel-edge-function - Claude Code command for AICCLI">
+  <meta name="description" content="Generate optimized Vercel Edge Functions with geolocation, authentication, and data transformation">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../command.html">Command</a> / vercel-edge-function</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>vercel-edge-function</h1>
-      <div class="meta">
-        <span class="meta-item">Command</span>
-        <span class="meta-item">nextjs-vercel</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">commands</a> / nextjs-vercel / vercel-edge-function
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⌨️</div>
+      <div class="title">
+        <h1>vercel-edge-function</h1>
+        <div class="meta">
+          <span class="badge type">Command</span>
+          <span class="badge">nextjs-vercel</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Generate optimized Vercel Edge Functions with geolocation, authentication, and data transformation</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/vercel-edge-function</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install commands/vercel-edge-function</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install commands/vercel-edge-function</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 allowed-tools: Read, Write, Edit
 argument-hint: [function-name] [--auth] [--geo] [--transform] [--proxy]
 description: Generate optimized Vercel Edge Functions with geolocation, authentication, and data transformation
@@ -95,21 +145,21 @@ api/edge/[function-name]/
 ### 2. Base Edge Function Template
 ```typescript
 // api/edge/[function-name]/index.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
-export const runtime = 'edge';
+export const runtime = &#039;edge&#039;;
 
 export async function GET(request: NextRequest) {
   try {
     // Get geolocation data
-    const country = request.geo?.country || 'Unknown';
-    const city = request.geo?.city || 'Unknown';
-    const region = request.geo?.region || 'Unknown';
+    const country = request.geo?.country || &#039;Unknown&#039;;
+    const city = request.geo?.city || &#039;Unknown&#039;;
+    const region = request.geo?.region || &#039;Unknown&#039;;
     
     // Get request metadata
-    const ip = request.headers.get('x-forwarded-for') || 'Unknown';
-    const userAgent = request.headers.get('user-agent') || 'Unknown';
-    const referer = request.headers.get('referer') || 'Unknown';
+    const ip = request.headers.get(&#039;x-forwarded-for&#039;) || &#039;Unknown&#039;;
+    const userAgent = request.headers.get(&#039;user-agent&#039;) || &#039;Unknown&#039;;
+    const referer = request.headers.get(&#039;referer&#039;) || &#039;Unknown&#039;;
     
     // Process request
     const result = await processRequest({
@@ -123,17 +173,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result, {
       status: 200,
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
-        'Content-Type': 'application/json',
-        'X-Edge-Location': region,
+        &#039;Cache-Control&#039;: &#039;public, s-maxage=60, stale-while-revalidate=300&#039;,
+        &#039;Content-Type&#039;: &#039;application/json&#039;,
+        &#039;X-Edge-Location&#039;: region,
       },
     });
     
   } catch (error) {
-    console.error('Edge function error:', error);
+    console.error(&#039;Edge function error:&#039;, error);
     
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: &#039;Internal server error&#039; },
       { status: 500 }
     );
   }
@@ -147,7 +197,7 @@ export async function POST(request: NextRequest) {
     const validationResult = validateRequestBody(body);
     if (!validationResult.valid) {
       return NextResponse.json(
-        { error: 'Invalid request body', details: validationResult.errors },
+        { error: &#039;Invalid request body&#039;, details: validationResult.errors },
         { status: 400 }
       );
     }
@@ -158,15 +208,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result, {
       status: 201,
       headers: {
-        'Content-Type': 'application/json',
+        &#039;Content-Type&#039;: &#039;application/json&#039;,
       },
     });
     
   } catch (error) {
-    console.error('Edge function POST error:', error);
+    console.error(&#039;Edge function POST error:&#039;, error);
     
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: &#039;Internal server error&#039; },
       { status: 500 }
     );
   }
@@ -175,7 +225,7 @@ export async function POST(request: NextRequest) {
 async function processRequest(metadata: RequestMetadata): Promise&lt;any&gt; {
   // Implement your edge function logic here
   return {
-    message: 'Edge function executed successfully',
+    message: &#039;Edge function executed successfully&#039;,
     metadata,
     timestamp: new Date().toISOString(),
   };
@@ -184,7 +234,7 @@ async function processRequest(metadata: RequestMetadata): Promise&lt;any&gt; {
 async function processPostRequest(body: any, request: NextRequest): Promise&lt;any&gt; {
   // Implement POST logic here
   return {
-    message: 'POST processed successfully',
+    message: &#039;POST processed successfully&#039;,
     data: body,
     timestamp: new Date().toISOString(),
   };
@@ -218,9 +268,9 @@ interface ValidationResult {
 ### 1. Geolocation-Based Content Delivery
 ```typescript
 // api/edge/geo-content/index.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
-export const runtime = 'edge';
+export const runtime = &#039;edge&#039;;
 
 interface ContentConfig {
   [country: string]: {
@@ -232,29 +282,29 @@ interface ContentConfig {
 }
 
 const contentConfig: ContentConfig = {
-  'US': {
-    currency: 'USD',
-    language: 'en-US',
-    content: 'Welcome to our US store!',
+  &#039;US&#039;: {
+    currency: &#039;USD&#039;,
+    language: &#039;en-US&#039;,
+    content: &#039;Welcome to our US store!&#039;,
     pricing: 99.99,
   },
-  'GB': {
-    currency: 'GBP',
-    language: 'en-GB',
-    content: 'Welcome to our UK store!',
+  &#039;GB&#039;: {
+    currency: &#039;GBP&#039;,
+    language: &#039;en-GB&#039;,
+    content: &#039;Welcome to our UK store!&#039;,
     pricing: 79.99,
   },
-  'DE': {
-    currency: 'EUR',
-    language: 'de-DE',
-    content: 'Willkommen in unserem deutschen Shop!',
+  &#039;DE&#039;: {
+    currency: &#039;EUR&#039;,
+    language: &#039;de-DE&#039;,
+    content: &#039;Willkommen in unserem deutschen Shop!&#039;,
     pricing: 89.99,
   },
 };
 
 export async function GET(request: NextRequest) {
-  const country = request.geo?.country || 'US';
-  const config = contentConfig[country] || contentConfig['US'];
+  const country = request.geo?.country || &#039;US&#039;;
+  const config = contentConfig[country] || contentConfig[&#039;US&#039;];
   
   // Add region-specific headers
   const response = NextResponse.json({
@@ -264,9 +314,9 @@ export async function GET(request: NextRequest) {
     timestamp: new Date().toISOString(),
   });
   
-  response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
-  response.headers.set('Vary', 'Accept-Language, CloudFront-Viewer-Country');
-  response.headers.set('Content-Language', config.language);
+  response.headers.set(&#039;Cache-Control&#039;, &#039;public, s-maxage=3600, stale-while-revalidate=86400&#039;);
+  response.headers.set(&#039;Vary&#039;, &#039;Accept-Language, CloudFront-Viewer-Country&#039;);
+  response.headers.set(&#039;Content-Language&#039;, config.language);
   
   return response;
 }
@@ -275,26 +325,26 @@ export async function GET(request: NextRequest) {
 ### 2. Authentication Edge Function
 ```typescript
 // api/edge/auth-check/index.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+import { jwtVerify } from &#039;jose&#039;;
 
-export const runtime = 'edge';
+export const runtime = &#039;edge&#039;;
 
 const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'your-secret-key'
+  process.env.JWT_SECRET || &#039;your-secret-key&#039;
 );
 
 export async function GET(request: NextRequest) {
   try {
     // Extract token from header or cookie
-    const authHeader = request.headers.get('authorization');
-    const cookieToken = request.cookies.get('auth-token')?.value;
+    const authHeader = request.headers.get(&#039;authorization&#039;);
+    const cookieToken = request.cookies.get(&#039;auth-token&#039;)?.value;
     
-    const token = authHeader?.replace('Bearer ', '') || cookieToken;
+    const token = authHeader?.replace(&#039;Bearer &#039;, &#039;&#039;) || cookieToken;
     
     if (!token) {
       return NextResponse.json(
-        { error: 'No token provided', authenticated: false },
+        { error: &#039;No token provided&#039;, authenticated: false },
         { status: 401 }
       );
     }
@@ -318,10 +368,10 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('Auth verification failed:', error);
+    console.error(&#039;Auth verification failed:&#039;, error);
     
     return NextResponse.json(
-      { error: 'Invalid token', authenticated: false },
+      { error: &#039;Invalid token&#039;, authenticated: false },
       { status: 401 }
     );
   }
@@ -336,7 +386,7 @@ export async function POST(request: NextRequest) {
     
     if (!user) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
+        { error: &#039;Invalid credentials&#039; },
         { status: 401 }
       );
     }
@@ -354,20 +404,20 @@ export async function POST(request: NextRequest) {
     });
     
     // Set secure cookie
-    response.cookies.set('auth-token', token, {
+    response.cookies.set(&#039;auth-token&#039;, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: process.env.NODE_ENV === &#039;production&#039;,
+      sameSite: &#039;strict&#039;,
       maxAge: 24 * 60 * 60, // 24 hours
     });
     
     return response;
     
   } catch (error) {
-    console.error('Authentication error:', error);
+    console.error(&#039;Authentication error:&#039;, error);
     
     return NextResponse.json(
-      { error: 'Authentication failed' },
+      { error: &#039;Authentication failed&#039; },
       { status: 500 }
     );
   }
@@ -382,42 +432,42 @@ async function validateCredentials(username: string, password: string) {
 async function generateJWT(user: any): Promise&lt;string&gt; {
   // Implement JWT generation
   // This would use a proper JWT library
-  return 'jwt-token'; // Placeholder
+  return &#039;jwt-token&#039;; // Placeholder
 }
 ```
 
 ### 3. Data Transformation Edge Function
 ```typescript
 // api/edge/transform/index.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
-export const runtime = 'edge';
+export const runtime = &#039;edge&#039;;
 
 interface TransformConfig {
-  format: 'json' | 'xml' | 'csv';
+  format: &#039;json&#039; | &#039;xml&#039; | &#039;csv&#039;;
   fields?: string[];
   transforms?: Record&lt;string, (value: any) =&gt; any&gt;;
 }
 
 const transformers = {
   // Currency conversion
-  currency: (value: number, targetCurrency: string = 'USD') =&gt; {
+  currency: (value: number, targetCurrency: string = &#039;USD&#039;) =&gt; {
     const rates = { USD: 1, EUR: 0.85, GBP: 0.73 };
     return value * (rates[targetCurrency as keyof typeof rates] || 1);
   },
   
   // Date formatting
-  date: (value: string, format: string = 'ISO') =&gt; {
+  date: (value: string, format: string = &#039;ISO&#039;) =&gt; {
     const date = new Date(value);
-    if (format === 'ISO') return date.toISOString();
-    if (format === 'US') return date.toLocaleDateString('en-US');
+    if (format === &#039;ISO&#039;) return date.toISOString();
+    if (format === &#039;US&#039;) return date.toLocaleDateString(&#039;en-US&#039;);
     return date.toString();
   },
   
   // Text formatting
-  text: (value: string, caseType: string = 'lower') =&gt; {
-    if (caseType === 'upper') return value.toUpperCase();
-    if (caseType === 'title') return value.replace(/\w\S*/g, txt =&gt; 
+  text: (value: string, caseType: string = &#039;lower&#039;) =&gt; {
+    if (caseType === &#039;upper&#039;) return value.toUpperCase();
+    if (caseType === &#039;title&#039;) return value.replace(/\w\S*/g, txt =&gt; 
       txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
     );
     return value.toLowerCase();
@@ -430,7 +480,7 @@ export async function POST(request: NextRequest) {
     
     if (!data || !config) {
       return NextResponse.json(
-        { error: 'Missing data or config' },
+        { error: &#039;Missing data or config&#039; },
         { status: 400 }
       );
     }
@@ -444,28 +494,28 @@ export async function POST(request: NextRequest) {
     const response = new NextResponse(output, {
       status: 200,
       headers: {
-        'Content-Type': getContentType(config.format),
-        'Cache-Control': 'public, s-maxage=300',
+        &#039;Content-Type&#039;: getContentType(config.format),
+        &#039;Cache-Control&#039;: &#039;public, s-maxage=300&#039;,
       },
     });
     
     return response;
     
   } catch (error) {
-    console.error('Transform error:', error);
+    console.error(&#039;Transform error:&#039;, error);
     
     return NextResponse.json(
-      { error: 'Transformation failed' },
+      { error: &#039;Transformation failed&#039; },
       { status: 500 }
     );
   }
 }
 
 async function transformData(data: any, config: TransformConfig, request: NextRequest) {
-  const country = request.geo?.country || 'US';
+  const country = request.geo?.country || &#039;US&#039;;
   
   // Apply field filtering if specified
-  if (config.fields && Array.isArray(data)) {
+  if (config.fields &amp;&amp; Array.isArray(data)) {
     data = data.map(item =&gt; {
       const filtered: any = {};
       config.fields!.forEach(field =&gt; {
@@ -504,11 +554,11 @@ async function transformData(data: any, config: TransformConfig, request: NextRe
 
 async function formatOutput(data: any, format: string): Promise&lt;string&gt; {
   switch (format) {
-    case 'xml':
+    case &#039;xml&#039;:
       return jsonToXml(data);
-    case 'csv':
+    case &#039;csv&#039;:
       return jsonToCsv(data);
-    case 'json':
+    case &#039;json&#039;:
     default:
       return JSON.stringify(data, null, 2);
   }
@@ -516,35 +566,35 @@ async function formatOutput(data: any, format: string): Promise&lt;string&gt; {
 
 function getContentType(format: string): string {
   switch (format) {
-    case 'xml': return 'application/xml';
-    case 'csv': return 'text/csv';
-    case 'json':
-    default: return 'application/json';
+    case &#039;xml&#039;: return &#039;application/xml&#039;;
+    case &#039;csv&#039;: return &#039;text/csv&#039;;
+    case &#039;json&#039;:
+    default: return &#039;application/json&#039;;
   }
 }
 
 function jsonToXml(data: any): string {
   // Simple XML conversion (implement proper XML library for production)
-  return `&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;root&gt;${JSON.stringify(data)}&lt;/root&gt;`;
+  return `&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;root&gt;${JSON.stringify(data)}&lt;/root&gt;`;
 }
 
 function jsonToCsv(data: any): string {
   // Simple CSV conversion (implement proper CSV library for production)
-  if (Array.isArray(data) && data.length &gt; 0) {
+  if (Array.isArray(data) &amp;&amp; data.length &gt; 0) {
     const headers = Object.keys(data[0]);
-    const rows = data.map(row =&gt; headers.map(header =&gt; row[header] || '').join(','));
-    return [headers.join(','), ...rows].join('\n');
+    const rows = data.map(row =&gt; headers.map(header =&gt; row[header] || &#039;&#039;).join(&#039;,&#039;));
+    return [headers.join(&#039;,&#039;), ...rows].join(&#039;\n&#039;);
   }
-  return '';
+  return &#039;&#039;;
 }
 ```
 
 ### 4. Proxy and Cache Edge Function
 ```typescript
 // api/edge/proxy/index.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
-export const runtime = 'edge';
+export const runtime = &#039;edge&#039;;
 
 interface ProxyConfig {
   targetUrl: string;
@@ -554,15 +604,15 @@ interface ProxyConfig {
 }
 
 const proxyConfigs: Record&lt;string, ProxyConfig&gt; = {
-  'api': {
-    targetUrl: 'https://jsonplaceholder.typicode.com',
+  &#039;api&#039;: {
+    targetUrl: &#039;https://jsonplaceholder.typicode.com&#039;,
     cacheTime: 300, // 5 minutes
     headers: {
-      'User-Agent': 'Vercel-Edge-Proxy/1.0',
+      &#039;User-Agent&#039;: &#039;Vercel-Edge-Proxy/1.0&#039;,
     },
   },
-  'cdn': {
-    targetUrl: 'https://cdn.example.com',
+  &#039;cdn&#039;: {
+    targetUrl: &#039;https://cdn.example.com&#039;,
     cacheTime: 3600, // 1 hour
     transformResponse: false,
   },
@@ -571,13 +621,13 @@ const proxyConfigs: Record&lt;string, ProxyConfig&gt; = {
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const proxyType = url.searchParams.get('type') || 'api';
-    const targetPath = url.searchParams.get('path') || '';
+    const proxyType = url.searchParams.get(&#039;type&#039;) || &#039;api&#039;;
+    const targetPath = url.searchParams.get(&#039;path&#039;) || &#039;&#039;;
     
     const config = proxyConfigs[proxyType];
     if (!config) {
       return NextResponse.json(
-        { error: 'Invalid proxy type' },
+        { error: &#039;Invalid proxy type&#039; },
         { status: 400 }
       );
     }
@@ -592,22 +642,22 @@ export async function GET(request: NextRequest) {
     const response = await fetch(targetUrl, {
       headers: {
         ...config.headers,
-        'X-Forwarded-For': request.headers.get('x-forwarded-for') || '',
-        'X-Real-IP': request.headers.get('x-real-ip') || '',
+        &#039;X-Forwarded-For&#039;: request.headers.get(&#039;x-forwarded-for&#039;) || &#039;&#039;,
+        &#039;X-Real-IP&#039;: request.headers.get(&#039;x-real-ip&#039;) || &#039;&#039;,
       },
     });
     
     if (!response.ok) {
       return NextResponse.json(
-        { error: 'Upstream server error' },
+        { error: &#039;Upstream server error&#039; },
         { status: response.status }
       );
     }
     
     let data;
-    const contentType = response.headers.get('content-type') || '';
+    const contentType = response.headers.get(&#039;content-type&#039;) || &#039;&#039;;
     
-    if (contentType.includes('application/json')) {
+    if (contentType.includes(&#039;application/json&#039;)) {
       data = await response.json();
       
       // Transform response if configured
@@ -618,9 +668,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(data, {
         status: 200,
         headers: {
-          'Cache-Control': `public, s-maxage=${config.cacheTime}, stale-while-revalidate=${config.cacheTime * 2}`,
-          'X-Proxy-Cache': 'MISS',
-          'X-Edge-Location': request.geo?.region || 'unknown',
+          &#039;Cache-Control&#039;: `public, s-maxage=${config.cacheTime}, stale-while-revalidate=${config.cacheTime * 2}`,
+          &#039;X-Proxy-Cache&#039;: &#039;MISS&#039;,
+          &#039;X-Edge-Location&#039;: request.geo?.region || &#039;unknown&#039;,
         },
       });
     } else {
@@ -630,17 +680,17 @@ export async function GET(request: NextRequest) {
       return new NextResponse(blob, {
         status: 200,
         headers: {
-          'Content-Type': contentType,
-          'Cache-Control': `public, s-maxage=${config.cacheTime}`,
+          &#039;Content-Type&#039;: contentType,
+          &#039;Cache-Control&#039;: `public, s-maxage=${config.cacheTime}`,
         },
       });
     }
     
   } catch (error) {
-    console.error('Proxy error:', error);
+    console.error(&#039;Proxy error:&#039;, error);
     
     return NextResponse.json(
-      { error: 'Proxy request failed' },
+      { error: &#039;Proxy request failed&#039; },
       { status: 502 }
     );
   }
@@ -690,7 +740,7 @@ export const defaultConfig: EdgeFunctionConfig = {
     enabled: true,
   },
   security: {
-    corsOrigins: ['*'],
+    corsOrigins: [&#039;*&#039;],
     requireAuth: false,
   },
 };
@@ -700,10 +750,10 @@ export const defaultConfig: EdgeFunctionConfig = {
 ```typescript
 // api/edge/[function-name]/utils.ts
 export function getClientIP(request: NextRequest): string {
-  return request.headers.get('x-forwarded-for') ||
-    request.headers.get('x-real-ip') ||
+  return request.headers.get(&#039;x-forwarded-for&#039;) ||
+    request.headers.get(&#039;x-real-ip&#039;) ||
     request.ip ||
-    'unknown';
+    &#039;unknown&#039;;
 }
 
 export function generateCacheKey(request: NextRequest, suffix?: string): string {
@@ -714,13 +764,13 @@ export function generateCacheKey(request: NextRequest, suffix?: string): string 
 
 export function createCorsResponse(
   data: any,
-  origins: string[] = ['*']
+  origins: string[] = [&#039;*&#039;]
 ): NextResponse {
   const response = NextResponse.json(data);
   
-  response.headers.set('Access-Control-Allow-Origin', origins.join(', '));
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  response.headers.set(&#039;Access-Control-Allow-Origin&#039;, origins.join(&#039;, &#039;));
+  response.headers.set(&#039;Access-Control-Allow-Methods&#039;, &#039;GET, POST, OPTIONS&#039;);
+  response.headers.set(&#039;Access-Control-Allow-Headers&#039;, &#039;Content-Type, Authorization&#039;);
   
   return response;
 }
@@ -737,59 +787,59 @@ export function validateGeoRestrictions(
 ### 3. Testing Framework
 ```typescript
 // api/edge/[function-name]/__tests__/[function-name].test.ts
-import { NextRequest } from 'next/server';
-import { GET, POST } from '../index';
+import { NextRequest } from &#039;next/server&#039;;
+import { GET, POST } from &#039;../index&#039;;
 
 // Mock geo data
 const createMockRequest = (url: string, options: any = {}) =&gt; {
   const request = new NextRequest(url, options);
   
   // Mock geo property
-  Object.defineProperty(request, 'geo', {
+  Object.defineProperty(request, &#039;geo&#039;, {
     value: {
-      country: 'US',
-      city: 'New York',
-      region: 'us-east-1',
+      country: &#039;US&#039;,
+      city: &#039;New York&#039;,
+      region: &#039;us-east-1&#039;,
     },
   });
   
   return request;
 };
 
-describe('Edge Function', () =&gt; {
-  describe('GET requests', () =&gt; {
-    it('should return geo-based content', async () =&gt; {
-      const request = createMockRequest('http://localhost:3000/api/edge/test');
+describe(&#039;Edge Function&#039;, () =&gt; {
+  describe(&#039;GET requests&#039;, () =&gt; {
+    it(&#039;should return geo-based content&#039;, async () =&gt; {
+      const request = createMockRequest(&#039;http://localhost:3000/api/edge/test&#039;);
       const response = await GET(request);
       const data = await response.json();
       
       expect(response.status).toBe(200);
-      expect(data.metadata.geo.country).toBe('US');
+      expect(data.metadata.geo.country).toBe(&#039;US&#039;);
     });
     
-    it('should handle missing geo data', async () =&gt; {
-      const request = new NextRequest('http://localhost:3000/api/edge/test');
+    it(&#039;should handle missing geo data&#039;, async () =&gt; {
+      const request = new NextRequest(&#039;http://localhost:3000/api/edge/test&#039;);
       const response = await GET(request);
       const data = await response.json();
       
       expect(response.status).toBe(200);
-      expect(data.metadata.geo.country).toBe('Unknown');
+      expect(data.metadata.geo.country).toBe(&#039;Unknown&#039;);
     });
   });
   
-  describe('POST requests', () =&gt; {
-    it('should validate request body', async () =&gt; {
-      const request = createMockRequest('http://localhost:3000/api/edge/test', {
-        method: 'POST',
-        body: JSON.stringify({ invalid: 'data' }),
-        headers: { 'Content-Type': 'application/json' },
+  describe(&#039;POST requests&#039;, () =&gt; {
+    it(&#039;should validate request body&#039;, async () =&gt; {
+      const request = createMockRequest(&#039;http://localhost:3000/api/edge/test&#039;, {
+        method: &#039;POST&#039;,
+        body: JSON.stringify({ invalid: &#039;data&#039; }),
+        headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
       });
       
       const response = await POST(request);
       const data = await response.json();
       
       expect(response.status).toBe(400);
-      expect(data.error).toBe('Invalid request body');
+      expect(data.error).toBe(&#039;Invalid request body&#039;);
     });
   });
 });
@@ -806,23 +856,23 @@ export function optimizeResponse(data: any, request: NextRequest): NextResponse 
   // Set appropriate cache headers
   const cacheTime = getCacheTime(request.url);
   response.headers.set(
-    'Cache-Control',
+    &#039;Cache-Control&#039;,
     `public, s-maxage=${cacheTime}, stale-while-revalidate=${cacheTime * 2}`
   );
   
   // Add compression hints
-  response.headers.set('Content-Encoding', 'gzip');
+  response.headers.set(&#039;Content-Encoding&#039;, &#039;gzip&#039;);
   
   // Add performance headers
-  response.headers.set('X-Edge-Location', request.geo?.region || 'unknown');
+  response.headers.set(&#039;X-Edge-Location&#039;, request.geo?.region || &#039;unknown&#039;);
   
   return response;
 }
 
 function getCacheTime(url: string): number {
   // Dynamic cache time based on URL patterns
-  if (url.includes('/static/')) return 3600; // 1 hour
-  if (url.includes('/api/')) return 60; // 1 minute
+  if (url.includes(&#039;/static/&#039;)) return 3600; // 1 hour
+  if (url.includes(&#039;/api/&#039;)) return 60; // 1 minute
   return 300; // 5 minutes default
 }
 ```
@@ -833,7 +883,7 @@ export function createErrorResponse(
   error: unknown,
   request: NextRequest
 ): NextResponse {
-  console.error('Edge function error:', error);
+  console.error(&#039;Edge function error:&#039;, error);
   
   // Log error with context
   const errorContext = {
@@ -846,13 +896,13 @@ export function createErrorResponse(
   // Return appropriate error response
   return NextResponse.json(
     {
-      error: 'Internal server error',
+      error: &#039;Internal server error&#039;,
       requestId: generateRequestId(),
     },
     {
       status: 500,
       headers: {
-        'X-Error-Context': JSON.stringify(errorContext),
+        &#039;X-Error-Context&#039;: JSON.stringify(errorContext),
       },
     }
   );
@@ -863,8 +913,39 @@ function generateRequestId(): string {
 }
 ```
 
-Generate comprehensive edge function implementation with the requested features, proper TypeScript types, error handling, and optimization patterns.</pre></div>
+Generate comprehensive edge function implementation with the requested features, proper TypeScript types, error handling, and optimization patterns.</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>261</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

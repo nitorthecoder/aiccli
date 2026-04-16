@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>scientific-schematics - AICCLI</title>
-  <meta name="description" content="scientific-schematics - Claude Code skill for AICCLI">
+  <meta name="description" content=""Create publication-quality scientific diagrams using Nano Banana Pro AI with smart iterative refinement. Uses Gemini 3 Pro for quality review. Only regenerates">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / scientific-schematics</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>scientific-schematics</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / scientific-schematics
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>scientific-schematics</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Create publication-quality scientific diagrams using Nano Banana Pro AI with smart iterative refinement. Uses Gemini 3 Pro for quality review. Only regenerates if quality is below threshold for your document type. Specialized in neural network architectures, system diagrams, flowcharts, biological pathways, and complex scientific visualizations."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/scientific-schematics</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/scientific-schematics</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/scientific-schematics</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: scientific-schematics
-description: "Create publication-quality scientific diagrams using Nano Banana Pro AI with smart iterative refinement. Uses Gemini 3 Pro for quality review. Only regenerates if quality is below threshold for your document type. Specialized in neural network architectures, system diagrams, flowcharts, biological pathways, and complex scientific visualizations."
+description: &quot;Create publication-quality scientific diagrams using Nano Banana Pro AI with smart iterative refinement. Uses Gemini 3 Pro for quality review. Only regenerates if quality is below threshold for your document type. Specialized in neural network architectures, system diagrams, flowcharts, biological pathways, and complex scientific visualizations.&quot;
 allowed-tools: [Read, Write, Edit, Bash]
 ---
 
@@ -96,16 +146,16 @@ Create any scientific diagram by simply describing it. Nano Banana Pro handles e
 
 ```bash
 # Generate for journal paper (highest quality threshold: 8.5/10)
-python scripts/generate_schematic.py "CONSORT participant flow diagram with 500 screened, 150 excluded, 350 randomized" -o figures/consort.png --doc-type journal
+python scripts/generate_schematic.py &quot;CONSORT participant flow diagram with 500 screened, 150 excluded, 350 randomized&quot; -o figures/consort.png --doc-type journal
 
 # Generate for presentation (lower threshold: 6.5/10 - faster)
-python scripts/generate_schematic.py "Transformer encoder-decoder architecture showing multi-head attention" -o figures/transformer.png --doc-type presentation
+python scripts/generate_schematic.py &quot;Transformer encoder-decoder architecture showing multi-head attention&quot; -o figures/transformer.png --doc-type presentation
 
 # Generate for poster (moderate threshold: 7.0/10)
-python scripts/generate_schematic.py "MAPK signaling pathway from EGFR to gene transcription" -o figures/mapk_pathway.png --doc-type poster
+python scripts/generate_schematic.py &quot;MAPK signaling pathway from EGFR to gene transcription&quot; -o figures/mapk_pathway.png --doc-type poster
 
 # Custom max iterations (max 2)
-python scripts/generate_schematic.py "Complex circuit diagram with op-amp, resistors, and capacitors" -o figures/circuit.png --iterations 2 --doc-type journal
+python scripts/generate_schematic.py &quot;Complex circuit diagram with op-amp, resistors, and capacitors&quot; -o figures/circuit.png --iterations 2 --doc-type journal
 ```
 
 **What happens behind the scenes:**
@@ -127,7 +177,7 @@ python scripts/generate_schematic.py "Complex circuit diagram with op-amp, resis
 
 Set your OpenRouter API key:
 ```bash
-export OPENROUTER_API_KEY='your_api_key_here'
+export OPENROUTER_API_KEY=&#039;your_api_key_here&#039;
 ```
 
 Get an API key at: https://openrouter.ai/keys
@@ -137,15 +187,15 @@ Get an API key at: https://openrouter.ai/keys
 **Effective Prompts for Scientific Diagrams:**
 
 ✓ **Good prompts** (specific, detailed):
-- "CONSORT flowchart showing participant flow from screening (n=500) through randomization to final analysis"
-- "Transformer neural network architecture with encoder stack on left, decoder stack on right, showing multi-head attention and cross-attention connections"
-- "Biological signaling cascade: EGFR receptor → RAS → RAF → MEK → ERK → nucleus, with phosphorylation steps labeled"
-- "Block diagram of IoT system: sensors → microcontroller → WiFi module → cloud server → mobile app"
+- &quot;CONSORT flowchart showing participant flow from screening (n=500) through randomization to final analysis&quot;
+- &quot;Transformer neural network architecture with encoder stack on left, decoder stack on right, showing multi-head attention and cross-attention connections&quot;
+- &quot;Biological signaling cascade: EGFR receptor → RAS → RAF → MEK → ERK → nucleus, with phosphorylation steps labeled&quot;
+- &quot;Block diagram of IoT system: sensors → microcontroller → WiFi module → cloud server → mobile app&quot;
 
 ✗ **Avoid vague prompts**:
-- "Make a flowchart" (too generic)
-- "Neural network" (which type? what components?)
-- "Pathway diagram" (which pathway? what molecules?)
+- &quot;Make a flowchart&quot; (too generic)
+- &quot;Neural network&quot; (which type? what components?)
+- &quot;Pathway diagram&quot; (which pathway? what molecules?)
 
 **Key elements to include:**
 - **Type**: Flowchart, architecture diagram, pathway, circuit, etc.
@@ -181,10 +231,10 @@ This skill should be used when:
 **Simply describe your diagram in natural language.** Nano Banana Pro generates it automatically:
 
 ```bash
-python scripts/generate_schematic.py "your diagram description" -o output.png
+python scripts/generate_schematic.py &quot;your diagram description&quot; -o output.png
 ```
 
-**That's it!** The AI handles:
+**That&#039;s it!** The AI handles:
 - ✓ Layout and composition
 - ✓ Labels and annotations
 - ✓ Colors and styling
@@ -273,7 +323,7 @@ VERDICT: ACCEPTABLE (for poster, threshold 7.0)
 ### Subsequent Iterations (Only If Needed)
 
 If quality is below threshold, the system:
-1. Extracts specific issues from Gemini 3 Pro's review
+1. Extracts specific issues from Gemini 3 Pro&#039;s review
 2. Enhances the prompt with improvement instructions
 3. Regenerates with Nano Banana Pro
 4. Reviews again with Gemini 3 Pro
@@ -283,21 +333,21 @@ If quality is below threshold, the system:
 All iterations are saved with a JSON review log that includes early-stop information:
 ```json
 {
-  "user_prompt": "CONSORT participant flow diagram...",
-  "doc_type": "poster",
-  "quality_threshold": 7.0,
-  "iterations": [
+  &quot;user_prompt&quot;: &quot;CONSORT participant flow diagram...&quot;,
+  &quot;doc_type&quot;: &quot;poster&quot;,
+  &quot;quality_threshold&quot;: 7.0,
+  &quot;iterations&quot;: [
     {
-      "iteration": 1,
-      "image_path": "figures/consort_v1.png",
-      "score": 7.5,
-      "needs_improvement": false,
-      "critique": "SCORE: 7.5\nSTRENGTHS:..."
+      &quot;iteration&quot;: 1,
+      &quot;image_path&quot;: &quot;figures/consort_v1.png&quot;,
+      &quot;score&quot;: 7.5,
+      &quot;needs_improvement&quot;: false,
+      &quot;critique&quot;: &quot;SCORE: 7.5\nSTRENGTHS:...&quot;
     }
   ],
-  "final_score": 7.5,
-  "early_stop": true,
-  "early_stop_reason": "Quality score 7.5 meets threshold 7.0 for poster"
+  &quot;final_score&quot;: 7.5,
+  &quot;early_stop&quot;: true,
+  &quot;early_stop_reason&quot;: &quot;Quality score 7.5 meets threshold 7.0 for poster&quot;
 }
 ```
 
@@ -312,87 +362,87 @@ from scripts.generate_schematic_ai import ScientificSchematicGenerator
 
 # Initialize generator
 generator = ScientificSchematicGenerator(
-    api_key="your_openrouter_key",
+    api_key=&quot;your_openrouter_key&quot;,
     verbose=True
 )
 
 # Generate with iterative refinement (max 2 iterations)
 results = generator.generate_iterative(
-    user_prompt="Transformer architecture diagram",
-    output_path="figures/transformer.png",
+    user_prompt=&quot;Transformer architecture diagram&quot;,
+    output_path=&quot;figures/transformer.png&quot;,
     iterations=2
 )
 
 # Access results
-print(f"Final score: {results['final_score']}/10")
-print(f"Final image: {results['final_image']}")
+print(f&quot;Final score: {results[&#039;final_score&#039;]}/10&quot;)
+print(f&quot;Final image: {results[&#039;final_image&#039;]}&quot;)
 
 # Review individual iterations
-for iteration in results['iterations']:
-    print(f"Iteration {iteration['iteration']}: {iteration['score']}/10")
-    print(f"Critique: {iteration['critique']}")
+for iteration in results[&#039;iterations&#039;]:
+    print(f&quot;Iteration {iteration[&#039;iteration&#039;]}: {iteration[&#039;score&#039;]}/10&quot;)
+    print(f&quot;Critique: {iteration[&#039;critique&#039;]}&quot;)
 ```
 
 ### Command-Line Options
 
 ```bash
 # Basic usage (default threshold 7.5/10)
-python scripts/generate_schematic.py "diagram description" -o output.png
+python scripts/generate_schematic.py &quot;diagram description&quot; -o output.png
 
 # Specify document type for appropriate quality threshold
-python scripts/generate_schematic.py "diagram" -o out.png --doc-type journal      # 8.5/10
-python scripts/generate_schematic.py "diagram" -o out.png --doc-type conference   # 8.0/10
-python scripts/generate_schematic.py "diagram" -o out.png --doc-type poster       # 7.0/10
-python scripts/generate_schematic.py "diagram" -o out.png --doc-type presentation # 6.5/10
+python scripts/generate_schematic.py &quot;diagram&quot; -o out.png --doc-type journal      # 8.5/10
+python scripts/generate_schematic.py &quot;diagram&quot; -o out.png --doc-type conference   # 8.0/10
+python scripts/generate_schematic.py &quot;diagram&quot; -o out.png --doc-type poster       # 7.0/10
+python scripts/generate_schematic.py &quot;diagram&quot; -o out.png --doc-type presentation # 6.5/10
 
 # Custom max iterations (1-2)
-python scripts/generate_schematic.py "complex diagram" -o diagram.png --iterations 2
+python scripts/generate_schematic.py &quot;complex diagram&quot; -o diagram.png --iterations 2
 
 # Verbose output (see all API calls and reviews)
-python scripts/generate_schematic.py "flowchart" -o flow.png -v
+python scripts/generate_schematic.py &quot;flowchart&quot; -o flow.png -v
 
 # Provide API key via flag
-python scripts/generate_schematic.py "diagram" -o out.png --api-key "sk-or-v1-..."
+python scripts/generate_schematic.py &quot;diagram&quot; -o out.png --api-key &quot;sk-or-v1-...&quot;
 
 # Combine options
-python scripts/generate_schematic.py "neural network" -o nn.png --doc-type journal --iterations 2 -v
+python scripts/generate_schematic.py &quot;neural network&quot; -o nn.png --doc-type journal --iterations 2 -v
 ```
 
 ### Prompt Engineering Tips
 
 **1. Be Specific About Layout:**
 ```
-✓ "Flowchart with vertical flow, top to bottom"
-✓ "Architecture diagram with encoder on left, decoder on right"
-✓ "Circular pathway diagram with clockwise flow"
+✓ &quot;Flowchart with vertical flow, top to bottom&quot;
+✓ &quot;Architecture diagram with encoder on left, decoder on right&quot;
+✓ &quot;Circular pathway diagram with clockwise flow&quot;
 ```
 
 **2. Include Quantitative Details:**
 ```
-✓ "Neural network with input layer (784 nodes), hidden layer (128 nodes), output (10 nodes)"
-✓ "Flowchart showing n=500 screened, n=150 excluded, n=350 randomized"
-✓ "Circuit with 1kΩ resistor, 10µF capacitor, 5V source"
+✓ &quot;Neural network with input layer (784 nodes), hidden layer (128 nodes), output (10 nodes)&quot;
+✓ &quot;Flowchart showing n=500 screened, n=150 excluded, n=350 randomized&quot;
+✓ &quot;Circuit with 1kΩ resistor, 10µF capacitor, 5V source&quot;
 ```
 
 **3. Specify Visual Style:**
 ```
-✓ "Minimalist block diagram with clean lines"
-✓ "Detailed biological pathway with protein structures"
-✓ "Technical schematic with engineering notation"
+✓ &quot;Minimalist block diagram with clean lines&quot;
+✓ &quot;Detailed biological pathway with protein structures&quot;
+✓ &quot;Technical schematic with engineering notation&quot;
 ```
 
 **4. Request Specific Labels:**
 ```
-✓ "Label all arrows with activation/inhibition"
-✓ "Include layer dimensions in each box"
-✓ "Show time progression with timestamps"
+✓ &quot;Label all arrows with activation/inhibition&quot;
+✓ &quot;Include layer dimensions in each box&quot;
+✓ &quot;Show time progression with timestamps&quot;
 ```
 
 **5. Mention Color Requirements:**
 ```
-✓ "Use colorblind-friendly colors"
-✓ "Grayscale-compatible design"
-✓ "Color-code by function: blue for input, green for processing, red for output"
+✓ &quot;Use colorblind-friendly colors&quot;
+✓ &quot;Grayscale-compatible design&quot;
+✓ &quot;Color-code by function: blue for input, green for processing, red for output&quot;
 ```
 
 ## AI Generation Examples
@@ -400,58 +450,58 @@ python scripts/generate_schematic.py "neural network" -o nn.png --doc-type journ
 ### Example 1: CONSORT Flowchart
 ```bash
 python scripts/generate_schematic.py \
-  "CONSORT participant flow diagram for randomized controlled trial. \
-   Start with 'Assessed for eligibility (n=500)' at top. \
-   Show 'Excluded (n=150)' with reasons: age&lt;18 (n=80), declined (n=50), other (n=20). \
-   Then 'Randomized (n=350)' splits into two arms: \
-   'Treatment group (n=175)' and 'Control group (n=175)'. \
-   Each arm shows 'Lost to follow-up' (n=15 and n=10). \
-   End with 'Analyzed' (n=160 and n=165). \
-   Use blue boxes for process steps, orange for exclusion, green for final analysis." \
+  &quot;CONSORT participant flow diagram for randomized controlled trial. \
+   Start with &#039;Assessed for eligibility (n=500)&#039; at top. \
+   Show &#039;Excluded (n=150)&#039; with reasons: age&lt;18 (n=80), declined (n=50), other (n=20). \
+   Then &#039;Randomized (n=350)&#039; splits into two arms: \
+   &#039;Treatment group (n=175)&#039; and &#039;Control group (n=175)&#039;. \
+   Each arm shows &#039;Lost to follow-up&#039; (n=15 and n=10). \
+   End with &#039;Analyzed&#039; (n=160 and n=165). \
+   Use blue boxes for process steps, orange for exclusion, green for final analysis.&quot; \
   -o figures/consort.png
 ```
 
 ### Example 2: Neural Network Architecture
 ```bash
 python scripts/generate_schematic.py \
-  "Transformer encoder-decoder architecture diagram. \
+  &quot;Transformer encoder-decoder architecture diagram. \
    Left side: Encoder stack with input embedding, positional encoding, \
-   multi-head self-attention, add & norm, feed-forward, add & norm. \
+   multi-head self-attention, add &amp; norm, feed-forward, add &amp; norm. \
    Right side: Decoder stack with output embedding, positional encoding, \
-   masked self-attention, add & norm, cross-attention (receiving from encoder), \
-   add & norm, feed-forward, add & norm, linear & softmax. \
+   masked self-attention, add &amp; norm, cross-attention (receiving from encoder), \
+   add &amp; norm, feed-forward, add &amp; norm, linear &amp; softmax. \
    Show cross-attention connection from encoder to decoder with dashed line. \
    Use light blue for encoder, light red for decoder. \
-   Label all components clearly." \
+   Label all components clearly.&quot; \
   -o figures/transformer.png --iterations 2
 ```
 
 ### Example 3: Biological Pathway
 ```bash
 python scripts/generate_schematic.py \
-  "MAPK signaling pathway diagram. \
+  &quot;MAPK signaling pathway diagram. \
    Start with EGFR receptor at cell membrane (top). \
    Arrow down to RAS (with GTP label). \
    Arrow to RAF kinase. \
    Arrow to MEK kinase. \
    Arrow to ERK kinase. \
    Final arrow to nucleus showing gene transcription. \
-   Label each arrow with 'phosphorylation' or 'activation'. \
+   Label each arrow with &#039;phosphorylation&#039; or &#039;activation&#039;. \
    Use rounded rectangles for proteins, different colors for each. \
-   Include membrane boundary line at top." \
+   Include membrane boundary line at top.&quot; \
   -o figures/mapk_pathway.png
 ```
 
 ### Example 4: System Architecture
 ```bash
 python scripts/generate_schematic.py \
-  "IoT system architecture block diagram. \
+  &quot;IoT system architecture block diagram. \
    Bottom layer: Sensors (temperature, humidity, motion) in green boxes. \
    Middle layer: Microcontroller (ESP32) in blue box. \
    Connections to WiFi module (orange box) and Display (purple box). \
    Top layer: Cloud server (gray box) connected to mobile app (light blue box). \
    Show data flow arrows between all components. \
-   Label connections with protocols: I2C, UART, WiFi, HTTPS." \
+   Label connections with protocols: I2C, UART, WiFi, HTTPS.&quot; \
   -o figures/iot_architecture.png
 ```
 
@@ -463,13 +513,13 @@ The main entry point for generating scientific schematics:
 
 ```bash
 # Basic usage
-python scripts/generate_schematic.py "diagram description" -o output.png
+python scripts/generate_schematic.py &quot;diagram description&quot; -o output.png
 
 # Custom iterations (max 2)
-python scripts/generate_schematic.py "complex diagram" -o diagram.png --iterations 2
+python scripts/generate_schematic.py &quot;complex diagram&quot; -o diagram.png --iterations 2
 
 # Verbose mode
-python scripts/generate_schematic.py "diagram" -o out.png -v
+python scripts/generate_schematic.py &quot;diagram&quot; -o out.png -v
 ```
 
 **Note:** The Nano Banana Pro AI generation system includes automatic quality review in its iterative refinement process. Each iteration is evaluated for scientific accuracy, clarity, and accessibility.
@@ -654,7 +704,7 @@ Before submitting diagrams, verify:
 
 ```bash
 # Required
-export OPENROUTER_API_KEY='your_api_key_here'
+export OPENROUTER_API_KEY=&#039;your_api_key_here&#039;
 
 # Get key at: https://openrouter.ai/keys
 ```
@@ -663,15 +713,46 @@ export OPENROUTER_API_KEY='your_api_key_here'
 
 **Simplest possible usage:**
 ```bash
-python scripts/generate_schematic.py "your diagram description" -o output.png
+python scripts/generate_schematic.py &quot;your diagram description&quot; -o output.png
 ```
 
 ---
 
 Use this skill to create clear, accessible, publication-quality diagrams that effectively communicate complex scientific concepts. The AI-powered workflow with iterative refinement ensures diagrams meet professional standards.
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>122</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

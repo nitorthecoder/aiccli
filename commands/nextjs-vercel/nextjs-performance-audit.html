@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>nextjs-performance-audit - AICCLI</title>
-  <meta name="description" content="nextjs-performance-audit - Claude Code command for AICCLI">
+  <meta name="description" content="Comprehensive Next.js performance audit with actionable optimization recommendations">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../command.html">Command</a> / nextjs-performance-audit</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>nextjs-performance-audit</h1>
-      <div class="meta">
-        <span class="meta-item">Command</span>
-        <span class="meta-item">nextjs-vercel</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">commands</a> / nextjs-vercel / nextjs-performance-audit
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⌨️</div>
+      <div class="title">
+        <h1>nextjs-performance-audit</h1>
+        <div class="meta">
+          <span class="badge type">Command</span>
+          <span class="badge">nextjs-vercel</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Comprehensive Next.js performance audit with actionable optimization recommendations</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/nextjs-performance-audit</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install commands/nextjs-performance-audit</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install commands/nextjs-performance-audit</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 allowed-tools: Read, Edit, Bash
 argument-hint: [--lighthouse] [--bundle] [--runtime] [--all]
 description: Comprehensive Next.js performance audit with actionable optimization recommendations
@@ -68,9 +118,9 @@ description: Comprehensive Next.js performance audit with actionable optimizatio
 ## Current Application Analysis
 
 ### Application State
-- Build status: !`ls -la .next/ 2&gt;/dev/null || echo "No build found - run 'npm run build' first"`
-- Application running: !`curl -s http://localhost:3000 &gt; /dev/null && echo "App is running" || echo "App not running - start with 'npm run dev'"`
-- Bundle analysis: !`ls -la .next/analyze/ 2&gt;/dev/null || echo "No bundle analysis found"`
+- Build status: !`ls -la .next/ 2&gt;/dev/null || echo &quot;No build found - run &#039;npm run build&#039; first&quot;`
+- Application running: !`curl -s http://localhost:3000 &gt; /dev/null &amp;&amp; echo &quot;App is running&quot; || echo &quot;App not running - start with &#039;npm run dev&#039;&quot;`
+- Bundle analysis: !`ls -la .next/analyze/ 2&gt;/dev/null || echo &quot;No bundle analysis found&quot;`
 
 ### Project Configuration
 - Next.js config: @next.config.js
@@ -95,7 +145,7 @@ lighthouse http://localhost:3000 \
   --output=json \
   --output=html \
   --output-path=./performance-audit \
-  --chrome-flags="--headless" \
+  --chrome-flags=&quot;--headless&quot; \
   --preset=perf
 
 # Mobile performance audit
@@ -105,7 +155,7 @@ lighthouse http://localhost:3000 \
   --preset=perf \
   --form-factor=mobile \
   --throttling-method=devtools \
-  --chrome-flags="--headless"
+  --chrome-flags=&quot;--headless&quot;
 
 # Generate detailed report
 lighthouse http://localhost:3000 \
@@ -117,22 +167,22 @@ lighthouse http://localhost:3000 \
 ### 2. Bundle Analysis
 ```javascript
 // next.config.js - Enable bundle analysis
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
+const withBundleAnalyzer = require(&#039;@next/bundle-analyzer&#039;)({
+  enabled: process.env.ANALYZE === &#039;true&#039;,
 });
 
 module.exports = withBundleAnalyzer({
   // ... your config
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) =&gt; {
     // Bundle analysis optimizations
-    if (!dev && !isServer) {
+    if (!dev &amp;&amp; !isServer) {
       config.optimization.splitChunks = {
-        chunks: 'all',
+        chunks: &#039;all&#039;,
         cacheGroups: {
           vendor: {
             test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
+            name: &#039;vendors&#039;,
+            chunks: &#039;all&#039;,
           },
         },
       };
@@ -148,13 +198,13 @@ module.exports = withBundleAnalyzer({
 ANALYZE=true npm run build
 
 # Check bundle sizes
-ls -lah .next/static/chunks/ | grep -E "\\.js$" | sort -k5 -hr | head -10
+ls -lah .next/static/chunks/ | grep -E &quot;\\.js$&quot; | sort -k5 -hr | head -10
 
 # Analyze dependencies
-npm ls --depth=0 --prod | grep -v "deduped"
+npm ls --depth=0 --prod | grep -v &quot;deduped&quot;
 
 # Check for duplicate dependencies
-npm ls --depth=0 | grep -E "UNMET|invalid"
+npm ls --depth=0 | grep -E &quot;UNMET|invalid&quot;
 ```
 
 ## Performance Metrics Collection
@@ -164,11 +214,11 @@ npm ls --depth=0 | grep -E "UNMET|invalid"
 // lib/analytics.ts
 export function reportWebVitals({ id, name, label, value }: any) {
   // Send to analytics service
-  if (typeof window !== 'undefined') {
+  if (typeof window !== &#039;undefined&#039;) {
     // Client-side reporting
-    fetch('/api/analytics/web-vitals', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch(&#039;/api/analytics/web-vitals&#039;, {
+      method: &#039;POST&#039;,
+      headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
       body: JSON.stringify({
         id,
         name,
@@ -186,7 +236,7 @@ export function trackMetric(name: string, value: number, labels?: Record&lt;stri
   reportWebVitals({
     id: `${name}-${Date.now()}`,
     name,
-    label: 'custom',
+    label: &#039;custom&#039;,
     value,
     ...labels,
   });
@@ -194,21 +244,21 @@ export function trackMetric(name: string, value: number, labels?: Record&lt;stri
 
 // Performance observer for custom metrics
 export function initPerformanceObserver() {
-  if (typeof window === 'undefined') return;
+  if (typeof window === &#039;undefined&#039;) return;
   
   // Largest Contentful Paint
   new PerformanceObserver((entryList) =&gt; {
     for (const entry of entryList.getEntries()) {
-      trackMetric('LCP', entry.startTime);
+      trackMetric(&#039;LCP&#039;, entry.startTime);
     }
-  }).observe({ entryTypes: ['largest-contentful-paint'] });
+  }).observe({ entryTypes: [&#039;largest-contentful-paint&#039;] });
   
   // First Input Delay
   new PerformanceObserver((entryList) =&gt; {
     for (const entry of entryList.getEntries()) {
-      trackMetric('FID', entry.processingStart - entry.startTime);
+      trackMetric(&#039;FID&#039;, entry.processingStart - entry.startTime);
     }
-  }).observe({ entryTypes: ['first-input'] });
+  }).observe({ entryTypes: [&#039;first-input&#039;] });
   
   // Cumulative Layout Shift
   new PerformanceObserver((entryList) =&gt; {
@@ -218,15 +268,15 @@ export function initPerformanceObserver() {
         clsValue += entry.value;
       }
     }
-    trackMetric('CLS', clsValue);
-  }).observe({ entryTypes: ['layout-shift'] });
+    trackMetric(&#039;CLS&#039;, clsValue);
+  }).observe({ entryTypes: [&#039;layout-shift&#039;] });
 }
 ```
 
 ### 2. Server-Side Performance Monitoring
 ```typescript
 // middleware.ts - Performance monitoring
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
 
 export function middleware(request: NextRequest) {
   const start = Date.now();
@@ -234,8 +284,8 @@ export function middleware(request: NextRequest) {
   const response = NextResponse.next();
   
   // Add performance headers
-  response.headers.set('X-Response-Time', `${Date.now() - start}ms`);
-  response.headers.set('X-Timestamp', new Date().toISOString());
+  response.headers.set(&#039;X-Response-Time&#039;, `${Date.now() - start}ms`);
+  response.headers.set(&#039;X-Timestamp&#039;, new Date().toISOString());
   
   return response;
 }
@@ -249,48 +299,48 @@ export function middleware(request: NextRequest) {
 const loadingPerformanceAudit = {
   // First Contentful Paint (FCP)
   fcp: {
-    target: '&lt; 1.8s',
-    current: '?', // From Lighthouse
+    target: &#039;&lt; 1.8s&#039;,
+    current: &#039;?&#039;, // From Lighthouse
     optimizations: [
-      'Optimize critical rendering path',
-      'Inline critical CSS',
-      'Preload key resources',
-      'Minimize render-blocking resources',
+      &#039;Optimize critical rendering path&#039;,
+      &#039;Inline critical CSS&#039;,
+      &#039;Preload key resources&#039;,
+      &#039;Minimize render-blocking resources&#039;,
     ],
   },
   
   // Largest Contentful Paint (LCP)
   lcp: {
-    target: '&lt; 2.5s',
-    current: '?', // From Lighthouse
+    target: &#039;&lt; 2.5s&#039;,
+    current: &#039;?&#039;, // From Lighthouse
     optimizations: [
-      'Optimize images (Next.js Image component)',
-      'Preload LCP element',
-      'Optimize server response time',
-      'Use CDN for static assets',
+      &#039;Optimize images (Next.js Image component)&#039;,
+      &#039;Preload LCP element&#039;,
+      &#039;Optimize server response time&#039;,
+      &#039;Use CDN for static assets&#039;,
     ],
   },
   
   // Time to Interactive (TTI)
   tti: {
-    target: '&lt; 3.8s',
-    current: '?', // From Lighthouse
+    target: &#039;&lt; 3.8s&#039;,
+    current: &#039;?&#039;, // From Lighthouse
     optimizations: [
-      'Reduce JavaScript bundle size',
-      'Code splitting',
-      'Remove unused code',
-      'Optimize third-party scripts',
+      &#039;Reduce JavaScript bundle size&#039;,
+      &#039;Code splitting&#039;,
+      &#039;Remove unused code&#039;,
+      &#039;Optimize third-party scripts&#039;,
     ],
   },
   
   // Speed Index
   speedIndex: {
-    target: '&lt; 3.4s',
-    current: '?', // From Lighthouse
+    target: &#039;&lt; 3.4s&#039;,
+    current: &#039;?&#039;, // From Lighthouse
     optimizations: [
-      'Optimize above-the-fold content',
-      'Progressive image loading',
-      'Critical resource prioritization',
+      &#039;Optimize above-the-fold content&#039;,
+      &#039;Progressive image loading&#039;,
+      &#039;Critical resource prioritization&#039;,
     ],
   },
 };
@@ -302,37 +352,37 @@ const loadingPerformanceAudit = {
 const runtimePerformanceAudit = {
   // First Input Delay (FID)
   fid: {
-    target: '&lt; 100ms',
-    current: '?',
+    target: &#039;&lt; 100ms&#039;,
+    current: &#039;?&#039;,
     optimizations: [
-      'Reduce JavaScript execution time',
-      'Break up long tasks',
-      'Use web workers for heavy computation',
-      'Optimize event handlers',
+      &#039;Reduce JavaScript execution time&#039;,
+      &#039;Break up long tasks&#039;,
+      &#039;Use web workers for heavy computation&#039;,
+      &#039;Optimize event handlers&#039;,
     ],
   },
   
   // Cumulative Layout Shift (CLS)
   cls: {
-    target: '&lt; 0.1',
-    current: '?',
+    target: &#039;&lt; 0.1&#039;,
+    current: &#039;?&#039;,
     optimizations: [
-      'Set dimensions for media elements',
-      'Reserve space for ads/embeds',
-      'Avoid dynamic content insertion',
-      'Use CSS transforms for animations',
+      &#039;Set dimensions for media elements&#039;,
+      &#039;Reserve space for ads/embeds&#039;,
+      &#039;Avoid dynamic content insertion&#039;,
+      &#039;Use CSS transforms for animations&#039;,
     ],
   },
   
   // Total Blocking Time (TBT)
   tbt: {
-    target: '&lt; 200ms',
-    current: '?',
+    target: &#039;&lt; 200ms&#039;,
+    current: &#039;?&#039;,
     optimizations: [
-      'Code splitting',
-      'Remove unused polyfills',
-      'Optimize third-party code',
-      'Use setTimeout for heavy operations',
+      &#039;Code splitting&#039;,
+      &#039;Remove unused polyfills&#039;,
+      &#039;Optimize third-party code&#039;,
+      &#039;Use setTimeout for heavy operations&#039;,
     ],
   },
 };
@@ -342,22 +392,22 @@ const runtimePerformanceAudit = {
 ```javascript
 // Bundle analysis report
 const bundleAnalysis = {
-  totalSize: '?', // From webpack-bundle-analyzer
-  firstLoadJS: '?', // Critical for performance
+  totalSize: &#039;?&#039;, // From webpack-bundle-analyzer
+  firstLoadJS: &#039;?&#039;, // Critical for performance
   chunks: {
-    main: '?',
-    framework: '?',
-    vendor: '?',
-    pages: '?',
+    main: &#039;?&#039;,
+    framework: &#039;?&#039;,
+    vendor: &#039;?&#039;,
+    pages: &#039;?&#039;,
   },
   
   recommendations: [
     // Dynamic imports for code splitting
     {
-      type: 'Dynamic Import',
-      description: 'Use dynamic imports for non-critical components',
+      type: &#039;Dynamic Import&#039;,
+      description: &#039;Use dynamic imports for non-critical components&#039;,
       example: `
-        const HeavyComponent = dynamic(() =&gt; import('./HeavyComponent'), {
+        const HeavyComponent = dynamic(() =&gt; import(&#039;./HeavyComponent&#039;), {
           loading: () =&gt; &lt;Loading /&gt;,
           ssr: false
         });
@@ -366,21 +416,21 @@ const bundleAnalysis = {
     
     // Tree shaking optimization
     {
-      type: 'Tree Shaking',
-      description: 'Import only needed functions from libraries',
+      type: &#039;Tree Shaking&#039;,
+      description: &#039;Import only needed functions from libraries&#039;,
       example: `
         // ❌ Imports entire library
-        import * as _ from 'lodash';
+        import * as _ from &#039;lodash&#039;;
         
         // ✅ Import only needed functions
-        import { debounce, throttle } from 'lodash';
+        import { debounce, throttle } from &#039;lodash&#039;;
       `,
     },
     
     // Bundle splitting
     {
-      type: 'Bundle Splitting',
-      description: 'Optimize webpack chunk splitting',
+      type: &#039;Bundle Splitting&#039;,
+      description: &#039;Optimize webpack chunk splitting&#039;,
       example: `
         module.exports = {
           webpack: (config, { isServer }) =&gt; {
@@ -388,8 +438,8 @@ const bundleAnalysis = {
               config.optimization.splitChunks.cacheGroups = {
                 vendor: {
                   test: /[\\/]node_modules[\\/]/,
-                  name: 'vendors',
-                  chunks: 'all',
+                  name: &#039;vendors&#039;,
+                  chunks: &#039;all&#039;,
                 },
               };
             }
@@ -409,52 +459,52 @@ const bundleAnalysis = {
 // Image optimization analysis
 const imageOptimization = {
   // Next.js Image component usage
-  nextImageUsage: 'Analyze usage of next/image vs &lt;img&gt;',
+  nextImageUsage: &#039;Analyze usage of next/image vs &lt;img&gt;&#039;,
   
   recommendations: [
     {
-      priority: 'High',
-      description: 'Replace &lt;img&gt; tags with Next.js Image component',
+      priority: &#039;High&#039;,
+      description: &#039;Replace &lt;img&gt; tags with Next.js Image component&#039;,
       implementation: `
-        import Image from 'next/image';
+        import Image from &#039;next/image&#039;;
         
         // ❌ Regular img tag
-        &lt;img src="/hero.jpg" alt="Hero" /&gt;
+        &lt;img src=&quot;/hero.jpg&quot; alt=&quot;Hero&quot; /&gt;
         
         // ✅ Next.js Image component
         &lt;Image
-          src="/hero.jpg"
-          alt="Hero"
+          src=&quot;/hero.jpg&quot;
+          alt=&quot;Hero&quot;
           width={1200}
           height={600}
           priority={true} // For above-the-fold images
-          placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,..."
+          placeholder=&quot;blur&quot;
+          blurDataURL=&quot;data:image/jpeg;base64,...&quot;
         /&gt;
       `,
     },
     {
-      priority: 'Medium',
-      description: 'Implement responsive images with sizes prop',
+      priority: &#039;Medium&#039;,
+      description: &#039;Implement responsive images with sizes prop&#039;,
       implementation: `
         &lt;Image
-          src="/hero.jpg"
-          alt="Hero"
+          src=&quot;/hero.jpg&quot;
+          alt=&quot;Hero&quot;
           width={1200}
           height={600}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          sizes=&quot;(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw&quot;
         /&gt;
       `,
     },
     {
-      priority: 'Low',
-      description: 'Configure custom image loader for CDN',
+      priority: &#039;Low&#039;,
+      description: &#039;Configure custom image loader for CDN&#039;,
       implementation: `
         // next.config.js
         module.exports = {
           images: {
-            loader: 'cloudinary',
-            path: 'https://res.cloudinary.com/demo/image/fetch/',
+            loader: &#039;cloudinary&#039;,
+            path: &#039;https://res.cloudinary.com/demo/image/fetch/&#039;,
           },
         };
       `,
@@ -481,19 +531,19 @@ const imageOptimization = {
 const cssOptimization = {
   recommendations: [
     {
-      type: 'Critical CSS',
-      description: 'Inline critical CSS for faster initial render',
-      implementation: 'Use styled-jsx or CSS-in-JS for critical styles',
+      type: &#039;Critical CSS&#039;,
+      description: &#039;Inline critical CSS for faster initial render&#039;,
+      implementation: &#039;Use styled-jsx or CSS-in-JS for critical styles&#039;,
     },
     {
-      type: 'CSS Modules',
-      description: 'Use CSS Modules to avoid global namespace pollution',
-      implementation: 'Import styles as modules: import styles from "./Component.module.css"',
+      type: &#039;CSS Modules&#039;,
+      description: &#039;Use CSS Modules to avoid global namespace pollution&#039;,
+      implementation: &#039;Import styles as modules: import styles from &quot;./Component.module.css&quot;&#039;,
     },
     {
-      type: 'Tailwind Purging',
-      description: 'Ensure unused Tailwind classes are purged',
-      implementation: 'Configure purge in tailwind.config.js',
+      type: &#039;Tailwind Purging&#039;,
+      description: &#039;Ensure unused Tailwind classes are purged&#039;,
+      implementation: &#039;Configure purge in tailwind.config.js&#039;,
     },
   ],
 };
@@ -505,41 +555,41 @@ const cssOptimization = {
 const jsOptimization = {
   recommendations: [
     {
-      priority: 'High',
-      type: 'Code Splitting',
-      description: 'Implement route-based and component-based code splitting',
+      priority: &#039;High&#039;,
+      type: &#039;Code Splitting&#039;,
+      description: &#039;Implement route-based and component-based code splitting&#039;,
       example: `
         // Route-based splitting (automatic with Next.js pages)
         
         // Component-based splitting
-        const LazyComponent = dynamic(() =&gt; import('./LazyComponent'));
+        const LazyComponent = dynamic(() =&gt; import(&#039;./LazyComponent&#039;));
         
         // Conditional loading
-        const AdminPanel = dynamic(() =&gt; import('./AdminPanel'), {
+        const AdminPanel = dynamic(() =&gt; import(&#039;./AdminPanel&#039;), {
           ssr: false,
           loading: () =&gt; &lt;AdminSkeleton /&gt;,
         });
       `,
     },
     {
-      priority: 'Medium',
-      type: 'Tree Shaking',
-      description: 'Ensure unused code is eliminated',
+      priority: &#039;Medium&#039;,
+      type: &#039;Tree Shaking&#039;,
+      description: &#039;Ensure unused code is eliminated&#039;,
       example: `
         // ❌ Imports entire library
-        import moment from 'moment';
+        import moment from &#039;moment&#039;;
         
         // ✅ Use tree-shakable alternative
-        import { format } from 'date-fns';
+        import { format } from &#039;date-fns&#039;;
         
         // ✅ Or import specific functions
-        import debounce from 'lodash/debounce';
+        import debounce from &#039;lodash/debounce&#039;;
       `,
     },
     {
-      priority: 'Medium',
-      type: 'Polyfill Optimization',
-      description: 'Reduce polyfill size by targeting modern browsers',
+      priority: &#039;Medium&#039;,
+      type: &#039;Polyfill Optimization&#039;,
+      description: &#039;Reduce polyfill size by targeting modern browsers&#039;,
       example: `
         // next.config.js
         module.exports = {
@@ -558,7 +608,7 @@ const jsOptimization = {
 ### 1. Real User Monitoring (RUM)
 ```typescript
 // pages/_app.tsx
-import { reportWebVitals } from '../lib/analytics';
+import { reportWebVitals } from &#039;../lib/analytics&#039;;
 
 export { reportWebVitals };
 
@@ -566,19 +616,19 @@ export default function MyApp({ Component, pageProps }) {
   return (
     &lt;&gt;
       &lt;Component {...pageProps} /&gt;
-      {process.env.NODE_ENV === 'production' && (
+      {process.env.NODE_ENV === &#039;production&#039; &amp;&amp; (
         &lt;script
           dangerouslySetInnerHTML={{
             __html: `
               // Custom RUM implementation
-              window.addEventListener('load', () =&gt; {
+              window.addEventListener(&#039;load&#039;, () =&gt; {
                 // Track page load time
                 const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-                fetch('/api/analytics/performance', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
+                fetch(&#039;/api/analytics/performance&#039;, {
+                  method: &#039;POST&#039;,
+                  headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
                   body: JSON.stringify({
-                    metric: 'page_load_time',
+                    metric: &#039;page_load_time&#039;,
                     value: loadTime,
                     url: window.location.href,
                   }),
@@ -600,7 +650,7 @@ module.exports = {
   performance: {
     maxAssetSize: 250000, // 250KB
     maxEntrypointSize: 400000, // 400KB
-    hints: process.env.NODE_ENV === 'production' ? 'error' : 'warning',
+    hints: process.env.NODE_ENV === &#039;production&#039; ? &#039;error&#039; : &#039;warning&#039;,
   },
 };
 ```
@@ -620,7 +670,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: &#039;18&#039;
       
       - name: Install dependencies
         run: npm ci
@@ -629,7 +679,7 @@ jobs:
         run: npm run build
       
       - name: Start Next.js
-        run: npm start &
+        run: npm start &amp;
         
       - name: Wait for server
         run: npx wait-on http://localhost:3000
@@ -677,16 +727,16 @@ Generate detailed performance report including:
 // Create performance dashboard component
 const PerformanceDashboard = () =&gt; {
   return (
-    &lt;div className="performance-dashboard"&gt;
+    &lt;div className=&quot;performance-dashboard&quot;&gt;
       &lt;h2&gt;Performance Metrics&lt;/h2&gt;
       
       {/* Core Web Vitals */}
       &lt;section&gt;
         &lt;h3&gt;Core Web Vitals&lt;/h3&gt;
-        &lt;div className="metrics-grid"&gt;
-          &lt;MetricCard title="LCP" value="2.1s" target="&lt; 2.5s" status="good" /&gt;
-          &lt;MetricCard title="FID" value="89ms" target="&lt; 100ms" status="good" /&gt;
-          &lt;MetricCard title="CLS" value="0.08" target="&lt; 0.1" status="good" /&gt;
+        &lt;div className=&quot;metrics-grid&quot;&gt;
+          &lt;MetricCard title=&quot;LCP&quot; value=&quot;2.1s&quot; target=&quot;&lt; 2.5s&quot; status=&quot;good&quot; /&gt;
+          &lt;MetricCard title=&quot;FID&quot; value=&quot;89ms&quot; target=&quot;&lt; 100ms&quot; status=&quot;good&quot; /&gt;
+          &lt;MetricCard title=&quot;CLS&quot; value=&quot;0.08&quot; target=&quot;&lt; 0.1&quot; status=&quot;good&quot; /&gt;
         &lt;/div&gt;
       &lt;/section&gt;
       
@@ -706,8 +756,39 @@ const PerformanceDashboard = () =&gt; {
 };
 ```
 
-Provide comprehensive performance audit with specific, measurable recommendations and implementation guidance for immediate and long-term optimization.</pre></div>
+Provide comprehensive performance audit with specific, measurable recommendations and implementation guidance for immediate and long-term optimization.</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>454</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

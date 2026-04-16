@@ -4,65 +4,115 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>moodle-external-api-development - AICCLI</title>
-  <meta name="description" content="moodle-external-api-development - Claude Code skill for AICCLI">
+  <meta name="description" content="Create custom external web service APIs for Moodle LMS. Use when implementing web services for course management, user tracking, quiz operations, or custom plug">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / moodle-external-api-development</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>moodle-external-api-development</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">development</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / development / moodle-external-api-development
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>moodle-external-api-development</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">development</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Create custom external web service APIs for Moodle LMS. Use when implementing web services for course management, user tracking, quiz operations, or custom plugin functionality. Covers parameter validation, database operations, error handling, service registration, and Moodle coding standards.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/moodle-external-api-development</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/moodle-external-api-development</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/moodle-external-api-development</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: moodle-external-api-development
 description: Create custom external web service APIs for Moodle LMS. Use when implementing web services for course management, user tracking, quiz operations, or custom plugin functionality. Covers parameter validation, database operations, error handling, service registration, and Moodle coding standards.
 ---
 
 # Moodle External API Development
 
-This skill guides you through creating custom external web service APIs for Moodle LMS, following Moodle's external API framework and coding standards.
+This skill guides you through creating custom external web service APIs for Moodle LMS, following Moodle&#039;s external API framework and coding standards.
 
 ## When to Use This Skill
 
@@ -90,8 +140,8 @@ Moodle external APIs follow a strict three-method pattern:
 &lt;?php
 namespace local_yourplugin\external;
 
-defined('MOODLE_INTERNAL') || die();
-require_once("$CFG-&gt;libdir/externallib.php");
+defined(&#039;MOODLE_INTERNAL&#039;) || die();
+require_once(&quot;$CFG-&gt;libdir/externallib.php&quot;);
 
 use external_api;
 use external_function_parameters;
@@ -108,7 +158,7 @@ class your_api_name extends external_api {
 **Key Points**:
 - Class must extend `external_api`
 - Namespace follows: `local_pluginname\external` or `mod_modname\external`
-- Include the security check: `defined('MOODLE_INTERNAL') || die();`
+- Include the security check: `defined(&#039;MOODLE_INTERNAL&#039;) || die();`
 - Require externallib.php for base classes
 
 ### Step 2: Define Input Parameters
@@ -116,12 +166,12 @@ class your_api_name extends external_api {
 ```php
 public static function execute_parameters() {
     return new external_function_parameters([
-        'userid' =&gt; new external_value(PARAM_INT, 'User ID', VALUE_REQUIRED),
-        'courseid' =&gt; new external_value(PARAM_INT, 'Course ID', VALUE_REQUIRED),
-        'options' =&gt; new external_single_structure([
-            'includedetails' =&gt; new external_value(PARAM_BOOL, 'Include details', VALUE_DEFAULT, false),
-            'limit' =&gt; new external_value(PARAM_INT, 'Result limit', VALUE_DEFAULT, 10)
-        ], 'Options', VALUE_OPTIONAL)
+        &#039;userid&#039; =&gt; new external_value(PARAM_INT, &#039;User ID&#039;, VALUE_REQUIRED),
+        &#039;courseid&#039; =&gt; new external_value(PARAM_INT, &#039;Course ID&#039;, VALUE_REQUIRED),
+        &#039;options&#039; =&gt; new external_single_structure([
+            &#039;includedetails&#039; =&gt; new external_value(PARAM_BOOL, &#039;Include details&#039;, VALUE_DEFAULT, false),
+            &#039;limit&#039; =&gt; new external_value(PARAM_INT, &#039;Result limit&#039;, VALUE_DEFAULT, 10)
+        ], &#039;Options&#039;, VALUE_OPTIONAL)
     ]);
 }
 ```
@@ -152,47 +202,47 @@ public static function execute($userid, $courseid, $options = []) {
 
     // 1. Validate parameters
     $params = self::validate_parameters(self::execute_parameters(), [
-        'userid' =&gt; $userid,
-        'courseid' =&gt; $courseid,
-        'options' =&gt; $options
+        &#039;userid&#039; =&gt; $userid,
+        &#039;courseid&#039; =&gt; $courseid,
+        &#039;options&#039; =&gt; $options
     ]);
 
     // 2. Check permissions/capabilities
-    $context = \context_course::instance($params['courseid']);
+    $context = \context_course::instance($params[&#039;courseid&#039;]);
     self::validate_context($context);
-    require_capability('moodle/course:view', $context);
+    require_capability(&#039;moodle/course:view&#039;, $context);
 
     // 3. Verify user access
-    if ($params['userid'] != $USER-&gt;id) {
-        require_capability('moodle/course:viewhiddenactivities', $context);
+    if ($params[&#039;userid&#039;] != $USER-&gt;id) {
+        require_capability(&#039;moodle/course:viewhiddenactivities&#039;, $context);
     }
 
     // 4. Database operations
-    $sql = "SELECT id, name, timecreated
+    $sql = &quot;SELECT id, name, timecreated
             FROM {your_table}
             WHERE userid = :userid
               AND courseid = :courseid
-            LIMIT :limit";
+            LIMIT :limit&quot;;
     
     $records = $DB-&gt;get_records_sql($sql, [
-        'userid' =&gt; $params['userid'],
-        'courseid' =&gt; $params['courseid'],
-        'limit' =&gt; $params['options']['limit']
+        &#039;userid&#039; =&gt; $params[&#039;userid&#039;],
+        &#039;courseid&#039; =&gt; $params[&#039;courseid&#039;],
+        &#039;limit&#039; =&gt; $params[&#039;options&#039;][&#039;limit&#039;]
     ]);
 
     // 5. Process and return data
     $results = [];
     foreach ($records as $record) {
         $results[] = [
-            'id' =&gt; $record-&gt;id,
-            'name' =&gt; $record-&gt;name,
-            'timestamp' =&gt; $record-&gt;timecreated
+            &#039;id&#039; =&gt; $record-&gt;id,
+            &#039;name&#039; =&gt; $record-&gt;name,
+            &#039;timestamp&#039; =&gt; $record-&gt;timecreated
         ];
     }
 
     return [
-        'items' =&gt; $results,
-        'count' =&gt; count($results)
+        &#039;items&#039; =&gt; $results,
+        &#039;count&#039; =&gt; count($results)
     ];
 }
 ```
@@ -209,14 +259,14 @@ public static function execute($userid, $courseid, $options = []) {
 ```php
 public static function execute_returns() {
     return new external_single_structure([
-        'items' =&gt; new external_multiple_structure(
+        &#039;items&#039; =&gt; new external_multiple_structure(
             new external_single_structure([
-                'id' =&gt; new external_value(PARAM_INT, 'Item ID'),
-                'name' =&gt; new external_value(PARAM_TEXT, 'Item name'),
-                'timestamp' =&gt; new external_value(PARAM_INT, 'Creation time')
+                &#039;id&#039; =&gt; new external_value(PARAM_INT, &#039;Item ID&#039;),
+                &#039;name&#039; =&gt; new external_value(PARAM_TEXT, &#039;Item name&#039;),
+                &#039;timestamp&#039; =&gt; new external_value(PARAM_INT, &#039;Creation time&#039;)
             ])
         ),
-        'count' =&gt; new external_value(PARAM_INT, 'Total items')
+        &#039;count&#039; =&gt; new external_value(PARAM_INT, &#039;Total items&#039;)
     ]);
 }
 ```
@@ -233,83 +283,83 @@ public static function execute_returns() {
 
 ```php
 &lt;?php
-defined('MOODLE_INTERNAL') || die();
+defined(&#039;MOODLE_INTERNAL&#039;) || die();
 
 $functions = [
-    'local_yourplugin_your_api_name' =&gt; [
-        'classname'   =&gt; 'local_yourplugin\external\your_api_name',
-        'methodname'  =&gt; 'execute',
-        'classpath'   =&gt; 'local/yourplugin/classes/external/your_api_name.php',
-        'description' =&gt; 'Brief description of what this API does',
-        'type'        =&gt; 'read',  // or 'write'
-        'ajax'        =&gt; true,
-        'capabilities'=&gt; 'moodle/course:view', // comma-separated if multiple
-        'services'    =&gt; [MOODLE_OFFICIAL_MOBILE_SERVICE] // Optional
+    &#039;local_yourplugin_your_api_name&#039; =&gt; [
+        &#039;classname&#039;   =&gt; &#039;local_yourplugin\external\your_api_name&#039;,
+        &#039;methodname&#039;  =&gt; &#039;execute&#039;,
+        &#039;classpath&#039;   =&gt; &#039;local/yourplugin/classes/external/your_api_name.php&#039;,
+        &#039;description&#039; =&gt; &#039;Brief description of what this API does&#039;,
+        &#039;type&#039;        =&gt; &#039;read&#039;,  // or &#039;write&#039;
+        &#039;ajax&#039;        =&gt; true,
+        &#039;capabilities&#039;=&gt; &#039;moodle/course:view&#039;, // comma-separated if multiple
+        &#039;services&#039;    =&gt; [MOODLE_OFFICIAL_MOBILE_SERVICE] // Optional
     ],
 ];
 
 $services = [
-    'Your Plugin Web Service' =&gt; [
-        'functions' =&gt; [
-            'local_yourplugin_your_api_name'
+    &#039;Your Plugin Web Service&#039; =&gt; [
+        &#039;functions&#039; =&gt; [
+            &#039;local_yourplugin_your_api_name&#039;
         ],
-        'restrictedusers' =&gt; 0,
-        'enabled' =&gt; 1
+        &#039;restrictedusers&#039; =&gt; 0,
+        &#039;enabled&#039; =&gt; 1
     ]
 ];
 ```
 
 **Service Registration Keys**:
 - `classname` - Full namespaced class name
-- `methodname` - Always 'execute'
-- `type` - 'read' (SELECT) or 'write' (INSERT/UPDATE/DELETE)
+- `methodname` - Always &#039;execute&#039;
+- `type` - &#039;read&#039; (SELECT) or &#039;write&#039; (INSERT/UPDATE/DELETE)
 - `ajax` - Set true for AJAX/REST access
 - `capabilities` - Required Moodle capabilities
 - `services` - Optional service bundles
 
-### Step 6: Implement Error Handling & Logging
+### Step 6: Implement Error Handling &amp; Logging
 
 ```php
 private static function log_debug($message) {
     global $CFG;
-    $logdir = $CFG-&gt;dataroot . '/local_yourplugin';
+    $logdir = $CFG-&gt;dataroot . &#039;/local_yourplugin&#039;;
     if (!file_exists($logdir)) {
         mkdir($logdir, 0777, true);
     }
-    $debuglog = $logdir . '/api_debug.log';
-    $timestamp = date('Y-m-d H:i:s');
-    file_put_contents($debuglog, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
+    $debuglog = $logdir . &#039;/api_debug.log&#039;;
+    $timestamp = date(&#039;Y-m-d H:i:s&#039;);
+    file_put_contents($debuglog, &quot;[$timestamp] $message\n&quot;, FILE_APPEND | LOCK_EX);
 }
 
 public static function execute($userid, $courseid) {
     global $DB;
 
     try {
-        self::log_debug("API called: userid=$userid, courseid=$courseid");
+        self::log_debug(&quot;API called: userid=$userid, courseid=$courseid&quot;);
         
         // Validate parameters
         $params = self::validate_parameters(self::execute_parameters(), [
-            'userid' =&gt; $userid,
-            'courseid' =&gt; $courseid
+            &#039;userid&#039; =&gt; $userid,
+            &#039;courseid&#039; =&gt; $courseid
         ]);
 
         // Your logic here
         
-        self::log_debug("API completed successfully");
+        self::log_debug(&quot;API completed successfully&quot;);
         return $result;
 
     } catch (\invalid_parameter_exception $e) {
-        self::log_debug("Parameter validation failed: " . $e-&gt;getMessage());
+        self::log_debug(&quot;Parameter validation failed: &quot; . $e-&gt;getMessage());
         throw $e;
     } catch (\moodle_exception $e) {
-        self::log_debug("Moodle exception: " . $e-&gt;getMessage());
+        self::log_debug(&quot;Moodle exception: &quot; . $e-&gt;getMessage());
         throw $e;
     } catch (\Exception $e) {
         // Log detailed error info
-        $lastsql = method_exists($DB, 'get_last_sql') ? $DB-&gt;get_last_sql() : '[N/A]';
-        self::log_debug("Fatal error: " . $e-&gt;getMessage());
-        self::log_debug("Last SQL: " . $lastsql);
-        self::log_debug("Stack trace: " . $e-&gt;getTraceAsString());
+        $lastsql = method_exists($DB, &#039;get_last_sql&#039;) ? $DB-&gt;get_last_sql() : &#039;[N/A]&#039;;
+        self::log_debug(&quot;Fatal error: &quot; . $e-&gt;getMessage());
+        self::log_debug(&quot;Last SQL: &quot; . $lastsql);
+        self::log_debug(&quot;Stack trace: &quot; . $e-&gt;getTraceAsString());
         throw $e;
     }
 }
@@ -332,10 +382,10 @@ $transaction = $DB-&gt;start_delegated_transaction();
 
 try {
     // Insert record
-    $recordid = $DB-&gt;insert_record('your_table', $dataobject);
+    $recordid = $DB-&gt;insert_record(&#039;your_table&#039;, $dataobject);
     
     // Update related records
-    $DB-&gt;set_field('another_table', 'status', 1, ['recordid' =&gt; $recordid]);
+    $DB-&gt;set_field(&#039;another_table&#039;, &#039;status&#039;, 1, [&#039;recordid&#039; =&gt; $recordid]);
     
     // Commit transaction
     $transaction-&gt;allow_commit();
@@ -349,7 +399,7 @@ try {
 
 ```php
 // Create course module
-$moduleid = $DB-&gt;get_field('modules', 'id', ['name' =&gt; 'quiz'], MUST_EXIST);
+$moduleid = $DB-&gt;get_field(&#039;modules&#039;, &#039;id&#039;, [&#039;name&#039; =&gt; &#039;quiz&#039;], MUST_EXIST);
 
 $cm = new \stdClass();
 $cm-&gt;course = $courseid;
@@ -362,14 +412,14 @@ $cmid = add_course_module($cm);
 // Create activity instance (e.g., quiz)
 $quiz = new \stdClass();
 $quiz-&gt;course = $courseid;
-$quiz-&gt;name = 'My Quiz';
+$quiz-&gt;name = &#039;My Quiz&#039;;
 $quiz-&gt;coursemodule = $cmid;
 // ... other quiz fields ...
 
 $quizid = quiz_add_instance($quiz, null);
 
 // Update course module with instance ID
-$DB-&gt;set_field('course_modules', 'instance', $quizid, ['id' =&gt; $cmid]);
+$DB-&gt;set_field(&#039;course_modules&#039;, &#039;instance&#039;, $quizid, [&#039;id&#039; =&gt; $cmid]);
 course_add_cm_to_section($courseid, $cmid, 0);
 ```
 
@@ -377,42 +427,42 @@ course_add_cm_to_section($courseid, $cmid, 0);
 
 ```php
 // Restrict activity to specific user via group
-$groupname = 'activity_' . $activityid . '_user_' . $userid;
+$groupname = &#039;activity_&#039; . $activityid . &#039;_user_&#039; . $userid;
 
 // Create or get group
-if (!$groupid = $DB-&gt;get_field('groups', 'id', ['courseid' =&gt; $courseid, 'name' =&gt; $groupname])) {
+if (!$groupid = $DB-&gt;get_field(&#039;groups&#039;, &#039;id&#039;, [&#039;courseid&#039; =&gt; $courseid, &#039;name&#039; =&gt; $groupname])) {
     $groupdata = (object)[
-        'courseid' =&gt; $courseid,
-        'name' =&gt; $groupname,
-        'timecreated' =&gt; time(),
-        'timemodified' =&gt; time()
+        &#039;courseid&#039; =&gt; $courseid,
+        &#039;name&#039; =&gt; $groupname,
+        &#039;timecreated&#039; =&gt; time(),
+        &#039;timemodified&#039; =&gt; time()
     ];
-    $groupid = $DB-&gt;insert_record('groups', $groupdata);
+    $groupid = $DB-&gt;insert_record(&#039;groups&#039;, $groupdata);
 }
 
 // Add user to group
-if (!$DB-&gt;record_exists('groups_members', ['groupid' =&gt; $groupid, 'userid' =&gt; $userid])) {
-    $DB-&gt;insert_record('groups_members', (object)[
-        'groupid' =&gt; $groupid,
-        'userid' =&gt; $userid,
-        'timeadded' =&gt; time()
+if (!$DB-&gt;record_exists(&#039;groups_members&#039;, [&#039;groupid&#039; =&gt; $groupid, &#039;userid&#039; =&gt; $userid])) {
+    $DB-&gt;insert_record(&#039;groups_members&#039;, (object)[
+        &#039;groupid&#039; =&gt; $groupid,
+        &#039;userid&#039; =&gt; $userid,
+        &#039;timeadded&#039; =&gt; time()
     ]);
 }
 
 // Set availability condition
 $restriction = [
-    'op' =&gt; '&',
-    'show' =&gt; false,
-    'c' =&gt; [
+    &#039;op&#039; =&gt; &#039;&amp;&#039;,
+    &#039;show&#039; =&gt; false,
+    &#039;c&#039; =&gt; [
         [
-            'type' =&gt; 'group',
-            'id' =&gt; $groupid
+            &#039;type&#039; =&gt; &#039;group&#039;,
+            &#039;id&#039; =&gt; $groupid
         ]
     ],
-    'showc' =&gt; [false]
+    &#039;showc&#039; =&gt; [false]
 ];
 
-$DB-&gt;set_field('course_modules', 'availability', json_encode($restriction), ['id' =&gt; $cmid]);
+$DB-&gt;set_field(&#039;course_modules&#039;, &#039;availability&#039;, json_encode($restriction), [&#039;id&#039; =&gt; $cmid]);
 ```
 
 ### Random Question Selection with Tags
@@ -421,7 +471,7 @@ $DB-&gt;set_field('course_modules', 'availability', json_encode($restriction), [
 private static function get_random_questions($categoryid, $tagname, $limit) {
     global $DB;
     
-    $sql = "SELECT q.id
+    $sql = &quot;SELECT q.id
             FROM {question} q
             INNER JOIN {question_versions} qv ON qv.questionid = q.id
             INNER JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
@@ -430,12 +480,12 @@ private static function get_random_questions($categoryid, $tagname, $limit) {
             JOIN {tag} t ON t.id = ti.tagid
             WHERE LOWER(t.name) = :tagname
               AND qc.id = :categoryid
-              AND ti.itemtype = 'question'
-              AND q.qtype = 'multichoice'";
+              AND ti.itemtype = &#039;question&#039;
+              AND q.qtype = &#039;multichoice&#039;&quot;;
     
     $qids = $DB-&gt;get_fieldset_sql($sql, [
-        'categoryid' =&gt; $categoryid,
-        'tagname' =&gt; strtolower($tagname)
+        &#039;categoryid&#039; =&gt; $categoryid,
+        &#039;tagname&#039; =&gt; strtolower($tagname)
     ]);
     
     shuffle($qids);
@@ -456,26 +506,26 @@ private static function get_random_questions($categoryid, $tagname, $limit) {
 
 ```bash
 # Get token first
-curl -X POST "https://yourmoodle.com/login/token.php" \
-  -d "username=admin" \
-  -d "password=yourpassword" \
-  -d "service=moodle_mobile_app"
+curl -X POST &quot;https://yourmoodle.com/login/token.php&quot; \
+  -d &quot;username=admin&quot; \
+  -d &quot;password=yourpassword&quot; \
+  -d &quot;service=moodle_mobile_app&quot;
 
 # Call your API
-curl -X POST "https://yourmoodle.com/webservice/rest/server.php" \
-  -d "wstoken=YOUR_TOKEN" \
-  -d "wsfunction=local_yourplugin_your_api_name" \
-  -d "moodlewsrestformat=json" \
-  -d "userid=2" \
-  -d "courseid=3"
+curl -X POST &quot;https://yourmoodle.com/webservice/rest/server.php&quot; \
+  -d &quot;wstoken=YOUR_TOKEN&quot; \
+  -d &quot;wsfunction=local_yourplugin_your_api_name&quot; \
+  -d &quot;moodlewsrestformat=json&quot; \
+  -d &quot;userid=2&quot; \
+  -d &quot;courseid=3&quot;
 ```
 
 ### 3. Via JavaScript (AJAX)
 
 ```javascript
-require(['core/ajax'], function(ajax) {
+require([&#039;core/ajax&#039;], function(ajax) {
     var promises = ajax.call([{
-        methodname: 'local_yourplugin_your_api_name',
+        methodname: &#039;local_yourplugin_your_api_name&#039;,
         args: {
             userid: 2,
             courseid: 3
@@ -483,22 +533,22 @@ require(['core/ajax'], function(ajax) {
     }]);
 
     promises[0].done(function(response) {
-        console.log('Success:', response);
+        console.log(&#039;Success:&#039;, response);
     }).fail(function(error) {
-        console.error('Error:', error);
+        console.error(&#039;Error:&#039;, error);
     });
 });
 ```
 
-## Common Pitfalls & Solutions
+## Common Pitfalls &amp; Solutions
 
-### 1. "Function not found" Error
+### 1. &quot;Function not found&quot; Error
 **Solution**: 
 - Purge caches: **Site administration &gt; Development &gt; Purge all caches**
 - Verify function name in services.php matches exactly
 - Check namespace and class name are correct
 
-### 2. "Invalid parameter value detected"
+### 2. &quot;Invalid parameter value detected&quot;
 **Solution**:
 - Ensure parameter types match between definition and usage
 - Check required vs optional parameters
@@ -508,12 +558,12 @@ require(['core/ajax'], function(ajax) {
 **Solution**:
 - Always use placeholder parameters (`:paramname`)
 - Never concatenate user input into SQL strings
-- Use Moodle's database methods: `get_record()`, `get_records()`, etc.
+- Use Moodle&#039;s database methods: `get_record()`, `get_records()`, etc.
 
 ### 4. Permission Denied Errors
 **Solution**:
 - Call `self::validate_context($context)` early in execute()
-- Check required capabilities match user's permissions
+- Check required capabilities match user&#039;s permissions
 - Verify user has role assignments in the context
 
 ### 5. Transaction Deadlocks
@@ -559,8 +609,8 @@ local/yourplugin/
 &lt;?php
 namespace local_userlog\external;
 
-defined('MOODLE_INTERNAL') || die();
-require_once("$CFG-&gt;libdir/externallib.php");
+defined(&#039;MOODLE_INTERNAL&#039;) || die();
+require_once(&quot;$CFG-&gt;libdir/externallib.php&quot;);
 
 use external_api;
 use external_function_parameters;
@@ -570,8 +620,8 @@ use external_value;
 class get_quiz_attempts extends external_api {
     public static function execute_parameters() {
         return new external_function_parameters([
-            'userid' =&gt; new external_value(PARAM_INT, 'User ID'),
-            'courseid' =&gt; new external_value(PARAM_INT, 'Course ID')
+            &#039;userid&#039; =&gt; new external_value(PARAM_INT, &#039;User ID&#039;),
+            &#039;courseid&#039; =&gt; new external_value(PARAM_INT, &#039;Course ID&#039;)
         ]);
     }
 
@@ -579,26 +629,26 @@ class get_quiz_attempts extends external_api {
         global $DB;
 
         self::validate_parameters(self::execute_parameters(), [
-            'userid' =&gt; $userid,
-            'courseid' =&gt; $courseid
+            &#039;userid&#039; =&gt; $userid,
+            &#039;courseid&#039; =&gt; $courseid
         ]);
 
-        $sql = "SELECT COUNT(*) AS quiz_attempts
+        $sql = &quot;SELECT COUNT(*) AS quiz_attempts
                 FROM {quiz_attempts} qa
                 JOIN {quiz} q ON qa.quiz = q.id
-                WHERE qa.userid = :userid AND q.course = :courseid";
+                WHERE qa.userid = :userid AND q.course = :courseid&quot;;
 
         $attempts = $DB-&gt;get_field_sql($sql, [
-            'userid' =&gt; $userid,
-            'courseid' =&gt; $courseid
+            &#039;userid&#039; =&gt; $userid,
+            &#039;courseid&#039; =&gt; $courseid
         ]);
 
-        return ['quiz_attempts' =&gt; (int)$attempts];
+        return [&#039;quiz_attempts&#039; =&gt; (int)$attempts];
     }
 
     public static function execute_returns() {
         return new external_single_structure([
-            'quiz_attempts' =&gt; new external_value(PARAM_INT, 'Total number of quiz attempts')
+            &#039;quiz_attempts&#039; =&gt; new external_value(PARAM_INT, &#039;Total number of quiz attempts&#039;)
         ]);
     }
 }
@@ -652,8 +702,39 @@ See attached `create_quiz_from_categories.php` for a comprehensive example inclu
 - Consider transaction safety for write operations
 - Purge caches after service registration changes
 - Keep API methods focused and single-purpose
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>22</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

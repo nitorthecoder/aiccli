@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>obsidian-bases - AICCLI</title>
-  <meta name="description" content="obsidian-bases - Claude Code skill for AICCLI">
+  <meta name="description" content="Create and edit Obsidian Bases (.base files) with views, filters, formulas, and summaries. Use when working with .base files, creating database-like views of no">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / obsidian-bases</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>obsidian-bases</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">document-processing</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / document-processing / obsidian-bases
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>obsidian-bases</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">document-processing</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Create and edit Obsidian Bases (.base files) with views, filters, formulas, and summaries. Use when working with .base files, creating database-like views of notes, or when the user mentions Bases, table views, card views, filters, or formulas in Obsidian.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/obsidian-bases</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/obsidian-bases</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/obsidian-bases</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: obsidian-bases
 description: Create and edit Obsidian Bases (.base files) with views, filters, formulas, and summaries. Use when working with .base files, creating database-like views of notes, or when the user mentions Bases, table views, card views, filters, or formulas in Obsidian.
 ---
@@ -85,25 +135,25 @@ filters:
 
 # Define formula properties that can be used across all views
 formulas:
-  formula_name: 'expression'
+  formula_name: &#039;expression&#039;
 
 # Configure display names and settings for properties
 properties:
   property_name:
-    displayName: "Display Name"
+    displayName: &quot;Display Name&quot;
   formula.formula_name:
-    displayName: "Formula Display Name"
+    displayName: &quot;Formula Display Name&quot;
   file.ext:
-    displayName: "Extension"
+    displayName: &quot;Extension&quot;
 
 # Define custom summary formulas
 summaries:
-  custom_summary_name: 'values.mean().round(3)'
+  custom_summary_name: &#039;values.mean().round(3)&#039;
 
 # Define one or more views
 views:
   - type: table | cards | list | map
-    name: "View Name"
+    name: &quot;View Name&quot;
     limit: 10                    # Optional: limit results
     groupBy:                     # Optional: group results
       property: property_name
@@ -126,35 +176,35 @@ Filters narrow down results. They can be applied globally or per-view.
 
 ```yaml
 # Single filter
-filters: 'status == "done"'
+filters: &#039;status == &quot;done&quot;&#039;
 
 # AND - all conditions must be true
 filters:
   and:
-    - 'status == "done"'
-    - 'priority &gt; 3'
+    - &#039;status == &quot;done&quot;&#039;
+    - &#039;priority &gt; 3&#039;
 
 # OR - any condition can be true
 filters:
   or:
-    - 'file.hasTag("book")'
-    - 'file.hasTag("article")'
+    - &#039;file.hasTag(&quot;book&quot;)&#039;
+    - &#039;file.hasTag(&quot;article&quot;)&#039;
 
 # NOT - exclude matching items
 filters:
   not:
-    - 'file.hasTag("archived")'
+    - &#039;file.hasTag(&quot;archived&quot;)&#039;
 
 # Nested filters
 filters:
   or:
-    - file.hasTag("tag")
+    - file.hasTag(&quot;tag&quot;)
     - and:
-        - file.hasTag("book")
-        - file.hasLink("Textbook")
+        - file.hasTag(&quot;book&quot;)
+        - file.hasLink(&quot;Textbook&quot;)
     - not:
-        - file.hasTag("book")
-        - file.inFolder("Required Reading")
+        - file.hasTag(&quot;book&quot;)
+        - file.inFolder(&quot;Required Reading&quot;)
 ```
 
 ### Filter Operators
@@ -167,7 +217,7 @@ filters:
 | `&lt;` | less than |
 | `&gt;=` | greater than or equal |
 | `&lt;=` | less than or equal |
-| `&&` | logical and |
+| `&amp;&amp;` | logical and |
 | `\|\|` | logical or |
 | `!` | logical not |
 
@@ -210,19 +260,19 @@ Formulas compute values from properties. Defined in the `formulas` section.
 ```yaml
 formulas:
   # Simple arithmetic
-  total: "price * quantity"
+  total: &quot;price * quantity&quot;
   
   # Conditional logic
-  status_icon: 'if(done, "✅", "⏳")'
+  status_icon: &#039;if(done, &quot;✅&quot;, &quot;⏳&quot;)&#039;
   
   # String formatting
-  formatted_price: 'if(price, price.toFixed(2) + " dollars")'
+  formatted_price: &#039;if(price, price.toFixed(2) + &quot; dollars&quot;)&#039;
   
   # Date formatting
-  created: 'file.ctime.format("YYYY-MM-DD")'
+  created: &#039;file.ctime.format(&quot;YYYY-MM-DD&quot;)&#039;
   
   # Complex expressions
-  days_old: '((now() - file.ctime) / 86400000).round(0)'
+  days_old: &#039;((now() - file.ctime) / 86400000).round(0)&#039;
 ```
 
 ## Functions Reference
@@ -255,7 +305,7 @@ formulas:
 | `isType()` | `any.isType(type): boolean` | Check type |
 | `toString()` | `any.toString(): string` | Convert to string |
 
-### Date Functions & Fields
+### Date Functions &amp; Fields
 
 **Fields:** `date.year`, `date.month`, `date.day`, `date.hour`, `date.minute`, `date.second`, `date.millisecond`
 
@@ -274,16 +324,16 @@ formulas:
 #                 w/week/weeks, h/hour/hours, m/minute/minutes, s/second/seconds
 
 # Add/subtract durations
-"date + \"1M\""           # Add 1 month
-"date - \"2h\""           # Subtract 2 hours
-"now() + \"1 day\""       # Tomorrow
-"today() + \"7d\""        # A week from today
+&quot;date + \&quot;1M\&quot;&quot;           # Add 1 month
+&quot;date - \&quot;2h\&quot;&quot;           # Subtract 2 hours
+&quot;now() + \&quot;1 day\&quot;&quot;       # Tomorrow
+&quot;today() + \&quot;7d\&quot;&quot;        # A week from today
 
 # Subtract dates for millisecond difference
-"now() - file.ctime"
+&quot;now() - file.ctime&quot;
 
 # Complex duration arithmetic
-"now() + (duration('1d') * 2)"
+&quot;now() + (duration(&#039;1d&#039;) * 2)&quot;
 ```
 
 ### String Functions
@@ -376,7 +426,7 @@ formulas:
 ```yaml
 views:
   - type: table
-    name: "My Table"
+    name: &quot;My Table&quot;
     order:
       - file.name
       - status
@@ -391,7 +441,7 @@ views:
 ```yaml
 views:
   - type: cards
-    name: "Gallery"
+    name: &quot;Gallery&quot;
     order:
       - file.name
       - cover_image
@@ -403,7 +453,7 @@ views:
 ```yaml
 views:
   - type: list
-    name: "Simple List"
+    name: &quot;Simple List&quot;
     order:
       - file.name
       - status
@@ -416,7 +466,7 @@ Requires latitude/longitude properties and the Maps plugin.
 ```yaml
 views:
   - type: map
-    name: "Locations"
+    name: &quot;Locations&quot;
     # Map-specific settings for lat/lng properties
 ```
 
@@ -447,28 +497,28 @@ views:
 ```yaml
 filters:
   and:
-    - file.hasTag("task")
-    - 'file.ext == "md"'
+    - file.hasTag(&quot;task&quot;)
+    - &#039;file.ext == &quot;md&quot;&#039;
 
 formulas:
-  days_until_due: 'if(due, ((date(due) - today()) / 86400000).round(0), "")'
-  is_overdue: 'if(due, date(due) &lt; today() && status != "done", false)'
-  priority_label: 'if(priority == 1, "🔴 High", if(priority == 2, "🟡 Medium", "🟢 Low"))'
+  days_until_due: &#039;if(due, ((date(due) - today()) / 86400000).round(0), &quot;&quot;)&#039;
+  is_overdue: &#039;if(due, date(due) &lt; today() &amp;&amp; status != &quot;done&quot;, false)&#039;
+  priority_label: &#039;if(priority == 1, &quot;🔴 High&quot;, if(priority == 2, &quot;🟡 Medium&quot;, &quot;🟢 Low&quot;))&#039;
 
 properties:
   status:
     displayName: Status
   formula.days_until_due:
-    displayName: "Days Until Due"
+    displayName: &quot;Days Until Due&quot;
   formula.priority_label:
     displayName: Priority
 
 views:
   - type: table
-    name: "Active Tasks"
+    name: &quot;Active Tasks&quot;
     filters:
       and:
-        - 'status != "done"'
+        - &#039;status != &quot;done&quot;&#039;
     order:
       - file.name
       - status
@@ -482,10 +532,10 @@ views:
       formula.days_until_due: Average
 
   - type: table
-    name: "Completed"
+    name: &quot;Completed&quot;
     filters:
       and:
-        - 'status == "done"'
+        - &#039;status == &quot;done&quot;&#039;
     order:
       - file.name
       - completed_date
@@ -496,25 +546,25 @@ views:
 ```yaml
 filters:
   or:
-    - file.hasTag("book")
-    - file.hasTag("article")
+    - file.hasTag(&quot;book&quot;)
+    - file.hasTag(&quot;article&quot;)
 
 formulas:
-  reading_time: 'if(pages, (pages * 2).toString() + " min", "")'
-  status_icon: 'if(status == "reading", "📖", if(status == "done", "✅", "📚"))'
-  year_read: 'if(finished_date, date(finished_date).year, "")'
+  reading_time: &#039;if(pages, (pages * 2).toString() + &quot; min&quot;, &quot;&quot;)&#039;
+  status_icon: &#039;if(status == &quot;reading&quot;, &quot;📖&quot;, if(status == &quot;done&quot;, &quot;✅&quot;, &quot;📚&quot;))&#039;
+  year_read: &#039;if(finished_date, date(finished_date).year, &quot;&quot;)&#039;
 
 properties:
   author:
     displayName: Author
   formula.status_icon:
-    displayName: ""
+    displayName: &quot;&quot;
   formula.reading_time:
-    displayName: "Est. Time"
+    displayName: &quot;Est. Time&quot;
 
 views:
   - type: cards
-    name: "Library"
+    name: &quot;Library&quot;
     order:
       - cover
       - file.name
@@ -522,13 +572,13 @@ views:
       - formula.status_icon
     filters:
       not:
-        - 'status == "dropped"'
+        - &#039;status == &quot;dropped&quot;&#039;
 
   - type: table
-    name: "Reading List"
+    name: &quot;Reading List&quot;
     filters:
       and:
-        - 'status == "to-read"'
+        - &#039;status == &quot;to-read&quot;&#039;
     order:
       - file.name
       - author
@@ -541,25 +591,25 @@ views:
 ```yaml
 filters:
   and:
-    - file.inFolder("Projects")
-    - 'file.ext == "md"'
+    - file.inFolder(&quot;Projects&quot;)
+    - &#039;file.ext == &quot;md&quot;&#039;
 
 formulas:
-  last_updated: 'file.mtime.relative()'
-  link_count: 'file.links.length'
+  last_updated: &#039;file.mtime.relative()&#039;
+  link_count: &#039;file.links.length&#039;
   
 summaries:
-  avgLinks: 'values.filter(value.isType("number")).mean().round(1)'
+  avgLinks: &#039;values.filter(value.isType(&quot;number&quot;)).mean().round(1)&#039;
 
 properties:
   formula.last_updated:
-    displayName: "Updated"
+    displayName: &quot;Updated&quot;
   formula.link_count:
-    displayName: "Links"
+    displayName: &quot;Links&quot;
 
 views:
   - type: table
-    name: "All Projects"
+    name: &quot;All Projects&quot;
     order:
       - file.name
       - status
@@ -572,7 +622,7 @@ views:
       direction: ASC
 
   - type: list
-    name: "Quick List"
+    name: &quot;Quick List&quot;
     order:
       - file.name
       - status
@@ -583,22 +633,22 @@ views:
 ```yaml
 filters:
   and:
-    - file.inFolder("Daily Notes")
-    - '/^\d{4}-\d{2}-\d{2}$/.matches(file.basename)'
+    - file.inFolder(&quot;Daily Notes&quot;)
+    - &#039;/^\d{4}-\d{2}-\d{2}$/.matches(file.basename)&#039;
 
 formulas:
-  word_estimate: '(file.size / 5).round(0)'
-  day_of_week: 'date(file.basename).format("dddd")'
+  word_estimate: &#039;(file.size / 5).round(0)&#039;
+  day_of_week: &#039;date(file.basename).format(&quot;dddd&quot;)&#039;
 
 properties:
   formula.day_of_week:
-    displayName: "Day"
+    displayName: &quot;Day&quot;
   formula.word_estimate:
-    displayName: "~Words"
+    displayName: &quot;~Words&quot;
 
 views:
   - type: table
-    name: "Recent Notes"
+    name: &quot;Recent Notes&quot;
     limit: 30
     order:
       - file.name
@@ -620,8 +670,8 @@ Embed in Markdown files:
 
 ## YAML Quoting Rules
 
-- Use single quotes for formulas containing double quotes: `'if(done, "Yes", "No")'`
-- Use double quotes for simple strings: `"My View Name"`
+- Use single quotes for formulas containing double quotes: `&#039;if(done, &quot;Yes&quot;, &quot;No&quot;)&#039;`
+- Use double quotes for simple strings: `&quot;My View Name&quot;`
 - Escape nested quotes properly in complex expressions
 
 ## Common Patterns
@@ -630,29 +680,29 @@ Embed in Markdown files:
 ```yaml
 filters:
   and:
-    - file.hasTag("project")
+    - file.hasTag(&quot;project&quot;)
 ```
 
 ### Filter by Folder
 ```yaml
 filters:
   and:
-    - file.inFolder("Notes")
+    - file.inFolder(&quot;Notes&quot;)
 ```
 
 ### Filter by Date Range
 ```yaml
 filters:
   and:
-    - 'file.mtime &gt; now() - "7d"'
+    - &#039;file.mtime &gt; now() - &quot;7d&quot;&#039;
 ```
 
 ### Filter by Property Value
 ```yaml
 filters:
   and:
-    - 'status == "active"'
-    - 'priority &gt;= 3'
+    - &#039;status == &quot;active&quot;&#039;
+    - &#039;priority &gt;= 3&#039;
 ```
 
 ### Combine Multiple Conditions
@@ -660,11 +710,11 @@ filters:
 filters:
   or:
     - and:
-        - file.hasTag("important")
-        - 'status != "done"'
+        - file.hasTag(&quot;important&quot;)
+        - &#039;status != &quot;done&quot;&#039;
     - and:
-        - 'priority == 1'
-        - 'due != ""'
+        - &#039;priority == 1&#039;
+        - &#039;due != &quot;&quot;&#039;
 ```
 
 ## References
@@ -674,8 +724,39 @@ filters:
 - [Views](https://help.obsidian.md/bases/views)
 - [Formulas](https://help.obsidian.md/formulas)
 
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>133</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>excel-analysis - AICCLI</title>
-  <meta name="description" content="excel-analysis - Claude Code skill for AICCLI">
+  <meta name="description" content="Analyze Excel spreadsheets, create pivot tables, generate charts, and perform data analysis. Use when analyzing Excel files, spreadsheets, tabular data, or .xls">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / excel-analysis</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>excel-analysis</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">enterprise-communication</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / enterprise-communication / excel-analysis
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>excel-analysis</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">enterprise-communication</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Analyze Excel spreadsheets, create pivot tables, generate charts, and perform data analysis. Use when analyzing Excel files, spreadsheets, tabular data, or .xlsx files.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/excel-analysis</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/excel-analysis</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/excel-analysis</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: Excel Analysis
 description: Analyze Excel spreadsheets, create pivot tables, generate charts, and perform data analysis. Use when analyzing Excel files, spreadsheets, tabular data, or .xlsx files.
 ---
@@ -70,7 +120,7 @@ Read Excel files with pandas:
 import pandas as pd
 
 # Read Excel file
-df = pd.read_excel("data.xlsx", sheet_name="Sheet1")
+df = pd.read_excel(&quot;data.xlsx&quot;, sheet_name=&quot;Sheet1&quot;)
 
 # Display first few rows
 print(df.head())
@@ -87,11 +137,11 @@ Process all sheets in a workbook:
 import pandas as pd
 
 # Read all sheets
-excel_file = pd.ExcelFile("workbook.xlsx")
+excel_file = pd.ExcelFile(&quot;workbook.xlsx&quot;)
 
 for sheet_name in excel_file.sheet_names:
     df = pd.read_excel(excel_file, sheet_name=sheet_name)
-    print(f"\n{sheet_name}:")
+    print(f&quot;\n{sheet_name}:&quot;)
     print(df.head())
 ```
 
@@ -102,20 +152,20 @@ Perform common analysis tasks:
 ```python
 import pandas as pd
 
-df = pd.read_excel("sales.xlsx")
+df = pd.read_excel(&quot;sales.xlsx&quot;)
 
 # Group by and aggregate
-sales_by_region = df.groupby("region")["sales"].sum()
+sales_by_region = df.groupby(&quot;region&quot;)[&quot;sales&quot;].sum()
 print(sales_by_region)
 
 # Filter data
-high_sales = df[df["sales"] &gt; 10000]
+high_sales = df[df[&quot;sales&quot;] &gt; 10000]
 
 # Calculate metrics
-df["profit_margin"] = (df["revenue"] - df["cost"]) / df["revenue"]
+df[&quot;profit_margin&quot;] = (df[&quot;revenue&quot;] - df[&quot;cost&quot;]) / df[&quot;revenue&quot;]
 
 # Sort by column
-df_sorted = df.sort_values("sales", ascending=False)
+df_sorted = df.sort_values(&quot;sales&quot;, ascending=False)
 ```
 
 ## Creating Excel files
@@ -126,17 +176,17 @@ Write data to Excel with formatting:
 import pandas as pd
 
 df = pd.DataFrame({
-    "Product": ["A", "B", "C"],
-    "Sales": [100, 200, 150],
-    "Profit": [20, 40, 30]
+    &quot;Product&quot;: [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;],
+    &quot;Sales&quot;: [100, 200, 150],
+    &quot;Profit&quot;: [20, 40, 30]
 })
 
 # Write to Excel
-writer = pd.ExcelWriter("output.xlsx", engine="openpyxl")
-df.to_excel(writer, sheet_name="Sales", index=False)
+writer = pd.ExcelWriter(&quot;output.xlsx&quot;, engine=&quot;openpyxl&quot;)
+df.to_excel(writer, sheet_name=&quot;Sales&quot;, index=False)
 
 # Get worksheet for formatting
-worksheet = writer.sheets["Sales"]
+worksheet = writer.sheets[&quot;Sales&quot;]
 
 # Auto-adjust column widths
 for column in worksheet.columns:
@@ -157,22 +207,22 @@ Create pivot tables programmatically:
 ```python
 import pandas as pd
 
-df = pd.read_excel("sales_data.xlsx")
+df = pd.read_excel(&quot;sales_data.xlsx&quot;)
 
 # Create pivot table
 pivot = pd.pivot_table(
     df,
-    values="sales",
-    index="region",
-    columns="product",
-    aggfunc="sum",
+    values=&quot;sales&quot;,
+    index=&quot;region&quot;,
+    columns=&quot;product&quot;,
+    aggfunc=&quot;sum&quot;,
     fill_value=0
 )
 
 print(pivot)
 
 # Save pivot table
-pivot.to_excel("pivot_report.xlsx")
+pivot.to_excel(&quot;pivot_report.xlsx&quot;)
 ```
 
 ## Charts and visualization
@@ -183,21 +233,21 @@ Generate charts from Excel data:
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_excel("data.xlsx")
+df = pd.read_excel(&quot;data.xlsx&quot;)
 
 # Create bar chart
-df.plot(x="category", y="value", kind="bar")
-plt.title("Sales by Category")
-plt.xlabel("Category")
-plt.ylabel("Sales")
+df.plot(x=&quot;category&quot;, y=&quot;value&quot;, kind=&quot;bar&quot;)
+plt.title(&quot;Sales by Category&quot;)
+plt.xlabel(&quot;Category&quot;)
+plt.ylabel(&quot;Sales&quot;)
 plt.tight_layout()
-plt.savefig("chart.png")
+plt.savefig(&quot;chart.png&quot;)
 
 # Create pie chart
-df.set_index("category")["value"].plot(kind="pie", autopct="%1.1f%%")
-plt.title("Market Share")
-plt.ylabel("")
-plt.savefig("pie_chart.png")
+df.set_index(&quot;category&quot;)[&quot;value&quot;].plot(kind=&quot;pie&quot;, autopct=&quot;%1.1f%%&quot;)
+plt.title(&quot;Market Share&quot;)
+plt.ylabel(&quot;&quot;)
+plt.savefig(&quot;pie_chart.png&quot;)
 ```
 
 ## Data cleaning
@@ -207,7 +257,7 @@ Clean and prepare Excel data:
 ```python
 import pandas as pd
 
-df = pd.read_excel("messy_data.xlsx")
+df = pd.read_excel(&quot;messy_data.xlsx&quot;)
 
 # Remove duplicates
 df = df.drop_duplicates()
@@ -216,14 +266,14 @@ df = df.drop_duplicates()
 df = df.fillna(0)  # or df.dropna()
 
 # Remove whitespace
-df["name"] = df["name"].str.strip()
+df[&quot;name&quot;] = df[&quot;name&quot;].str.strip()
 
 # Convert data types
-df["date"] = pd.to_datetime(df["date"])
-df["amount"] = pd.to_numeric(df["amount"], errors="coerce")
+df[&quot;date&quot;] = pd.to_datetime(df[&quot;date&quot;])
+df[&quot;amount&quot;] = pd.to_numeric(df[&quot;amount&quot;], errors=&quot;coerce&quot;)
 
 # Save cleaned data
-df.to_excel("cleaned_data.xlsx", index=False)
+df.to_excel(&quot;cleaned_data.xlsx&quot;, index=False)
 ```
 
 ## Merging and joining
@@ -234,19 +284,19 @@ Combine multiple Excel files:
 import pandas as pd
 
 # Read multiple files
-df1 = pd.read_excel("sales_q1.xlsx")
-df2 = pd.read_excel("sales_q2.xlsx")
+df1 = pd.read_excel(&quot;sales_q1.xlsx&quot;)
+df2 = pd.read_excel(&quot;sales_q2.xlsx&quot;)
 
 # Concatenate vertically
 combined = pd.concat([df1, df2], ignore_index=True)
 
 # Merge on common column
-customers = pd.read_excel("customers.xlsx")
-sales = pd.read_excel("sales.xlsx")
+customers = pd.read_excel(&quot;customers.xlsx&quot;)
+sales = pd.read_excel(&quot;sales.xlsx&quot;)
 
-merged = pd.merge(sales, customers, on="customer_id", how="left")
+merged = pd.merge(sales, customers, on=&quot;customer_id&quot;, how=&quot;left&quot;)
 
-merged.to_excel("merged_data.xlsx", index=False)
+merged.to_excel(&quot;merged_data.xlsx&quot;, index=False)
 ```
 
 ## Advanced formatting
@@ -260,22 +310,22 @@ from openpyxl.styles import PatternFill, Font
 
 # Create Excel file
 df = pd.DataFrame({
-    "Product": ["A", "B", "C"],
-    "Sales": [100, 200, 150]
+    &quot;Product&quot;: [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;],
+    &quot;Sales&quot;: [100, 200, 150]
 })
 
-df.to_excel("formatted.xlsx", index=False)
+df.to_excel(&quot;formatted.xlsx&quot;, index=False)
 
 # Load workbook for formatting
-wb = load_workbook("formatted.xlsx")
+wb = load_workbook(&quot;formatted.xlsx&quot;)
 ws = wb.active
 
 # Apply conditional formatting
-red_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
-green_fill = PatternFill(start_color="00FF00", end_color="00FF00", fill_type="solid")
+red_fill = PatternFill(start_color=&quot;FF0000&quot;, end_color=&quot;FF0000&quot;, fill_type=&quot;solid&quot;)
+green_fill = PatternFill(start_color=&quot;00FF00&quot;, end_color=&quot;00FF00&quot;, fill_type=&quot;solid&quot;)
 
 for row in range(2, len(df) + 2):
-    cell = ws[f"B{row}"]
+    cell = ws[f&quot;B{row}&quot;]
     if cell.value &lt; 150:
         cell.fill = red_fill
     else:
@@ -285,14 +335,14 @@ for row in range(2, len(df) + 2):
 for cell in ws[1]:
     cell.font = Font(bold=True)
 
-wb.save("formatted.xlsx")
+wb.save(&quot;formatted.xlsx&quot;)
 ```
 
 ## Performance tips
 
 - Use `read_excel` with `usecols` to read specific columns only
 - Use `chunksize` for very large files
-- Consider using `engine='openpyxl'` or `engine='xlrd'` based on file type
+- Consider using `engine=&#039;openpyxl&#039;` or `engine=&#039;xlrd&#039;` based on file type
 - Use `dtype` parameter to specify column types for faster reading
 
 ## Available packages
@@ -302,8 +352,39 @@ wb.save("formatted.xlsx")
 - **xlrd** - Reading older .xls files
 - **xlsxwriter** - Advanced Excel writing capabilities
 - **matplotlib** - Chart generation
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>2146</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

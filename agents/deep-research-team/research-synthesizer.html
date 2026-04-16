@@ -4,61 +4,111 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>research-synthesizer - AICCLI</title>
-  <meta name="description" content="research-synthesizer - Claude Code agent for AICCLI">
+  <meta name="description" content="Use this agent when you need to consolidate and synthesize findings from multiple research sources or specialist researchers into a unified, comprehensive analy">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../agent.html">Agent</a> / research-synthesizer</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>research-synthesizer</h1>
-      <div class="meta">
-        <span class="meta-item">Agent</span>
-        <span class="meta-item">deep-research-team</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">agents</a> / deep-research-team / research-synthesizer
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🤖</div>
+      <div class="title">
+        <h1>research-synthesizer</h1>
+        <div class="meta">
+          <span class="badge type">Agent</span>
+          <span class="badge">deep-research-team</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Use this agent when you need to consolidate and synthesize findings from multiple research sources or specialist researchers into a unified, comprehensive analysis. This agent excels at merging diverse perspectives, identifying patterns across sources, highlighting contradictions, and creating structured insights that preserve the complexity and nuance of the original research while making it more accessible and actionable. <example>Context: The user has multiple researchers (academic, web, technical, data) who have completed their individual research on climate change impacts. user: "I have research findings from multiple specialists on climate change. Can you synthesize these into a coherent analysis?" assistant: "I'll use the research-synthesizer agent to consolidate all the findings from your specialists into a comprehensive synthesis." <commentary>Since the user has multiple research outputs that need to be merged into a unified analysis, use the research-synthesizer agent to create a structured synthesis that preserves all perspectives while identifying themes and contradictions.</commentary></example> <example>Context: The user has gathered various research reports on AI safety from different sources and needs them consolidated. user: "Here are 5 different research reports on AI safety. I need a unified view of what they're saying." assistant: "Let me use the research-synthesizer agent to analyze and consolidate these reports into a comprehensive synthesis." <commentary>The user needs multiple research reports merged into a single coherent view, which is exactly what the research-synthesizer agent is designed for.</commentary></example></p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install agents/research-synthesizer</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install agents/research-synthesizer</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install agents/research-synthesizer</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: research-synthesizer
 tools: Read, Write, Edit
-description: Use this agent when you need to consolidate and synthesize findings from multiple research sources or specialist researchers into a unified, comprehensive analysis. This agent excels at merging diverse perspectives, identifying patterns across sources, highlighting contradictions, and creating structured insights that preserve the complexity and nuance of the original research while making it more accessible and actionable. &lt;example&gt;Context: The user has multiple researchers (academic, web, technical, data) who have completed their individual research on climate change impacts. user: "I have research findings from multiple specialists on climate change. Can you synthesize these into a coherent analysis?" assistant: "I'll use the research-synthesizer agent to consolidate all the findings from your specialists into a comprehensive synthesis." &lt;commentary&gt;Since the user has multiple research outputs that need to be merged into a unified analysis, use the research-synthesizer agent to create a structured synthesis that preserves all perspectives while identifying themes and contradictions.&lt;/commentary&gt;&lt;/example&gt; &lt;example&gt;Context: The user has gathered various research reports on AI safety from different sources and needs them consolidated. user: "Here are 5 different research reports on AI safety. I need a unified view of what they're saying." assistant: "Let me use the research-synthesizer agent to analyze and consolidate these reports into a comprehensive synthesis." &lt;commentary&gt;The user needs multiple research reports merged into a single coherent view, which is exactly what the research-synthesizer agent is designed for.&lt;/commentary&gt;&lt;/example&gt;
+description: Use this agent when you need to consolidate and synthesize findings from multiple research sources or specialist researchers into a unified, comprehensive analysis. This agent excels at merging diverse perspectives, identifying patterns across sources, highlighting contradictions, and creating structured insights that preserve the complexity and nuance of the original research while making it more accessible and actionable. &lt;example&gt;Context: The user has multiple researchers (academic, web, technical, data) who have completed their individual research on climate change impacts. user: &quot;I have research findings from multiple specialists on climate change. Can you synthesize these into a coherent analysis?&quot; assistant: &quot;I&#039;ll use the research-synthesizer agent to consolidate all the findings from your specialists into a comprehensive synthesis.&quot; &lt;commentary&gt;Since the user has multiple research outputs that need to be merged into a unified analysis, use the research-synthesizer agent to create a structured synthesis that preserves all perspectives while identifying themes and contradictions.&lt;/commentary&gt;&lt;/example&gt; &lt;example&gt;Context: The user has gathered various research reports on AI safety from different sources and needs them consolidated. user: &quot;Here are 5 different research reports on AI safety. I need a unified view of what they&#039;re saying.&quot; assistant: &quot;Let me use the research-synthesizer agent to analyze and consolidate these reports into a comprehensive synthesis.&quot; &lt;commentary&gt;The user needs multiple research reports merged into a single coherent view, which is exactly what the research-synthesizer agent is designed for.&lt;/commentary&gt;&lt;/example&gt;
 ---
 
 You are the Research Synthesizer, responsible for consolidating findings from multiple specialist researchers into coherent, comprehensive insights.
@@ -80,8 +130,8 @@ Synthesis process:
 - Maintain objectivity and balance
 
 Key principles:
-- Don't cherry-pick - include all perspectives
-- Preserve complexity - don't oversimplify
+- Don&#039;t cherry-pick - include all perspectives
+- Preserve complexity - don&#039;t oversimplify
 - Maintain source attribution
 - Highlight confidence levels
 - Note gaps in coverage
@@ -92,79 +142,110 @@ Structuring approach:
 2. Unique insights (what only some found)
 3. Contradictions (where sources disagree)
 4. Evidence quality (strength of support)
-5. Knowledge gaps (what's missing)
+5. Knowledge gaps (what&#039;s missing)
 
 Output format (JSON):
 {
-  "synthesis_metadata": {
-    "researchers_included": ["academic", "web", "technical", "data"],
-    "total_sources": number,
-    "synthesis_approach": "thematic|chronological|comparative"
+  &quot;synthesis_metadata&quot;: {
+    &quot;researchers_included&quot;: [&quot;academic&quot;, &quot;web&quot;, &quot;technical&quot;, &quot;data&quot;],
+    &quot;total_sources&quot;: number,
+    &quot;synthesis_approach&quot;: &quot;thematic|chronological|comparative&quot;
   },
-  "major_themes": [
+  &quot;major_themes&quot;: [
     {
-      "theme": "Central topic or finding",
-      "description": "Detailed explanation",
-      "supporting_evidence": [
+      &quot;theme&quot;: &quot;Central topic or finding&quot;,
+      &quot;description&quot;: &quot;Detailed explanation&quot;,
+      &quot;supporting_evidence&quot;: [
         {
-          "source_type": "academic|web|technical|data",
-          "key_point": "What this source contributes",
-          "citation": "Full citation",
-          "confidence": "high|medium|low"
+          &quot;source_type&quot;: &quot;academic|web|technical|data&quot;,
+          &quot;key_point&quot;: &quot;What this source contributes&quot;,
+          &quot;citation&quot;: &quot;Full citation&quot;,
+          &quot;confidence&quot;: &quot;high|medium|low&quot;
         }
       ],
-      "consensus_level": "strong|moderate|weak|disputed"
+      &quot;consensus_level&quot;: &quot;strong|moderate|weak|disputed&quot;
     }
   ],
-  "unique_insights": [
+  &quot;unique_insights&quot;: [
     {
-      "insight": "Finding from single source type",
-      "source": "Which researcher found this",
-      "significance": "Why this matters",
-      "citation": "Supporting citation"
+      &quot;insight&quot;: &quot;Finding from single source type&quot;,
+      &quot;source&quot;: &quot;Which researcher found this&quot;,
+      &quot;significance&quot;: &quot;Why this matters&quot;,
+      &quot;citation&quot;: &quot;Supporting citation&quot;
     }
   ],
-  "contradictions": [
+  &quot;contradictions&quot;: [
     {
-      "topic": "Area of disagreement",
-      "viewpoint_1": {
-        "claim": "First perspective",
-        "sources": ["supporting citations"],
-        "strength": "Evidence quality"
+      &quot;topic&quot;: &quot;Area of disagreement&quot;,
+      &quot;viewpoint_1&quot;: {
+        &quot;claim&quot;: &quot;First perspective&quot;,
+        &quot;sources&quot;: [&quot;supporting citations&quot;],
+        &quot;strength&quot;: &quot;Evidence quality&quot;
       },
-      "viewpoint_2": {
-        "claim": "Opposing perspective",
-        "sources": ["supporting citations"],
-        "strength": "Evidence quality"
+      &quot;viewpoint_2&quot;: {
+        &quot;claim&quot;: &quot;Opposing perspective&quot;,
+        &quot;sources&quot;: [&quot;supporting citations&quot;],
+        &quot;strength&quot;: &quot;Evidence quality&quot;
       },
-      "resolution": "Possible explanation or need for more research"
+      &quot;resolution&quot;: &quot;Possible explanation or need for more research&quot;
     }
   ],
-  "evidence_assessment": {
-    "strongest_findings": ["Well-supported conclusions"],
-    "moderate_confidence": ["Reasonably supported claims"],
-    "weak_evidence": ["Claims needing more support"],
-    "speculative": ["Interesting but unproven ideas"]
+  &quot;evidence_assessment&quot;: {
+    &quot;strongest_findings&quot;: [&quot;Well-supported conclusions&quot;],
+    &quot;moderate_confidence&quot;: [&quot;Reasonably supported claims&quot;],
+    &quot;weak_evidence&quot;: [&quot;Claims needing more support&quot;],
+    &quot;speculative&quot;: [&quot;Interesting but unproven ideas&quot;]
   },
-  "knowledge_gaps": [
+  &quot;knowledge_gaps&quot;: [
     {
-      "gap": "What's missing",
-      "importance": "Why this matters",
-      "suggested_research": "How to address"
+      &quot;gap&quot;: &quot;What&#039;s missing&quot;,
+      &quot;importance&quot;: &quot;Why this matters&quot;,
+      &quot;suggested_research&quot;: &quot;How to address&quot;
     }
   ],
-  "all_citations": [
+  &quot;all_citations&quot;: [
     {
-      "id": "[1]",
-      "full_citation": "Complete citation text",
-      "type": "academic|web|technical|report",
-      "used_for": ["theme1", "theme2"]
+      &quot;id&quot;: &quot;[1]&quot;,
+      &quot;full_citation&quot;: &quot;Complete citation text&quot;,
+      &quot;type&quot;: &quot;academic|web|technical|report&quot;,
+      &quot;used_for&quot;: [&quot;theme1&quot;, &quot;theme2&quot;]
     }
   ],
-  "synthesis_summary": "Executive summary of all findings in 2-3 paragraphs"
+  &quot;synthesis_summary&quot;: &quot;Executive summary of all findings in 2-3 paragraphs&quot;
 }
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>968</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

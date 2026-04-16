@@ -4,60 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>autonomous-agent-patterns - AICCLI</title>
-  <meta name="description" content="autonomous-agent-patterns - Claude Code skill for AICCLI">
+  <meta name="description" content=""Design patterns for building autonomous coding agents. Covers tool integration, permission systems, browser automation, and human-in-the-loop workflows. Use wh">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / autonomous-agent-patterns</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>autonomous-agent-patterns</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / autonomous-agent-patterns
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>autonomous-agent-patterns</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">"Design patterns for building autonomous coding agents. Covers tool integration, permission systems, browser automation, and human-in-the-loop workflows. Use when building AI agents, designing tool APIs, implementing permission systems, or creating autonomous coding assistants."</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/autonomous-agent-patterns</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/autonomous-agent-patterns</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/autonomous-agent-patterns</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: autonomous-agent-patterns
-description: "Design patterns for building autonomous coding agents. Covers tool integration, permission systems, browser automation, and human-in-the-loop workflows. Use when building AI agents, designing tool APIs, implementing permission systems, or creating autonomous coding assistants."
+description: &quot;Design patterns for building autonomous coding agents. Covers tool integration, permission systems, browser automation, and human-in-the-loop workflows. Use when building AI agents, designing tool APIs, implementing permission systems, or creating autonomous coding assistants.&quot;
 ---
 
 # 🕹️ Autonomous Agent Patterns
@@ -105,14 +155,14 @@ class AgentLoop:
         self.history = []
 
     def run(self, task: str) -&gt; str:
-        self.history.append({"role": "user", "content": task})
+        self.history.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: task})
 
         for i in range(self.max_iterations):
             # Think: Get LLM response with tool options
             response = self.llm.chat(
                 messages=self.history,
                 tools=self._format_tools(),
-                tool_choice="auto"
+                tool_choice=&quot;auto&quot;
             )
 
             # Decide: Check if agent wants to use a tool
@@ -123,15 +173,15 @@ class AgentLoop:
 
                     # Observe: Add result to history
                     self.history.append({
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "content": str(result)
+                        &quot;role&quot;: &quot;tool&quot;,
+                        &quot;tool_call_id&quot;: tool_call.id,
+                        &quot;content&quot;: str(result)
                     })
             else:
                 # No more tool calls = task complete
                 return response.content
 
-        return "Max iterations reached"
+        return &quot;Max iterations reached&quot;
 
     def _execute_tool(self, tool_call) -&gt; Any:
         tool = self.tools[tool_call.name]
@@ -143,28 +193,28 @@ class AgentLoop:
 
 ```python
 class MultiModelAgent:
-    """
+    &quot;&quot;&quot;
     Use different models for different purposes:
     - Fast model for planning
     - Powerful model for complex reasoning
     - Specialized model for code generation
-    """
+    &quot;&quot;&quot;
 
     def __init__(self):
         self.models = {
-            "fast": "gpt-3.5-turbo",      # Quick decisions
-            "smart": "gpt-4-turbo",        # Complex reasoning
-            "code": "claude-3-sonnet",     # Code generation
+            &quot;fast&quot;: &quot;gpt-3.5-turbo&quot;,      # Quick decisions
+            &quot;smart&quot;: &quot;gpt-4-turbo&quot;,        # Complex reasoning
+            &quot;code&quot;: &quot;claude-3-sonnet&quot;,     # Code generation
         }
 
     def select_model(self, task_type: str) -&gt; str:
-        if task_type == "planning":
-            return self.models["fast"]
-        elif task_type == "analysis":
-            return self.models["smart"]
-        elif task_type == "code":
-            return self.models["code"]
-        return self.models["smart"]
+        if task_type == &quot;planning&quot;:
+            return self.models[&quot;fast&quot;]
+        elif task_type == &quot;analysis&quot;:
+            return self.models[&quot;smart&quot;]
+        elif task_type == &quot;code&quot;:
+            return self.models[&quot;code&quot;]
+        return self.models[&quot;smart&quot;]
 ```
 
 ---
@@ -175,51 +225,51 @@ class MultiModelAgent:
 
 ```python
 class Tool:
-    """Base class for agent tools"""
+    &quot;&quot;&quot;Base class for agent tools&quot;&quot;&quot;
 
     @property
     def schema(self) -&gt; dict:
-        """JSON Schema for the tool"""
+        &quot;&quot;&quot;JSON Schema for the tool&quot;&quot;&quot;
         return {
-            "name": self.name,
-            "description": self.description,
-            "parameters": {
-                "type": "object",
-                "properties": self._get_parameters(),
-                "required": self._get_required()
+            &quot;name&quot;: self.name,
+            &quot;description&quot;: self.description,
+            &quot;parameters&quot;: {
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;: self._get_parameters(),
+                &quot;required&quot;: self._get_required()
             }
         }
 
     def execute(self, **kwargs) -&gt; ToolResult:
-        """Execute the tool and return result"""
+        &quot;&quot;&quot;Execute the tool and return result&quot;&quot;&quot;
         raise NotImplementedError
 
 class ReadFileTool(Tool):
-    name = "read_file"
-    description = "Read the contents of a file from the filesystem"
+    name = &quot;read_file&quot;
+    description = &quot;Read the contents of a file from the filesystem&quot;
 
     def _get_parameters(self):
         return {
-            "path": {
-                "type": "string",
-                "description": "Absolute path to the file"
+            &quot;path&quot;: {
+                &quot;type&quot;: &quot;string&quot;,
+                &quot;description&quot;: &quot;Absolute path to the file&quot;
             },
-            "start_line": {
-                "type": "integer",
-                "description": "Line to start reading from (1-indexed)"
+            &quot;start_line&quot;: {
+                &quot;type&quot;: &quot;integer&quot;,
+                &quot;description&quot;: &quot;Line to start reading from (1-indexed)&quot;
             },
-            "end_line": {
-                "type": "integer",
-                "description": "Line to stop reading at (inclusive)"
+            &quot;end_line&quot;: {
+                &quot;type&quot;: &quot;integer&quot;,
+                &quot;description&quot;: &quot;Line to stop reading at (inclusive)&quot;
             }
         }
 
     def _get_required(self):
-        return ["path"]
+        return [&quot;path&quot;]
 
     def execute(self, path: str, start_line: int = None, end_line: int = None) -&gt; ToolResult:
         try:
-            with open(path, 'r') as f:
+            with open(path, &#039;r&#039;) as f:
                 lines = f.readlines()
 
             if start_line and end_line:
@@ -227,12 +277,12 @@ class ReadFileTool(Tool):
 
             return ToolResult(
                 success=True,
-                output="".join(lines)
+                output=&quot;&quot;.join(lines)
             )
         except FileNotFoundError:
             return ToolResult(
                 success=False,
-                error=f"File not found: {path}"
+                error=f&quot;File not found: {path}&quot;
             )
 ```
 
@@ -241,31 +291,31 @@ class ReadFileTool(Tool):
 ```python
 CODING_AGENT_TOOLS = {
     # File operations
-    "read_file": "Read file contents",
-    "write_file": "Create or overwrite a file",
-    "edit_file": "Make targeted edits to a file",
-    "list_directory": "List files and folders",
-    "search_files": "Search for files by pattern",
+    &quot;read_file&quot;: &quot;Read file contents&quot;,
+    &quot;write_file&quot;: &quot;Create or overwrite a file&quot;,
+    &quot;edit_file&quot;: &quot;Make targeted edits to a file&quot;,
+    &quot;list_directory&quot;: &quot;List files and folders&quot;,
+    &quot;search_files&quot;: &quot;Search for files by pattern&quot;,
 
     # Code understanding
-    "search_code": "Search for code patterns (grep)",
-    "get_definition": "Find function/class definition",
-    "get_references": "Find all references to a symbol",
+    &quot;search_code&quot;: &quot;Search for code patterns (grep)&quot;,
+    &quot;get_definition&quot;: &quot;Find function/class definition&quot;,
+    &quot;get_references&quot;: &quot;Find all references to a symbol&quot;,
 
     # Terminal
-    "run_command": "Execute a shell command",
-    "read_output": "Read command output",
-    "send_input": "Send input to running command",
+    &quot;run_command&quot;: &quot;Execute a shell command&quot;,
+    &quot;read_output&quot;: &quot;Read command output&quot;,
+    &quot;send_input&quot;: &quot;Send input to running command&quot;,
 
     # Browser (optional)
-    "open_browser": "Open URL in browser",
-    "click_element": "Click on page element",
-    "type_text": "Type text into input",
-    "screenshot": "Capture screenshot",
+    &quot;open_browser&quot;: &quot;Open URL in browser&quot;,
+    &quot;click_element&quot;: &quot;Click on page element&quot;,
+    &quot;type_text&quot;: &quot;Type text into input&quot;,
+    &quot;screenshot&quot;: &quot;Capture screenshot&quot;,
 
     # Context
-    "ask_user": "Ask the user a question",
-    "search_web": "Search the web for information"
+    &quot;ask_user&quot;: &quot;Ask the user a question&quot;,
+    &quot;search_web&quot;: &quot;Search the web for information&quot;
 }
 ```
 
@@ -273,13 +323,13 @@ CODING_AGENT_TOOLS = {
 
 ```python
 class EditFileTool(Tool):
-    """
+    &quot;&quot;&quot;
     Precise file editing with conflict detection.
     Uses search/replace pattern for reliable edits.
-    """
+    &quot;&quot;&quot;
 
-    name = "edit_file"
-    description = "Edit a file by replacing specific content"
+    name = &quot;edit_file&quot;
+    description = &quot;Edit a file by replacing specific content&quot;
 
     def execute(
         self,
@@ -288,14 +338,14 @@ class EditFileTool(Tool):
         replace: str,
         expected_occurrences: int = 1
     ) -&gt; ToolResult:
-        """
+        &quot;&quot;&quot;
         Args:
             path: File to edit
             search: Exact text to find (must match exactly, including whitespace)
             replace: Text to replace with
             expected_occurrences: How many times search should appear (validation)
-        """
-        with open(path, 'r') as f:
+        &quot;&quot;&quot;
+        with open(path, &#039;r&#039;) as f:
             content = f.read()
 
         # Validate
@@ -303,64 +353,64 @@ class EditFileTool(Tool):
         if actual_occurrences != expected_occurrences:
             return ToolResult(
                 success=False,
-                error=f"Expected {expected_occurrences} occurrences, found {actual_occurrences}"
+                error=f&quot;Expected {expected_occurrences} occurrences, found {actual_occurrences}&quot;
             )
 
         if actual_occurrences == 0:
             return ToolResult(
                 success=False,
-                error="Search text not found in file"
+                error=&quot;Search text not found in file&quot;
             )
 
         # Apply edit
         new_content = content.replace(search, replace)
 
-        with open(path, 'w') as f:
+        with open(path, &#039;w&#039;) as f:
             f.write(new_content)
 
         return ToolResult(
             success=True,
-            output=f"Replaced {actual_occurrences} occurrence(s)"
+            output=f&quot;Replaced {actual_occurrences} occurrence(s)&quot;
         )
 ```
 
 ---
 
-## 3. Permission & Safety Patterns
+## 3. Permission &amp; Safety Patterns
 
 ### 3.1 Permission Levels
 
 ```python
 class PermissionLevel(Enum):
     # Fully automatic - no user approval needed
-    AUTO = "auto"
+    AUTO = &quot;auto&quot;
 
     # Ask once per session
-    ASK_ONCE = "ask_once"
+    ASK_ONCE = &quot;ask_once&quot;
 
     # Ask every time
-    ASK_EACH = "ask_each"
+    ASK_EACH = &quot;ask_each&quot;
 
     # Never allow
-    NEVER = "never"
+    NEVER = &quot;never&quot;
 
 PERMISSION_CONFIG = {
     # Low risk - can auto-approve
-    "read_file": PermissionLevel.AUTO,
-    "list_directory": PermissionLevel.AUTO,
-    "search_code": PermissionLevel.AUTO,
+    &quot;read_file&quot;: PermissionLevel.AUTO,
+    &quot;list_directory&quot;: PermissionLevel.AUTO,
+    &quot;search_code&quot;: PermissionLevel.AUTO,
 
     # Medium risk - ask once
-    "write_file": PermissionLevel.ASK_ONCE,
-    "edit_file": PermissionLevel.ASK_ONCE,
+    &quot;write_file&quot;: PermissionLevel.ASK_ONCE,
+    &quot;edit_file&quot;: PermissionLevel.ASK_ONCE,
 
     # High risk - ask each time
-    "run_command": PermissionLevel.ASK_EACH,
-    "delete_file": PermissionLevel.ASK_EACH,
+    &quot;run_command&quot;: PermissionLevel.ASK_EACH,
+    &quot;delete_file&quot;: PermissionLevel.ASK_EACH,
 
     # Dangerous - never auto-approve
-    "sudo_command": PermissionLevel.NEVER,
-    "format_disk": PermissionLevel.NEVER
+    &quot;sudo_command&quot;: PermissionLevel.NEVER,
+    &quot;format_disk&quot;: PermissionLevel.NEVER
 }
 ```
 
@@ -380,7 +430,7 @@ class ApprovalManager:
             return True
 
         if level == PermissionLevel.NEVER:
-            self.ui.show_error(f"Tool '{tool_name}' is not allowed")
+            self.ui.show_error(f&quot;Tool &#039;{tool_name}&#039; is not allowed&quot;)
             return False
 
         if level == PermissionLevel.ASK_ONCE:
@@ -400,35 +450,35 @@ class ApprovalManager:
         return approved
 
     def _assess_risk(self, tool_name: str, args: dict) -&gt; str:
-        """Analyze specific call for risk level"""
-        if tool_name == "run_command":
-            cmd = args.get("command", "")
-            if any(danger in cmd for danger in ["rm -rf", "sudo", "chmod"]):
-                return "HIGH"
-        return "MEDIUM"
+        &quot;&quot;&quot;Analyze specific call for risk level&quot;&quot;&quot;
+        if tool_name == &quot;run_command&quot;:
+            cmd = args.get(&quot;command&quot;, &quot;&quot;)
+            if any(danger in cmd for danger in [&quot;rm -rf&quot;, &quot;sudo&quot;, &quot;chmod&quot;]):
+                return &quot;HIGH&quot;
+        return &quot;MEDIUM&quot;
 ```
 
 ### 3.3 Sandboxing
 
 ```python
 class SandboxedExecution:
-    """
+    &quot;&quot;&quot;
     Execute code/commands in isolated environment
-    """
+    &quot;&quot;&quot;
 
     def __init__(self, workspace_dir: str):
         self.workspace = workspace_dir
-        self.allowed_commands = ["npm", "python", "node", "git", "ls", "cat"]
-        self.blocked_paths = ["/etc", "/usr", "/bin", os.path.expanduser("~")]
+        self.allowed_commands = [&quot;npm&quot;, &quot;python&quot;, &quot;node&quot;, &quot;git&quot;, &quot;ls&quot;, &quot;cat&quot;]
+        self.blocked_paths = [&quot;/etc&quot;, &quot;/usr&quot;, &quot;/bin&quot;, os.path.expanduser(&quot;~&quot;)]
 
     def validate_path(self, path: str) -&gt; bool:
-        """Ensure path is within workspace"""
+        &quot;&quot;&quot;Ensure path is within workspace&quot;&quot;&quot;
         real_path = os.path.realpath(path)
         workspace_real = os.path.realpath(self.workspace)
         return real_path.startswith(workspace_real)
 
     def validate_command(self, command: str) -&gt; bool:
-        """Check if command is allowed"""
+        &quot;&quot;&quot;Check if command is allowed&quot;&quot;&quot;
         cmd_parts = shlex.split(command)
         if not cmd_parts:
             return False
@@ -440,7 +490,7 @@ class SandboxedExecution:
         if not self.validate_command(command):
             return ToolResult(
                 success=False,
-                error=f"Command not allowed: {command}"
+                error=f&quot;Command not allowed: {command}&quot;
             )
 
         # Execute in isolated environment
@@ -452,7 +502,7 @@ class SandboxedExecution:
             timeout=30,
             env={
                 **os.environ,
-                "HOME": self.workspace,  # Isolate home directory
+                &quot;HOME&quot;: self.workspace,  # Isolate home directory
             }
         )
 
@@ -471,10 +521,10 @@ class SandboxedExecution:
 
 ```python
 class BrowserTool:
-    """
+    &quot;&quot;&quot;
     Browser automation for agents using Playwright/Puppeteer.
     Enables visual debugging and web testing.
-    """
+    &quot;&quot;&quot;
 
     def __init__(self, headless: bool = True):
         self.browser = None
@@ -482,7 +532,7 @@ class BrowserTool:
         self.headless = headless
 
     async def open_url(self, url: str) -&gt; ToolResult:
-        """Navigate to URL and return page info"""
+        &quot;&quot;&quot;Navigate to URL and return page info&quot;&quot;&quot;
         if not self.browser:
             self.browser = await playwright.chromium.launch(headless=self.headless)
             self.page = await self.browser.new_page()
@@ -490,44 +540,44 @@ class BrowserTool:
         await self.page.goto(url)
 
         # Capture state
-        screenshot = await self.page.screenshot(type='png')
+        screenshot = await self.page.screenshot(type=&#039;png&#039;)
         title = await self.page.title()
 
         return ToolResult(
             success=True,
-            output=f"Loaded: {title}",
+            output=f&quot;Loaded: {title}&quot;,
             metadata={
-                "screenshot": base64.b64encode(screenshot).decode(),
-                "url": self.page.url
+                &quot;screenshot&quot;: base64.b64encode(screenshot).decode(),
+                &quot;url&quot;: self.page.url
             }
         )
 
     async def click(self, selector: str) -&gt; ToolResult:
-        """Click on an element"""
+        &quot;&quot;&quot;Click on an element&quot;&quot;&quot;
         try:
             await self.page.click(selector, timeout=5000)
-            await self.page.wait_for_load_state("networkidle")
+            await self.page.wait_for_load_state(&quot;networkidle&quot;)
 
             screenshot = await self.page.screenshot()
             return ToolResult(
                 success=True,
-                output=f"Clicked: {selector}",
-                metadata={"screenshot": base64.b64encode(screenshot).decode()}
+                output=f&quot;Clicked: {selector}&quot;,
+                metadata={&quot;screenshot&quot;: base64.b64encode(screenshot).decode()}
             )
         except TimeoutError:
             return ToolResult(
                 success=False,
-                error=f"Element not found: {selector}"
+                error=f&quot;Element not found: {selector}&quot;
             )
 
     async def type_text(self, selector: str, text: str) -&gt; ToolResult:
-        """Type text into an input"""
+        &quot;&quot;&quot;Type text into an input&quot;&quot;&quot;
         await self.page.fill(selector, text)
-        return ToolResult(success=True, output=f"Typed into {selector}")
+        return ToolResult(success=True, output=f&quot;Typed into {selector}&quot;)
 
     async def get_page_content(self) -&gt; ToolResult:
-        """Get accessible text content of the page"""
-        content = await self.page.evaluate("""
+        &quot;&quot;&quot;Get accessible text content of the page&quot;&quot;&quot;
+        content = await self.page.evaluate(&quot;&quot;&quot;
             () =&gt; {
                 // Get visible text
                 const walker = document.createTreeWalker(
@@ -537,16 +587,16 @@ class BrowserTool:
                     false
                 );
 
-                let text = '';
+                let text = &#039;&#039;;
                 while (walker.nextNode()) {
                     const node = walker.currentNode;
                     if (node.textContent.trim()) {
-                        text += node.textContent.trim() + '\\n';
+                        text += node.textContent.trim() + &#039;\\n&#039;;
                     }
                 }
                 return text;
             }
-        """)
+        &quot;&quot;&quot;)
         return ToolResult(success=True, output=content)
 ```
 
@@ -554,25 +604,25 @@ class BrowserTool:
 
 ```python
 class VisualAgent:
-    """
+    &quot;&quot;&quot;
     Agent that uses screenshots to understand web pages.
     Can identify elements visually without selectors.
-    """
+    &quot;&quot;&quot;
 
     def __init__(self, llm, browser):
         self.llm = llm
         self.browser = browser
 
     async def describe_page(self) -&gt; str:
-        """Use vision model to describe current page"""
+        &quot;&quot;&quot;Use vision model to describe current page&quot;&quot;&quot;
         screenshot = await self.browser.screenshot()
 
         response = self.llm.chat([
             {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": "Describe this webpage. List all interactive elements you see."},
-                    {"type": "image", "data": screenshot}
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: [
+                    {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: &quot;Describe this webpage. List all interactive elements you see.&quot;},
+                    {&quot;type&quot;: &quot;image&quot;, &quot;data&quot;: screenshot}
                 ]
             }
         ])
@@ -580,30 +630,30 @@ class VisualAgent:
         return response.content
 
     async def find_and_click(self, description: str) -&gt; ToolResult:
-        """Find element by visual description and click it"""
+        &quot;&quot;&quot;Find element by visual description and click it&quot;&quot;&quot;
         screenshot = await self.browser.screenshot()
 
         # Ask vision model to find element
         response = self.llm.chat([
             {
-                "role": "user",
-                "content": [
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: [
                     {
-                        "type": "text",
-                        "text": f"""
-                        Find the element matching: "{description}"
-                        Return the approximate coordinates as JSON: {{"x": number, "y": number}}
-                        """
+                        &quot;type&quot;: &quot;text&quot;,
+                        &quot;text&quot;: f&quot;&quot;&quot;
+                        Find the element matching: &quot;{description}&quot;
+                        Return the approximate coordinates as JSON: {{&quot;x&quot;: number, &quot;y&quot;: number}}
+                        &quot;&quot;&quot;
                     },
-                    {"type": "image", "data": screenshot}
+                    {&quot;type&quot;: &quot;image&quot;, &quot;data&quot;: screenshot}
                 ]
             }
         ])
 
         coords = json.loads(response.content)
-        await self.browser.page.mouse.click(coords["x"], coords["y"])
+        await self.browser.page.mouse.click(coords[&quot;x&quot;], coords[&quot;y&quot;])
 
-        return ToolResult(success=True, output=f"Clicked at ({coords['x']}, {coords['y']})")
+        return ToolResult(success=True, output=f&quot;Clicked at ({coords[&#039;x&#039;]}, {coords[&#039;y&#039;]})&quot;)
 ```
 
 ---
@@ -614,112 +664,112 @@ class VisualAgent:
 
 ````python
 class ContextManager:
-    """
+    &quot;&quot;&quot;
     Manage context provided to the agent.
-    Inspired by Cline's @-mention patterns.
-    """
+    Inspired by Cline&#039;s @-mention patterns.
+    &quot;&quot;&quot;
 
     def __init__(self, workspace: str):
         self.workspace = workspace
         self.context = []
 
     def add_file(self, path: str) -&gt; None:
-        """@file - Add file contents to context"""
-        with open(path, 'r') as f:
+        &quot;&quot;&quot;@file - Add file contents to context&quot;&quot;&quot;
+        with open(path, &#039;r&#039;) as f:
             content = f.read()
 
         self.context.append({
-            "type": "file",
-            "path": path,
-            "content": content
+            &quot;type&quot;: &quot;file&quot;,
+            &quot;path&quot;: path,
+            &quot;content&quot;: content
         })
 
     def add_folder(self, path: str, max_files: int = 20) -&gt; None:
-        """@folder - Add all files in folder"""
+        &quot;&quot;&quot;@folder - Add all files in folder&quot;&quot;&quot;
         for root, dirs, files in os.walk(path):
             for file in files[:max_files]:
                 file_path = os.path.join(root, file)
                 self.add_file(file_path)
 
     def add_url(self, url: str) -&gt; None:
-        """@url - Fetch and add URL content"""
+        &quot;&quot;&quot;@url - Fetch and add URL content&quot;&quot;&quot;
         response = requests.get(url)
         content = html_to_markdown(response.text)
 
         self.context.append({
-            "type": "url",
-            "url": url,
-            "content": content
+            &quot;type&quot;: &quot;url&quot;,
+            &quot;url&quot;: url,
+            &quot;content&quot;: content
         })
 
     def add_problems(self, diagnostics: list) -&gt; None:
-        """@problems - Add IDE diagnostics"""
+        &quot;&quot;&quot;@problems - Add IDE diagnostics&quot;&quot;&quot;
         self.context.append({
-            "type": "diagnostics",
-            "problems": diagnostics
+            &quot;type&quot;: &quot;diagnostics&quot;,
+            &quot;problems&quot;: diagnostics
         })
 
     def format_for_prompt(self) -&gt; str:
-        """Format all context for LLM prompt"""
+        &quot;&quot;&quot;Format all context for LLM prompt&quot;&quot;&quot;
         parts = []
         for item in self.context:
-            if item["type"] == "file":
-                parts.append(f"## File: {item['path']}\n```\n{item['content']}\n```")
-            elif item["type"] == "url":
-                parts.append(f"## URL: {item['url']}\n{item['content']}")
-            elif item["type"] == "diagnostics":
-                parts.append(f"## Problems:\n{json.dumps(item['problems'], indent=2)}")
+            if item[&quot;type&quot;] == &quot;file&quot;:
+                parts.append(f&quot;## File: {item[&#039;path&#039;]}\n```\n{item[&#039;content&#039;]}\n```&quot;)
+            elif item[&quot;type&quot;] == &quot;url&quot;:
+                parts.append(f&quot;## URL: {item[&#039;url&#039;]}\n{item[&#039;content&#039;]}&quot;)
+            elif item[&quot;type&quot;] == &quot;diagnostics&quot;:
+                parts.append(f&quot;## Problems:\n{json.dumps(item[&#039;problems&#039;], indent=2)}&quot;)
 
-        return "\n\n".join(parts)
+        return &quot;\n\n&quot;.join(parts)
 ````
 
 ### 5.2 Checkpoint/Resume
 
 ```python
 class CheckpointManager:
-    """
+    &quot;&quot;&quot;
     Save and restore agent state for long-running tasks.
-    """
+    &quot;&quot;&quot;
 
     def __init__(self, storage_dir: str):
         self.storage_dir = storage_dir
         os.makedirs(storage_dir, exist_ok=True)
 
     def save_checkpoint(self, session_id: str, state: dict) -&gt; str:
-        """Save current agent state"""
+        &quot;&quot;&quot;Save current agent state&quot;&quot;&quot;
         checkpoint = {
-            "timestamp": datetime.now().isoformat(),
-            "session_id": session_id,
-            "history": state["history"],
-            "context": state["context"],
-            "workspace_state": self._capture_workspace(state["workspace"]),
-            "metadata": state.get("metadata", {})
+            &quot;timestamp&quot;: datetime.now().isoformat(),
+            &quot;session_id&quot;: session_id,
+            &quot;history&quot;: state[&quot;history&quot;],
+            &quot;context&quot;: state[&quot;context&quot;],
+            &quot;workspace_state&quot;: self._capture_workspace(state[&quot;workspace&quot;]),
+            &quot;metadata&quot;: state.get(&quot;metadata&quot;, {})
         }
 
-        path = os.path.join(self.storage_dir, f"{session_id}.json")
-        with open(path, 'w') as f:
+        path = os.path.join(self.storage_dir, f&quot;{session_id}.json&quot;)
+        with open(path, &#039;w&#039;) as f:
             json.dump(checkpoint, f, indent=2)
 
         return path
 
     def restore_checkpoint(self, checkpoint_path: str) -&gt; dict:
-        """Restore agent state from checkpoint"""
-        with open(checkpoint_path, 'r') as f:
+        &quot;&quot;&quot;Restore agent state from checkpoint&quot;&quot;&quot;
+        with open(checkpoint_path, &#039;r&#039;) as f:
             checkpoint = json.load(f)
 
         return {
-            "history": checkpoint["history"],
-            "context": checkpoint["context"],
-            "workspace": self._restore_workspace(checkpoint["workspace_state"]),
-            "metadata": checkpoint["metadata"]
+            &quot;history&quot;: checkpoint[&quot;history&quot;],
+            &quot;context&quot;: checkpoint[&quot;context&quot;],
+            &quot;workspace&quot;: self._restore_workspace(checkpoint[&quot;workspace_state&quot;]),
+            &quot;metadata&quot;: checkpoint[&quot;metadata&quot;]
         }
 
     def _capture_workspace(self, workspace: str) -&gt; dict:
-        """Capture relevant workspace state"""
+        &quot;&quot;&quot;Capture relevant workspace state&quot;&quot;&quot;
         # Git status, file hashes, etc.
         return {
-            "git_ref": subprocess.getoutput(f"cd {workspace} && git rev-parse HEAD"),
-            "git_dirty": subprocess.getoutput(f"cd {workspace} && git status --porcelain")
+            &quot;git_ref&quot;: subprocess.getoutput(f&quot;cd {workspace} &amp;&amp; git rev-parse HEAD&quot;),
+            &quot;git_dirty&quot;: subprocess.getoutput(f&quot;cd {workspace} &amp;&amp; git status --porcelain&quot;)
         }
 ```
 
@@ -733,10 +783,10 @@ class CheckpointManager:
 from mcp import Server, Tool
 
 class MCPAgent:
-    """
+    &quot;&quot;&quot;
     Agent that can dynamically discover and use MCP tools.
-    'Add a tool that...' pattern from Cline.
-    """
+    &#039;Add a tool that...&#039; pattern from Cline.
+    &quot;&quot;&quot;
 
     def __init__(self, llm):
         self.llm = llm
@@ -744,7 +794,7 @@ class MCPAgent:
         self.available_tools = {}
 
     def connect_server(self, name: str, config: dict) -&gt; None:
-        """Connect to an MCP server"""
+        &quot;&quot;&quot;Connect to an MCP server&quot;&quot;&quot;
         server = Server(config)
         self.mcp_servers[name] = server
 
@@ -752,35 +802,35 @@ class MCPAgent:
         tools = server.list_tools()
         for tool in tools:
             self.available_tools[tool.name] = {
-                "server": name,
-                "schema": tool.schema
+                &quot;server&quot;: name,
+                &quot;schema&quot;: tool.schema
             }
 
     async def create_tool(self, description: str) -&gt; str:
-        """
+        &quot;&quot;&quot;
         Create a new MCP server based on user description.
-        'Add a tool that fetches Jira tickets'
-        """
+        &#039;Add a tool that fetches Jira tickets&#039;
+        &quot;&quot;&quot;
         # Generate MCP server code
-        code = self.llm.generate(f"""
+        code = self.llm.generate(f&quot;&quot;&quot;
         Create a Python MCP server with a tool that does:
         {description}
 
         Use the FastMCP framework. Include proper error handling.
         Return only the Python code.
-        """)
+        &quot;&quot;&quot;)
 
         # Save and install
         server_name = self._extract_name(description)
-        path = f"./mcp_servers/{server_name}/server.py"
+        path = f&quot;./mcp_servers/{server_name}/server.py&quot;
 
-        with open(path, 'w') as f:
+        with open(path, &#039;w&#039;) as f:
             f.write(code)
 
         # Hot-reload
-        self.connect_server(server_name, {"path": path})
+        self.connect_server(server_name, {&quot;path&quot;: path})
 
-        return f"Created tool: {server_name}"
+        return f&quot;Created tool: {server_name}&quot;
 ```
 
 ---
@@ -816,8 +866,39 @@ class MCPAgent:
 - [OpenAI Codex](https://github.com/openai/codex)
 - [Model Context Protocol](https://modelcontextprotocol.io/)
 - [Anthropic Tool Use](https://docs.anthropic.com/claude/docs/tool-use)
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>125</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

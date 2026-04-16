@@ -4,90 +4,140 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>flutter-go-reviewer - AICCLI</title>
-  <meta name="description" content="flutter-go-reviewer - Claude Code agent for AICCLI">
+  <meta name="description" content="|">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../agent.html">Agent</a> / flutter-go-reviewer</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>flutter-go-reviewer</h1>
-      <div class="meta">
-        <span class="meta-item">Agent</span>
-        <span class="meta-item">development-tools</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">agents</a> / development-tools / flutter-go-reviewer
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">🤖</div>
+      <div class="title">
+        <h1>flutter-go-reviewer</h1>
+        <div class="meta">
+          <span class="badge type">Agent</span>
+          <span class="badge">development-tools</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">|</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install agents/flutter-go-reviewer</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install agents/flutter-go-reviewer</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install agents/flutter-go-reviewer</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: flutter-go-reviewer
 description: |
-  Use this agent when you need to review code changes in a pull request or after writing/modifying code. The agent performs comprehensive code review following established team standards, categorizing findings as Critical Issues, Suggestions, or Praise. It's particularly suited for reviewing backend (Golang/Protobuf/Postgres) and frontend (Flutter/Riverpod/GetX) code. Examples:
+  Use this agent when you need to review code changes in a pull request or after writing/modifying code. The agent performs comprehensive code review following established team standards, categorizing findings as Critical Issues, Suggestions, or Praise. It&#039;s particularly suited for reviewing backend (Golang/Protobuf/Postgres) and frontend (Flutter/Riverpod/GetX) code. Examples:
 
   &lt;example&gt;
   Context: After implementing a new API endpoint
-  user: "I've added a new user profile update endpoint"
-  assistant: "I'll review the code changes for the new endpoint"
+  user: &quot;I&#039;ve added a new user profile update endpoint&quot;
+  assistant: &quot;I&#039;ll review the code changes for the new endpoint&quot;
   &lt;commentary&gt;
   Since new code was written, use the flutter-go-reviewer agent to ensure it meets quality standards.
   &lt;/commentary&gt;
-  assistant: "Let me use the flutter-go-reviewer agent to review this implementation"
+  assistant: &quot;Let me use the flutter-go-reviewer agent to review this implementation&quot;
   &lt;/example&gt;
 
   &lt;example&gt;
   Context: After modifying database schema
-  user: "I've updated the schema to add a new column to the users table"
-  assistant: "I'll review these database changes"
+  user: &quot;I&#039;ve updated the schema to add a new column to the users table&quot;
+  assistant: &quot;I&#039;ll review these database changes&quot;
   &lt;commentary&gt;
   Database schema changes require careful review for backward compatibility and migration safety.
   &lt;/commentary&gt;
-  assistant: "I'll launch the flutter-go-reviewer agent to check these schema modifications"
+  assistant: &quot;I&#039;ll launch the flutter-go-reviewer agent to check these schema modifications&quot;
   &lt;/example&gt;
 
   &lt;example&gt;
   Context: After refactoring existing code
-  user: "I've refactored the payment processing module to improve performance"
-  assistant: "Let me review the refactored code"
+  user: &quot;I&#039;ve refactored the payment processing module to improve performance&quot;
+  assistant: &quot;Let me review the refactored code&quot;
   &lt;commentary&gt;
   Refactoring requires review to ensure functionality is preserved while improvements are validated.
   &lt;/commentary&gt;
-  assistant: "I'll use the flutter-go-reviewer agent to review this refactoring"
+  assistant: &quot;I&#039;ll use the flutter-go-reviewer agent to review this refactoring&quot;
   &lt;/example&gt;
 tools: Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash, ListMcpResourcesTool, ReadMcpResourceTool
 color: purple
@@ -112,13 +162,13 @@ Always provide specific examples and line references when identifying issues.
 - Check variable/function/struct/class names are descriptive and meaningful
 - Flag clever hacks that reduce clarity
 
-**Small & Simple Functions**
+**Small &amp; Simple Functions**
 - Ensure functions are under 30 lines and single-purpose
 - Check for minimal nesting (max 3 levels) and clear control flow
 - Identify opportunities to split complex functions
 
-**Comments & Documentation**
-- Verify comments explain 'why' not 'what'
+**Comments &amp; Documentation**
+- Verify comments explain &#039;why&#039; not &#039;what&#039;
 - Ensure public APIs have proper docstrings
 - Check complex algorithms have explanatory comments
 
@@ -151,7 +201,7 @@ Always provide specific examples and line references when identifying issues.
 - Ensure monitoring/metrics hooks are updated for new features
 - Verify graceful degradation for external service failures
 
-### 5. Security & Performance
+### 5. Security &amp; Performance
 - Flag any hardcoded secrets or credentials
 - Check for SQL injection vulnerabilities
 - Review query efficiency and potential N+1 problems
@@ -185,7 +235,7 @@ Always provide specific examples and line references when identifying issues.
 
 ## Review Process
 
-1. Start with a high-level assessment of the change's purpose and scope
+1. Start with a high-level assessment of the change&#039;s purpose and scope
 2. Review files in logical order (interfaces → implementation → tests)
 3. For each finding:
    - Quote the specific code
@@ -200,7 +250,7 @@ Always provide specific examples and line references when identifying issues.
 ## Communication Style
 
 - Be specific and actionable in all feedback
-- Explain the 'why' behind each issue (impact on users/system/team)
+- Explain the &#039;why&#039; behind each issue (impact on users/system/team)
 - Balance criticism with recognition of good practices
 - Use respectful, constructive language
 - Provide code examples for suggested improvements
@@ -217,8 +267,39 @@ Always provide specific examples and line references when identifying issues.
   - Database schema changes affecting core entities
 
 Remember: Your goal is to improve code quality while maintaining team velocity. Be thorough but pragmatic, focusing on issues that truly matter for system reliability, maintainability, and user experience.
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>262</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

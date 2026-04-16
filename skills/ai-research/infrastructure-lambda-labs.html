@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>infrastructure-lambda-labs - AICCLI</title>
-  <meta name="description" content="infrastructure-lambda-labs - Claude Code skill for AICCLI">
+  <meta name="description" content="Reserved and on-demand GPU cloud instances for ML training and inference. Use when you need dedicated GPU instances with simple SSH access, persistent filesyste">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / infrastructure-lambda-labs</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>infrastructure-lambda-labs</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">ai-research</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / ai-research / infrastructure-lambda-labs
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>infrastructure-lambda-labs</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">ai-research</span>
+          <span class="badge">by Orchestra Research</span>
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">Reserved and on-demand GPU cloud instances for ML training and inference. Use when you need dedicated GPU instances with simple SSH access, persistent filesystems, or high-performance multi-node clusters for large-scale training.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/infrastructure-lambda-labs</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/infrastructure-lambda-labs</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/infrastructure-lambda-labs</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: lambda-labs-gpu-cloud
 description: Reserved and on-demand GPU cloud instances for ML training and inference. Use when you need dedicated GPU instances with simple SSH access, persistent filesystems, or high-performance multi-node clusters for large-scale training.
 version: 1.0.0
@@ -105,7 +155,7 @@ Comprehensive guide to running ML workloads on Lambda Labs GPU cloud with on-dem
 ### Launch via console
 
 1. Go to https://cloud.lambda.ai/instances
-2. Click "Launch instance"
+2. Click &quot;Launch instance&quot;
 3. Select GPU type and region
 4. Choose SSH key
 5. Optionally attach filesystem
@@ -175,7 +225,7 @@ All instances come with Lambda Stack pre-installed:
 nvidia-smi
 
 # Check PyTorch
-python -c "import torch; print(torch.cuda.is_available())"
+python -c &quot;import torch; print(torch.cuda.is_available())&quot;
 
 # Check CUDA version
 nvcc --version
@@ -197,8 +247,8 @@ import lambda_cloud_client
 
 # Configure with API key
 configuration = lambda_cloud_client.Configuration(
-    host="https://cloud.lambdalabs.com/api/v1",
-    access_token=os.environ["LAMBDA_API_KEY"]
+    host=&quot;https://cloud.lambdalabs.com/api/v1&quot;,
+    access_token=os.environ[&quot;LAMBDA_API_KEY&quot;]
 )
 ```
 
@@ -211,7 +261,7 @@ with lambda_cloud_client.ApiClient(configuration) as api_client:
     # Get available instance types
     types = api.instance_types()
     for name, info in types.data.items():
-        print(f"{name}: {info.instance_type.description}")
+        print(f&quot;{name}: {info.instance_type.description}&quot;)
 ```
 
 ### Launch instance
@@ -220,16 +270,16 @@ with lambda_cloud_client.ApiClient(configuration) as api_client:
 from lambda_cloud_client.models import LaunchInstanceRequest
 
 request = LaunchInstanceRequest(
-    region_name="us-west-1",
-    instance_type_name="gpu_1x_h100_sxm5",
-    ssh_key_names=["my-ssh-key"],
-    file_system_names=["my-filesystem"],  # Optional
-    name="training-job"
+    region_name=&quot;us-west-1&quot;,
+    instance_type_name=&quot;gpu_1x_h100_sxm5&quot;,
+    ssh_key_names=[&quot;my-ssh-key&quot;],
+    file_system_names=[&quot;my-filesystem&quot;],  # Optional
+    name=&quot;training-job&quot;
 )
 
 response = api.launch_instance(request)
 instance_id = response.data.instance_ids[0]
-print(f"Launched: {instance_id}")
+print(f&quot;Launched: {instance_id}&quot;)
 ```
 
 ### List running instances
@@ -237,7 +287,7 @@ print(f"Launched: {instance_id}")
 ```python
 instances = api.list_instances()
 for instance in instances.data:
-    print(f"{instance.name}: {instance.ip} ({instance.status})")
+    print(f&quot;{instance.name}: {instance.ip} ({instance.status})&quot;)
 ```
 
 ### Terminate instance
@@ -258,8 +308,8 @@ from lambda_cloud_client.models import AddSshKeyRequest
 
 # Add SSH key
 request = AddSshKeyRequest(
-    name="my-key",
-    public_key="ssh-rsa AAAA..."
+    name=&quot;my-key&quot;,
+    public_key=&quot;ssh-rsa AAAA...&quot;
 )
 api.add_ssh_key(request)
 
@@ -284,12 +334,12 @@ curl -u $LAMBDA_API_KEY: \
 ```bash
 curl -u $LAMBDA_API_KEY: \
   -X POST https://cloud.lambdalabs.com/api/v1/instance-operations/launch \
-  -H "Content-Type: application/json" \
-  -d '{
-    "region_name": "us-west-1",
-    "instance_type_name": "gpu_1x_h100_sxm5",
-    "ssh_key_names": ["my-key"]
-  }' | jq
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{
+    &quot;region_name&quot;: &quot;us-west-1&quot;,
+    &quot;instance_type_name&quot;: &quot;gpu_1x_h100_sxm5&quot;,
+    &quot;ssh_key_names&quot;: [&quot;my-key&quot;]
+  }&#039; | jq
 ```
 
 ### Terminate instance
@@ -297,8 +347,8 @@ curl -u $LAMBDA_API_KEY: \
 ```bash
 curl -u $LAMBDA_API_KEY: \
   -X POST https://cloud.lambdalabs.com/api/v1/instance-operations/terminate \
-  -H "Content-Type: application/json" \
-  -d '{"instance_ids": ["&lt;INSTANCE-ID&gt;"]}' | jq
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{&quot;instance_ids&quot;: [&quot;&lt;INSTANCE-ID&gt;&quot;]}&#039; | jq
 ```
 
 ## Persistent storage
@@ -318,7 +368,7 @@ python train.py --checkpoint-dir /lambda/nfs/my-storage/checkpoints
 ### Create filesystem
 
 1. Go to Storage in Lambda console
-2. Click "Create filesystem"
+2. Click &quot;Create filesystem&quot;
 3. Select region (must match instance region)
 4. Name and create
 
@@ -359,7 +409,7 @@ ssh-keygen -t ed25519 -f ~/.ssh/lambda_key
 
 ```bash
 # On instance, add more keys
-echo 'ssh-rsa AAAA...' &gt;&gt; ~/.ssh/authorized_keys
+echo &#039;ssh-rsa AAAA...&#039; &gt;&gt; ~/.ssh/authorized_keys
 ```
 
 ### Import from GitHub
@@ -387,7 +437,7 @@ ssh -L 8888:localhost:8888 -L 6006:localhost:6006 ubuntu@&lt;IP&gt;
 ### Launch from console
 
 1. Go to Instances page
-2. Click "Launch" in Cloud IDE column
+2. Click &quot;Launch&quot; in Cloud IDE column
 3. JupyterLab opens in browser
 
 ### Manual access
@@ -429,7 +479,7 @@ import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 def main():
-    dist.init_process_group("nccl")
+    dist.init_process_group(&quot;nccl&quot;)
     rank = dist.get_rank()
     device = rank % torch.cuda.device_count()
 
@@ -438,7 +488,7 @@ def main():
 
     # Training loop...
 
-if __name__ == "__main__":
+if __name__ == &quot;__main__&quot;:
     main()
 ```
 
@@ -452,16 +502,16 @@ torchrun --nproc_per_node=8 train_ddp.py
 ```python
 import os
 
-checkpoint_dir = "/lambda/nfs/my-storage/checkpoints"
+checkpoint_dir = &quot;/lambda/nfs/my-storage/checkpoints&quot;
 os.makedirs(checkpoint_dir, exist_ok=True)
 
 # Save checkpoint
 torch.save({
-    'epoch': epoch,
-    'model_state_dict': model.state_dict(),
-    'optimizer_state_dict': optimizer.state_dict(),
-    'loss': loss,
-}, f"{checkpoint_dir}/checkpoint_{epoch}.pt")
+    &#039;epoch&#039;: epoch,
+    &#039;model_state_dict&#039;: model.state_dict(),
+    &#039;optimizer_state_dict&#039;: optimizer.state_dict(),
+    &#039;loss&#039;: loss,
+}, f&quot;{checkpoint_dir}/checkpoint_{epoch}.pt&quot;)
 ```
 
 ## 1-Click Clusters
@@ -514,7 +564,7 @@ srun --nodes=4 --ntasks-per-node=8 --gpus-per-node=8 \
 
 ```bash
 # Find private IP
-ip addr show | grep 'inet '
+ip addr show | grep &#039;inet &#039;
 ```
 
 ## Common workflows
@@ -529,11 +579,11 @@ ssh ubuntu@&lt;IP&gt;
 pip install transformers accelerate peft
 
 # 3. Download model to filesystem
-python -c "
+python -c &quot;
 from transformers import AutoModelForCausalLM
-model = AutoModelForCausalLM.from_pretrained('meta-llama/Llama-2-7b-hf')
-model.save_pretrained('/lambda/nfs/storage/models/llama-2-7b')
-"
+model = AutoModelForCausalLM.from_pretrained(&#039;meta-llama/Llama-2-7b-hf&#039;)
+model.save_pretrained(&#039;/lambda/nfs/storage/models/llama-2-7b&#039;)
+&quot;
 
 # 4. Fine-tune with checkpoints on filesystem
 accelerate launch --num_processes 8 train.py \
@@ -570,7 +620,7 @@ python inference.py \
 
 1. **Use filesystems**: Avoid re-downloading data
 2. **Checkpoint frequently**: Resume interrupted training
-3. **Right-size**: Don't over-provision GPUs
+3. **Right-size**: Don&#039;t over-provision GPUs
 4. **Terminate idle**: No auto-stop, manually terminate
 
 ### Monitor usage
@@ -582,7 +632,7 @@ python inference.py \
 
 | Issue | Solution |
 |-------|----------|
-| Instance won't launch | Check region availability, try different GPU |
+| Instance won&#039;t launch | Check region availability, try different GPU |
 | SSH connection refused | Wait for instance to initialize (3-15 min) |
 | Data lost after terminate | Use persistent filesystems |
 | Slow data transfer | Use filesystem in same region |
@@ -600,8 +650,46 @@ python inference.py \
 - **Pricing**: https://lambda.ai/instances
 - **Support**: https://support.lambdalabs.com
 - **Blog**: https://lambda.ai/blog
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+    <div class="section">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">Infrastructure</span><span class="tag">GPU Cloud</span><span class="tag">Training</span><span class="tag">Inference</span><span class="tag">Lambda Labs</span>
+      </div>
+    </div>
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>24</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>

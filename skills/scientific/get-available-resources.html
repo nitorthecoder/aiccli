@@ -4,58 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>get-available-resources - AICCLI</title>
-  <meta name="description" content="get-available-resources - Claude Code skill for AICCLI">
+  <meta name="description" content="This skill should be used at the start of any computationally intensive scientific task to detect and report available system resources (CPU cores, GPUs, memory">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-dark: #0a0a0f;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #a0a0b0;
-      --text-muted: #606070;
-      --accent: #a855f7;
-      --accent-glow: rgba(168, 85, 247, 0.3);
-      --cyan: #22d3ee;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 20% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); background: rgba(10, 10, 15, 0.8); }
-    .header-content { max-width: 1400px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 20px; }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .logo { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--accent); }
-    .brand { font-size: 24px; font-weight: 700; color: var(--accent); letter-spacing: -1px; }
-    .breadcrumb { margin-left: auto; color: var(--text-secondary); font-size: 14px; }
-    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--accent); }
-    .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 32px; backdrop-filter: blur(20px); margin-bottom: 30px; }
-    h1 { font-size: 36px; margin-bottom: 16px; letter-spacing: -1px; background: linear-gradient(135deg, var(--accent), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-    .meta-item { padding: 8px 16px; background: rgba(168, 85, 247, 0.15); border: 1px solid var(--accent); border-radius: 20px; font-size: 13px; color: var(--accent); }
-    .content-section h2 { font-size: 20px; margin: 24px 0 16px; color: var(--text-primary); }
-    pre { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-wrap: break-word; }
-    code { background: rgba(168, 85, 247, 0.15); padding: 2px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--cyan); }
-    .description { font-size: 16px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 24px; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6}
+    .container{max-width:900px;margin:0 auto;padding:0 24px}
+    header{background:#fff;border-bottom:1px solid #e5e5e5;position:sticky;top:0;z-index:100;padding:12px 0}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo img{width:32px;height:32px;border-radius:6px}
+    .logo span{font-size:18px;font-weight:700;color:#1a1a1a}
+    .nav{display:flex;gap:8px}
+    .nav a{padding:8px 16px;border-radius:6px;text-decoration:none;color:#666;font-size:14px;font-weight:500;transition:all .2s}
+    .nav a:hover{background:#f5f5f5;color:#1a1a1a}
+    .breadcrumb{padding:24px 0 0;font-size:14px;color:#888}
+    .breadcrumb a{color:#666;text-decoration:none}
+    .breadcrumb a:hover{color:#1a1a1a}
+    .content{padding:32px 0 64px}
+    .header{display:flex;align-items:flex-start;gap:20px;margin-bottom:32px}
+    .icon{width:64px;height:64px;background:#f5f5f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+    .title{flex:1}
+    .title h1{font-size:32px;font-weight:700;margin-bottom:8px}
+    .title .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .badge{padding:6px 12px;background:#f5f5f5;border-radius:6px;font-size:13px;color:#666}
+    .badge.type{background:#e8f4ff;color:#0066cc}
+    .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
+    .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
+    .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
+    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
+    .copy-btn:hover{background:#f5f5f5}
+    pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
+    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
+    .how-to ol{margin:16px 0;padding-left:24px}
+    .how-to li{margin-bottom:12px;color:#444}
+    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
+    .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
+    .stats{display:flex;gap:24px;margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:24px;font-weight:600;color:#1a1a1a}
+    .stat span{font-size:12px;color:#888}
+    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <a href="../index.html" class="logo-link"><img src="../logo.png" alt="AICCLI" class="logo"><span class="brand">AICCLI</span></a>
-      <div class="breadcrumb"><a href="../index.html">Home</a> / <a href="../skill.html">Skill</a> / get-available-resources</div>
+    <div class="container">
+      <a href="index.html" class="logo"><img src="logo.png" alt="AICCLI"><span>AICCLI</span></a>
+      <nav class="nav">
+        <a href="index.html">Components</a>
+        <a href="docs.html">Docs</a>
+        <a href="install.html">Install</a>
+      </nav>
     </div>
   </header>
+
   <div class="container">
-    <div class="card">
-      <h1>get-available-resources</h1>
-      <div class="meta">
-        <span class="meta-item">Skill</span>
-        <span class="meta-item">scientific</span>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="index.html">skills</a> / scientific / get-available-resources
+    </div>
+  </div>
+
+  <main class="container content">
+    <div class="header">
+      <div class="icon">⚡</div>
+      <div class="title">
+        <h1>get-available-resources</h1>
+        <div class="meta">
+          <span class="badge type">Skill</span>
+          <span class="badge">scientific</span>
+          
+        </div>
       </div>
-      <div class="description"><pre>---
+    </div>
+
+    <p class="desc">This skill should be used at the start of any computationally intensive scientific task to detect and report available system resources (CPU cores, GPUs, memory, disk space). It creates a JSON file with resource information and strategic recommendations that inform computational approach decisions such as whether to use parallel processing (joblib, multiprocessing), out-of-core computing (Dask, Zarr), GPU acceleration (PyTorch, JAX), or memory-efficient strategies. Use this skill before running analyses, training models, processing large datasets, or any task where resource constraints matter.</p>
+
+    <div class="section">
+      <h2>How to Use</h2>
+      <div class="how-to">
+        <ol>
+          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/get-available-resources</code> in your terminal</li>
+          <li><strong>Or with OpenCode:</strong> Run <code>opencode install skills/get-available-resources</code></li>
+          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
+        </ol>
+        
+        <div class="install-box">
+          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+          <p>Installation Command:</p>
+          <code id="install-cmd">npx aiccli install skills/get-available-resources</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Configuration</h2>
+      <pre id="config"><code>---
 name: get-available-resources
 description: This skill should be used at the start of any computationally intensive scientific task to detect and report available system resources (CPU cores, GPUs, memory, disk space). It creates a JSON file with resource information and strategic recommendations that inform computational approach decisions such as whether to use parallel processing (joblib, multiprocessing), out-of-core computing (Dask, Zarr), GPU acceleration (PyTorch, JAX), or memory-efficient strategies. Use this skill before running analyses, training models, processing large datasets, or any task where resource constraints matter.
 ---
@@ -77,10 +127,10 @@ Use this skill proactively before any computationally intensive task:
 - **At project initialization**: Understand baseline capabilities for making architectural decisions
 
 **Example scenarios:**
-- "Help me analyze this 50GB genomics dataset" → Use this skill first to determine if Dask/Zarr are needed
-- "Train a neural network on this data" → Use this skill to detect available GPUs and backends
-- "Process 10,000 files in parallel" → Use this skill to determine optimal worker count
-- "Run a computationally intensive simulation" → Use this skill to understand resource constraints
+- &quot;Help me analyze this 50GB genomics dataset&quot; → Use this skill first to determine if Dask/Zarr are needed
+- &quot;Train a neural network on this data&quot; → Use this skill to detect available GPUs and backends
+- &quot;Process 10,000 files in parallel&quot; → Use this skill to determine optimal worker count
+- &quot;Run a computationally intensive simulation&quot; → Use this skill to understand resource constraints
 
 ## How This Skill Works
 
@@ -118,58 +168,58 @@ The skill generates a `.claude_resources.json` file in the current working direc
 
 ```json
 {
-  "timestamp": "2025-10-23T10:30:00",
-  "os": {
-    "system": "Darwin",
-    "release": "25.0.0",
-    "machine": "arm64"
+  &quot;timestamp&quot;: &quot;2025-10-23T10:30:00&quot;,
+  &quot;os&quot;: {
+    &quot;system&quot;: &quot;Darwin&quot;,
+    &quot;release&quot;: &quot;25.0.0&quot;,
+    &quot;machine&quot;: &quot;arm64&quot;
   },
-  "cpu": {
-    "physical_cores": 8,
-    "logical_cores": 8,
-    "architecture": "arm64"
+  &quot;cpu&quot;: {
+    &quot;physical_cores&quot;: 8,
+    &quot;logical_cores&quot;: 8,
+    &quot;architecture&quot;: &quot;arm64&quot;
   },
-  "memory": {
-    "total_gb": 16.0,
-    "available_gb": 8.5,
-    "percent_used": 46.9
+  &quot;memory&quot;: {
+    &quot;total_gb&quot;: 16.0,
+    &quot;available_gb&quot;: 8.5,
+    &quot;percent_used&quot;: 46.9
   },
-  "disk": {
-    "total_gb": 500.0,
-    "available_gb": 200.0,
-    "percent_used": 60.0
+  &quot;disk&quot;: {
+    &quot;total_gb&quot;: 500.0,
+    &quot;available_gb&quot;: 200.0,
+    &quot;percent_used&quot;: 60.0
   },
-  "gpu": {
-    "nvidia_gpus": [],
-    "amd_gpus": [],
-    "apple_silicon": {
-      "name": "Apple M2",
-      "type": "Apple Silicon",
-      "backend": "Metal",
-      "unified_memory": true
+  &quot;gpu&quot;: {
+    &quot;nvidia_gpus&quot;: [],
+    &quot;amd_gpus&quot;: [],
+    &quot;apple_silicon&quot;: {
+      &quot;name&quot;: &quot;Apple M2&quot;,
+      &quot;type&quot;: &quot;Apple Silicon&quot;,
+      &quot;backend&quot;: &quot;Metal&quot;,
+      &quot;unified_memory&quot;: true
     },
-    "total_gpus": 1,
-    "available_backends": ["Metal"]
+    &quot;total_gpus&quot;: 1,
+    &quot;available_backends&quot;: [&quot;Metal&quot;]
   },
-  "recommendations": {
-    "parallel_processing": {
-      "strategy": "high_parallelism",
-      "suggested_workers": 6,
-      "libraries": ["joblib", "multiprocessing", "dask"]
+  &quot;recommendations&quot;: {
+    &quot;parallel_processing&quot;: {
+      &quot;strategy&quot;: &quot;high_parallelism&quot;,
+      &quot;suggested_workers&quot;: 6,
+      &quot;libraries&quot;: [&quot;joblib&quot;, &quot;multiprocessing&quot;, &quot;dask&quot;]
     },
-    "memory_strategy": {
-      "strategy": "moderate_memory",
-      "libraries": ["dask", "zarr"],
-      "note": "Consider chunking for datasets &gt; 2GB"
+    &quot;memory_strategy&quot;: {
+      &quot;strategy&quot;: &quot;moderate_memory&quot;,
+      &quot;libraries&quot;: [&quot;dask&quot;, &quot;zarr&quot;],
+      &quot;note&quot;: &quot;Consider chunking for datasets &gt; 2GB&quot;
     },
-    "gpu_acceleration": {
-      "available": true,
-      "backends": ["Metal"],
-      "suggested_libraries": ["pytorch-mps", "tensorflow-metal", "jax-metal"]
+    &quot;gpu_acceleration&quot;: {
+      &quot;available&quot;: true,
+      &quot;backends&quot;: [&quot;Metal&quot;],
+      &quot;suggested_libraries&quot;: [&quot;pytorch-mps&quot;, &quot;tensorflow-metal&quot;, &quot;jax-metal&quot;]
     },
-    "large_data_handling": {
-      "strategy": "disk_abundant",
-      "note": "Sufficient space for large intermediate files"
+    &quot;large_data_handling&quot;: {
+      &quot;strategy&quot;: &quot;disk_abundant&quot;,
+      &quot;note&quot;: &quot;Sufficient space for large intermediate files&quot;
     }
   }
 }
@@ -222,23 +272,23 @@ After running detection, read the generated `.claude_resources.json` file to inf
 # Example: Use recommendations in code
 import json
 
-with open('.claude_resources.json', 'r') as f:
+with open(&#039;.claude_resources.json&#039;, &#039;r&#039;) as f:
     resources = json.load(f)
 
 # Check parallel processing strategy
-if resources['recommendations']['parallel_processing']['strategy'] == 'high_parallelism':
-    n_jobs = resources['recommendations']['parallel_processing']['suggested_workers']
+if resources[&#039;recommendations&#039;][&#039;parallel_processing&#039;][&#039;strategy&#039;] == &#039;high_parallelism&#039;:
+    n_jobs = resources[&#039;recommendations&#039;][&#039;parallel_processing&#039;][&#039;suggested_workers&#039;]
     # Use joblib, Dask, or multiprocessing with n_jobs workers
 
 # Check memory strategy
-if resources['recommendations']['memory_strategy']['strategy'] == 'memory_constrained':
+if resources[&#039;recommendations&#039;][&#039;memory_strategy&#039;][&#039;strategy&#039;] == &#039;memory_constrained&#039;:
     # Use Dask, Zarr, or H5py for out-of-core processing
     import dask.array as da
     # Load data in chunks
 
 # Check GPU availability
-if resources['recommendations']['gpu_acceleration']['available']:
-    backends = resources['recommendations']['gpu_acceleration']['backends']
+if resources[&#039;recommendations&#039;][&#039;gpu_acceleration&#039;][&#039;available&#039;]:
+    backends = resources[&#039;recommendations&#039;][&#039;gpu_acceleration&#039;][&#039;backends&#039;]
     # Use appropriate GPU library based on available backend
 ```
 
@@ -248,24 +298,24 @@ Use the resource information and recommendations to make strategic choices:
 
 **For data loading:**
 ```python
-memory_available_gb = resources['memory']['available_gb']
+memory_available_gb = resources[&#039;memory&#039;][&#039;available_gb&#039;]
 dataset_size_gb = 10
 
 if dataset_size_gb &gt; memory_available_gb * 0.5:
     # Dataset is large relative to memory, use Dask
     import dask.dataframe as dd
-    df = dd.read_csv('large_file.csv')
+    df = dd.read_csv(&#039;large_file.csv&#039;)
 else:
     # Dataset fits in memory, use pandas
     import pandas as pd
-    df = pd.read_csv('large_file.csv')
+    df = pd.read_csv(&#039;large_file.csv&#039;)
 ```
 
 **For parallel processing:**
 ```python
 from joblib import Parallel, delayed
 
-n_jobs = resources['recommendations']['parallel_processing'].get('suggested_workers', 1)
+n_jobs = resources[&#039;recommendations&#039;][&#039;parallel_processing&#039;].get(&#039;suggested_workers&#039;, 1)
 
 results = Parallel(n_jobs=n_jobs)(
     delayed(process_function)(item) for item in data
@@ -276,12 +326,12 @@ results = Parallel(n_jobs=n_jobs)(
 ```python
 import torch
 
-if 'CUDA' in resources['gpu']['available_backends']:
-    device = torch.device('cuda')
-elif 'Metal' in resources['gpu']['available_backends']:
-    device = torch.device('mps')
+if &#039;CUDA&#039; in resources[&#039;gpu&#039;][&#039;available_backends&#039;]:
+    device = torch.device(&#039;cuda&#039;)
+elif &#039;Metal&#039; in resources[&#039;gpu&#039;][&#039;available_backends&#039;]:
+    device = torch.device(&#039;mps&#039;)
 else:
-    device = torch.device('cpu')
+    device = torch.device(&#039;cpu&#039;)
 
 model = model.to(device)
 ```
@@ -324,10 +374,41 @@ All other functionality uses Python standard library modules (json, os, platform
 
 **Inaccurate memory readings:**
 - Memory readings are snapshots; actual available memory changes constantly
-- Close other applications before detection for accurate "available" memory
+- Close other applications before detection for accurate &quot;available&quot; memory
 - Consider running detection multiple times and averaging results
-</pre></div>
+</code></pre>
     </div>
-  </div>
+
+    
+
+    <div class="section">
+      <h2>Info</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong>13</strong>
+          <span>Downloads</span>
+        </div>
+        <div class="stat">
+          <strong>1.0</strong>
+          <span>Version</span>
+        </div>
+        <div class="stat">
+          <strong>MIT</strong>
+          <span>License</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function copyConfig() {
+      const config = document.getElementById('config').textContent;
+      navigator.clipboard.writeText(config).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Config', 2000);
+      });
+    }
+  </script>
 </body>
 </html>
