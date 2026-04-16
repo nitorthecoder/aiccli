@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,119 @@
     <p class="desc">Perform code reviews following Sentry engineering practices. Use when reviewing pull requests, examining code changes, or providing feedback on code quality. Covers security, performance, testing, and design review.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/code-review</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/code-review</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: code-review
+description: Perform code reviews following Sentry engineering practices. Use when reviewing pull requests, examining code changes, or providing feedback on code quality. Covers security, performance, testing, and design review.
+---
+
+# Sentry Code Review
+
+Follow these guidelines when reviewing code for Sentry projects.
+
+## Review Checklist
+
+### Identifying Problems
+
+Look for these issues in code changes:
+
+- **Runtime errors**: Potential exceptions, null pointer issues, out-of-bounds access
+- **Performance**: Unbounded O(n²) operations, N+1 queries, unnecessary allocations
+- **Side effects**: Unintended behavioral changes affecting other components
+- **Backwards compatibility**: Breaking API changes without migration path
+- **ORM queries**: Complex Django ORM with unexpected query performance
+- **Security vulnerabilities**: Injection, XSS, access control gaps, secrets exposure
+
+### Design Assessment
+
+- Do component interactions make logical sense?
+- Does the change align with existing project architecture?
+- Are there conflicts with current requirements or goals?
+
+### Test Coverage
+
+Every PR should have appropriate test coverage:
+
+- Functional tests for business logic
+- Integration tests for component interactions
+- End-to-end tests for critical user paths
+
+Verify tests cover actual requirements and edge cases. Avoid excessive branching or looping in test code.
+
+### Long-Term Impact
+
+Flag for senior engineer review when changes involve:
+
+- Database schema modifications
+- API contract changes
+- New framework or library adoption
+- Performance-critical code paths
+- Security-sensitive functionality
+
+## Feedback Guidelines
+
+### Tone
+
+- Be polite and empathetic
+- Provide actionable suggestions, not vague criticism
+- Phrase as questions when uncertain: &quot;Have you considered...?&quot;
+
+### Approval
+
+- Approve when only minor issues remain
+- Don&#039;t block PRs for stylistic preferences
+- Remember: the goal is risk reduction, not perfect code
+
+## Common Patterns to Flag
+
+### Python/Django
+
+```python
+# Bad: N+1 query
+for user in users:
+    print(user.profile.name)  # Separate query per user
+
+# Good: Prefetch related
+users = User.objects.prefetch_related(&#039;profile&#039;)
+```
+
+### TypeScript/React
+
+```typescript
+// Bad: Missing dependency in useEffect
+useEffect(() =&gt; {
+  fetchData(userId);
+}, []);  // userId not in deps
+
+// Good: Include all dependencies
+useEffect(() =&gt; {
+  fetchData(userId);
+}, [userId]);
+```
+
+### Security
+
+```python
+# Bad: SQL injection risk
+cursor.execute(f&quot;SELECT * FROM users WHERE id = {user_id}&quot;)
+
+# Good: Parameterized query
+cursor.execute(&quot;SELECT * FROM users WHERE id = %s&quot;, [user_id])
+```
+
+## References
+
+- [Sentry Code Review Guidelines](https://develop.sentry.dev/engineering-practices/code-review/)
+</code>
       </div>
     </div>
 

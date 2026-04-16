@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,518 @@
     <p class="desc">"Query ClinicalTrials.gov via API v2. Search trials by condition, drug, location, status, or phase. Retrieve trial details by NCT ID, export data, for clinical research and patient matching."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/clinicaltrials-database</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/clinicaltrials-database</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: clinicaltrials-database
+description: &quot;Query ClinicalTrials.gov via API v2. Search trials by condition, drug, location, status, or phase. Retrieve trial details by NCT ID, export data, for clinical research and patient matching.&quot;
+---
+
+# ClinicalTrials.gov Database
+
+## Overview
+
+ClinicalTrials.gov is a comprehensive registry of clinical studies conducted worldwide, maintained by the U.S. National Library of Medicine. Access API v2 to search for trials, retrieve detailed study information, filter by various criteria, and export data for analysis. The API is public (no authentication required) with rate limits of ~50 requests per minute, supporting JSON and CSV formats.
+
+## When to Use This Skill
+
+This skill should be used when working with clinical trial data in scenarios such as:
+
+- **Patient matching** - Finding recruiting trials for specific conditions or patient populations
+- **Research analysis** - Analyzing clinical trial trends, outcomes, or study designs
+- **Drug/intervention research** - Identifying trials testing specific drugs or interventions
+- **Geographic searches** - Locating trials in specific locations or regions
+- **Sponsor/organization tracking** - Finding trials conducted by specific institutions
+- **Data export** - Extracting clinical trial data for further analysis or reporting
+- **Trial monitoring** - Tracking status updates or results for specific trials
+- **Eligibility screening** - Reviewing inclusion/exclusion criteria for trials
+
+## Quick Start
+
+### Basic Search Query
+
+Search for clinical trials using the helper script:
+
+```bash
+cd scientific-databases/clinicaltrials-database/scripts
+python3 query_clinicaltrials.py
+```
+
+Or use Python directly with the `requests` library:
+
+```python
+import requests
+
+url = &quot;https://clinicaltrials.gov/api/v2/studies&quot;
+params = {
+    &quot;query.cond&quot;: &quot;breast cancer&quot;,
+    &quot;filter.overallStatus&quot;: &quot;RECRUITING&quot;,
+    &quot;pageSize&quot;: 10
+}
+
+response = requests.get(url, params=params)
+data = response.json()
+
+print(f&quot;Found {data[&#039;totalCount&#039;]} trials&quot;)
+```
+
+### Retrieve Specific Trial
+
+Get detailed information about a trial using its NCT ID:
+
+```python
+import requests
+
+nct_id = &quot;NCT04852770&quot;
+url = f&quot;https://clinicaltrials.gov/api/v2/studies/{nct_id}&quot;
+
+response = requests.get(url)
+study = response.json()
+
+# Access specific modules
+title = study[&#039;protocolSection&#039;][&#039;identificationModule&#039;][&#039;briefTitle&#039;]
+status = study[&#039;protocolSection&#039;][&#039;statusModule&#039;][&#039;overallStatus&#039;]
+```
+
+## Core Capabilities
+
+### 1. Search by Condition/Disease
+
+Find trials studying specific medical conditions or diseases using the `query.cond` parameter.
+
+**Example: Find recruiting diabetes trials**
+
+```python
+from scripts.query_clinicaltrials import search_studies
+
+results = search_studies(
+    condition=&quot;type 2 diabetes&quot;,
+    status=&quot;RECRUITING&quot;,
+    page_size=20,
+    sort=&quot;LastUpdatePostDate:desc&quot;
+)
+
+print(f&quot;Found {results[&#039;totalCount&#039;]} recruiting diabetes trials&quot;)
+for study in results[&#039;studies&#039;]:
+    protocol = study[&#039;protocolSection&#039;]
+    nct_id = protocol[&#039;identificationModule&#039;][&#039;nctId&#039;]
+    title = protocol[&#039;identificationModule&#039;][&#039;briefTitle&#039;]
+    print(f&quot;{nct_id}: {title}&quot;)
+```
+
+**Common use cases:**
+- Finding trials for rare diseases
+- Identifying trials for comorbid conditions
+- Tracking trial availability for specific diagnoses
+
+### 2. Search by Intervention/Drug
+
+Search for trials testing specific interventions, drugs, devices, or procedures using the `query.intr` parameter.
+
+**Example: Find Phase 3 trials testing Pembrolizumab**
+
+```python
+from scripts.query_clinicaltrials import search_studies
+
+results = search_studies(
+    intervention=&quot;Pembrolizumab&quot;,
+    status=[&quot;RECRUITING&quot;, &quot;ACTIVE_NOT_RECRUITING&quot;],
+    page_size=50
+)
+
+# Filter by phase in results
+phase3_trials = [
+    study for study in results[&#039;studies&#039;]
+    if &#039;PHASE3&#039; in study[&#039;protocolSection&#039;].get(&#039;designModule&#039;, {}).get(&#039;phases&#039;, [])
+]
+```
+
+**Common use cases:**
+- Drug development tracking
+- Competitive intelligence for pharmaceutical companies
+- Treatment option research for clinicians
+
+### 3. Geographic Search
+
+Find trials in specific locations using the `query.locn` parameter.
+
+**Example: Find cancer trials in New York**
+
+```python
+from scripts.query_clinicaltrials import search_studies
+
+results = search_studies(
+    condition=&quot;cancer&quot;,
+    location=&quot;New York&quot;,
+    status=&quot;RECRUITING&quot;,
+    page_size=100
+)
+
+# Extract location details
+for study in results[&#039;studies&#039;]:
+    locations_module = study[&#039;protocolSection&#039;].get(&#039;contactsLocationsModule&#039;, {})
+    locations = locations_module.get(&#039;locations&#039;, [])
+    for loc in locations:
+        if &#039;New York&#039; in loc.get(&#039;city&#039;, &#039;&#039;):
+            print(f&quot;{loc[&#039;facility&#039;]}: {loc[&#039;city&#039;]}, {loc.get(&#039;state&#039;, &#039;&#039;)}&quot;)
+```
+
+**Common use cases:**
+- Patient referrals to local trials
+- Geographic trial distribution analysis
+- Site selection for new trials
+
+### 4. Search by Sponsor/Organization
+
+Find trials conducted by specific organizations using the `query.spons` parameter.
+
+**Example: Find trials sponsored by NCI**
+
+```python
+from scripts.query_clinicaltrials import search_studies
+
+results = search_studies(
+    sponsor=&quot;National Cancer Institute&quot;,
+    page_size=100
+)
+
+# Extract sponsor information
+for study in results[&#039;studies&#039;]:
+    sponsor_module = study[&#039;protocolSection&#039;][&#039;sponsorCollaboratorsModule&#039;]
+    lead_sponsor = sponsor_module[&#039;leadSponsor&#039;][&#039;name&#039;]
+    collaborators = sponsor_module.get(&#039;collaborators&#039;, [])
+    print(f&quot;Lead: {lead_sponsor}&quot;)
+    if collaborators:
+        print(f&quot;  Collaborators: {&#039;, &#039;.join([c[&#039;name&#039;] for c in collaborators])}&quot;)
+```
+
+**Common use cases:**
+- Tracking institutional research portfolios
+- Analyzing funding organization priorities
+- Identifying collaboration opportunities
+
+### 5. Filter by Study Status
+
+Filter trials by recruitment or completion status using the `filter.overallStatus` parameter.
+
+**Valid status values:**
+- `RECRUITING` - Currently recruiting participants
+- `NOT_YET_RECRUITING` - Not yet open for recruitment
+- `ENROLLING_BY_INVITATION` - Only enrolling by invitation
+- `ACTIVE_NOT_RECRUITING` - Active but no longer recruiting
+- `SUSPENDED` - Temporarily halted
+- `TERMINATED` - Stopped prematurely
+- `COMPLETED` - Study has concluded
+- `WITHDRAWN` - Withdrawn prior to enrollment
+
+**Example: Find recently completed trials with results**
+
+```python
+from scripts.query_clinicaltrials import search_studies
+
+results = search_studies(
+    condition=&quot;alzheimer disease&quot;,
+    status=&quot;COMPLETED&quot;,
+    sort=&quot;LastUpdatePostDate:desc&quot;,
+    page_size=50
+)
+
+# Filter for trials with results
+trials_with_results = [
+    study for study in results[&#039;studies&#039;]
+    if study.get(&#039;hasResults&#039;, False)
+]
+
+print(f&quot;Found {len(trials_with_results)} completed trials with results&quot;)
+```
+
+### 6. Retrieve Detailed Study Information
+
+Get comprehensive information about specific trials including eligibility criteria, outcomes, contacts, and locations.
+
+**Example: Extract eligibility criteria**
+
+```python
+from scripts.query_clinicaltrials import get_study_details
+
+study = get_study_details(&quot;NCT04852770&quot;)
+eligibility = study[&#039;protocolSection&#039;][&#039;eligibilityModule&#039;]
+
+print(f&quot;Eligible Ages: {eligibility.get(&#039;minimumAge&#039;)} - {eligibility.get(&#039;maximumAge&#039;)}&quot;)
+print(f&quot;Eligible Sex: {eligibility.get(&#039;sex&#039;)}&quot;)
+print(f&quot;\nInclusion Criteria:&quot;)
+print(eligibility.get(&#039;eligibilityCriteria&#039;))
+```
+
+**Example: Extract contact information**
+
+```python
+from scripts.query_clinicaltrials import get_study_details
+
+study = get_study_details(&quot;NCT04852770&quot;)
+contacts_module = study[&#039;protocolSection&#039;][&#039;contactsLocationsModule&#039;]
+
+# Overall contacts
+if &#039;centralContacts&#039; in contacts_module:
+    for contact in contacts_module[&#039;centralContacts&#039;]:
+        print(f&quot;Contact: {contact.get(&#039;name&#039;)}&quot;)
+        print(f&quot;Phone: {contact.get(&#039;phone&#039;)}&quot;)
+        print(f&quot;Email: {contact.get(&#039;email&#039;)}&quot;)
+
+# Study locations
+if &#039;locations&#039; in contacts_module:
+    for location in contacts_module[&#039;locations&#039;]:
+        print(f&quot;\nFacility: {location.get(&#039;facility&#039;)}&quot;)
+        print(f&quot;City: {location.get(&#039;city&#039;)}, {location.get(&#039;state&#039;)}&quot;)
+        if location.get(&#039;status&#039;):
+            print(f&quot;Status: {location[&#039;status&#039;]}&quot;)
+```
+
+### 7. Pagination and Bulk Data Retrieval
+
+Handle large result sets efficiently using pagination.
+
+**Example: Retrieve all matching trials**
+
+```python
+from scripts.query_clinicaltrials import search_with_all_results
+
+# Get all trials (automatically handles pagination)
+all_trials = search_with_all_results(
+    condition=&quot;rare disease&quot;,
+    status=&quot;RECRUITING&quot;
+)
+
+print(f&quot;Retrieved {len(all_trials)} total trials&quot;)
+```
+
+**Example: Manual pagination with control**
+
+```python
+from scripts.query_clinicaltrials import search_studies
+
+all_studies = []
+page_token = None
+max_pages = 10  # Limit to avoid excessive requests
+
+for page in range(max_pages):
+    results = search_studies(
+        condition=&quot;cancer&quot;,
+        page_size=1000,  # Max page size
+        page_token=page_token
+    )
+
+    all_studies.extend(results[&#039;studies&#039;])
+
+    # Check for next page
+    page_token = results.get(&#039;pageToken&#039;)
+    if not page_token:
+        break
+
+print(f&quot;Retrieved {len(all_studies)} studies across {page + 1} pages&quot;)
+```
+
+### 8. Data Export to CSV
+
+Export trial data to CSV format for analysis in spreadsheet software or data analysis tools.
+
+**Example: Export to CSV file**
+
+```python
+from scripts.query_clinicaltrials import search_studies
+
+# Request CSV format
+results = search_studies(
+    condition=&quot;heart disease&quot;,
+    status=&quot;RECRUITING&quot;,
+    format=&quot;csv&quot;,
+    page_size=1000
+)
+
+# Save to file
+with open(&quot;heart_disease_trials.csv&quot;, &quot;w&quot;) as f:
+    f.write(results)
+
+print(&quot;Data exported to heart_disease_trials.csv&quot;)
+```
+
+**Note:** CSV format returns a string instead of JSON dictionary.
+
+### 9. Extract and Summarize Study Information
+
+Extract key information for quick overview or reporting.
+
+**Example: Create trial summary**
+
+```python
+from scripts.query_clinicaltrials import get_study_details, extract_study_summary
+
+# Get details and extract summary
+study = get_study_details(&quot;NCT04852770&quot;)
+summary = extract_study_summary(study)
+
+print(f&quot;NCT ID: {summary[&#039;nct_id&#039;]}&quot;)
+print(f&quot;Title: {summary[&#039;title&#039;]}&quot;)
+print(f&quot;Status: {summary[&#039;status&#039;]}&quot;)
+print(f&quot;Phase: {&#039;, &#039;.join(summary[&#039;phase&#039;])}&quot;)
+print(f&quot;Enrollment: {summary[&#039;enrollment&#039;]}&quot;)
+print(f&quot;Last Update: {summary[&#039;last_update&#039;]}&quot;)
+print(f&quot;\nBrief Summary:\n{summary[&#039;brief_summary&#039;]}&quot;)
+```
+
+### 10. Combined Query Strategies
+
+Combine multiple filters for targeted searches.
+
+**Example: Multi-criteria search**
+
+```python
+from scripts.query_clinicaltrials import search_studies
+
+# Find Phase 2/3 immunotherapy trials for lung cancer in California
+results = search_studies(
+    condition=&quot;lung cancer&quot;,
+    intervention=&quot;immunotherapy&quot;,
+    location=&quot;California&quot;,
+    status=[&quot;RECRUITING&quot;, &quot;NOT_YET_RECRUITING&quot;],
+    page_size=100
+)
+
+# Further filter by phase
+phase2_3_trials = [
+    study for study in results[&#039;studies&#039;]
+    if any(phase in [&#039;PHASE2&#039;, &#039;PHASE3&#039;]
+           for phase in study[&#039;protocolSection&#039;].get(&#039;designModule&#039;, {}).get(&#039;phases&#039;, []))
+]
+
+print(f&quot;Found {len(phase2_3_trials)} Phase 2/3 immunotherapy trials&quot;)
+```
+
+## Resources
+
+### scripts/query_clinicaltrials.py
+
+Comprehensive Python script providing helper functions for common query patterns:
+
+- `search_studies()` - Search for trials with various filters
+- `get_study_details()` - Retrieve full information for a specific trial
+- `search_with_all_results()` - Automatically paginate through all results
+- `extract_study_summary()` - Extract key information for quick overview
+
+Run the script directly for example usage:
+
+```bash
+python3 scripts/query_clinicaltrials.py
+```
+
+### references/api_reference.md
+
+Detailed API documentation including:
+
+- Complete endpoint specifications
+- All query parameters and valid values
+- Response data structure and modules
+- Common use cases with code examples
+- Error handling and best practices
+- Data standards (ISO 8601 dates, CommonMark markdown)
+
+Load this reference when working with unfamiliar API features or troubleshooting issues.
+
+## Best Practices
+
+### Rate Limit Management
+
+The API has a rate limit of approximately 50 requests per minute. For bulk data retrieval:
+
+1. Use maximum page size (1000) to minimize requests
+2. Implement exponential backoff on rate limit errors (429 status)
+3. Add delays between requests for large-scale data collection
+
+```python
+import time
+import requests
+
+def search_with_rate_limit(params):
+    try:
+        response = requests.get(&quot;https://clinicaltrials.gov/api/v2/studies&quot;, params=params)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 429:
+            print(&quot;Rate limited. Waiting 60 seconds...&quot;)
+            time.sleep(60)
+            return search_with_rate_limit(params)  # Retry
+        raise
+```
+
+### Data Structure Navigation
+
+The API response has a nested structure. Key paths to common information:
+
+- **NCT ID**: `study[&#039;protocolSection&#039;][&#039;identificationModule&#039;][&#039;nctId&#039;]`
+- **Title**: `study[&#039;protocolSection&#039;][&#039;identificationModule&#039;][&#039;briefTitle&#039;]`
+- **Status**: `study[&#039;protocolSection&#039;][&#039;statusModule&#039;][&#039;overallStatus&#039;]`
+- **Phase**: `study[&#039;protocolSection&#039;][&#039;designModule&#039;][&#039;phases&#039;]`
+- **Eligibility**: `study[&#039;protocolSection&#039;][&#039;eligibilityModule&#039;]`
+- **Locations**: `study[&#039;protocolSection&#039;][&#039;contactsLocationsModule&#039;][&#039;locations&#039;]`
+- **Interventions**: `study[&#039;protocolSection&#039;][&#039;armsInterventionsModule&#039;][&#039;interventions&#039;]`
+
+### Error Handling
+
+Always implement proper error handling for network requests:
+
+```python
+import requests
+
+try:
+    response = requests.get(url, params=params, timeout=30)
+    response.raise_for_status()
+    data = response.json()
+except requests.exceptions.HTTPError as e:
+    print(f&quot;HTTP error: {e.response.status_code}&quot;)
+except requests.exceptions.RequestException as e:
+    print(f&quot;Request failed: {e}&quot;)
+except ValueError as e:
+    print(f&quot;JSON decode error: {e}&quot;)
+```
+
+### Handling Missing Data
+
+Not all trials have complete information. Always check for field existence:
+
+```python
+# Safe navigation with .get()
+phases = study[&#039;protocolSection&#039;].get(&#039;designModule&#039;, {}).get(&#039;phases&#039;, [])
+enrollment = study[&#039;protocolSection&#039;].get(&#039;designModule&#039;, {}).get(&#039;enrollmentInfo&#039;, {}).get(&#039;count&#039;, &#039;N/A&#039;)
+
+# Check before accessing
+if &#039;resultsSection&#039; in study:
+    # Process results
+    pass
+```
+
+## Technical Specifications
+
+- **Base URL**: `https://clinicaltrials.gov/api/v2`
+- **Authentication**: Not required (public API)
+- **Rate Limit**: ~50 requests/minute per IP
+- **Response Formats**: JSON (default), CSV
+- **Max Page Size**: 1000 studies per request
+- **Date Format**: ISO 8601
+- **Text Format**: CommonMark Markdown for rich text fields
+- **API Version**: 2.0 (released March 2024)
+- **API Specification**: OpenAPI 3.0
+
+For complete technical details, see `references/api_reference.md`.
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,589 @@
     <p class="desc">Expert guidance for GRPO/RL fine-tuning with TRL for reasoning and task-specific model training</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/post-training-grpo-rl-training</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/post-training-grpo-rl-training</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: grpo-rl-training
+description: Expert guidance for GRPO/RL fine-tuning with TRL for reasoning and task-specific model training
+version: 1.0.0
+author: Orchestra Research
+license: MIT
+tags: [Post-Training, Reinforcement Learning, GRPO, TRL, RLHF, Reward Modeling, Reasoning, DPO, PPO, Structured Output]
+dependencies: [transformers&gt;=4.47.0, trl&gt;=0.14.0, datasets&gt;=3.2.0, peft&gt;=0.14.0, torch]
+---
+
+# GRPO/RL Training with TRL
+
+Expert-level guidance for implementing Group Relative Policy Optimization (GRPO) using the Transformer Reinforcement Learning (TRL) library. This skill provides battle-tested patterns, critical insights, and production-ready workflows for fine-tuning language models with custom reward functions.
+
+## When to Use This Skill
+
+Use GRPO training when you need to:
+- **Enforce specific output formats** (e.g., XML tags, JSON, structured reasoning)
+- **Teach verifiable tasks** with objective correctness metrics (math, coding, fact-checking)
+- **Improve reasoning capabilities** by rewarding chain-of-thought patterns
+- **Align models to domain-specific behaviors** without labeled preference data
+- **Optimize for multiple objectives** simultaneously (format + correctness + style)
+
+**Do NOT use GRPO for:**
+- Simple supervised fine-tuning tasks (use SFT instead)
+- Tasks without clear reward signals
+- When you already have high-quality preference pairs (use DPO/PPO instead)
+
+---
+
+## Core Concepts
+
+### 1. GRPO Algorithm Fundamentals
+
+**Key Mechanism:**
+- Generates **multiple completions** for each prompt (group size: 4-16)
+- Compares completions within each group using reward functions
+- Updates policy to favor higher-rewarded responses relative to the group
+
+**Critical Difference from PPO:**
+- No separate reward model needed
+- More sample-efficient (learns from within-group comparisons)
+- Simpler to implement and debug
+
+**Mathematical Intuition:**
+```
+For each prompt p:
+  1. Generate N completions: {c₁, c₂, ..., cₙ}
+  2. Compute rewards: {r₁, r₂, ..., rₙ}
+  3. Learn to increase probability of high-reward completions
+     relative to low-reward ones in the same group
+```
+
+### 2. Reward Function Design Philosophy
+
+**Golden Rules:**
+1. **Compose multiple reward functions** - Each handles one aspect (format, correctness, style)
+2. **Scale rewards appropriately** - Higher weight = stronger signal
+3. **Use incremental rewards** - Partial credit for partial compliance
+4. **Test rewards independently** - Debug each reward function in isolation
+
+**Reward Function Types:**
+
+| Type | Use Case | Example Weight |
+|------|----------|----------------|
+| **Correctness** | Verifiable tasks (math, code) | 2.0 (highest) |
+| **Format** | Strict structure enforcement | 0.5-1.0 |
+| **Length** | Encourage verbosity/conciseness | 0.1-0.5 |
+| **Style** | Penalize unwanted patterns | -0.5 to 0.5 |
+
+---
+
+## Implementation Workflow
+
+### Step 1: Dataset Preparation
+
+**Critical Requirements:**
+- Prompts in chat format (list of dicts with &#039;role&#039; and &#039;content&#039;)
+- Include system prompts to set expectations
+- For verifiable tasks, include ground truth answers as additional columns
+
+**Example Structure:**
+```python
+from datasets import load_dataset, Dataset
+
+SYSTEM_PROMPT = &quot;&quot;&quot;
+Respond in the following format:
+&lt;reasoning&gt;
+[Your step-by-step thinking]
+&lt;/reasoning&gt;
+&lt;answer&gt;
+[Final answer]
+&lt;/answer&gt;
+&quot;&quot;&quot;
+
+def prepare_dataset(raw_data):
+    &quot;&quot;&quot;
+    Transform raw data into GRPO-compatible format.
+
+    Returns: Dataset with columns:
+    - &#039;prompt&#039;: List[Dict] with role/content (system + user messages)
+    - &#039;answer&#039;: str (ground truth, optional but recommended)
+    &quot;&quot;&quot;
+    return raw_data.map(lambda x: {
+        &#039;prompt&#039;: [
+            {&#039;role&#039;: &#039;system&#039;, &#039;content&#039;: SYSTEM_PROMPT},
+            {&#039;role&#039;: &#039;user&#039;, &#039;content&#039;: x[&#039;question&#039;]}
+        ],
+        &#039;answer&#039;: extract_answer(x[&#039;raw_answer&#039;])
+    })
+```
+
+**Pro Tips:**
+- Use one-shot or few-shot examples in system prompt for complex formats
+- Keep prompts concise (max_prompt_length: 256-512 tokens)
+- Validate data quality before training (garbage in = garbage out)
+
+### Step 2: Reward Function Implementation
+
+**Template Structure:**
+```python
+def reward_function_name(
+    prompts,        # List[List[Dict]]: Original prompts
+    completions,    # List[List[Dict]]: Model generations
+    answer=None,    # Optional: Ground truth from dataset
+    **kwargs        # Additional dataset columns
+) -&gt; list[float]:
+    &quot;&quot;&quot;
+    Evaluate completions and return rewards.
+
+    Returns: List of floats (one per completion)
+    &quot;&quot;&quot;
+    # Extract completion text
+    responses = [comp[0][&#039;content&#039;] for comp in completions]
+
+    # Compute rewards
+    rewards = []
+    for response in responses:
+        score = compute_score(response)
+        rewards.append(score)
+
+    return rewards
+```
+
+**Example 1: Correctness Reward (Math/Coding)**
+```python
+def correctness_reward(prompts, completions, answer, **kwargs):
+    &quot;&quot;&quot;Reward correct answers with high score.&quot;&quot;&quot;
+    responses = [comp[0][&#039;content&#039;] for comp in completions]
+    extracted = [extract_final_answer(r) for r in responses]
+    return [2.0 if ans == gt else 0.0
+            for ans, gt in zip(extracted, answer)]
+```
+
+**Example 2: Format Reward (Structured Output)**
+```python
+import re
+
+def format_reward(completions, **kwargs):
+    &quot;&quot;&quot;Reward XML-like structured format.&quot;&quot;&quot;
+    pattern = r&#039;&lt;reasoning&gt;.*?&lt;/reasoning&gt;\s*&lt;answer&gt;.*?&lt;/answer&gt;&#039;
+    responses = [comp[0][&#039;content&#039;] for comp in completions]
+    return [1.0 if re.search(pattern, r, re.DOTALL) else 0.0
+            for r in responses]
+```
+
+**Example 3: Incremental Format Reward (Partial Credit)**
+```python
+def incremental_format_reward(completions, **kwargs):
+    &quot;&quot;&quot;Award partial credit for format compliance.&quot;&quot;&quot;
+    responses = [comp[0][&#039;content&#039;] for comp in completions]
+    rewards = []
+
+    for r in responses:
+        score = 0.0
+        if &#039;&lt;reasoning&gt;&#039; in r:
+            score += 0.25
+        if &#039;&lt;/reasoning&gt;&#039; in r:
+            score += 0.25
+        if &#039;&lt;answer&gt;&#039; in r:
+            score += 0.25
+        if &#039;&lt;/answer&gt;&#039; in r:
+            score += 0.25
+        # Penalize extra text after closing tag
+        if r.count(&#039;&lt;/answer&gt;&#039;) == 1:
+            extra_text = r.split(&#039;&lt;/answer&gt;&#039;)[-1].strip()
+            score -= len(extra_text) * 0.001
+        rewards.append(score)
+
+    return rewards
+```
+
+**Critical Insight:**
+Combine 3-5 reward functions for robust training. Order matters less than diversity of signals.
+
+### Step 3: Training Configuration
+
+**Memory-Optimized Config (Small GPU)**
+```python
+from trl import GRPOConfig
+
+training_args = GRPOConfig(
+    output_dir=&quot;outputs/grpo-model&quot;,
+
+    # Learning rate
+    learning_rate=5e-6,          # Lower = more stable
+    adam_beta1=0.9,
+    adam_beta2=0.99,
+    weight_decay=0.1,
+    warmup_ratio=0.1,
+    lr_scheduler_type=&#039;cosine&#039;,
+
+    # Batch settings
+    per_device_train_batch_size=1,
+    gradient_accumulation_steps=4,  # Effective batch = 4
+
+    # GRPO-specific
+    num_generations=8,            # Group size: 8-16 recommended
+    max_prompt_length=256,
+    max_completion_length=512,
+
+    # Training duration
+    num_train_epochs=1,
+    max_steps=None,               # Or set fixed steps (e.g., 500)
+
+    # Optimization
+    bf16=True,                    # Faster on A100/H100
+    optim=&quot;adamw_8bit&quot;,          # Memory-efficient optimizer
+    max_grad_norm=0.1,
+
+    # Logging
+    logging_steps=1,
+    save_steps=100,
+    report_to=&quot;wandb&quot;,            # Or &quot;none&quot; for no logging
+)
+```
+
+**High-Performance Config (Large GPU)**
+```python
+training_args = GRPOConfig(
+    output_dir=&quot;outputs/grpo-model&quot;,
+    learning_rate=1e-5,
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=2,
+    num_generations=16,           # Larger groups = better signal
+    max_prompt_length=512,
+    max_completion_length=1024,
+    num_train_epochs=1,
+    bf16=True,
+    use_vllm=True,                # Fast generation with vLLM
+    logging_steps=10,
+)
+```
+
+**Critical Hyperparameters:**
+
+| Parameter | Impact | Tuning Advice |
+|-----------|--------|---------------|
+| `num_generations` | Group size for comparison | Start with 8, increase to 16 if GPU allows |
+| `learning_rate` | Convergence speed/stability | 5e-6 (safe), 1e-5 (faster, riskier) |
+| `max_completion_length` | Output verbosity | Match your task (512 for reasoning, 256 for short answers) |
+| `gradient_accumulation_steps` | Effective batch size | Increase if GPU memory limited |
+
+### Step 4: Model Setup and Training
+
+**Standard Setup (Transformers)**
+```python
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from peft import LoraConfig
+from trl import GRPOTrainer
+
+# Load model
+model_name = &quot;Qwen/Qwen2.5-1.5B-Instruct&quot;
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    torch_dtype=torch.bfloat16,
+    attn_implementation=&quot;flash_attention_2&quot;,  # 2-3x faster
+    device_map=&quot;auto&quot;
+)
+
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer.pad_token = tokenizer.eos_token
+
+# Optional: LoRA for parameter-efficient training
+peft_config = LoraConfig(
+    r=16,                         # Rank (higher = more capacity)
+    lora_alpha=32,               # Scaling factor (typically 2*r)
+    target_modules=[
+        &quot;q_proj&quot;, &quot;k_proj&quot;, &quot;v_proj&quot;, &quot;o_proj&quot;,
+        &quot;gate_proj&quot;, &quot;up_proj&quot;, &quot;down_proj&quot;
+    ],
+    task_type=&quot;CAUSAL_LM&quot;,
+    lora_dropout=0.05,
+)
+
+# Initialize trainer
+trainer = GRPOTrainer(
+    model=model,
+    processing_class=tokenizer,
+    reward_funcs=[
+        incremental_format_reward,
+        format_reward,
+        correctness_reward,
+    ],
+    args=training_args,
+    train_dataset=dataset,
+    peft_config=peft_config,      # Remove for full fine-tuning
+)
+
+# Train
+trainer.train()
+
+# Save
+trainer.save_model(&quot;final_model&quot;)
+```
+
+**Unsloth Setup (2-3x Faster)**
+```python
+from unsloth import FastLanguageModel
+
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name=&quot;google/gemma-3-1b-it&quot;,
+    max_seq_length=1024,
+    load_in_4bit=True,
+    fast_inference=True,
+    max_lora_rank=32,
+)
+
+model = FastLanguageModel.get_peft_model(
+    model,
+    r=32,
+    target_modules=[&quot;q_proj&quot;, &quot;k_proj&quot;, &quot;v_proj&quot;, &quot;o_proj&quot;,
+                    &quot;gate_proj&quot;, &quot;up_proj&quot;, &quot;down_proj&quot;],
+    lora_alpha=32,
+    use_gradient_checkpointing=&quot;unsloth&quot;,
+)
+
+# Rest is identical to standard setup
+trainer = GRPOTrainer(model=model, ...)
+trainer.train()
+```
+
+---
+
+## Critical Training Insights
+
+### 1. Loss Behavior (EXPECTED PATTERN)
+- **Loss starts near 0 and INCREASES during training**
+- This is CORRECT - loss measures KL divergence from initial policy
+- Model is learning (diverging from original behavior to optimize rewards)
+- Monitor reward metrics instead of loss for progress
+
+### 2. Reward Tracking
+Key metrics to watch:
+- `reward`: Average across all completions
+- `reward_std`: Diversity within groups (should remain &gt; 0)
+- `kl`: KL divergence from reference (should grow moderately)
+
+**Healthy Training Pattern:**
+```
+Step   Reward    Reward_Std   KL
+100    0.5       0.3          0.02
+200    0.8       0.25         0.05
+300    1.2       0.2          0.08  ← Good progression
+400    1.5       0.15         0.12
+```
+
+**Warning Signs:**
+- Reward std → 0 (model collapsing to single response)
+- KL exploding (&gt; 0.5) (diverging too much, reduce LR)
+- Reward stuck (reward functions too harsh or model capacity issue)
+
+### 3. Common Pitfalls and Solutions
+
+| Problem | Symptom | Solution |
+|---------|---------|----------|
+| **Mode collapse** | All completions identical | Increase `num_generations`, add diversity penalty |
+| **No learning** | Flat rewards | Check reward function logic, increase LR |
+| **OOM errors** | GPU memory exceeded | Reduce `num_generations`, enable gradient checkpointing |
+| **Slow training** | &lt; 1 it/s | Enable `use_vllm=True`, use Unsloth, reduce seq length |
+| **Format ignored** | Model doesn&#039;t follow structure | Increase format reward weight, add incremental rewards |
+
+---
+
+## Advanced Patterns
+
+### 1. Multi-Stage Training
+For complex tasks, train in stages:
+
+```python
+# Stage 1: Format compliance (epochs=1)
+trainer_stage1 = GRPOTrainer(
+    model=model,
+    reward_funcs=[incremental_format_reward, format_reward],
+    ...
+)
+trainer_stage1.train()
+
+# Stage 2: Correctness (epochs=1)
+trainer_stage2 = GRPOTrainer(
+    model=model,
+    reward_funcs=[format_reward, correctness_reward],
+    ...
+)
+trainer_stage2.train()
+```
+
+### 2. Adaptive Reward Scaling
+```python
+class AdaptiveReward:
+    def __init__(self, base_reward_func, initial_weight=1.0):
+        self.func = base_reward_func
+        self.weight = initial_weight
+
+    def __call__(self, *args, **kwargs):
+        rewards = self.func(*args, **kwargs)
+        return [r * self.weight for r in rewards]
+
+    def adjust_weight(self, success_rate):
+        &quot;&quot;&quot;Increase weight if model struggling, decrease if succeeding.&quot;&quot;&quot;
+        if success_rate &lt; 0.3:
+            self.weight *= 1.2
+        elif success_rate &gt; 0.8:
+            self.weight *= 0.9
+```
+
+### 3. Custom Dataset Integration
+```python
+def load_custom_knowledge_base(csv_path):
+    &quot;&quot;&quot;Example: School communication platform docs.&quot;&quot;&quot;
+    import pandas as pd
+    df = pd.read_csv(csv_path)
+
+    dataset = Dataset.from_pandas(df).map(lambda x: {
+        &#039;prompt&#039;: [
+            {&#039;role&#039;: &#039;system&#039;, &#039;content&#039;: CUSTOM_SYSTEM_PROMPT},
+            {&#039;role&#039;: &#039;user&#039;, &#039;content&#039;: x[&#039;question&#039;]}
+        ],
+        &#039;answer&#039;: x[&#039;expert_answer&#039;]
+    })
+    return dataset
+```
+
+---
+
+## Deployment and Inference
+
+### Save and Merge LoRA
+```python
+# Merge LoRA adapters into base model
+if hasattr(trainer.model, &#039;merge_and_unload&#039;):
+    merged_model = trainer.model.merge_and_unload()
+    merged_model.save_pretrained(&quot;production_model&quot;)
+    tokenizer.save_pretrained(&quot;production_model&quot;)
+```
+
+### Inference Example
+```python
+from transformers import pipeline
+
+generator = pipeline(
+    &quot;text-generation&quot;,
+    model=&quot;production_model&quot;,
+    tokenizer=tokenizer
+)
+
+result = generator(
+    [
+        {&#039;role&#039;: &#039;system&#039;, &#039;content&#039;: SYSTEM_PROMPT},
+        {&#039;role&#039;: &#039;user&#039;, &#039;content&#039;: &quot;What is 15 + 27?&quot;}
+    ],
+    max_new_tokens=256,
+    do_sample=True,
+    temperature=0.7,
+    top_p=0.9
+)
+print(result[0][&#039;generated_text&#039;])
+```
+
+---
+
+## Best Practices Checklist
+
+**Before Training:**
+- [ ] Validate dataset format (prompts as List[Dict])
+- [ ] Test reward functions on sample data
+- [ ] Calculate expected max_prompt_length from data
+- [ ] Choose appropriate num_generations based on GPU memory
+- [ ] Set up logging (wandb recommended)
+
+**During Training:**
+- [ ] Monitor reward progression (should increase)
+- [ ] Check reward_std (should stay &gt; 0.1)
+- [ ] Watch for OOM errors (reduce batch size if needed)
+- [ ] Sample generations every 50-100 steps
+- [ ] Validate format compliance on holdout set
+
+**After Training:**
+- [ ] Merge LoRA weights if using PEFT
+- [ ] Test on diverse prompts
+- [ ] Compare to baseline model
+- [ ] Document reward weights and hyperparameters
+- [ ] Save reproducibility config
+
+---
+
+## Troubleshooting Guide
+
+### Debugging Workflow
+1. **Isolate reward functions** - Test each independently
+2. **Check data distribution** - Ensure diversity in prompts
+3. **Reduce complexity** - Start with single reward, add gradually
+4. **Monitor generations** - Print samples every N steps
+5. **Validate extraction logic** - Ensure answer parsing works
+
+### Quick Fixes
+```python
+# Debug reward function
+def debug_reward(completions, **kwargs):
+    responses = [comp[0][&#039;content&#039;] for comp in completions]
+    for i, r in enumerate(responses[:2]):  # Print first 2
+        print(f&quot;Response {i}: {r[:200]}...&quot;)
+    return [1.0] * len(responses)  # Dummy rewards
+
+# Test without training
+trainer = GRPOTrainer(..., reward_funcs=[debug_reward])
+trainer.generate_completions(dataset[:1])  # Generate without updating
+```
+
+---
+
+## References and Resources
+
+**Official Documentation:**
+- TRL GRPO Trainer: https://huggingface.co/docs/trl/grpo_trainer
+- DeepSeek R1 Paper: https://arxiv.org/abs/2501.12948
+- Unsloth Docs: https://docs.unsloth.ai/
+
+**Example Repositories:**
+- Open R1 Implementation: https://github.com/huggingface/open-r1
+- TRL Examples: https://github.com/huggingface/trl/tree/main/examples
+
+**Recommended Reading:**
+- Progressive Disclosure Pattern for agent instructions
+- Reward shaping in RL (Ng et al.)
+- LoRA paper (Hu et al., 2021)
+
+---
+
+## Usage Instructions for Agents
+
+When this skill is loaded:
+
+1. **Read this entire file** before implementing GRPO training
+2. **Start with the simplest reward function** (e.g., length-based) to validate setup
+3. **Use the templates** in `templates/` directory as starting points
+4. **Reference examples** in `examples/` for task-specific implementations
+5. **Follow the workflow** sequentially (don&#039;t skip steps)
+6. **Debug incrementally** - add one reward function at a time
+
+**Critical Reminders:**
+- Always use multiple reward functions (3-5 is optimal)
+- Monitor reward metrics, not loss
+- Test reward functions before training
+- Start small (num_generations=4), scale up gradually
+- Save checkpoints frequently (every 100 steps)
+
+This skill is designed for **expert-level implementation**. Beginners should start with supervised fine-tuning before attempting GRPO.
+
+
+
+</code>
       </div>
     </div>
 

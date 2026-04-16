@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,343 @@
     <p class="desc">Scalable data processing for ML workloads. Streaming execution across CPU/GPU, supports Parquet/CSV/JSON/images. Integrates with Ray Train, PyTorch, TensorFlow. Scales from single machine to 100s of nodes. Use for batch inference, data preprocessing, multi-modal data loading, or distributed ETL pipelines.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/data-processing-ray-data</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/data-processing-ray-data</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: ray-data
+description: Scalable data processing for ML workloads. Streaming execution across CPU/GPU, supports Parquet/CSV/JSON/images. Integrates with Ray Train, PyTorch, TensorFlow. Scales from single machine to 100s of nodes. Use for batch inference, data preprocessing, multi-modal data loading, or distributed ETL pipelines.
+version: 1.0.0
+author: Orchestra Research
+license: MIT
+tags: [Data Processing, Ray Data, Distributed Computing, ML Pipelines, Batch Inference, ETL, Scalable, Ray, PyTorch, TensorFlow]
+dependencies: [ray[data], pyarrow, pandas]
+---
+
+# Ray Data - Scalable ML Data Processing
+
+Distributed data processing library for ML and AI workloads.
+
+## When to use Ray Data
+
+**Use Ray Data when:**
+- Processing large datasets (&gt;100GB) for ML training
+- Need distributed data preprocessing across cluster
+- Building batch inference pipelines
+- Loading multi-modal data (images, audio, video)
+- Scaling data processing from laptop to cluster
+
+**Key features**:
+- **Streaming execution**: Process data larger than memory
+- **GPU support**: Accelerate transforms with GPUs
+- **Framework integration**: PyTorch, TensorFlow, HuggingFace
+- **Multi-modal**: Images, Parquet, CSV, JSON, audio, video
+
+**Use alternatives instead**:
+- **Pandas**: Small data (&lt;1GB) on single machine
+- **Dask**: Tabular data, SQL-like operations
+- **Spark**: Enterprise ETL, SQL queries
+
+## Quick start
+
+### Installation
+
+```bash
+pip install -U &#039;ray[data]&#039;
+```
+
+### Load and transform data
+
+```python
+import ray
+
+# Read Parquet files
+ds = ray.data.read_parquet(&quot;s3://bucket/data/*.parquet&quot;)
+
+# Transform data (lazy execution)
+ds = ds.map_batches(lambda batch: {&quot;processed&quot;: batch[&quot;text&quot;].str.lower()})
+
+# Consume data
+for batch in ds.iter_batches(batch_size=100):
+    print(batch)
+```
+
+### Integration with Ray Train
+
+```python
+import ray
+from ray.train import ScalingConfig
+from ray.train.torch import TorchTrainer
+
+# Create dataset
+train_ds = ray.data.read_parquet(&quot;s3://bucket/train/*.parquet&quot;)
+
+def train_func(config):
+    # Access dataset in training
+    train_ds = ray.train.get_dataset_shard(&quot;train&quot;)
+
+    for epoch in range(10):
+        for batch in train_ds.iter_batches(batch_size=32):
+            # Train on batch
+            pass
+
+# Train with Ray
+trainer = TorchTrainer(
+    train_func,
+    datasets={&quot;train&quot;: train_ds},
+    scaling_config=ScalingConfig(num_workers=4, use_gpu=True)
+)
+trainer.fit()
+```
+
+## Reading data
+
+### From cloud storage
+
+```python
+import ray
+
+# Parquet (recommended for ML)
+ds = ray.data.read_parquet(&quot;s3://bucket/data/*.parquet&quot;)
+
+# CSV
+ds = ray.data.read_csv(&quot;s3://bucket/data/*.csv&quot;)
+
+# JSON
+ds = ray.data.read_json(&quot;gs://bucket/data/*.json&quot;)
+
+# Images
+ds = ray.data.read_images(&quot;s3://bucket/images/&quot;)
+```
+
+### From Python objects
+
+```python
+# From list
+ds = ray.data.from_items([{&quot;id&quot;: i, &quot;value&quot;: i * 2} for i in range(1000)])
+
+# From range
+ds = ray.data.range(1000000)  # Synthetic data
+
+# From pandas
+import pandas as pd
+df = pd.DataFrame({&quot;col1&quot;: [1, 2, 3], &quot;col2&quot;: [4, 5, 6]})
+ds = ray.data.from_pandas(df)
+```
+
+## Transformations
+
+### Map batches (vectorized)
+
+```python
+# Batch transformation (fast)
+def process_batch(batch):
+    batch[&quot;doubled&quot;] = batch[&quot;value&quot;] * 2
+    return batch
+
+ds = ds.map_batches(process_batch, batch_size=1000)
+```
+
+### Row transformations
+
+```python
+# Row-by-row (slower)
+def process_row(row):
+    row[&quot;squared&quot;] = row[&quot;value&quot;] ** 2
+    return row
+
+ds = ds.map(process_row)
+```
+
+### Filter
+
+```python
+# Filter rows
+ds = ds.filter(lambda row: row[&quot;value&quot;] &gt; 100)
+```
+
+### Group by and aggregate
+
+```python
+# Group by column
+ds = ds.groupby(&quot;category&quot;).count()
+
+# Custom aggregation
+ds = ds.groupby(&quot;category&quot;).map_groups(lambda group: {&quot;sum&quot;: group[&quot;value&quot;].sum()})
+```
+
+## GPU-accelerated transforms
+
+```python
+# Use GPU for preprocessing
+def preprocess_images_gpu(batch):
+    import torch
+    images = torch.tensor(batch[&quot;image&quot;]).cuda()
+    # GPU preprocessing
+    processed = images * 255
+    return {&quot;processed&quot;: processed.cpu().numpy()}
+
+ds = ds.map_batches(
+    preprocess_images_gpu,
+    batch_size=64,
+    num_gpus=1  # Request GPU
+)
+```
+
+## Writing data
+
+```python
+# Write to Parquet
+ds.write_parquet(&quot;s3://bucket/output/&quot;)
+
+# Write to CSV
+ds.write_csv(&quot;output/&quot;)
+
+# Write to JSON
+ds.write_json(&quot;output/&quot;)
+```
+
+## Performance optimization
+
+### Repartition
+
+```python
+# Control parallelism
+ds = ds.repartition(100)  # 100 blocks for 100-core cluster
+```
+
+### Batch size tuning
+
+```python
+# Larger batches = faster vectorized ops
+ds.map_batches(process_fn, batch_size=10000)  # vs batch_size=100
+```
+
+### Streaming execution
+
+```python
+# Process data larger than memory
+ds = ray.data.read_parquet(&quot;s3://huge-dataset/&quot;)
+for batch in ds.iter_batches(batch_size=1000):
+    process(batch)  # Streamed, not loaded to memory
+```
+
+## Common patterns
+
+### Batch inference
+
+```python
+import ray
+
+# Load model
+def load_model():
+    # Load once per worker
+    return MyModel()
+
+# Inference function
+class BatchInference:
+    def __init__(self):
+        self.model = load_model()
+
+    def __call__(self, batch):
+        predictions = self.model(batch[&quot;input&quot;])
+        return {&quot;prediction&quot;: predictions}
+
+# Run distributed inference
+ds = ray.data.read_parquet(&quot;s3://data/&quot;)
+predictions = ds.map_batches(BatchInference, batch_size=32, num_gpus=1)
+predictions.write_parquet(&quot;s3://output/&quot;)
+```
+
+### Data preprocessing pipeline
+
+```python
+# Multi-step pipeline
+ds = (
+    ray.data.read_parquet(&quot;s3://raw/&quot;)
+    .map_batches(clean_data)
+    .map_batches(tokenize)
+    .map_batches(augment)
+    .write_parquet(&quot;s3://processed/&quot;)
+)
+```
+
+## Integration with ML frameworks
+
+### PyTorch
+
+```python
+# Convert to PyTorch
+torch_ds = ds.to_torch(label_column=&quot;label&quot;, batch_size=32)
+
+for batch in torch_ds:
+    # batch is dict with tensors
+    inputs, labels = batch[&quot;features&quot;], batch[&quot;label&quot;]
+```
+
+### TensorFlow
+
+```python
+# Convert to TensorFlow
+tf_ds = ds.to_tf(feature_columns=[&quot;image&quot;], label_column=&quot;label&quot;, batch_size=32)
+
+for features, labels in tf_ds:
+    # Train model
+    pass
+```
+
+## Supported data formats
+
+| Format | Read | Write | Use Case |
+|--------|------|-------|----------|
+| Parquet | ✅ | ✅ | ML data (recommended) |
+| CSV | ✅ | ✅ | Tabular data |
+| JSON | ✅ | ✅ | Semi-structured |
+| Images | ✅ | ❌ | Computer vision |
+| NumPy | ✅ | ✅ | Arrays |
+| Pandas | ✅ | ❌ | DataFrames |
+
+## Performance benchmarks
+
+**Scaling** (processing 100GB data):
+- 1 node (16 cores): ~30 minutes
+- 4 nodes (64 cores): ~8 minutes
+- 16 nodes (256 cores): ~2 minutes
+
+**GPU acceleration** (image preprocessing):
+- CPU only: 1,000 images/sec
+- 1 GPU: 5,000 images/sec
+- 4 GPUs: 18,000 images/sec
+
+## Use cases
+
+**Production deployments**:
+- **Pinterest**: Last-mile data processing for model training
+- **ByteDance**: Scaling offline inference with multi-modal LLMs
+- **Spotify**: ML platform for batch inference
+
+## References
+
+- **[Transformations Guide](references/transformations.md)** - Map, filter, groupby operations
+- **[Integration Guide](references/integration.md)** - Ray Train, PyTorch, TensorFlow
+
+## Resources
+
+- **Docs**: https://docs.ray.io/en/latest/data/data.html
+- **GitHub**: https://github.com/ray-project/ray ⭐ 36,000+
+- **Version**: Ray 2.40.0+
+- **Examples**: https://docs.ray.io/en/latest/data/examples/overview.html
+
+
+
+</code>
       </div>
     </div>
 

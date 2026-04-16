@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,378 @@
     <p class="desc">Optimize web performance for faster loading and better user experience. Use when asked to "speed up my site", "optimize performance", "reduce load time", "fix slow loading", "improve page speed", or "performance audit".</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/performance</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/performance</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: performance
+description: Optimize web performance for faster loading and better user experience. Use when asked to &quot;speed up my site&quot;, &quot;optimize performance&quot;, &quot;reduce load time&quot;, &quot;fix slow loading&quot;, &quot;improve page speed&quot;, or &quot;performance audit&quot;.
+license: MIT
+metadata:
+  author: web-quality-skills
+  version: &quot;1.0&quot;
+---
+
+# Performance optimization
+
+Deep performance optimization based on Lighthouse performance audits. Focuses on loading speed, runtime efficiency, and resource optimization.
+
+## How it works
+
+1. Identify performance bottlenecks in code and assets
+2. Prioritize by impact on Core Web Vitals
+3. Provide specific optimizations with code examples
+4. Measure improvement with before/after metrics
+
+## Performance budget
+
+| Resource | Budget | Rationale |
+|----------|--------|-----------|
+| Total page weight | &lt; 1.5 MB | 3G loads in ~4s |
+| JavaScript (compressed) | &lt; 300 KB | Parsing + execution time |
+| CSS (compressed) | &lt; 100 KB | Render blocking |
+| Images (above-fold) | &lt; 500 KB | LCP impact |
+| Fonts | &lt; 100 KB | FOIT/FOUT prevention |
+| Third-party | &lt; 200 KB | Uncontrolled latency |
+
+## Critical rendering path
+
+### Server response
+* **TTFB &lt; 800ms.** Time to First Byte should be fast. Use CDN, caching, and efficient backends.
+* **Enable compression.** Gzip or Brotli for text assets. Brotli preferred (15-20% smaller).
+* **HTTP/2 or HTTP/3.** Multiplexing reduces connection overhead.
+* **Edge caching.** Cache HTML at CDN edge when possible.
+
+### Resource loading
+
+**Preconnect to required origins:**
+```html
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://cdn.example.com&quot; crossorigin&gt;
+```
+
+**Preload critical resources:**
+```html
+&lt;!-- LCP image --&gt;
+&lt;link rel=&quot;preload&quot; href=&quot;/hero.webp&quot; as=&quot;image&quot; fetchpriority=&quot;high&quot;&gt;
+
+&lt;!-- Critical font --&gt;
+&lt;link rel=&quot;preload&quot; href=&quot;/font.woff2&quot; as=&quot;font&quot; type=&quot;font/woff2&quot; crossorigin&gt;
+```
+
+**Defer non-critical CSS:**
+```html
+&lt;!-- Critical CSS inlined --&gt;
+&lt;style&gt;/* Above-fold styles */&lt;/style&gt;
+
+&lt;!-- Non-critical CSS --&gt;
+&lt;link rel=&quot;preload&quot; href=&quot;/styles.css&quot; as=&quot;style&quot; onload=&quot;this.onload=null;this.rel=&#039;stylesheet&#039;&quot;&gt;
+&lt;noscript&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;/styles.css&quot;&gt;&lt;/noscript&gt;
+```
+
+### JavaScript optimization
+
+**Defer non-essential scripts:**
+```html
+&lt;!-- Parser-blocking (avoid) --&gt;
+&lt;script src=&quot;/critical.js&quot;&gt;&lt;/script&gt;
+
+&lt;!-- Deferred (preferred) --&gt;
+&lt;script defer src=&quot;/app.js&quot;&gt;&lt;/script&gt;
+
+&lt;!-- Async (for independent scripts) --&gt;
+&lt;script async src=&quot;/analytics.js&quot;&gt;&lt;/script&gt;
+
+&lt;!-- Module (deferred by default) --&gt;
+&lt;script type=&quot;module&quot; src=&quot;/app.mjs&quot;&gt;&lt;/script&gt;
+```
+
+**Code splitting patterns:**
+```javascript
+// Route-based splitting
+const Dashboard = lazy(() =&gt; import(&#039;./Dashboard&#039;));
+
+// Component-based splitting
+const HeavyChart = lazy(() =&gt; import(&#039;./HeavyChart&#039;));
+
+// Feature-based splitting
+if (user.isPremium) {
+  const PremiumFeatures = await import(&#039;./PremiumFeatures&#039;);
+}
+```
+
+**Tree shaking best practices:**
+```javascript
+// ❌ Imports entire library
+import _ from &#039;lodash&#039;;
+_.debounce(fn, 300);
+
+// ✅ Imports only what&#039;s needed
+import debounce from &#039;lodash/debounce&#039;;
+debounce(fn, 300);
+```
+
+## Image optimization
+
+### Format selection
+| Format | Use case | Browser support |
+|--------|----------|-----------------|
+| AVIF | Photos, best compression | 92%+ |
+| WebP | Photos, good fallback | 97%+ |
+| PNG | Graphics with transparency | Universal |
+| SVG | Icons, logos, illustrations | Universal |
+
+### Responsive images
+```html
+&lt;picture&gt;
+  &lt;!-- AVIF for modern browsers --&gt;
+  &lt;source 
+    type=&quot;image/avif&quot;
+    srcset=&quot;hero-400.avif 400w,
+            hero-800.avif 800w,
+            hero-1200.avif 1200w&quot;
+    sizes=&quot;(max-width: 600px) 100vw, 50vw&quot;&gt;
+  
+  &lt;!-- WebP fallback --&gt;
+  &lt;source 
+    type=&quot;image/webp&quot;
+    srcset=&quot;hero-400.webp 400w,
+            hero-800.webp 800w,
+            hero-1200.webp 1200w&quot;
+    sizes=&quot;(max-width: 600px) 100vw, 50vw&quot;&gt;
+  
+  &lt;!-- JPEG fallback --&gt;
+  &lt;img 
+    src=&quot;hero-800.jpg&quot;
+    srcset=&quot;hero-400.jpg 400w,
+            hero-800.jpg 800w,
+            hero-1200.jpg 1200w&quot;
+    sizes=&quot;(max-width: 600px) 100vw, 50vw&quot;
+    width=&quot;1200&quot; 
+    height=&quot;600&quot;
+    alt=&quot;Hero image&quot;
+    loading=&quot;lazy&quot;
+    decoding=&quot;async&quot;&gt;
+&lt;/picture&gt;
+```
+
+### LCP image priority
+```html
+&lt;!-- Above-fold LCP image: eager loading, high priority --&gt;
+&lt;img 
+  src=&quot;hero.webp&quot; 
+  fetchpriority=&quot;high&quot;
+  loading=&quot;eager&quot;
+  decoding=&quot;sync&quot;
+  alt=&quot;Hero&quot;&gt;
+
+&lt;!-- Below-fold images: lazy loading --&gt;
+&lt;img 
+  src=&quot;product.webp&quot; 
+  loading=&quot;lazy&quot;
+  decoding=&quot;async&quot;
+  alt=&quot;Product&quot;&gt;
+```
+
+## Font optimization
+
+### Loading strategy
+```css
+/* System font stack as fallback */
+body {
+  font-family: &#039;Custom Font&#039;, -apple-system, BlinkMacSystemFont, 
+               &#039;Segoe UI&#039;, Roboto, sans-serif;
+}
+
+/* Prevent invisible text */
+@font-face {
+  font-family: &#039;Custom Font&#039;;
+  src: url(&#039;/fonts/custom.woff2&#039;) format(&#039;woff2&#039;);
+  font-display: swap; /* or optional for non-critical */
+  font-weight: 400;
+  font-style: normal;
+  unicode-range: U+0000-00FF; /* Subset to Latin */
+}
+```
+
+### Preloading critical fonts
+```html
+&lt;link rel=&quot;preload&quot; href=&quot;/fonts/heading.woff2&quot; as=&quot;font&quot; type=&quot;font/woff2&quot; crossorigin&gt;
+```
+
+### Variable fonts
+```css
+/* One file instead of multiple weights */
+@font-face {
+  font-family: &#039;Inter&#039;;
+  src: url(&#039;/fonts/Inter-Variable.woff2&#039;) format(&#039;woff2-variations&#039;);
+  font-weight: 100 900;
+  font-display: swap;
+}
+```
+
+## Caching strategy
+
+### Cache-Control headers
+```
+# HTML (short or no cache)
+Cache-Control: no-cache, must-revalidate
+
+# Static assets with hash (immutable)
+Cache-Control: public, max-age=31536000, immutable
+
+# Static assets without hash
+Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# API responses
+Cache-Control: private, max-age=0, must-revalidate
+```
+
+### Service worker caching
+```javascript
+// Cache-first for static assets
+self.addEventListener(&#039;fetch&#039;, (event) =&gt; {
+  if (event.request.destination === &#039;image&#039; ||
+      event.request.destination === &#039;style&#039; ||
+      event.request.destination === &#039;script&#039;) {
+    event.respondWith(
+      caches.match(event.request).then((cached) =&gt; {
+        return cached || fetch(event.request).then((response) =&gt; {
+          const clone = response.clone();
+          caches.open(&#039;static-v1&#039;).then((cache) =&gt; cache.put(event.request, clone));
+          return response;
+        });
+      })
+    );
+  }
+});
+```
+
+## Runtime performance
+
+### Avoid layout thrashing
+```javascript
+// ❌ Forces multiple reflows
+elements.forEach(el =&gt; {
+  const height = el.offsetHeight; // Read
+  el.style.height = height + 10 + &#039;px&#039;; // Write
+});
+
+// ✅ Batch reads, then batch writes
+const heights = elements.map(el =&gt; el.offsetHeight); // All reads
+elements.forEach((el, i) =&gt; {
+  el.style.height = heights[i] + 10 + &#039;px&#039;; // All writes
+});
+```
+
+### Debounce expensive operations
+```javascript
+function debounce(fn, delay) {
+  let timeout;
+  return (...args) =&gt; {
+    clearTimeout(timeout);
+    timeout = setTimeout(() =&gt; fn(...args), delay);
+  };
+}
+
+// Debounce scroll/resize handlers
+window.addEventListener(&#039;scroll&#039;, debounce(handleScroll, 100));
+```
+
+### Use requestAnimationFrame
+```javascript
+// ❌ May cause jank
+setInterval(animate, 16);
+
+// ✅ Synced with display refresh
+function animate() {
+  // Animation logic
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+```
+
+### Virtualize long lists
+```javascript
+// For lists &gt; 100 items, render only visible items
+// Use libraries like react-window, vue-virtual-scroller, or native CSS:
+.virtual-list {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 50px; /* Estimated item height */
+}
+```
+
+## Third-party scripts
+
+### Load strategies
+```javascript
+// ❌ Blocks main thread
+&lt;script src=&quot;https://analytics.example.com/script.js&quot;&gt;&lt;/script&gt;
+
+// ✅ Async loading
+&lt;script async src=&quot;https://analytics.example.com/script.js&quot;&gt;&lt;/script&gt;
+
+// ✅ Delay until interaction
+&lt;script&gt;
+document.addEventListener(&#039;DOMContentLoaded&#039;, () =&gt; {
+  const observer = new IntersectionObserver((entries) =&gt; {
+    if (entries[0].isIntersecting) {
+      const script = document.createElement(&#039;script&#039;);
+      script.src = &#039;https://widget.example.com/embed.js&#039;;
+      document.body.appendChild(script);
+      observer.disconnect();
+    }
+  });
+  observer.observe(document.querySelector(&#039;#widget-container&#039;));
+});
+&lt;/script&gt;
+```
+
+### Facade pattern
+```html
+&lt;!-- Show static placeholder until interaction --&gt;
+&lt;div class=&quot;youtube-facade&quot; 
+     data-video-id=&quot;abc123&quot; 
+     onclick=&quot;loadYouTube(this)&quot;&gt;
+  &lt;img src=&quot;/thumbnails/abc123.jpg&quot; alt=&quot;Video title&quot;&gt;
+  &lt;button aria-label=&quot;Play video&quot;&gt;▶&lt;/button&gt;
+&lt;/div&gt;
+```
+
+## Measurement
+
+### Key metrics
+| Metric | Target | Tool |
+|--------|--------|------|
+| LCP | &lt; 2.5s | Lighthouse, CrUX |
+| FCP | &lt; 1.8s | Lighthouse |
+| Speed Index | &lt; 3.4s | Lighthouse |
+| TBT | &lt; 200ms | Lighthouse |
+| TTI | &lt; 3.8s | Lighthouse |
+
+### Testing commands
+```bash
+# Lighthouse CLI
+npx lighthouse https://example.com --output html --output-path report.html
+
+# Web Vitals library
+import {onLCP, onINP, onCLS} from &#039;web-vitals&#039;;
+onLCP(console.log);
+onINP(console.log);
+onCLS(console.log);
+```
+
+## References
+
+For Core Web Vitals specific optimizations, see [Core Web Vitals](../core-web-vitals/SKILL.md).
+</code>
       </div>
     </div>
 

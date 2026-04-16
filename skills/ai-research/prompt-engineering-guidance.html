@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,589 @@
     <p class="desc">Control LLM output with regex and grammars, guarantee valid JSON/XML/code generation, enforce structured formats, and build multi-step workflows with Guidance - Microsoft Research's constrained generation framework</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/prompt-engineering-guidance</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/prompt-engineering-guidance</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: guidance
+description: Control LLM output with regex and grammars, guarantee valid JSON/XML/code generation, enforce structured formats, and build multi-step workflows with Guidance - Microsoft Research&#039;s constrained generation framework
+version: 1.0.0
+author: Orchestra Research
+license: MIT
+tags: [Prompt Engineering, Guidance, Constrained Generation, Structured Output, JSON Validation, Grammar, Microsoft Research, Format Enforcement, Multi-Step Workflows]
+dependencies: [guidance, transformers]
+---
+
+# Guidance: Constrained LLM Generation
+
+## When to Use This Skill
+
+Use Guidance when you need to:
+- **Control LLM output syntax** with regex or grammars
+- **Guarantee valid JSON/XML/code** generation
+- **Reduce latency** vs traditional prompting approaches
+- **Enforce structured formats** (dates, emails, IDs, etc.)
+- **Build multi-step workflows** with Pythonic control flow
+- **Prevent invalid outputs** through grammatical constraints
+
+**GitHub Stars**: 18,000+ | **From**: Microsoft Research
+
+## Installation
+
+```bash
+# Base installation
+pip install guidance
+
+# With specific backends
+pip install guidance[transformers]  # Hugging Face models
+pip install guidance[llama_cpp]     # llama.cpp models
+```
+
+## Quick Start
+
+### Basic Example: Structured Generation
+
+```python
+from guidance import models, gen
+
+# Load model (supports OpenAI, Transformers, llama.cpp)
+lm = models.OpenAI(&quot;gpt-4&quot;)
+
+# Generate with constraints
+result = lm + &quot;The capital of France is &quot; + gen(&quot;capital&quot;, max_tokens=5)
+
+print(result[&quot;capital&quot;])  # &quot;Paris&quot;
+```
+
+### With Anthropic Claude
+
+```python
+from guidance import models, gen, system, user, assistant
+
+# Configure Claude
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+
+# Use context managers for chat format
+with system():
+    lm += &quot;You are a helpful assistant.&quot;
+
+with user():
+    lm += &quot;What is the capital of France?&quot;
+
+with assistant():
+    lm += gen(max_tokens=20)
+```
+
+## Core Concepts
+
+### 1. Context Managers
+
+Guidance uses Pythonic context managers for chat-style interactions.
+
+```python
+from guidance import system, user, assistant, gen
+
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+
+# System message
+with system():
+    lm += &quot;You are a JSON generation expert.&quot;
+
+# User message
+with user():
+    lm += &quot;Generate a person object with name and age.&quot;
+
+# Assistant response
+with assistant():
+    lm += gen(&quot;response&quot;, max_tokens=100)
+
+print(lm[&quot;response&quot;])
+```
+
+**Benefits:**
+- Natural chat flow
+- Clear role separation
+- Easy to read and maintain
+
+### 2. Constrained Generation
+
+Guidance ensures outputs match specified patterns using regex or grammars.
+
+#### Regex Constraints
+
+```python
+from guidance import models, gen
+
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+
+# Constrain to valid email format
+lm += &quot;Email: &quot; + gen(&quot;email&quot;, regex=r&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;)
+
+# Constrain to date format (YYYY-MM-DD)
+lm += &quot;Date: &quot; + gen(&quot;date&quot;, regex=r&quot;\d{4}-\d{2}-\d{2}&quot;)
+
+# Constrain to phone number
+lm += &quot;Phone: &quot; + gen(&quot;phone&quot;, regex=r&quot;\d{3}-\d{3}-\d{4}&quot;)
+
+print(lm[&quot;email&quot;])  # Guaranteed valid email
+print(lm[&quot;date&quot;])   # Guaranteed YYYY-MM-DD format
+```
+
+**How it works:**
+- Regex converted to grammar at token level
+- Invalid tokens filtered during generation
+- Model can only produce matching outputs
+
+#### Selection Constraints
+
+```python
+from guidance import models, gen, select
+
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+
+# Constrain to specific choices
+lm += &quot;Sentiment: &quot; + select([&quot;positive&quot;, &quot;negative&quot;, &quot;neutral&quot;], name=&quot;sentiment&quot;)
+
+# Multiple-choice selection
+lm += &quot;Best answer: &quot; + select(
+    [&quot;A) Paris&quot;, &quot;B) London&quot;, &quot;C) Berlin&quot;, &quot;D) Madrid&quot;],
+    name=&quot;answer&quot;
+)
+
+print(lm[&quot;sentiment&quot;])  # One of: positive, negative, neutral
+print(lm[&quot;answer&quot;])     # One of: A, B, C, or D
+```
+
+### 3. Token Healing
+
+Guidance automatically &quot;heals&quot; token boundaries between prompt and generation.
+
+**Problem:** Tokenization creates unnatural boundaries.
+
+```python
+# Without token healing
+prompt = &quot;The capital of France is &quot;
+# Last token: &quot; is &quot;
+# First generated token might be &quot; Par&quot; (with leading space)
+# Result: &quot;The capital of France is  Paris&quot; (double space!)
+```
+
+**Solution:** Guidance backs up one token and regenerates.
+
+```python
+from guidance import models, gen
+
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+
+# Token healing enabled by default
+lm += &quot;The capital of France is &quot; + gen(&quot;capital&quot;, max_tokens=5)
+# Result: &quot;The capital of France is Paris&quot; (correct spacing)
+```
+
+**Benefits:**
+- Natural text boundaries
+- No awkward spacing issues
+- Better model performance (sees natural token sequences)
+
+### 4. Grammar-Based Generation
+
+Define complex structures using context-free grammars.
+
+```python
+from guidance import models, gen
+
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+
+# JSON grammar (simplified)
+json_grammar = &quot;&quot;&quot;
+{
+    &quot;name&quot;: &lt;gen name regex=&quot;[A-Za-z ]+&quot; max_tokens=20&gt;,
+    &quot;age&quot;: &lt;gen age regex=&quot;[0-9]+&quot; max_tokens=3&gt;,
+    &quot;email&quot;: &lt;gen email regex=&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}&quot; max_tokens=50&gt;
+}
+&quot;&quot;&quot;
+
+# Generate valid JSON
+lm += gen(&quot;person&quot;, grammar=json_grammar)
+
+print(lm[&quot;person&quot;])  # Guaranteed valid JSON structure
+```
+
+**Use cases:**
+- Complex structured outputs
+- Nested data structures
+- Programming language syntax
+- Domain-specific languages
+
+### 5. Guidance Functions
+
+Create reusable generation patterns with the `@guidance` decorator.
+
+```python
+from guidance import guidance, gen, models
+
+@guidance
+def generate_person(lm):
+    &quot;&quot;&quot;Generate a person with name and age.&quot;&quot;&quot;
+    lm += &quot;Name: &quot; + gen(&quot;name&quot;, max_tokens=20, stop=&quot;\n&quot;)
+    lm += &quot;\nAge: &quot; + gen(&quot;age&quot;, regex=r&quot;[0-9]+&quot;, max_tokens=3)
+    return lm
+
+# Use the function
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+lm = generate_person(lm)
+
+print(lm[&quot;name&quot;])
+print(lm[&quot;age&quot;])
+```
+
+**Stateful Functions:**
+
+```python
+@guidance(stateless=False)
+def react_agent(lm, question, tools, max_rounds=5):
+    &quot;&quot;&quot;ReAct agent with tool use.&quot;&quot;&quot;
+    lm += f&quot;Question: {question}\n\n&quot;
+
+    for i in range(max_rounds):
+        # Thought
+        lm += f&quot;Thought {i+1}: &quot; + gen(&quot;thought&quot;, stop=&quot;\n&quot;)
+
+        # Action
+        lm += &quot;\nAction: &quot; + select(list(tools.keys()), name=&quot;action&quot;)
+
+        # Execute tool
+        tool_result = tools[lm[&quot;action&quot;]]()
+        lm += f&quot;\nObservation: {tool_result}\n\n&quot;
+
+        # Check if done
+        lm += &quot;Done? &quot; + select([&quot;Yes&quot;, &quot;No&quot;], name=&quot;done&quot;)
+        if lm[&quot;done&quot;] == &quot;Yes&quot;:
+            break
+
+    # Final answer
+    lm += &quot;\nFinal Answer: &quot; + gen(&quot;answer&quot;, max_tokens=100)
+    return lm
+```
+
+## Backend Configuration
+
+### Anthropic Claude
+
+```python
+from guidance import models
+
+lm = models.Anthropic(
+    model=&quot;claude-sonnet-4-5-20250929&quot;,
+    api_key=&quot;your-api-key&quot;  # Or set ANTHROPIC_API_KEY env var
+)
+```
+
+### OpenAI
+
+```python
+lm = models.OpenAI(
+    model=&quot;gpt-4o-mini&quot;,
+    api_key=&quot;your-api-key&quot;  # Or set OPENAI_API_KEY env var
+)
+```
+
+### Local Models (Transformers)
+
+```python
+from guidance.models import Transformers
+
+lm = Transformers(
+    &quot;microsoft/Phi-4-mini-instruct&quot;,
+    device=&quot;cuda&quot;  # Or &quot;cpu&quot;
+)
+```
+
+### Local Models (llama.cpp)
+
+```python
+from guidance.models import LlamaCpp
+
+lm = LlamaCpp(
+    model_path=&quot;/path/to/model.gguf&quot;,
+    n_ctx=4096,
+    n_gpu_layers=35
+)
+```
+
+## Common Patterns
+
+### Pattern 1: JSON Generation
+
+```python
+from guidance import models, gen, system, user, assistant
+
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+
+with system():
+    lm += &quot;You generate valid JSON.&quot;
+
+with user():
+    lm += &quot;Generate a user profile with name, age, and email.&quot;
+
+with assistant():
+    lm += &quot;&quot;&quot;{
+    &quot;name&quot;: &quot;&quot;&quot; + gen(&quot;name&quot;, regex=r&#039;&quot;[A-Za-z ]+&quot;&#039;, max_tokens=30) + &quot;&quot;&quot;,
+    &quot;age&quot;: &quot;&quot;&quot; + gen(&quot;age&quot;, regex=r&quot;[0-9]+&quot;, max_tokens=3) + &quot;&quot;&quot;,
+    &quot;email&quot;: &quot;&quot;&quot; + gen(&quot;email&quot;, regex=r&#039;&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;&#039;, max_tokens=50) + &quot;&quot;&quot;
+}&quot;&quot;&quot;
+
+print(lm)  # Valid JSON guaranteed
+```
+
+### Pattern 2: Classification
+
+```python
+from guidance import models, gen, select
+
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+
+text = &quot;This product is amazing! I love it.&quot;
+
+lm += f&quot;Text: {text}\n&quot;
+lm += &quot;Sentiment: &quot; + select([&quot;positive&quot;, &quot;negative&quot;, &quot;neutral&quot;], name=&quot;sentiment&quot;)
+lm += &quot;\nConfidence: &quot; + gen(&quot;confidence&quot;, regex=r&quot;[0-9]+&quot;, max_tokens=3) + &quot;%&quot;
+
+print(f&quot;Sentiment: {lm[&#039;sentiment&#039;]}&quot;)
+print(f&quot;Confidence: {lm[&#039;confidence&#039;]}%&quot;)
+```
+
+### Pattern 3: Multi-Step Reasoning
+
+```python
+from guidance import models, gen, guidance
+
+@guidance
+def chain_of_thought(lm, question):
+    &quot;&quot;&quot;Generate answer with step-by-step reasoning.&quot;&quot;&quot;
+    lm += f&quot;Question: {question}\n\n&quot;
+
+    # Generate multiple reasoning steps
+    for i in range(3):
+        lm += f&quot;Step {i+1}: &quot; + gen(f&quot;step_{i+1}&quot;, stop=&quot;\n&quot;, max_tokens=100) + &quot;\n&quot;
+
+    # Final answer
+    lm += &quot;\nTherefore, the answer is: &quot; + gen(&quot;answer&quot;, max_tokens=50)
+
+    return lm
+
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+lm = chain_of_thought(lm, &quot;What is 15% of 200?&quot;)
+
+print(lm[&quot;answer&quot;])
+```
+
+### Pattern 4: ReAct Agent
+
+```python
+from guidance import models, gen, select, guidance
+
+@guidance(stateless=False)
+def react_agent(lm, question):
+    &quot;&quot;&quot;ReAct agent with tool use.&quot;&quot;&quot;
+    tools = {
+        &quot;calculator&quot;: lambda expr: eval(expr),
+        &quot;search&quot;: lambda query: f&quot;Search results for: {query}&quot;,
+    }
+
+    lm += f&quot;Question: {question}\n\n&quot;
+
+    for round in range(5):
+        # Thought
+        lm += f&quot;Thought: &quot; + gen(&quot;thought&quot;, stop=&quot;\n&quot;) + &quot;\n&quot;
+
+        # Action selection
+        lm += &quot;Action: &quot; + select([&quot;calculator&quot;, &quot;search&quot;, &quot;answer&quot;], name=&quot;action&quot;)
+
+        if lm[&quot;action&quot;] == &quot;answer&quot;:
+            lm += &quot;\nFinal Answer: &quot; + gen(&quot;answer&quot;, max_tokens=100)
+            break
+
+        # Action input
+        lm += &quot;\nAction Input: &quot; + gen(&quot;action_input&quot;, stop=&quot;\n&quot;) + &quot;\n&quot;
+
+        # Execute tool
+        if lm[&quot;action&quot;] in tools:
+            result = tools[lm[&quot;action&quot;]](lm[&quot;action_input&quot;])
+            lm += f&quot;Observation: {result}\n\n&quot;
+
+    return lm
+
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+lm = react_agent(lm, &quot;What is 25 * 4 + 10?&quot;)
+print(lm[&quot;answer&quot;])
+```
+
+### Pattern 5: Data Extraction
+
+```python
+from guidance import models, gen, guidance
+
+@guidance
+def extract_entities(lm, text):
+    &quot;&quot;&quot;Extract structured entities from text.&quot;&quot;&quot;
+    lm += f&quot;Text: {text}\n\n&quot;
+
+    # Extract person
+    lm += &quot;Person: &quot; + gen(&quot;person&quot;, stop=&quot;\n&quot;, max_tokens=30) + &quot;\n&quot;
+
+    # Extract organization
+    lm += &quot;Organization: &quot; + gen(&quot;organization&quot;, stop=&quot;\n&quot;, max_tokens=30) + &quot;\n&quot;
+
+    # Extract date
+    lm += &quot;Date: &quot; + gen(&quot;date&quot;, regex=r&quot;\d{4}-\d{2}-\d{2}&quot;, max_tokens=10) + &quot;\n&quot;
+
+    # Extract location
+    lm += &quot;Location: &quot; + gen(&quot;location&quot;, stop=&quot;\n&quot;, max_tokens=30) + &quot;\n&quot;
+
+    return lm
+
+text = &quot;Tim Cook announced at Apple Park on 2024-09-15 in Cupertino.&quot;
+
+lm = models.Anthropic(&quot;claude-sonnet-4-5-20250929&quot;)
+lm = extract_entities(lm, text)
+
+print(f&quot;Person: {lm[&#039;person&#039;]}&quot;)
+print(f&quot;Organization: {lm[&#039;organization&#039;]}&quot;)
+print(f&quot;Date: {lm[&#039;date&#039;]}&quot;)
+print(f&quot;Location: {lm[&#039;location&#039;]}&quot;)
+```
+
+## Best Practices
+
+### 1. Use Regex for Format Validation
+
+```python
+# ✅ Good: Regex ensures valid format
+lm += &quot;Email: &quot; + gen(&quot;email&quot;, regex=r&quot;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&quot;)
+
+# ❌ Bad: Free generation may produce invalid emails
+lm += &quot;Email: &quot; + gen(&quot;email&quot;, max_tokens=50)
+```
+
+### 2. Use select() for Fixed Categories
+
+```python
+# ✅ Good: Guaranteed valid category
+lm += &quot;Status: &quot; + select([&quot;pending&quot;, &quot;approved&quot;, &quot;rejected&quot;], name=&quot;status&quot;)
+
+# ❌ Bad: May generate typos or invalid values
+lm += &quot;Status: &quot; + gen(&quot;status&quot;, max_tokens=20)
+```
+
+### 3. Leverage Token Healing
+
+```python
+# Token healing is enabled by default
+# No special action needed - just concatenate naturally
+lm += &quot;The capital is &quot; + gen(&quot;capital&quot;)  # Automatic healing
+```
+
+### 4. Use stop Sequences
+
+```python
+# ✅ Good: Stop at newline for single-line outputs
+lm += &quot;Name: &quot; + gen(&quot;name&quot;, stop=&quot;\n&quot;)
+
+# ❌ Bad: May generate multiple lines
+lm += &quot;Name: &quot; + gen(&quot;name&quot;, max_tokens=50)
+```
+
+### 5. Create Reusable Functions
+
+```python
+# ✅ Good: Reusable pattern
+@guidance
+def generate_person(lm):
+    lm += &quot;Name: &quot; + gen(&quot;name&quot;, stop=&quot;\n&quot;)
+    lm += &quot;\nAge: &quot; + gen(&quot;age&quot;, regex=r&quot;[0-9]+&quot;)
+    return lm
+
+# Use multiple times
+lm = generate_person(lm)
+lm += &quot;\n\n&quot;
+lm = generate_person(lm)
+```
+
+### 6. Balance Constraints
+
+```python
+# ✅ Good: Reasonable constraints
+lm += gen(&quot;name&quot;, regex=r&quot;[A-Za-z ]+&quot;, max_tokens=30)
+
+# ❌ Too strict: May fail or be very slow
+lm += gen(&quot;name&quot;, regex=r&quot;^(John|Jane)$&quot;, max_tokens=10)
+```
+
+## Comparison to Alternatives
+
+| Feature | Guidance | Instructor | Outlines | LMQL |
+|---------|----------|------------|----------|------|
+| Regex Constraints | ✅ Yes | ❌ No | ✅ Yes | ✅ Yes |
+| Grammar Support | ✅ CFG | ❌ No | ✅ CFG | ✅ CFG |
+| Pydantic Validation | ❌ No | ✅ Yes | ✅ Yes | ❌ No |
+| Token Healing | ✅ Yes | ❌ No | ✅ Yes | ❌ No |
+| Local Models | ✅ Yes | ⚠️ Limited | ✅ Yes | ✅ Yes |
+| API Models | ✅ Yes | ✅ Yes | ⚠️ Limited | ✅ Yes |
+| Pythonic Syntax | ✅ Yes | ✅ Yes | ✅ Yes | ❌ SQL-like |
+| Learning Curve | Low | Low | Medium | High |
+
+**When to choose Guidance:**
+- Need regex/grammar constraints
+- Want token healing
+- Building complex workflows with control flow
+- Using local models (Transformers, llama.cpp)
+- Prefer Pythonic syntax
+
+**When to choose alternatives:**
+- Instructor: Need Pydantic validation with automatic retrying
+- Outlines: Need JSON schema validation
+- LMQL: Prefer declarative query syntax
+
+## Performance Characteristics
+
+**Latency Reduction:**
+- 30-50% faster than traditional prompting for constrained outputs
+- Token healing reduces unnecessary regeneration
+- Grammar constraints prevent invalid token generation
+
+**Memory Usage:**
+- Minimal overhead vs unconstrained generation
+- Grammar compilation cached after first use
+- Efficient token filtering at inference time
+
+**Token Efficiency:**
+- Prevents wasted tokens on invalid outputs
+- No need for retry loops
+- Direct path to valid outputs
+
+## Resources
+
+- **Documentation**: https://guidance.readthedocs.io
+- **GitHub**: https://github.com/guidance-ai/guidance (18k+ stars)
+- **Notebooks**: https://github.com/guidance-ai/guidance/tree/main/notebooks
+- **Discord**: Community support available
+
+## See Also
+
+- `references/constraints.md` - Comprehensive regex and grammar patterns
+- `references/backends.md` - Backend-specific configuration
+- `references/examples.md` - Production-ready examples
+
+
+</code>
       </div>
     </div>
 

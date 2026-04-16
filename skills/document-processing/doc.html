@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,98 @@
     <p class="desc">"Use when the task involves reading, creating, or editing `.docx` documents, especially when formatting or layout fidelity matters; prefer `python-docx` plus the bundled `scripts/render_docx.py` for visual checks."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/doc</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/doc</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: &quot;doc&quot;
+description: &quot;Use when the task involves reading, creating, or editing `.docx` documents, especially when formatting or layout fidelity matters; prefer `python-docx` plus the bundled `scripts/render_docx.py` for visual checks.&quot;
+author: openai
+---
+
+
+# DOCX Skill
+
+## When to use
+- Read or review DOCX content where layout matters (tables, diagrams, pagination).
+- Create or edit DOCX files with professional formatting.
+- Validate visual layout before delivery.
+
+## Workflow
+1. Prefer visual review (layout, tables, diagrams).
+   - If `soffice` and `pdftoppm` are available, convert DOCX -&gt; PDF -&gt; PNGs.
+   - Or use `scripts/render_docx.py` (requires `pdf2image` and Poppler).
+   - If these tools are missing, install them or ask the user to review rendered pages locally.
+2. Use `python-docx` for edits and structured creation (headings, styles, tables, lists).
+3. After each meaningful change, re-render and inspect the pages.
+4. If visual review is not possible, extract text with `python-docx` as a fallback and call out layout risk.
+5. Keep intermediate outputs organized and clean up after final approval.
+
+## Temp and output conventions
+- Use `tmp/docs/` for intermediate files; delete when done.
+- Write final artifacts under `output/doc/` when working in this repo.
+- Keep filenames stable and descriptive.
+
+## Dependencies (install if missing)
+Prefer `uv` for dependency management.
+
+Python packages:
+```
+uv pip install python-docx pdf2image
+```
+If `uv` is unavailable:
+```
+python3 -m pip install python-docx pdf2image
+```
+System tools (for rendering):
+```
+# macOS (Homebrew)
+brew install libreoffice poppler
+
+# Ubuntu/Debian
+sudo apt-get install -y libreoffice poppler-utils
+```
+
+If installation isn&#039;t possible in this environment, tell the user which dependency is missing and how to install it locally.
+
+## Environment
+No required environment variables.
+
+## Rendering commands
+DOCX -&gt; PDF:
+```
+soffice -env:UserInstallation=file:///tmp/lo_profile_$$ --headless --convert-to pdf --outdir $OUTDIR $INPUT_DOCX
+```
+
+PDF -&gt; PNGs:
+```
+pdftoppm -png $OUTDIR/$BASENAME.pdf $OUTDIR/$BASENAME
+```
+
+Bundled helper:
+```
+python3 scripts/render_docx.py /path/to/file.docx --output_dir /tmp/docx_pages
+```
+
+## Quality expectations
+- Deliver a client-ready document: consistent typography, spacing, margins, and clear hierarchy.
+- Avoid formatting defects: clipped/overlapping text, broken tables, unreadable characters, or default-template styling.
+- Charts, tables, and visuals must be legible in rendered pages with correct alignment.
+- Use ASCII hyphens only. Avoid U+2011 (non-breaking hyphen) and other Unicode dashes.
+- Citations and references must be human-readable; never leave tool tokens or placeholder strings.
+
+## Final checks
+- Re-render and inspect every page at 100% zoom before final delivery.
+- Fix any spacing, alignment, or pagination issues and repeat the render loop.
+- Confirm there are no leftovers (temp files, duplicate renders) unless the user asks to keep them.
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,289 @@
     <p class="desc">"Query Reactome REST API for pathway analysis, enrichment, gene-pathway mapping, disease pathways, molecular interactions, expression analysis, for systems biology studies."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/reactome-database</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/reactome-database</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: reactome-database
+description: &quot;Query Reactome REST API for pathway analysis, enrichment, gene-pathway mapping, disease pathways, molecular interactions, expression analysis, for systems biology studies.&quot;
+---
+
+# Reactome Database
+
+## Overview
+
+Reactome is a free, open-source, curated pathway database with 2,825+ human pathways. Query biological pathways, perform overrepresentation and expression analysis, map genes to pathways, explore molecular interactions via REST API and Python client for systems biology research.
+
+## When to Use This Skill
+
+This skill should be used when:
+- Performing pathway enrichment analysis on gene or protein lists
+- Analyzing gene expression data to identify relevant biological pathways
+- Querying specific pathway information, reactions, or molecular interactions
+- Mapping genes or proteins to biological pathways and processes
+- Exploring disease-related pathways and mechanisms
+- Visualizing analysis results in the Reactome Pathway Browser
+- Conducting comparative pathway analysis across species
+
+## Core Capabilities
+
+Reactome provides two main API services and a Python client library:
+
+### 1. Content Service - Data Retrieval
+
+Query and retrieve biological pathway data, molecular interactions, and entity information.
+
+**Common operations:**
+- Retrieve pathway information and hierarchies
+- Query specific entities (proteins, reactions, complexes)
+- Get participating molecules in pathways
+- Access database version and metadata
+- Explore pathway compartments and locations
+
+**API Base URL:** `https://reactome.org/ContentService`
+
+### 2. Analysis Service - Pathway Analysis
+
+Perform computational analysis on gene lists and expression data.
+
+**Analysis types:**
+- **Overrepresentation Analysis**: Identify statistically significant pathways from gene/protein lists
+- **Expression Data Analysis**: Analyze gene expression datasets to find relevant pathways
+- **Species Comparison**: Compare pathway data across different organisms
+
+**API Base URL:** `https://reactome.org/AnalysisService`
+
+### 3. reactome2py Python Package
+
+Python client library that wraps Reactome API calls for easier programmatic access.
+
+**Installation:**
+```bash
+uv pip install reactome2py
+```
+
+**Note:** The reactome2py package (version 3.0.0, released January 2021) is functional but not actively maintained. For the most up-to-date functionality, consider using direct REST API calls.
+
+## Querying Pathway Data
+
+### Using Content Service REST API
+
+The Content Service uses REST protocol and returns data in JSON or plain text formats.
+
+**Get database version:**
+```python
+import requests
+
+response = requests.get(&quot;https://reactome.org/ContentService/data/database/version&quot;)
+version = response.text
+print(f&quot;Reactome version: {version}&quot;)
+```
+
+**Query a specific entity:**
+```python
+import requests
+
+entity_id = &quot;R-HSA-69278&quot;  # Example pathway ID
+response = requests.get(f&quot;https://reactome.org/ContentService/data/query/{entity_id}&quot;)
+data = response.json()
+```
+
+**Get participating molecules in a pathway:**
+```python
+import requests
+
+event_id = &quot;R-HSA-69278&quot;
+response = requests.get(
+    f&quot;https://reactome.org/ContentService/data/event/{event_id}/participatingPhysicalEntities&quot;
+)
+molecules = response.json()
+```
+
+### Using reactome2py Package
+
+```python
+import reactome2py
+from reactome2py import content
+
+# Query pathway information
+pathway_info = content.query_by_id(&quot;R-HSA-69278&quot;)
+
+# Get database version
+version = content.get_database_version()
+```
+
+**For detailed API endpoints and parameters**, refer to `references/api_reference.md` in this skill.
+
+## Performing Pathway Analysis
+
+### Overrepresentation Analysis
+
+Submit a list of gene/protein identifiers to find enriched pathways.
+
+**Using REST API:**
+```python
+import requests
+
+# Prepare identifier list
+identifiers = [&quot;TP53&quot;, &quot;BRCA1&quot;, &quot;EGFR&quot;, &quot;MYC&quot;]
+data = &quot;\n&quot;.join(identifiers)
+
+# Submit analysis
+response = requests.post(
+    &quot;https://reactome.org/AnalysisService/identifiers/&quot;,
+    headers={&quot;Content-Type&quot;: &quot;text/plain&quot;},
+    data=data
+)
+
+result = response.json()
+token = result[&quot;summary&quot;][&quot;token&quot;]  # Save token to retrieve results later
+
+# Access pathways
+for pathway in result[&quot;pathways&quot;]:
+    print(f&quot;{pathway[&#039;stId&#039;]}: {pathway[&#039;name&#039;]} (p-value: {pathway[&#039;entities&#039;][&#039;pValue&#039;]})&quot;)
+```
+
+**Retrieve analysis by token:**
+```python
+# Token is valid for 7 days
+response = requests.get(f&quot;https://reactome.org/AnalysisService/token/{token}&quot;)
+results = response.json()
+```
+
+### Expression Data Analysis
+
+Analyze gene expression datasets with quantitative values.
+
+**Input format (TSV with header starting with #):**
+```
+#Gene	Sample1	Sample2	Sample3
+TP53	2.5	3.1	2.8
+BRCA1	1.2	1.5	1.3
+EGFR	4.5	4.2	4.8
+```
+
+**Submit expression data:**
+```python
+import requests
+
+# Read TSV file
+with open(&quot;expression_data.tsv&quot;, &quot;r&quot;) as f:
+    data = f.read()
+
+response = requests.post(
+    &quot;https://reactome.org/AnalysisService/identifiers/&quot;,
+    headers={&quot;Content-Type&quot;: &quot;text/plain&quot;},
+    data=data
+)
+
+result = response.json()
+```
+
+### Species Projection
+
+Map identifiers to human pathways exclusively using the `/projection/` endpoint:
+
+```python
+response = requests.post(
+    &quot;https://reactome.org/AnalysisService/identifiers/projection/&quot;,
+    headers={&quot;Content-Type&quot;: &quot;text/plain&quot;},
+    data=data
+)
+```
+
+## Visualizing Results
+
+Analysis results can be visualized in the Reactome Pathway Browser by constructing URLs with the analysis token:
+
+```python
+token = result[&quot;summary&quot;][&quot;token&quot;]
+pathway_id = &quot;R-HSA-69278&quot;
+url = f&quot;https://reactome.org/PathwayBrowser/#{pathway_id}&amp;DTAB=AN&amp;ANALYSIS={token}&quot;
+print(f&quot;View results: {url}&quot;)
+```
+
+## Working with Analysis Tokens
+
+- Analysis tokens are valid for **7 days**
+- Tokens allow retrieval of previously computed results without re-submission
+- Store tokens to access results across sessions
+- Use `GET /token/{TOKEN}` endpoint to retrieve results
+
+## Data Formats and Identifiers
+
+### Supported Identifier Types
+
+Reactome accepts various identifier formats:
+- UniProt accessions (e.g., P04637)
+- Gene symbols (e.g., TP53)
+- Ensembl IDs (e.g., ENSG00000141510)
+- EntrezGene IDs (e.g., 7157)
+- ChEBI IDs for small molecules
+
+The system automatically detects identifier types.
+
+### Input Format Requirements
+
+**For overrepresentation analysis:**
+- Plain text list of identifiers (one per line)
+- OR single column in TSV format
+
+**For expression analysis:**
+- TSV format with mandatory header row starting with &quot;#&quot;
+- Column 1: identifiers
+- Columns 2+: numeric expression values
+- Use period (.) as decimal separator
+
+### Output Format
+
+All API responses return JSON containing:
+- `pathways`: Array of enriched pathways with statistical metrics
+- `summary`: Analysis metadata and token
+- `entities`: Matched and unmapped identifiers
+- Statistical values: pValue, FDR (false discovery rate)
+
+## Helper Scripts
+
+This skill includes `scripts/reactome_query.py`, a helper script for common Reactome operations:
+
+```bash
+# Query pathway information
+python scripts/reactome_query.py query R-HSA-69278
+
+# Perform overrepresentation analysis
+python scripts/reactome_query.py analyze gene_list.txt
+
+# Get database version
+python scripts/reactome_query.py version
+```
+
+## Additional Resources
+
+- **API Documentation**: https://reactome.org/dev
+- **User Guide**: https://reactome.org/userguide
+- **Documentation Portal**: https://reactome.org/documentation
+- **Data Downloads**: https://reactome.org/download-data
+- **reactome2py Docs**: https://reactome.github.io/reactome2py/
+
+For comprehensive API endpoint documentation, see `references/api_reference.md` in this skill.
+
+## Current Database Statistics (Version 94, September 2025)
+
+- 2,825 human pathways
+- 16,002 reactions
+- 11,630 proteins
+- 2,176 small molecules
+- 1,070 drugs
+- 41,373 literature references
+</code>
       </div>
     </div>
 

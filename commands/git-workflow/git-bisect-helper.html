@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,276 @@
     <p class="desc">Use PROACTIVELY to guide automated git bisect sessions for finding regression commits with smart test execution</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/git-bisect-helper</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/git-bisect-helper</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Bash(git bisect:*), Bash(git log:*), Bash(git show:*), Bash(git checkout:*), Bash(npm:*), Bash(yarn:*), Bash(pnpm:*), Read, Edit, Grep
+argument-hint: [good-commit] [bad-commit] | --auto [test-command] | --reset | --continue
+description: Use PROACTIVELY to guide automated git bisect sessions for finding regression commits with smart test execution
+---
+
+# Git Bisect Helper &amp; Automation
+
+Automated git bisect session to find regression commits: $ARGUMENTS
+
+## Current Repository State
+
+- Current branch: !`git branch --show-current`
+- Recent commits: !`git log --oneline -10`
+- Git status: !`git status --porcelain`
+- Bisect status: !`git bisect log 2&gt;/dev/null || echo &quot;No active bisect session&quot;`
+- Available tags: !`git tag --sort=-version:refname | head -10`
+
+## Task
+
+Set up and manage an intelligent git bisect session to identify the exact commit that introduced a regression or bug.
+
+## Bisect Session Management
+
+### 1. Session Initialization
+- Analyze commit history to suggest good/bad commit candidates
+- Set up bisect session with appropriate range
+- Validate that the range actually contains the regression
+- Create backup branch before starting bisect
+
+### 2. Automatic Test Execution
+- Run specified test command at each bisect point
+- Interpret test results (exit codes, output patterns)
+- Automatically mark commits as good/bad based on test outcomes
+- Handle test environment setup/teardown
+
+### 3. Manual Verification Support
+- Provide clear instructions for manual testing at each step
+- Show relevant changes in current commit
+- Guide user through good/bad decision process
+- Maintain bisect log with detailed reasoning
+
+### 4. Smart Commit Analysis
+- Analyze commit messages for relevant keywords
+- Show file changes that might be related to the issue
+- Highlight suspicious patterns or large changes
+- Skip obviously unrelated commits when possible
+
+## Bisect Modes
+
+### Automatic Bisect (`--auto [test-command]`)
+```bash
+# Automatically bisect using test command
+/git-bisect-helper --auto &quot;npm test&quot;
+/git-bisect-helper --auto &quot;python -m pytest tests/test_regression.py&quot;
+/git-bisect-helper --auto &quot;./scripts/check-performance.sh&quot;
+```
+
+**Process:**
+1. Run test command at each bisect point
+2. Mark commit as good (exit code 0) or bad (non-zero)
+3. Continue until regression commit is found
+4. Provide detailed report of findings
+
+### Manual Guided Bisect
+```bash
+# Interactive bisect with guidance
+/git-bisect-helper v1.2.0 HEAD
+/git-bisect-helper abc123 def456
+```
+
+**Process:**
+1. Show current commit details and changes
+2. Provide testing suggestions
+3. Wait for user input (good/bad)
+4. Continue to next bisect point
+5. Offer insights about current commit
+
+### Continue Existing Session (`--continue`)
+```bash
+# Resume interrupted bisect session
+/git-bisect-helper --continue
+```
+
+**Process:**
+1. Analyze current bisect state
+2. Show progress and remaining steps
+3. Continue with appropriate mode
+4. Provide context from previous steps
+
+### Reset Session (`--reset`)
+```bash
+# Clean up and reset bisect session
+/git-bisect-helper --reset
+```
+
+**Process:**
+1. End current bisect session
+2. Return to original branch
+3. Clean up temporary files
+4. Provide session summary
+
+## Intelligent Test Execution
+
+### Test Environment Detection
+- **Node.js**: Detect package.json and run appropriate package manager
+- **Python**: Identify requirements.txt, setup.py, pyproject.toml
+- **Ruby**: Look for Gemfile and use bundler
+- **Java**: Detect Maven (pom.xml) or Gradle (build.gradle)
+- **Go**: Identify go.mod and use go test
+- **Rust**: Detect Cargo.toml and use cargo test
+
+### Build System Integration
+- Run build process before testing if needed
+- Handle dependency installation for older commits
+- Manage environment variable requirements
+- Skip build for commits that don&#039;t compile (mark as bad)
+
+### Test Result Interpretation
+- Parse test output for meaningful error patterns
+- Distinguish between test failures and environment issues
+- Handle flaky tests with retry logic
+- Provide confidence levels for automated decisions
+
+## Commit Analysis Features
+
+### Change Impact Assessment
+```bash
+# Analyze current bisect commit
+Files changed: !`git show --name-only --pretty=&quot;&quot; HEAD`
+Commit message: !`git log -1 --pretty=format:&quot;%s&quot;`
+Author and date: !`git log -1 --pretty=format:&quot;%an (%ar)&quot;`
+```
+
+### Regression Pattern Detection
+- Identify commits touching critical areas
+- Flag commits with suspicious change patterns
+- Highlight performance-related modifications
+- Detect dependency or configuration changes
+
+### Context Preservation
+- Maintain detailed log of bisect decisions
+- Record reasoning for each good/bad marking
+- Save test outputs for later analysis
+- Document environmental factors
+
+## Advanced Bisect Strategies
+
+### Skip Strategy for Build Issues
+- Automatically skip commits that don&#039;t compile
+- Handle dependency version conflicts
+- Skip commits with known build system issues
+- Focus bisect on functional commits only
+
+### Performance Regression Detection
+- Use performance benchmarks instead of pass/fail tests
+- Set acceptable performance thresholds
+- Track performance trends across commits
+- Identify performance cliff points
+
+### Multi-criteria Bisecting
+- Test multiple aspects simultaneously
+- Handle cases where good/bad isn&#039;t binary
+- Support complex regression scenarios
+- Provide weighted decision making
+
+## Bisect Session Reporting
+
+### Progress Tracking
+```
+Bisect Progress:
+🎯 Target: Find regression in user authentication
+📊 Commits remaining: ~4 (out of 127)
+⏱️  Estimated time: 8 minutes
+🔍 Current commit: abc123 - &quot;refactor auth middleware&quot;
+```
+
+### Final Report
+```
+🎉 Regression Found!
+
+Bad Commit: def456
+Author: John Doe
+Date: 2024-01-15 14:30:00
+Message: &quot;optimize database queries&quot;
+
+Files Changed:
+- src/auth/database.js
+- src/middleware/auth.js
+- tests/auth.test.js
+
+Bisect Log: 15 steps, 3 manual verifications
+Total Time: 12 minutes
+
+Recovery Commands:
+git revert def456                    # Revert the problematic commit
+git cherry-pick def456^..def456~1    # Cherry-pick the good parts
+```
+
+## Integration with Development Workflow
+
+### CI/CD Integration
+- Use same test commands as CI pipeline
+- Respect CI environment variables
+- Handle containerized test environments
+- Integrate with existing quality gates
+
+### Team Collaboration
+- Share bisect sessions with team members
+- Document findings in issue tracking
+- Create reproducible bisect scripts
+- Establish team bisect best practices
+
+### Debugging Enhancement
+- Generate debug reports for problematic commits
+- Create minimal reproduction cases
+- Suggest fix approaches based on regression type
+- Link to relevant documentation or similar issues
+
+## Safety and Recovery
+
+### Session Backup
+- Create backup branch before starting
+- Save original HEAD position
+- Maintain recovery information
+- Handle interrupted sessions gracefully
+
+### Error Handling
+- Recover from corrupted bisect state
+- Handle repository state conflicts
+- Manage disk space issues during long bisects
+- Provide clear error messages and solutions
+
+## Example Workflows
+
+### Performance Regression
+```bash
+# Find when tests became slower
+/git-bisect-helper --auto &quot;timeout 30s npm test&quot;
+```
+
+### Feature Regression  
+```bash
+# Find when feature X broke
+/git-bisect-helper --auto &quot;./test-feature-x.sh&quot;
+```
+
+### Build Regression
+```bash
+# Find when build started failing
+/git-bisect-helper --auto &quot;npm run build&quot;
+```
+
+### Manual Investigation
+```bash
+# Interactive bisect for complex issues
+/git-bisect-helper v2.1.0 HEAD
+```
+
+The bisect helper provides intelligent automation while maintaining full control over the debugging process, making regression hunting efficient and systematic.</code>
       </div>
     </div>
 

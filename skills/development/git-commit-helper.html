@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,226 @@
     <p class="desc">Generate descriptive commit messages by analyzing git diffs. Use when the user asks for help writing commit messages or reviewing staged changes.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/git-commit-helper</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/git-commit-helper</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: Git Commit Helper
+description: Generate descriptive commit messages by analyzing git diffs. Use when the user asks for help writing commit messages or reviewing staged changes.
+hooks:
+  PostToolUse:
+    - matcher: &quot;Bash&quot;
+      hooks:
+        - type: command
+          command: &quot;echo \&quot;[$(date)] Git Commit Helper: Analyzed git diff for commit message\&quot; &gt;&gt; ~/.claude/git-commit-helper.log&quot;
+---
+
+# Git Commit Helper
+
+## Quick start
+
+Analyze staged changes and generate commit message:
+
+```bash
+# View staged changes
+git diff --staged
+
+# Generate commit message based on changes
+# (Claude will analyze the diff and suggest a message)
+```
+
+## Commit message format
+
+Follow conventional commits format:
+
+```
+&lt;type&gt;(&lt;scope&gt;): &lt;description&gt;
+
+[optional body]
+
+[optional footer]
+```
+
+### Types
+
+- **feat**: New feature
+- **fix**: Bug fix
+- **docs**: Documentation changes
+- **style**: Code style changes (formatting, missing semicolons)
+- **refactor**: Code refactoring
+- **test**: Adding or updating tests
+- **chore**: Maintenance tasks
+
+### Examples
+
+**Feature commit:**
+```
+feat(auth): add JWT authentication
+
+Implement JWT-based authentication system with:
+- Login endpoint with token generation
+- Token validation middleware
+- Refresh token support
+```
+
+**Bug fix:**
+```
+fix(api): handle null values in user profile
+
+Prevent crashes when user profile fields are null.
+Add null checks before accessing nested properties.
+```
+
+**Refactor:**
+```
+refactor(database): simplify query builder
+
+Extract common query patterns into reusable functions.
+Reduce code duplication in database layer.
+```
+
+## Analyzing changes
+
+Review what&#039;s being committed:
+
+```bash
+# Show files changed
+git status
+
+# Show detailed changes
+git diff --staged
+
+# Show statistics
+git diff --staged --stat
+
+# Show changes for specific file
+git diff --staged path/to/file
+```
+
+## Commit message guidelines
+
+**DO:**
+- Use imperative mood (&quot;add feature&quot; not &quot;added feature&quot;)
+- Keep first line under 50 characters
+- Capitalize first letter
+- No period at end of summary
+- Explain WHY not just WHAT in body
+
+**DON&#039;T:**
+- Use vague messages like &quot;update&quot; or &quot;fix stuff&quot;
+- Include technical implementation details in summary
+- Write paragraphs in summary line
+- Use past tense
+
+## Multi-file commits
+
+When committing multiple related changes:
+
+```
+refactor(core): restructure authentication module
+
+- Move auth logic from controllers to service layer
+- Extract validation into separate validators
+- Update tests to use new structure
+- Add integration tests for auth flow
+
+Breaking change: Auth service now requires config object
+```
+
+## Scope examples
+
+**Frontend:**
+- `feat(ui): add loading spinner to dashboard`
+- `fix(form): validate email format`
+
+**Backend:**
+- `feat(api): add user profile endpoint`
+- `fix(db): resolve connection pool leak`
+
+**Infrastructure:**
+- `chore(ci): update Node version to 20`
+- `feat(docker): add multi-stage build`
+
+## Breaking changes
+
+Indicate breaking changes clearly:
+
+```
+feat(api)!: restructure API response format
+
+BREAKING CHANGE: All API responses now follow JSON:API spec
+
+Previous format:
+{ &quot;data&quot;: {...}, &quot;status&quot;: &quot;ok&quot; }
+
+New format:
+{ &quot;data&quot;: {...}, &quot;meta&quot;: {...} }
+
+Migration guide: Update client code to handle new response structure
+```
+
+## Template workflow
+
+1. **Review changes**: `git diff --staged`
+2. **Identify type**: Is it feat, fix, refactor, etc.?
+3. **Determine scope**: What part of the codebase?
+4. **Write summary**: Brief, imperative description
+5. **Add body**: Explain why and what impact
+6. **Note breaking changes**: If applicable
+
+## Interactive commit helper
+
+Use `git add -p` for selective staging:
+
+```bash
+# Stage changes interactively
+git add -p
+
+# Review what&#039;s staged
+git diff --staged
+
+# Commit with message
+git commit -m &quot;type(scope): description&quot;
+```
+
+## Amending commits
+
+Fix the last commit message:
+
+```bash
+# Amend commit message only
+git commit --amend
+
+# Amend and add more changes
+git add forgotten-file.js
+git commit --amend --no-edit
+```
+
+## Best practices
+
+1. **Atomic commits** - One logical change per commit
+2. **Test before commit** - Ensure code works
+3. **Reference issues** - Include issue numbers if applicable
+4. **Keep it focused** - Don&#039;t mix unrelated changes
+5. **Write for humans** - Future you will read this
+
+## Commit message checklist
+
+- [ ] Type is appropriate (feat/fix/docs/etc.)
+- [ ] Scope is specific and clear
+- [ ] Summary is under 50 characters
+- [ ] Summary uses imperative mood
+- [ ] Body explains WHY not just WHAT
+- [ ] Breaking changes are clearly marked
+- [ ] Related issue numbers are included
+</code>
       </div>
     </div>
 

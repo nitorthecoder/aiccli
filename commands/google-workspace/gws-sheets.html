@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,120 @@
     <p class="desc">Google Sheets: Read and write spreadsheets.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/gws-sheets</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/gws-sheets</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Bash, Read, Write, Edit
+argument-hint: [resource] [method] [flags]
+description: Google Sheets: Read and write spreadsheets.
+---
+
+# Google Workspace Sheets
+
+Execute Google Workspace Sheets operations: $ARGUMENTS
+
+## Prerequisites
+
+- Google Workspace CLI (`gws`) must be installed
+- Authentication configured: Run `gws auth status` to verify
+- Review `gws sheets --help` for all available commands
+
+## Available Resources and Methods
+
+# sheets (v4)
+
+&gt; **PREREQUISITE:** Read `../gws-shared/SKILL.md` for auth, global flags, and security rules. If missing, run `gws generate-skills` to create it.
+
+```bash
+gws sheets &lt;resource&gt; &lt;method&gt; [flags]
+```
+
+## Helper Commands
+
+| Command | Description |
+|---------|-------------|
+| [`+append`](../gws-sheets-append/SKILL.md) | Append a row to a spreadsheet |
+| [`+read`](../gws-sheets-read/SKILL.md) | Read values from a spreadsheet |
+
+## API Resources
+
+### spreadsheets
+
+  - `batchUpdate` — Applies one or more updates to the spreadsheet. Each request is validated before being applied. If any request is not valid then the entire request will fail and nothing will be applied. Some requests have replies to give you some information about how they are applied. The replies will mirror the requests. For example, if you applied 4 updates and the 3rd one had a reply, then the response will have 2 empty replies, the actual reply, and another empty reply, in that order.
+  - `create` — Creates a spreadsheet, returning the newly created spreadsheet.
+  - `get` — Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. By default, data within grids is not returned. You can include grid data in one of 2 ways: * Specify a [field mask](https://developers.google.com/workspace/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData URL parameter to true.
+  - `getByDataFilter` — Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. For more information, see [Read, write, and search metadata](https://developers.google.com/workspace/sheets/api/guides/metadata). This method differs from GetSpreadsheet in that it allows selecting which subsets of spreadsheet data to return by specifying a dataFilters parameter. Multiple DataFilters can be specified.
+  - `developerMetadata` — Operations on the &#039;developerMetadata&#039; resource
+  - `sheets` — Operations on the &#039;sheets&#039; resource
+  - `values` — Operations on the &#039;values&#039; resource
+
+## Discovering Commands
+
+Before calling any API method, inspect it:
+
+```bash
+# Browse resources and methods
+gws sheets --help
+
+# Inspect a method&#039;s required params, types, and defaults
+gws schema sheets.&lt;resource&gt;.&lt;method&gt;
+```
+
+Use `gws schema` output to build your `--params` and `--json` flags.
+
+## Usage
+
+```bash
+# List available resources and methods
+gws sheets --help
+
+# Inspect method schema before calling
+gws schema sheets.&lt;resource&gt;.&lt;method&gt;
+
+# Execute command with arguments
+gws sheets $ARGUMENTS
+```
+
+## Task
+
+Execute the requested Sheets operation: $ARGUMENTS
+
+1. **Verify Prerequisites**
+   - Check `gws` is installed: `gws --version`
+   - Verify authentication: `gws auth status`
+   - Review available commands: `gws sheets --help`
+
+2. **Inspect Method Schema**
+   - Before calling any method, inspect its parameters
+   - Use `gws schema` to understand required fields
+   - Review parameter types and constraints
+
+3. **Execute Operation**
+   - Build command with appropriate flags
+   - Use `--params` for query/path parameters
+   - Use `--json` for request body
+   - Handle pagination with `--max-results` or `--page-token`
+
+4. **Error Handling**
+   - Check command output for errors
+   - Review API quotas and rate limits
+   - Handle authentication issues
+   - Retry transient failures
+
+---
+
+**License**: Apache License 2.0
+**Source**: [Google Workspace CLI](https://github.com/googleworkspace/cli)
+**Original Skill**: `gws-sheets`
+</code>
       </div>
     </div>
 

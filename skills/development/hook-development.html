@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,729 @@
     <p class="desc">This skill should be used when the user asks to "create a hook", "add a PreToolUse/PostToolUse/Stop hook", "validate tool use", "implement prompt-based hooks", "use ${CLAUDE_PLUGIN_ROOT}", "set up event-driven automation", "block dangerous commands", or mentions hook events (PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification). Provides comprehensive guidance for creating and implementing Claude Code plugin hooks with focus on advanced prompt-based hooks API.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/hook-development</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/hook-development</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: Hook Development
+description: This skill should be used when the user asks to &quot;create a hook&quot;, &quot;add a PreToolUse/PostToolUse/Stop hook&quot;, &quot;validate tool use&quot;, &quot;implement prompt-based hooks&quot;, &quot;use ${CLAUDE_PLUGIN_ROOT}&quot;, &quot;set up event-driven automation&quot;, &quot;block dangerous commands&quot;, or mentions hook events (PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification). Provides comprehensive guidance for creating and implementing Claude Code plugin hooks with focus on advanced prompt-based hooks API.
+version: 0.1.0
+---
+
+# Hook Development for Claude Code Plugins
+
+## Overview
+
+Hooks are event-driven automation scripts that execute in response to Claude Code events. Use hooks to validate operations, enforce policies, add context, and integrate external tools into workflows.
+
+**Key capabilities:**
+- Validate tool calls before execution (PreToolUse)
+- React to tool results (PostToolUse)
+- Enforce completion standards (Stop, SubagentStop)
+- Load project context (SessionStart)
+- Automate workflows across the development lifecycle
+
+## Hook Types
+
+### Prompt-Based Hooks (Recommended)
+
+Use LLM-driven decision making for context-aware validation:
+
+```json
+{
+  &quot;type&quot;: &quot;prompt&quot;,
+  &quot;prompt&quot;: &quot;Evaluate if this tool use is appropriate: $TOOL_INPUT&quot;,
+  &quot;timeout&quot;: 30
+}
+```
+
+**Supported events:** Stop, SubagentStop, UserPromptSubmit, PreToolUse
+
+**Benefits:**
+- Context-aware decisions based on natural language reasoning
+- Flexible evaluation logic without bash scripting
+- Better edge case handling
+- Easier to maintain and extend
+
+### Command Hooks
+
+Execute bash commands for deterministic checks:
+
+```json
+{
+  &quot;type&quot;: &quot;command&quot;,
+  &quot;command&quot;: &quot;bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh&quot;,
+  &quot;timeout&quot;: 60
+}
+```
+
+**Use for:**
+- Fast deterministic validations
+- File system operations
+- External tool integrations
+- Performance-critical checks
+
+## Hook Configuration Formats
+
+### Plugin hooks.json Format
+
+**For plugin hooks** in `hooks/hooks.json`, use wrapper format:
+
+```json
+{
+  &quot;description&quot;: &quot;Brief explanation of hooks (optional)&quot;,
+  &quot;hooks&quot;: {
+    &quot;PreToolUse&quot;: [...],
+    &quot;Stop&quot;: [...],
+    &quot;SessionStart&quot;: [...]
+  }
+}
+```
+
+**Key points:**
+- `description` field is optional
+- `hooks` field is required wrapper containing actual hook events
+- This is the **plugin-specific format**
+
+**Example:**
+```json
+{
+  &quot;description&quot;: &quot;Validation hooks for code quality&quot;,
+  &quot;hooks&quot;: {
+    &quot;PreToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Write&quot;,
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;${CLAUDE_PLUGIN_ROOT}/hooks/validate.sh&quot;
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Settings Format (Direct)
+
+**For user settings** in `.claude/settings.json`, use direct format:
+
+```json
+{
+  &quot;PreToolUse&quot;: [...],
+  &quot;Stop&quot;: [...],
+  &quot;SessionStart&quot;: [...]
+}
+```
+
+**Key points:**
+- No wrapper - events directly at top level
+- No description field
+- This is the **settings format**
+
+**Important:** The examples below show the hook event structure that goes inside either format. For plugin hooks.json, wrap these in `{&quot;hooks&quot;: {...}}`.
+
+## Hook Events
+
+### PreToolUse
+
+Execute before any tool runs. Use to approve, deny, or modify tool calls.
+
+**Example (prompt-based):**
+```json
+{
+  &quot;PreToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;Write|Edit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Validate file write safety. Check: system paths, credentials, path traversal, sensitive content. Return &#039;approve&#039; or &#039;deny&#039;.&quot;
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Output for PreToolUse:**
+```json
+{
+  &quot;hookSpecificOutput&quot;: {
+    &quot;permissionDecision&quot;: &quot;allow|deny|ask&quot;,
+    &quot;updatedInput&quot;: {&quot;field&quot;: &quot;modified_value&quot;}
+  },
+  &quot;systemMessage&quot;: &quot;Explanation for Claude&quot;
+}
+```
+
+### PostToolUse
+
+Execute after tool completes. Use to react to results, provide feedback, or log.
+
+**Example:**
+```json
+{
+  &quot;PostToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;Edit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Analyze edit result for potential issues: syntax errors, security vulnerabilities, breaking changes. Provide feedback.&quot;
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Output behavior:**
+- Exit 0: stdout shown in transcript
+- Exit 2: stderr fed back to Claude
+- systemMessage included in context
+
+### Stop
+
+Execute when main agent considers stopping. Use to validate completeness.
+
+**Example:**
+```json
+{
+  &quot;Stop&quot;: [
+    {
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Verify task completion: tests run, build succeeded, questions answered. Return &#039;approve&#039; to stop or &#039;block&#039; with reason to continue.&quot;
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Decision output:**
+```json
+{
+  &quot;decision&quot;: &quot;approve|block&quot;,
+  &quot;reason&quot;: &quot;Explanation&quot;,
+  &quot;systemMessage&quot;: &quot;Additional context&quot;
+}
+```
+
+### SubagentStop
+
+Execute when subagent considers stopping. Use to ensure subagent completed its task.
+
+Similar to Stop hook, but for subagents.
+
+### UserPromptSubmit
+
+Execute when user submits a prompt. Use to add context, validate, or block prompts.
+
+**Example:**
+```json
+{
+  &quot;UserPromptSubmit&quot;: [
+    {
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Check if prompt requires security guidance. If discussing auth, permissions, or API security, return relevant warnings.&quot;
+        }
+      ]
+    }
+  ]
+}
+```
+
+### SessionStart
+
+Execute when Claude Code session begins. Use to load context and set environment.
+
+**Example:**
+```json
+{
+  &quot;SessionStart&quot;: [
+    {
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;bash ${CLAUDE_PLUGIN_ROOT}/scripts/load-context.sh&quot;
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Special capability:** Persist environment variables using `$CLAUDE_ENV_FILE`:
+```bash
+echo &quot;export PROJECT_TYPE=nodejs&quot; &gt;&gt; &quot;$CLAUDE_ENV_FILE&quot;
+```
+
+See `examples/load-context.sh` for complete example.
+
+### SessionEnd
+
+Execute when session ends. Use for cleanup, logging, and state preservation.
+
+### PreCompact
+
+Execute before context compaction. Use to add critical information to preserve.
+
+### Notification
+
+Execute when Claude sends notifications. Use to react to user notifications.
+
+## Hook Output Format
+
+### Standard Output (All Hooks)
+
+```json
+{
+  &quot;continue&quot;: true,
+  &quot;suppressOutput&quot;: false,
+  &quot;systemMessage&quot;: &quot;Message for Claude&quot;
+}
+```
+
+- `continue`: If false, halt processing (default true)
+- `suppressOutput`: Hide output from transcript (default false)
+- `systemMessage`: Message shown to Claude
+
+### Exit Codes
+
+- `0` - Success (stdout shown in transcript)
+- `2` - Blocking error (stderr fed back to Claude)
+- Other - Non-blocking error
+
+## Hook Input Format
+
+All hooks receive JSON via stdin with common fields:
+
+```json
+{
+  &quot;session_id&quot;: &quot;abc123&quot;,
+  &quot;transcript_path&quot;: &quot;/path/to/transcript.txt&quot;,
+  &quot;cwd&quot;: &quot;/current/working/dir&quot;,
+  &quot;permission_mode&quot;: &quot;ask|allow&quot;,
+  &quot;hook_event_name&quot;: &quot;PreToolUse&quot;
+}
+```
+
+**Event-specific fields:**
+
+- **PreToolUse/PostToolUse:** `tool_name`, `tool_input`, `tool_result`
+- **UserPromptSubmit:** `user_prompt`
+- **Stop/SubagentStop:** `reason`
+
+Access fields in prompts using `$TOOL_INPUT`, `$TOOL_RESULT`, `$USER_PROMPT`, etc.
+
+## Environment Variables
+
+Available in all command hooks:
+
+- `$CLAUDE_PROJECT_DIR` - Project root path
+- `$CLAUDE_PLUGIN_ROOT` - Plugin directory (use for portable paths)
+- `$CLAUDE_ENV_FILE` - SessionStart only: persist env vars here
+- `$CLAUDE_CODE_REMOTE` - Set if running in remote context
+
+**Always use ${CLAUDE_PLUGIN_ROOT} in hook commands for portability:**
+
+```json
+{
+  &quot;type&quot;: &quot;command&quot;,
+  &quot;command&quot;: &quot;bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh&quot;
+}
+```
+
+## Plugin Hook Configuration
+
+In plugins, define hooks in `hooks/hooks.json`:
+
+```json
+{
+  &quot;PreToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;Write|Edit&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Validate file write safety&quot;
+        }
+      ]
+    }
+  ],
+  &quot;Stop&quot;: [
+    {
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;prompt&quot;,
+          &quot;prompt&quot;: &quot;Verify task completion&quot;
+        }
+      ]
+    }
+  ],
+  &quot;SessionStart&quot;: [
+    {
+      &quot;matcher&quot;: &quot;*&quot;,
+      &quot;hooks&quot;: [
+        {
+          &quot;type&quot;: &quot;command&quot;,
+          &quot;command&quot;: &quot;bash ${CLAUDE_PLUGIN_ROOT}/scripts/load-context.sh&quot;,
+          &quot;timeout&quot;: 10
+        }
+      ]
+    }
+  ]
+}
+```
+
+Plugin hooks merge with user&#039;s hooks and run in parallel.
+
+## Matchers
+
+### Tool Name Matching
+
+**Exact match:**
+```json
+&quot;matcher&quot;: &quot;Write&quot;
+```
+
+**Multiple tools:**
+```json
+&quot;matcher&quot;: &quot;Read|Write|Edit&quot;
+```
+
+**Wildcard (all tools):**
+```json
+&quot;matcher&quot;: &quot;*&quot;
+```
+
+**Regex patterns:**
+```json
+&quot;matcher&quot;: &quot;mcp__.*__delete.*&quot;  // All MCP delete tools
+```
+
+**Note:** Matchers are case-sensitive.
+
+### Common Patterns
+
+```json
+// All MCP tools
+&quot;matcher&quot;: &quot;mcp__.*&quot;
+
+// Specific plugin&#039;s MCP tools
+&quot;matcher&quot;: &quot;mcp__plugin_asana_.*&quot;
+
+// All file operations
+&quot;matcher&quot;: &quot;Read|Write|Edit&quot;
+
+// Bash commands only
+&quot;matcher&quot;: &quot;Bash&quot;
+```
+
+## Security Best Practices
+
+### Input Validation
+
+Always validate inputs in command hooks:
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+input=$(cat)
+tool_name=$(echo &quot;$input&quot; | jq -r &#039;.tool_name&#039;)
+
+# Validate tool name format
+if [[ ! &quot;$tool_name&quot; =~ ^[a-zA-Z0-9_]+$ ]]; then
+  echo &#039;{&quot;decision&quot;: &quot;deny&quot;, &quot;reason&quot;: &quot;Invalid tool name&quot;}&#039; &gt;&amp;2
+  exit 2
+fi
+```
+
+### Path Safety
+
+Check for path traversal and sensitive files:
+
+```bash
+file_path=$(echo &quot;$input&quot; | jq -r &#039;.tool_input.file_path&#039;)
+
+# Deny path traversal
+if [[ &quot;$file_path&quot; == *&quot;..&quot;* ]]; then
+  echo &#039;{&quot;decision&quot;: &quot;deny&quot;, &quot;reason&quot;: &quot;Path traversal detected&quot;}&#039; &gt;&amp;2
+  exit 2
+fi
+
+# Deny sensitive files
+if [[ &quot;$file_path&quot; == *&quot;.env&quot;* ]]; then
+  echo &#039;{&quot;decision&quot;: &quot;deny&quot;, &quot;reason&quot;: &quot;Sensitive file&quot;}&#039; &gt;&amp;2
+  exit 2
+fi
+```
+
+See `examples/validate-write.sh` and `examples/validate-bash.sh` for complete examples.
+
+### Quote All Variables
+
+```bash
+# GOOD: Quoted
+echo &quot;$file_path&quot;
+cd &quot;$CLAUDE_PROJECT_DIR&quot;
+
+# BAD: Unquoted (injection risk)
+echo $file_path
+cd $CLAUDE_PROJECT_DIR
+```
+
+### Set Appropriate Timeouts
+
+```json
+{
+  &quot;type&quot;: &quot;command&quot;,
+  &quot;command&quot;: &quot;bash script.sh&quot;,
+  &quot;timeout&quot;: 10
+}
+```
+
+**Defaults:** Command hooks (60s), Prompt hooks (30s)
+
+## Performance Considerations
+
+### Parallel Execution
+
+All matching hooks run **in parallel**:
+
+```json
+{
+  &quot;PreToolUse&quot;: [
+    {
+      &quot;matcher&quot;: &quot;Write&quot;,
+      &quot;hooks&quot;: [
+        {&quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;check1.sh&quot;},  // Parallel
+        {&quot;type&quot;: &quot;command&quot;, &quot;command&quot;: &quot;check2.sh&quot;},  // Parallel
+        {&quot;type&quot;: &quot;prompt&quot;, &quot;prompt&quot;: &quot;Validate...&quot;}   // Parallel
+      ]
+    }
+  ]
+}
+```
+
+**Design implications:**
+- Hooks don&#039;t see each other&#039;s output
+- Non-deterministic ordering
+- Design for independence
+
+### Optimization
+
+1. Use command hooks for quick deterministic checks
+2. Use prompt hooks for complex reasoning
+3. Cache validation results in temp files
+4. Minimize I/O in hot paths
+
+## Temporarily Active Hooks
+
+Create hooks that activate conditionally by checking for a flag file or configuration:
+
+**Pattern: Flag file activation**
+```bash
+#!/bin/bash
+# Only active when flag file exists
+FLAG_FILE=&quot;$CLAUDE_PROJECT_DIR/.enable-strict-validation&quot;
+
+if [ ! -f &quot;$FLAG_FILE&quot; ]; then
+  # Flag not present, skip validation
+  exit 0
+fi
+
+# Flag present, run validation
+input=$(cat)
+# ... validation logic ...
+```
+
+**Pattern: Configuration-based activation**
+```bash
+#!/bin/bash
+# Check configuration for activation
+CONFIG_FILE=&quot;$CLAUDE_PROJECT_DIR/.claude/plugin-config.json&quot;
+
+if [ -f &quot;$CONFIG_FILE&quot; ]; then
+  enabled=$(jq -r &#039;.strictMode // false&#039; &quot;$CONFIG_FILE&quot;)
+  if [ &quot;$enabled&quot; != &quot;true&quot; ]; then
+    exit 0  # Not enabled, skip
+  fi
+fi
+
+# Enabled, run hook logic
+input=$(cat)
+# ... hook logic ...
+```
+
+**Use cases:**
+- Enable strict validation only when needed
+- Temporary debugging hooks
+- Project-specific hook behavior
+- Feature flags for hooks
+
+**Best practice:** Document activation mechanism in plugin README so users know how to enable/disable temporary hooks.
+
+## Hook Lifecycle and Limitations
+
+### Hooks Load at Session Start
+
+**Important:** Hooks are loaded when Claude Code session starts. Changes to hook configuration require restarting Claude Code.
+
+**Cannot hot-swap hooks:**
+- Editing `hooks/hooks.json` won&#039;t affect current session
+- Adding new hook scripts won&#039;t be recognized
+- Changing hook commands/prompts won&#039;t update
+- Must restart Claude Code: exit and run `claude` again
+
+**To test hook changes:**
+1. Edit hook configuration or scripts
+2. Exit Claude Code session
+3. Restart: `claude` or `cc`
+4. New hook configuration loads
+5. Test hooks with `claude --debug`
+
+### Hook Validation at Startup
+
+Hooks are validated when Claude Code starts:
+- Invalid JSON in hooks.json causes loading failure
+- Missing scripts cause warnings
+- Syntax errors reported in debug mode
+
+Use `/hooks` command to review loaded hooks in current session.
+
+## Debugging Hooks
+
+### Enable Debug Mode
+
+```bash
+claude --debug
+```
+
+Look for hook registration, execution logs, input/output JSON, and timing information.
+
+### Test Hook Scripts
+
+Test command hooks directly:
+
+```bash
+echo &#039;{&quot;tool_name&quot;: &quot;Write&quot;, &quot;tool_input&quot;: {&quot;file_path&quot;: &quot;/test&quot;}}&#039; | \
+  bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate.sh
+
+echo &quot;Exit code: $?&quot;
+```
+
+### Validate JSON Output
+
+Ensure hooks output valid JSON:
+
+```bash
+output=$(./your-hook.sh &lt; test-input.json)
+echo &quot;$output&quot; | jq .
+```
+
+## Quick Reference
+
+### Hook Events Summary
+
+| Event | When | Use For |
+|-------|------|---------|
+| PreToolUse | Before tool | Validation, modification |
+| PostToolUse | After tool | Feedback, logging |
+| UserPromptSubmit | User input | Context, validation |
+| Stop | Agent stopping | Completeness check |
+| SubagentStop | Subagent done | Task validation |
+| SessionStart | Session begins | Context loading |
+| SessionEnd | Session ends | Cleanup, logging |
+| PreCompact | Before compact | Preserve context |
+| Notification | User notified | Logging, reactions |
+
+### Best Practices
+
+**DO:**
+- ✅ Use prompt-based hooks for complex logic
+- ✅ Use ${CLAUDE_PLUGIN_ROOT} for portability
+- ✅ Validate all inputs in command hooks
+- ✅ Quote all bash variables
+- ✅ Set appropriate timeouts
+- ✅ Return structured JSON output
+- ✅ Test hooks thoroughly
+
+**DON&#039;T:**
+- ❌ Use hardcoded paths
+- ❌ Trust user input without validation
+- ❌ Create long-running hooks
+- ❌ Rely on hook execution order
+- ❌ Modify global state unpredictably
+- ❌ Log sensitive information
+
+## Additional Resources
+
+### Reference Files
+
+For detailed patterns and advanced techniques, consult:
+
+- **`references/patterns.md`** - Common hook patterns (8+ proven patterns)
+- **`references/migration.md`** - Migrating from basic to advanced hooks
+- **`references/advanced.md`** - Advanced use cases and techniques
+
+### Example Hook Scripts
+
+Working examples in `examples/`:
+
+- **`validate-write.sh`** - File write validation example
+- **`validate-bash.sh`** - Bash command validation example
+- **`load-context.sh`** - SessionStart context loading example
+
+### Utility Scripts
+
+Development tools in `scripts/`:
+
+- **`validate-hook-schema.sh`** - Validate hooks.json structure and syntax
+- **`test-hook.sh`** - Test hooks with sample input before deployment
+- **`hook-linter.sh`** - Check hook scripts for common issues and best practices
+
+### External Resources
+
+- **Official Docs**: https://docs.claude.com/en/docs/claude-code/hooks
+- **Examples**: See security-guidance plugin in marketplace
+- **Testing**: Use `claude --debug` for detailed logs
+- **Validation**: Use `jq` to validate hook JSON output
+
+## Implementation Workflow
+
+To implement hooks in a plugin:
+
+1. Identify events to hook into (PreToolUse, Stop, SessionStart, etc.)
+2. Decide between prompt-based (flexible) or command (deterministic) hooks
+3. Write hook configuration in `hooks/hooks.json`
+4. For command hooks, create hook scripts
+5. Use ${CLAUDE_PLUGIN_ROOT} for all file references
+6. Validate configuration with `scripts/validate-hook-schema.sh hooks/hooks.json`
+7. Test hooks with `scripts/test-hook.sh` before deployment
+8. Test in Claude Code with `claude --debug`
+9. Document hooks in plugin README
+
+Focus on prompt-based hooks for most use cases. Reserve command hooks for performance-critical or deterministic checks.
+</code>
       </div>
     </div>
 

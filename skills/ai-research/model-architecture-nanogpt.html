@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,307 @@
     <p class="desc">Educational GPT implementation in ~300 lines. Reproduces GPT-2 (124M) on OpenWebText. Clean, hackable code for learning transformers. By Andrej Karpathy. Perfect for understanding GPT architecture from scratch. Train on Shakespeare (CPU) or OpenWebText (multi-GPU).</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/model-architecture-nanogpt</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/model-architecture-nanogpt</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: nanogpt
+description: Educational GPT implementation in ~300 lines. Reproduces GPT-2 (124M) on OpenWebText. Clean, hackable code for learning transformers. By Andrej Karpathy. Perfect for understanding GPT architecture from scratch. Train on Shakespeare (CPU) or OpenWebText (multi-GPU).
+version: 1.0.0
+author: Orchestra Research
+license: MIT
+tags: [Model Architecture, NanoGPT, GPT-2, Educational, Andrej Karpathy, Transformer, Minimalist, From Scratch, Training]
+dependencies: [torch, transformers, datasets, tiktoken, wandb]
+---
+
+# nanoGPT - Minimalist GPT Training
+
+## Quick start
+
+nanoGPT is a simplified GPT implementation designed for learning and experimentation.
+
+**Installation**:
+```bash
+pip install torch numpy transformers datasets tiktoken wandb tqdm
+```
+
+**Train on Shakespeare** (CPU-friendly):
+```bash
+# Prepare data
+python data/shakespeare_char/prepare.py
+
+# Train (5 minutes on CPU)
+python train.py config/train_shakespeare_char.py
+
+# Generate text
+python sample.py --out_dir=out-shakespeare-char
+```
+
+**Output**:
+```
+ROMEO:
+What say&#039;st thou? Shall I speak, and be a man?
+
+JULIET:
+I am afeard, and yet I&#039;ll speak; for thou art
+One that hath been a man, and yet I know not
+What thou art.
+```
+
+## Common workflows
+
+### Workflow 1: Character-level Shakespeare
+
+**Complete training pipeline**:
+```bash
+# Step 1: Prepare data (creates train.bin, val.bin)
+python data/shakespeare_char/prepare.py
+
+# Step 2: Train small model
+python train.py config/train_shakespeare_char.py
+
+# Step 3: Generate text
+python sample.py --out_dir=out-shakespeare-char
+```
+
+**Config** (`config/train_shakespeare_char.py`):
+```python
+# Model config
+n_layer = 6          # 6 transformer layers
+n_head = 6           # 6 attention heads
+n_embd = 384         # 384-dim embeddings
+block_size = 256     # 256 char context
+
+# Training config
+batch_size = 64
+learning_rate = 1e-3
+max_iters = 5000
+eval_interval = 500
+
+# Hardware
+device = &#039;cpu&#039;  # Or &#039;cuda&#039;
+compile = False # Set True for PyTorch 2.0
+```
+
+**Training time**: ~5 minutes (CPU), ~1 minute (GPU)
+
+### Workflow 2: Reproduce GPT-2 (124M)
+
+**Multi-GPU training on OpenWebText**:
+```bash
+# Step 1: Prepare OpenWebText (takes ~1 hour)
+python data/openwebtext/prepare.py
+
+# Step 2: Train GPT-2 124M with DDP (8 GPUs)
+torchrun --standalone --nproc_per_node=8 \
+  train.py config/train_gpt2.py
+
+# Step 3: Sample from trained model
+python sample.py --out_dir=out
+```
+
+**Config** (`config/train_gpt2.py`):
+```python
+# GPT-2 (124M) architecture
+n_layer = 12
+n_head = 12
+n_embd = 768
+block_size = 1024
+dropout = 0.0
+
+# Training
+batch_size = 12
+gradient_accumulation_steps = 5 * 8  # Total batch ~0.5M tokens
+learning_rate = 6e-4
+max_iters = 600000
+lr_decay_iters = 600000
+
+# System
+compile = True  # PyTorch 2.0
+```
+
+**Training time**: ~4 days (8× A100)
+
+### Workflow 3: Fine-tune pretrained GPT-2
+
+**Start from OpenAI checkpoint**:
+```python
+# In train.py or config
+init_from = &#039;gpt2&#039;  # Options: gpt2, gpt2-medium, gpt2-large, gpt2-xl
+
+# Model loads OpenAI weights automatically
+python train.py config/finetune_shakespeare.py
+```
+
+**Example config** (`config/finetune_shakespeare.py`):
+```python
+# Start from GPT-2
+init_from = &#039;gpt2&#039;
+
+# Dataset
+dataset = &#039;shakespeare_char&#039;
+batch_size = 1
+block_size = 1024
+
+# Fine-tuning
+learning_rate = 3e-5  # Lower LR for fine-tuning
+max_iters = 2000
+warmup_iters = 100
+
+# Regularization
+weight_decay = 1e-1
+```
+
+### Workflow 4: Custom dataset
+
+**Train on your own text**:
+```python
+# data/custom/prepare.py
+import numpy as np
+
+# Load your data
+with open(&#039;my_data.txt&#039;, &#039;r&#039;) as f:
+    text = f.read()
+
+# Create character mappings
+chars = sorted(list(set(text)))
+stoi = {ch: i for i, ch in enumerate(chars)}
+itos = {i: ch for i, ch in enumerate(chars)}
+
+# Tokenize
+data = np.array([stoi[ch] for ch in text], dtype=np.uint16)
+
+# Split train/val
+n = len(data)
+train_data = data[:int(n*0.9)]
+val_data = data[int(n*0.9):]
+
+# Save
+train_data.tofile(&#039;data/custom/train.bin&#039;)
+val_data.tofile(&#039;data/custom/val.bin&#039;)
+```
+
+**Train**:
+```bash
+python data/custom/prepare.py
+python train.py --dataset=custom
+```
+
+## When to use vs alternatives
+
+**Use nanoGPT when**:
+- Learning how GPT works
+- Experimenting with transformer variants
+- Teaching/education purposes
+- Quick prototyping
+- Limited compute (can run on CPU)
+
+**Simplicity advantages**:
+- **~300 lines**: Entire model in `model.py`
+- **~300 lines**: Training loop in `train.py`
+- **Hackable**: Easy to modify
+- **No abstractions**: Pure PyTorch
+
+**Use alternatives instead**:
+- **HuggingFace Transformers**: Production use, many models
+- **Megatron-LM**: Large-scale distributed training
+- **LitGPT**: More architectures, production-ready
+- **PyTorch Lightning**: Need high-level framework
+
+## Common issues
+
+**Issue: CUDA out of memory**
+
+Reduce batch size or context length:
+```python
+batch_size = 1  # Reduce from 12
+block_size = 512  # Reduce from 1024
+gradient_accumulation_steps = 40  # Increase to maintain effective batch
+```
+
+**Issue: Training too slow**
+
+Enable compilation (PyTorch 2.0+):
+```python
+compile = True  # 2× speedup
+```
+
+Use mixed precision:
+```python
+dtype = &#039;bfloat16&#039;  # Or &#039;float16&#039;
+```
+
+**Issue: Poor generation quality**
+
+Train longer:
+```python
+max_iters = 10000  # Increase from 5000
+```
+
+Lower temperature:
+```python
+# In sample.py
+temperature = 0.7  # Lower from 1.0
+top_k = 200       # Add top-k sampling
+```
+
+**Issue: Can&#039;t load GPT-2 weights**
+
+Install transformers:
+```bash
+pip install transformers
+```
+
+Check model name:
+```python
+init_from = &#039;gpt2&#039;  # Valid: gpt2, gpt2-medium, gpt2-large, gpt2-xl
+```
+
+## Advanced topics
+
+**Model architecture**: See [references/architecture.md](references/architecture.md) for GPT block structure, multi-head attention, and MLP layers explained simply.
+
+**Training loop**: See [references/training.md](references/training.md) for learning rate schedule, gradient accumulation, and distributed data parallel setup.
+
+**Data preparation**: See [references/data.md](references/data.md) for tokenization strategies (character-level vs BPE) and binary format details.
+
+## Hardware requirements
+
+- **Shakespeare (char-level)**:
+  - CPU: 5 minutes
+  - GPU (T4): 1 minute
+  - VRAM: &lt;1GB
+
+- **GPT-2 (124M)**:
+  - 1× A100: ~1 week
+  - 8× A100: ~4 days
+  - VRAM: ~16GB per GPU
+
+- **GPT-2 Medium (350M)**:
+  - 8× A100: ~2 weeks
+  - VRAM: ~40GB per GPU
+
+**Performance**:
+- With `compile=True`: 2× speedup
+- With `dtype=bfloat16`: 50% memory reduction
+
+## Resources
+
+- GitHub: https://github.com/karpathy/nanoGPT ⭐ 48,000+
+- Video: &quot;Let&#039;s build GPT&quot; by Andrej Karpathy
+- Paper: &quot;Attention is All You Need&quot; (Vaswani et al.)
+- OpenWebText: https://huggingface.co/datasets/Skylion007/openwebtext
+- Educational: Best for understanding transformers from scratch
+
+
+</code>
       </div>
     </div>
 

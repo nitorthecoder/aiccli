@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,181 @@
     <p class="desc">"X API & Twitter scraper skill for AI coding agents. Builds integrations with the Xquik REST API, MCP server & webhooks: tweet search, user lookup, follower extraction, engagement metrics, giveaway contest draws, trending topics, account monitoring, reply/retweet/quote extraction, community & Space data, mutual follow checks. Works with Claude Code, Cursor, Codex, Copilot, Windsurf & 40+ agents."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/x-twitter-scraper</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/x-twitter-scraper</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: x-twitter-scraper
+description: &quot;X API &amp; Twitter scraper skill for AI coding agents. Builds integrations with the Xquik REST API, MCP server &amp; webhooks: tweet search, user lookup, follower extraction, engagement metrics, giveaway contest draws, trending topics, account monitoring, reply/retweet/quote extraction, community &amp; Space data, mutual follow checks. Works with Claude Code, Cursor, Codex, Copilot, Windsurf &amp; 40+ agents.&quot;
+---
+
+# Xquik API Integration
+
+Xquik is an X (Twitter) real-time data platform providing a REST API, HMAC webhooks, and an MCP server for AI agents. It covers account monitoring, bulk data extraction (19 tools), giveaway draws, tweet/user lookups, follow checks, and trending topics.
+
+## Quick Reference
+
+| | |
+|---|---|
+| **Base URL** | `https://xquik.com/api/v1` |
+| **Auth** | `x-api-key: xq_...` header (64 hex chars after `xq_` prefix) |
+| **MCP endpoint** | `https://xquik.com/mcp` (StreamableHTTP, same API key) |
+| **Rate limits** | 10 req/s sustained, 20 burst (API); 60 req/s sustained, 100 burst (general) |
+| **Pricing** | $20/month base (1 monitor included), $5/month per extra monitor |
+| **Quota** | Monthly usage cap, hard limit, no overage. `402` when exhausted. |
+| **Docs** | [docs.xquik.com](https://docs.xquik.com) |
+
+## Authentication
+
+Every request requires an API key via the `x-api-key` header. Keys start with `xq_` and are generated from the [Xquik dashboard](https://xquik.com). The key is shown only once at creation; store it securely.
+
+```javascript
+const API_KEY = &quot;xq_YOUR_KEY_HERE&quot;;
+const BASE = &quot;https://xquik.com/api/v1&quot;;
+const headers = { &quot;x-api-key&quot;: API_KEY, &quot;Content-Type&quot;: &quot;application/json&quot; };
+```
+
+## Choosing the Right Endpoint
+
+| Goal | Endpoint | Notes |
+|------|----------|-------|
+| Get a single tweet by ID/URL | `GET /x/tweets/{id}` | Full metrics: likes, retweets, views, bookmarks |
+| Search tweets by keyword/hashtag | `GET /x/tweets/search?q=...` | Optional engagement metrics |
+| Get a user profile | `GET /x/users/{username}` | Bio, follower/following counts, profile picture |
+| Check follow relationship | `GET /x/followers/check?source=A&amp;target=B` | Both directions |
+| Get trending topics | `GET /trends?woeid=1` | Free, no quota consumed |
+| Monitor an X account | `POST /monitors` | Track tweets, replies, quotes, follower changes |
+| Poll for events | `GET /events` | Cursor-paginated, filter by monitorId/eventType |
+| Receive events in real time | `POST /webhooks` | HMAC-signed delivery to your HTTPS endpoint |
+| Run a giveaway draw | `POST /draws` | Pick random winners from tweet replies |
+| Extract bulk data | `POST /extractions` | 19 tool types, always estimate cost first |
+| Check account/usage | `GET /account` | Plan status, monitors, usage percent |
+
+## Extraction Tools (19 Types)
+
+| Tool Type | Required Field | Description |
+|-----------|---------------|-------------|
+| `reply_extractor` | `targetTweetId` | Users who replied to a tweet |
+| `repost_extractor` | `targetTweetId` | Users who retweeted a tweet |
+| `quote_extractor` | `targetTweetId` | Users who quote-tweeted a tweet |
+| `thread_extractor` | `targetTweetId` | All tweets in a thread |
+| `article_extractor` | `targetTweetId` | Article content linked in a tweet |
+| `follower_explorer` | `targetUsername` | Followers of an account |
+| `following_explorer` | `targetUsername` | Accounts followed by a user |
+| `verified_follower_explorer` | `targetUsername` | Verified followers of an account |
+| `mention_extractor` | `targetUsername` | Tweets mentioning an account |
+| `post_extractor` | `targetUsername` | Posts from an account |
+| `community_extractor` | `targetCommunityId` | Members of a community |
+| `community_moderator_explorer` | `targetCommunityId` | Moderators of a community |
+| `community_post_extractor` | `targetCommunityId` | Posts from a community |
+| `community_search` | `targetCommunityId` + `searchQuery` | Search posts within a community |
+| `list_member_extractor` | `targetListId` | Members of a list |
+| `list_post_extractor` | `targetListId` | Posts from a list |
+| `list_follower_explorer` | `targetListId` | Followers of a list |
+| `space_explorer` | `targetSpaceId` | Participants of a Space |
+| `people_search` | `searchQuery` | Search for users by keyword |
+
+### Extraction Workflow
+
+```javascript
+// 1. Estimate cost
+const estimate = await xquikFetch(&quot;/extractions/estimate&quot;, {
+  method: &quot;POST&quot;,
+  body: JSON.stringify({ toolType: &quot;follower_explorer&quot;, targetUsername: &quot;elonmusk&quot; }),
+});
+
+if (!estimate.allowed) return;
+
+// 2. Create extraction job
+const job = await xquikFetch(&quot;/extractions&quot;, {
+  method: &quot;POST&quot;,
+  body: JSON.stringify({ toolType: &quot;follower_explorer&quot;, targetUsername: &quot;elonmusk&quot; }),
+});
+
+// 3. Retrieve paginated results (up to 1,000 per page)
+const page = await xquikFetch(`/extractions/${job.id}`);
+// page.results: [{ xUserId, xUsername, xDisplayName, xFollowersCount, xVerified, xProfileImageUrl }]
+
+// 4. Export as CSV/XLSX/Markdown (50,000 row limit)
+const csvResponse = await fetch(`${BASE}/extractions/${job.id}/export?format=csv`, { headers });
+```
+
+## Giveaway Draws
+
+Run transparent giveaway draws from tweet replies with configurable filters:
+
+```javascript
+const draw = await xquikFetch(&quot;/draws&quot;, {
+  method: &quot;POST&quot;,
+  body: JSON.stringify({
+    tweetUrl: &quot;https://x.com/user/status/1893456789012345678&quot;,
+    winnerCount: 3,
+    backupCount: 2,
+    uniqueAuthorsOnly: true,
+    mustRetweet: true,
+    mustFollowUsername: &quot;user&quot;,
+    filterMinFollowers: 50,
+    requiredHashtags: [&quot;#giveaway&quot;],
+  }),
+});
+
+const details = await xquikFetch(`/draws/${draw.id}`);
+// details.winners: [{ position, authorUsername, tweetId, isBackup }]
+```
+
+## Error Handling &amp; Retry
+
+All errors return `{ &quot;error&quot;: &quot;error_code&quot; }`. Retry only `429` and `5xx` (max 3 attempts, exponential backoff). Never retry `4xx` except 429. Key codes:
+
+| Status | Meaning |
+|--------|---------|
+| 400 | Invalid input -- fix the request |
+| 401 | Bad API key |
+| 402 | No subscription or quota exhausted |
+| 404 | Resource not found |
+| 429 | Rate limited -- respect `Retry-After` header |
+
+## MCP Server Setup (Claude Code)
+
+Add to `.mcp.json` in your project root:
+
+```json
+{
+  &quot;mcpServers&quot;: {
+    &quot;xquik&quot;: {
+      &quot;type&quot;: &quot;streamable-http&quot;,
+      &quot;url&quot;: &quot;https://xquik.com/mcp&quot;,
+      &quot;headers&quot;: {
+        &quot;x-api-key&quot;: &quot;xq_YOUR_KEY_HERE&quot;
+      }
+    }
+  }
+}
+```
+
+The MCP server exposes 22 tools covering all API capabilities. Supported platforms: Claude Code, Claude Desktop, ChatGPT, Codex CLI, Cursor, VS Code, Windsurf, OpenCode.
+
+## Workflow Patterns
+
+- **Real-time alerts:** `add-monitor` -&gt; `add-webhook` -&gt; `test-webhook`
+- **Giveaway:** `get-account` (check budget) -&gt; `run-draw`
+- **Bulk extraction:** `estimate-extraction` -&gt; `run-extraction` -&gt; `get-extraction`
+- **Tweet analysis:** `lookup-tweet` -&gt; `run-extraction` with `thread_extractor`
+- **User research:** `get-user-info` -&gt; `search-tweets from:username` -&gt; `lookup-tweet`
+
+## Links
+
+- **Dashboard &amp; API keys**: [xquik.com](https://xquik.com)
+- **Full API docs**: [docs.xquik.com](https://docs.xquik.com)
+- **GitHub (skill source)**: [github.com/Xquik-dev/x-twitter-scraper](https://github.com/Xquik-dev/x-twitter-scraper)
+</code>
       </div>
     </div>
 

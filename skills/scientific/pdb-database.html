@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,320 @@
     <p class="desc">"Access RCSB PDB for 3D protein/nucleic acid structures. Search by text/sequence/structure, download coordinates (PDB/mmCIF), retrieve metadata, for structural biology and drug discovery."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pdb-database</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/pdb-database</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: pdb-database
+description: &quot;Access RCSB PDB for 3D protein/nucleic acid structures. Search by text/sequence/structure, download coordinates (PDB/mmCIF), retrieve metadata, for structural biology and drug discovery.&quot;
+---
+
+# PDB Database
+
+## Overview
+
+RCSB PDB is the worldwide repository for 3D structural data of biological macromolecules. Search for structures, retrieve coordinates and metadata, perform sequence and structure similarity searches across 200,000+ experimentally determined structures and computed models.
+
+## When to Use This Skill
+
+This skill should be used when:
+- Searching for protein or nucleic acid 3D structures by text, sequence, or structural similarity
+- Downloading coordinate files in PDB, mmCIF, or BinaryCIF formats
+- Retrieving structural metadata, experimental methods, or quality metrics
+- Performing batch operations across multiple structures
+- Integrating PDB data into computational workflows for drug discovery, protein engineering, or structural biology research
+
+## Core Capabilities
+
+### 1. Searching for Structures
+
+Find PDB entries using various search criteria:
+
+**Text Search:** Search by protein name, keywords, or descriptions
+```python
+from rcsbapi.search import TextQuery
+query = TextQuery(&quot;hemoglobin&quot;)
+results = list(query())
+print(f&quot;Found {len(results)} structures&quot;)
+```
+
+**Attribute Search:** Query specific properties (organism, resolution, method, etc.)
+```python
+from rcsbapi.search import AttributeQuery
+from rcsbapi.search.attrs import rcsb_entity_source_organism
+
+# Find human protein structures
+query = AttributeQuery(
+    attribute=rcsb_entity_source_organism.scientific_name,
+    operator=&quot;exact_match&quot;,
+    value=&quot;Homo sapiens&quot;
+)
+results = list(query())
+```
+
+**Sequence Similarity:** Find structures similar to a given sequence
+```python
+from rcsbapi.search import SequenceQuery
+
+query = SequenceQuery(
+    value=&quot;MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHHYREQIKRVKDSEDVPMVLVGNKCDLPSRTVDTKQAQDLARSYGIPFIETSAKTRQGVDDAFYTLVREIRKHKEKMSKDGKKKKKKSKTKCVIM&quot;,
+    evalue_cutoff=0.1,
+    identity_cutoff=0.9
+)
+results = list(query())
+```
+
+**Structure Similarity:** Find structures with similar 3D geometry
+```python
+from rcsbapi.search import StructSimilarityQuery
+
+query = StructSimilarityQuery(
+    structure_search_type=&quot;entry&quot;,
+    entry_id=&quot;4HHB&quot;  # Hemoglobin
+)
+results = list(query())
+```
+
+**Combining Queries:** Use logical operators to build complex searches
+```python
+from rcsbapi.search import TextQuery, AttributeQuery
+from rcsbapi.search.attrs import rcsb_entry_info
+
+# High-resolution human proteins
+query1 = AttributeQuery(
+    attribute=rcsb_entity_source_organism.scientific_name,
+    operator=&quot;exact_match&quot;,
+    value=&quot;Homo sapiens&quot;
+)
+query2 = AttributeQuery(
+    attribute=rcsb_entry_info.resolution_combined,
+    operator=&quot;less&quot;,
+    value=2.0
+)
+combined_query = query1 &amp; query2  # AND operation
+results = list(combined_query())
+```
+
+### 2. Retrieving Structure Data
+
+Access detailed information about specific PDB entries:
+
+**Basic Entry Information:**
+```python
+from rcsbapi.data import Schema, fetch
+
+# Get entry-level data
+entry_data = fetch(&quot;4HHB&quot;, schema=Schema.ENTRY)
+print(entry_data[&quot;struct&quot;][&quot;title&quot;])
+print(entry_data[&quot;exptl&quot;][0][&quot;method&quot;])
+```
+
+**Polymer Entity Information:**
+```python
+# Get protein/nucleic acid information
+entity_data = fetch(&quot;4HHB_1&quot;, schema=Schema.POLYMER_ENTITY)
+print(entity_data[&quot;entity_poly&quot;][&quot;pdbx_seq_one_letter_code&quot;])
+```
+
+**Using GraphQL for Flexible Queries:**
+```python
+from rcsbapi.data import fetch
+
+# Custom GraphQL query
+query = &quot;&quot;&quot;
+{
+  entry(entry_id: &quot;4HHB&quot;) {
+    struct {
+      title
+    }
+    exptl {
+      method
+    }
+    rcsb_entry_info {
+      resolution_combined
+      deposited_atom_count
+    }
+  }
+}
+&quot;&quot;&quot;
+data = fetch(query_type=&quot;graphql&quot;, query=query)
+```
+
+### 3. Downloading Structure Files
+
+Retrieve coordinate files in various formats:
+
+**Download Methods:**
+- **PDB format** (legacy text format): `https://files.rcsb.org/download/{PDB_ID}.pdb`
+- **mmCIF format** (modern standard): `https://files.rcsb.org/download/{PDB_ID}.cif`
+- **BinaryCIF** (compressed binary): Use ModelServer API for efficient access
+- **Biological assembly**: `https://files.rcsb.org/download/{PDB_ID}.pdb1` (for assembly 1)
+
+**Example Download:**
+```python
+import requests
+
+pdb_id = &quot;4HHB&quot;
+
+# Download PDB format
+pdb_url = f&quot;https://files.rcsb.org/download/{pdb_id}.pdb&quot;
+response = requests.get(pdb_url)
+with open(f&quot;{pdb_id}.pdb&quot;, &quot;w&quot;) as f:
+    f.write(response.text)
+
+# Download mmCIF format
+cif_url = f&quot;https://files.rcsb.org/download/{pdb_id}.cif&quot;
+response = requests.get(cif_url)
+with open(f&quot;{pdb_id}.cif&quot;, &quot;w&quot;) as f:
+    f.write(response.text)
+```
+
+### 4. Working with Structure Data
+
+Common operations with retrieved structures:
+
+**Parse and Analyze Coordinates:**
+Use BioPython or other structural biology libraries to work with downloaded files:
+```python
+from Bio.PDB import PDBParser
+
+parser = PDBParser()
+structure = parser.get_structure(&quot;protein&quot;, &quot;4HHB.pdb&quot;)
+
+# Iterate through atoms
+for model in structure:
+    for chain in model:
+        for residue in chain:
+            for atom in residue:
+                print(atom.get_coord())
+```
+
+**Extract Metadata:**
+```python
+from rcsbapi.data import fetch, Schema
+
+# Get experimental details
+data = fetch(&quot;4HHB&quot;, schema=Schema.ENTRY)
+
+resolution = data.get(&quot;rcsb_entry_info&quot;, {}).get(&quot;resolution_combined&quot;)
+method = data.get(&quot;exptl&quot;, [{}])[0].get(&quot;method&quot;)
+deposition_date = data.get(&quot;rcsb_accession_info&quot;, {}).get(&quot;deposit_date&quot;)
+
+print(f&quot;Resolution: {resolution} Å&quot;)
+print(f&quot;Method: {method}&quot;)
+print(f&quot;Deposited: {deposition_date}&quot;)
+```
+
+### 5. Batch Operations
+
+Process multiple structures efficiently:
+
+```python
+from rcsbapi.data import fetch, Schema
+
+pdb_ids = [&quot;4HHB&quot;, &quot;1MBN&quot;, &quot;1GZX&quot;]  # Hemoglobin, myoglobin, etc.
+
+results = {}
+for pdb_id in pdb_ids:
+    try:
+        data = fetch(pdb_id, schema=Schema.ENTRY)
+        results[pdb_id] = {
+            &quot;title&quot;: data[&quot;struct&quot;][&quot;title&quot;],
+            &quot;resolution&quot;: data.get(&quot;rcsb_entry_info&quot;, {}).get(&quot;resolution_combined&quot;),
+            &quot;organism&quot;: data.get(&quot;rcsb_entity_source_organism&quot;, [{}])[0].get(&quot;scientific_name&quot;)
+        }
+    except Exception as e:
+        print(f&quot;Error fetching {pdb_id}: {e}&quot;)
+
+# Display results
+for pdb_id, info in results.items():
+    print(f&quot;\n{pdb_id}: {info[&#039;title&#039;]}&quot;)
+    print(f&quot;  Resolution: {info[&#039;resolution&#039;]} Å&quot;)
+    print(f&quot;  Organism: {info[&#039;organism&#039;]}&quot;)
+```
+
+## Python Package Installation
+
+Install the official RCSB PDB Python API client:
+
+```bash
+# Current recommended package
+uv pip install rcsb-api
+
+# For legacy code (deprecated, use rcsb-api instead)
+uv pip install rcsbsearchapi
+```
+
+The `rcsb-api` package provides unified access to both Search and Data APIs through the `rcsbapi.search` and `rcsbapi.data` modules.
+
+## Common Use Cases
+
+### Drug Discovery
+- Search for structures of drug targets
+- Analyze ligand binding sites
+- Compare protein-ligand complexes
+- Identify similar binding pockets
+
+### Protein Engineering
+- Find homologous structures for modeling
+- Analyze sequence-structure relationships
+- Compare mutant structures
+- Study protein stability and dynamics
+
+### Structural Biology Research
+- Download structures for computational analysis
+- Build structure-based alignments
+- Analyze structural features (secondary structure, domains)
+- Compare experimental methods and quality metrics
+
+### Education and Visualization
+- Retrieve structures for teaching
+- Generate molecular visualizations
+- Explore structure-function relationships
+- Study evolutionary conservation
+
+## Key Concepts
+
+**PDB ID:** Unique 4-character identifier (e.g., &quot;4HHB&quot;) for each structure entry. AlphaFold and ModelArchive entries start with &quot;AF_&quot; or &quot;MA_&quot; prefixes.
+
+**mmCIF/PDBx:** Modern file format that uses key-value structure, replacing legacy PDB format for large structures.
+
+**Biological Assembly:** The functional form of a macromolecule, which may contain multiple copies of chains from the asymmetric unit.
+
+**Resolution:** Measure of detail in crystallographic structures (lower values = higher detail). Typical range: 1.5-3.5 Å for high-quality structures.
+
+**Entity:** A unique molecular component in a structure (protein chain, DNA, ligand, etc.).
+
+## Resources
+
+This skill includes reference documentation in the `references/` directory:
+
+### references/api_reference.md
+Comprehensive API documentation covering:
+- Detailed API endpoint specifications
+- Advanced query patterns and examples
+- Data schema reference
+- Rate limiting and best practices
+- Troubleshooting common issues
+
+Use this reference when you need in-depth information about API capabilities, complex query construction, or detailed data schema information.
+
+## Additional Resources
+
+- **RCSB PDB Website:** https://www.rcsb.org
+- **PDB-101 Educational Portal:** https://pdb101.rcsb.org
+- **API Documentation:** https://www.rcsb.org/docs/programmatic-access/web-apis-overview
+- **Python Package Docs:** https://rcsbapi.readthedocs.io/
+- **Data API Documentation:** https://data.rcsb.org/
+- **GitHub Repository:** https://github.com/rcsb/py-rcsb-api
+</code>
       </div>
     </div>
 

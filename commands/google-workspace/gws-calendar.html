@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,175 @@
     <p class="desc">Google Calendar: Manage calendars and events.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/gws-calendar</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/gws-calendar</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Bash, Read, Write, Edit
+argument-hint: [resource] [method] [flags]
+description: Google Calendar: Manage calendars and events.
+---
+
+# Google Workspace Calendar
+
+Execute Google Workspace Calendar operations: $ARGUMENTS
+
+## Prerequisites
+
+- Google Workspace CLI (`gws`) must be installed
+- Authentication configured: Run `gws auth status` to verify
+- Review `gws calendar --help` for all available commands
+
+## Available Resources and Methods
+
+# calendar (v3)
+
+&gt; **PREREQUISITE:** Read `../gws-shared/SKILL.md` for auth, global flags, and security rules. If missing, run `gws generate-skills` to create it.
+
+```bash
+gws calendar &lt;resource&gt; &lt;method&gt; [flags]
+```
+
+## Helper Commands
+
+| Command | Description |
+|---------|-------------|
+| [`+insert`](../gws-calendar-insert/SKILL.md) | create a new event |
+| [`+agenda`](../gws-calendar-agenda/SKILL.md) | Show upcoming events across all calendars |
+
+## API Resources
+
+### acl
+
+  - `delete` — Deletes an access control rule.
+  - `get` — Returns an access control rule.
+  - `insert` — Creates an access control rule.
+  - `list` — Returns the rules in the access control list for the calendar.
+  - `patch` — Updates an access control rule. This method supports patch semantics.
+  - `update` — Updates an access control rule.
+  - `watch` — Watch for changes to ACL resources.
+
+### calendarList
+
+  - `delete` — Removes a calendar from the user&#039;s calendar list.
+  - `get` — Returns a calendar from the user&#039;s calendar list.
+  - `insert` — Inserts an existing calendar into the user&#039;s calendar list.
+  - `list` — Returns the calendars on the user&#039;s calendar list.
+  - `patch` — Updates an existing calendar on the user&#039;s calendar list. This method supports patch semantics.
+  - `update` — Updates an existing calendar on the user&#039;s calendar list.
+  - `watch` — Watch for changes to CalendarList resources.
+
+### calendars
+
+  - `clear` — Clears a primary calendar. This operation deletes all events associated with the primary calendar of an account.
+  - `delete` — Deletes a secondary calendar. Use calendars.clear for clearing all events on primary calendars.
+  - `get` — Returns metadata for a calendar.
+  - `insert` — Creates a secondary calendar.
+The authenticated user for the request is made the data owner of the new calendar.
+
+Note: We recommend to authenticate as the intended data owner of the calendar. You can use domain-wide delegation of authority to allow applications to act on behalf of a specific user. Don&#039;t use a service account for authentication. If you use a service account for authentication, the service account is the data owner, which can lead to unexpected behavior.
+  - `patch` — Updates metadata for a calendar. This method supports patch semantics.
+  - `update` — Updates metadata for a calendar.
+
+### channels
+
+  - `stop` — Stop watching resources through this channel
+
+### colors
+
+  - `get` — Returns the color definitions for calendars and events.
+
+### events
+
+  - `delete` — Deletes an event.
+  - `get` — Returns an event based on its Google Calendar ID. To retrieve an event using its iCalendar ID, call the events.list method using the iCalUID parameter.
+  - `import` — Imports an event. This operation is used to add a private copy of an existing event to a calendar. Only events with an eventType of default may be imported.
+Deprecated behavior: If a non-default event is imported, its type will be changed to default and any event-type-specific properties it may have will be dropped.
+  - `insert` — Creates an event.
+  - `instances` — Returns instances of the specified recurring event.
+  - `list` — Returns events on the specified calendar.
+  - `move` — Moves an event to another calendar, i.e. changes an event&#039;s organizer. Note that only default events can be moved; birthday, focusTime, fromGmail, outOfOffice and workingLocation events cannot be moved.
+  - `patch` — Updates an event. This method supports patch semantics.
+  - `quickAdd` — Creates an event based on a simple text string.
+  - `update` — Updates an event.
+  - `watch` — Watch for changes to Events resources.
+
+### freebusy
+
+  - `query` — Returns free/busy information for a set of calendars.
+
+### settings
+
+  - `get` — Returns a single user setting.
+  - `list` — Returns all user settings for the authenticated user.
+  - `watch` — Watch for changes to Settings resources.
+
+## Discovering Commands
+
+Before calling any API method, inspect it:
+
+```bash
+# Browse resources and methods
+gws calendar --help
+
+# Inspect a method&#039;s required params, types, and defaults
+gws schema calendar.&lt;resource&gt;.&lt;method&gt;
+```
+
+Use `gws schema` output to build your `--params` and `--json` flags.
+
+## Usage
+
+```bash
+# List available resources and methods
+gws calendar --help
+
+# Inspect method schema before calling
+gws schema calendar.&lt;resource&gt;.&lt;method&gt;
+
+# Execute command with arguments
+gws calendar $ARGUMENTS
+```
+
+## Task
+
+Execute the requested Calendar operation: $ARGUMENTS
+
+1. **Verify Prerequisites**
+   - Check `gws` is installed: `gws --version`
+   - Verify authentication: `gws auth status`
+   - Review available commands: `gws calendar --help`
+
+2. **Inspect Method Schema**
+   - Before calling any method, inspect its parameters
+   - Use `gws schema` to understand required fields
+   - Review parameter types and constraints
+
+3. **Execute Operation**
+   - Build command with appropriate flags
+   - Use `--params` for query/path parameters
+   - Use `--json` for request body
+   - Handle pagination with `--max-results` or `--page-token`
+
+4. **Error Handling**
+   - Check command output for errors
+   - Review API quotas and rate limits
+   - Handle authentication issues
+   - Retry transient failures
+
+---
+
+**License**: Apache License 2.0
+**Source**: [Google Workspace CLI](https://github.com/googleworkspace/cli)
+**Original Skill**: `gws-calendar`
+</code>
       </div>
     </div>
 

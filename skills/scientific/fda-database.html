@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,529 @@
     <p class="desc">"Query openFDA API for drugs, devices, adverse events, recalls, regulatory submissions (510k, PMA), substance identification (UNII), for FDA regulatory data analysis and safety research."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/fda-database</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/fda-database</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: fda-database
+description: &quot;Query openFDA API for drugs, devices, adverse events, recalls, regulatory submissions (510k, PMA), substance identification (UNII), for FDA regulatory data analysis and safety research.&quot;
+---
+
+# FDA Database Access
+
+## Overview
+
+Access comprehensive FDA regulatory data through openFDA, the FDA&#039;s initiative to provide open APIs for public datasets. Query information about drugs, medical devices, foods, animal/veterinary products, and substances using Python with standardized interfaces.
+
+**Key capabilities:**
+- Query adverse events for drugs, devices, foods, and veterinary products
+- Access product labeling, approvals, and regulatory submissions
+- Monitor recalls and enforcement actions
+- Look up National Drug Codes (NDC) and substance identifiers (UNII)
+- Analyze device classifications and clearances (510k, PMA)
+- Track drug shortages and supply issues
+- Research chemical structures and substance relationships
+
+## When to Use This Skill
+
+This skill should be used when working with:
+- **Drug research**: Safety profiles, adverse events, labeling, approvals, shortages
+- **Medical device surveillance**: Adverse events, recalls, 510(k) clearances, PMA approvals
+- **Food safety**: Recalls, allergen tracking, adverse events, dietary supplements
+- **Veterinary medicine**: Animal drug adverse events by species and breed
+- **Chemical/substance data**: UNII lookup, CAS number mapping, molecular structures
+- **Regulatory analysis**: Approval pathways, enforcement actions, compliance tracking
+- **Pharmacovigilance**: Post-market surveillance, safety signal detection
+- **Scientific research**: Drug interactions, comparative safety, epidemiological studies
+
+## Quick Start
+
+### 1. Basic Setup
+
+```python
+from scripts.fda_query import FDAQuery
+
+# Initialize (API key optional but recommended)
+fda = FDAQuery(api_key=&quot;YOUR_API_KEY&quot;)
+
+# Query drug adverse events
+events = fda.query_drug_events(&quot;aspirin&quot;, limit=100)
+
+# Get drug labeling
+label = fda.query_drug_label(&quot;Lipitor&quot;, brand=True)
+
+# Search device recalls
+recalls = fda.query(&quot;device&quot;, &quot;enforcement&quot;,
+                   search=&quot;classification:Class+I&quot;,
+                   limit=50)
+```
+
+### 2. API Key Setup
+
+While the API works without a key, registering provides higher rate limits:
+- **Without key**: 240 requests/min, 1,000/day
+- **With key**: 240 requests/min, 120,000/day
+
+Register at: https://open.fda.gov/apis/authentication/
+
+Set as environment variable:
+```bash
+export FDA_API_KEY=&quot;your_key_here&quot;
+```
+
+### 3. Running Examples
+
+```bash
+# Run comprehensive examples
+python scripts/fda_examples.py
+
+# This demonstrates:
+# - Drug safety profiles
+# - Device surveillance
+# - Food recall monitoring
+# - Substance lookup
+# - Comparative drug analysis
+# - Veterinary drug analysis
+```
+
+## FDA Database Categories
+
+### Drugs
+
+Access 6 drug-related endpoints covering the full drug lifecycle from approval to post-market surveillance.
+
+**Endpoints:**
+1. **Adverse Events** - Reports of side effects, errors, and therapeutic failures
+2. **Product Labeling** - Prescribing information, warnings, indications
+3. **NDC Directory** - National Drug Code product information
+4. **Enforcement Reports** - Drug recalls and safety actions
+5. **Drugs@FDA** - Historical approval data since 1939
+6. **Drug Shortages** - Current and resolved supply issues
+
+**Common use cases:**
+```python
+# Safety signal detection
+fda.count_by_field(&quot;drug&quot;, &quot;event&quot;,
+                  search=&quot;patient.drug.medicinalproduct:metformin&quot;,
+                  field=&quot;patient.reaction.reactionmeddrapt&quot;)
+
+# Get prescribing information
+label = fda.query_drug_label(&quot;Keytruda&quot;, brand=True)
+
+# Check for recalls
+recalls = fda.query_drug_recalls(drug_name=&quot;metformin&quot;)
+
+# Monitor shortages
+shortages = fda.query(&quot;drug&quot;, &quot;drugshortages&quot;,
+                     search=&quot;status:Currently+in+Shortage&quot;)
+```
+
+**Reference:** See `references/drugs.md` for detailed documentation
+
+### Devices
+
+Access 9 device-related endpoints covering medical device safety, approvals, and registrations.
+
+**Endpoints:**
+1. **Adverse Events** - Device malfunctions, injuries, deaths
+2. **510(k) Clearances** - Premarket notifications
+3. **Classification** - Device categories and risk classes
+4. **Enforcement Reports** - Device recalls
+5. **Recalls** - Detailed recall information
+6. **PMA** - Premarket approval data for Class III devices
+7. **Registrations &amp; Listings** - Manufacturing facility data
+8. **UDI** - Unique Device Identification database
+9. **COVID-19 Serology** - Antibody test performance data
+
+**Common use cases:**
+```python
+# Monitor device safety
+events = fda.query_device_events(&quot;pacemaker&quot;, limit=100)
+
+# Look up device classification
+classification = fda.query_device_classification(&quot;DQY&quot;)
+
+# Find 510(k) clearances
+clearances = fda.query_device_510k(applicant=&quot;Medtronic&quot;)
+
+# Search by UDI
+device_info = fda.query(&quot;device&quot;, &quot;udi&quot;,
+                       search=&quot;identifiers.id:00884838003019&quot;)
+```
+
+**Reference:** See `references/devices.md` for detailed documentation
+
+### Foods
+
+Access 2 food-related endpoints for safety monitoring and recalls.
+
+**Endpoints:**
+1. **Adverse Events** - Food, dietary supplement, and cosmetic events
+2. **Enforcement Reports** - Food product recalls
+
+**Common use cases:**
+```python
+# Monitor allergen recalls
+recalls = fda.query_food_recalls(reason=&quot;undeclared peanut&quot;)
+
+# Track dietary supplement events
+events = fda.query_food_events(
+    industry=&quot;Dietary Supplements&quot;)
+
+# Find contamination recalls
+listeria = fda.query_food_recalls(
+    reason=&quot;listeria&quot;,
+    classification=&quot;I&quot;)
+```
+
+**Reference:** See `references/foods.md` for detailed documentation
+
+### Animal &amp; Veterinary
+
+Access veterinary drug adverse event data with species-specific information.
+
+**Endpoint:**
+1. **Adverse Events** - Animal drug side effects by species, breed, and product
+
+**Common use cases:**
+```python
+# Species-specific events
+dog_events = fda.query_animal_events(
+    species=&quot;Dog&quot;,
+    drug_name=&quot;flea collar&quot;)
+
+# Breed predisposition analysis
+breed_query = fda.query(&quot;animalandveterinary&quot;, &quot;event&quot;,
+    search=&quot;reaction.veddra_term_name:*seizure*+AND+&quot;
+           &quot;animal.breed.breed_component:*Labrador*&quot;)
+```
+
+**Reference:** See `references/animal_veterinary.md` for detailed documentation
+
+### Substances &amp; Other
+
+Access molecular-level substance data with UNII codes, chemical structures, and relationships.
+
+**Endpoints:**
+1. **Substance Data** - UNII, CAS, chemical structures, relationships
+2. **NSDE** - Historical substance data (legacy)
+
+**Common use cases:**
+```python
+# UNII to CAS mapping
+substance = fda.query_substance_by_unii(&quot;R16CO5Y76E&quot;)
+
+# Search by name
+results = fda.query_substance_by_name(&quot;acetaminophen&quot;)
+
+# Get chemical structure
+structure = fda.query(&quot;other&quot;, &quot;substance&quot;,
+    search=&quot;names.name:ibuprofen+AND+substanceClass:chemical&quot;)
+```
+
+**Reference:** See `references/other.md` for detailed documentation
+
+## Common Query Patterns
+
+### Pattern 1: Safety Profile Analysis
+
+Create comprehensive safety profiles combining multiple data sources:
+
+```python
+def drug_safety_profile(fda, drug_name):
+    &quot;&quot;&quot;Generate complete safety profile.&quot;&quot;&quot;
+
+    # 1. Total adverse events
+    events = fda.query_drug_events(drug_name, limit=1)
+    total = events[&quot;meta&quot;][&quot;results&quot;][&quot;total&quot;]
+
+    # 2. Most common reactions
+    reactions = fda.count_by_field(
+        &quot;drug&quot;, &quot;event&quot;,
+        search=f&quot;patient.drug.medicinalproduct:*{drug_name}*&quot;,
+        field=&quot;patient.reaction.reactionmeddrapt&quot;,
+        exact=True
+    )
+
+    # 3. Serious events
+    serious = fda.query(&quot;drug&quot;, &quot;event&quot;,
+        search=f&quot;patient.drug.medicinalproduct:*{drug_name}*+AND+serious:1&quot;,
+        limit=1)
+
+    # 4. Recent recalls
+    recalls = fda.query_drug_recalls(drug_name=drug_name)
+
+    return {
+        &quot;total_events&quot;: total,
+        &quot;top_reactions&quot;: reactions[&quot;results&quot;][:10],
+        &quot;serious_events&quot;: serious[&quot;meta&quot;][&quot;results&quot;][&quot;total&quot;],
+        &quot;recalls&quot;: recalls[&quot;results&quot;]
+    }
+```
+
+### Pattern 2: Temporal Trend Analysis
+
+Analyze trends over time using date ranges:
+
+```python
+from datetime import datetime, timedelta
+
+def get_monthly_trends(fda, drug_name, months=12):
+    &quot;&quot;&quot;Get monthly adverse event trends.&quot;&quot;&quot;
+    trends = []
+
+    for i in range(months):
+        end = datetime.now() - timedelta(days=30*i)
+        start = end - timedelta(days=30)
+
+        date_range = f&quot;[{start.strftime(&#039;%Y%m%d&#039;)}+TO+{end.strftime(&#039;%Y%m%d&#039;)}]&quot;
+        search = f&quot;patient.drug.medicinalproduct:*{drug_name}*+AND+receivedate:{date_range}&quot;
+
+        result = fda.query(&quot;drug&quot;, &quot;event&quot;, search=search, limit=1)
+        count = result[&quot;meta&quot;][&quot;results&quot;][&quot;total&quot;] if &quot;meta&quot; in result else 0
+
+        trends.append({
+            &quot;month&quot;: start.strftime(&quot;%Y-%m&quot;),
+            &quot;events&quot;: count
+        })
+
+    return trends
+```
+
+### Pattern 3: Comparative Analysis
+
+Compare multiple products side-by-side:
+
+```python
+def compare_drugs(fda, drug_list):
+    &quot;&quot;&quot;Compare safety profiles of multiple drugs.&quot;&quot;&quot;
+    comparison = {}
+
+    for drug in drug_list:
+        # Total events
+        events = fda.query_drug_events(drug, limit=1)
+        total = events[&quot;meta&quot;][&quot;results&quot;][&quot;total&quot;] if &quot;meta&quot; in events else 0
+
+        # Serious events
+        serious = fda.query(&quot;drug&quot;, &quot;event&quot;,
+            search=f&quot;patient.drug.medicinalproduct:*{drug}*+AND+serious:1&quot;,
+            limit=1)
+        serious_count = serious[&quot;meta&quot;][&quot;results&quot;][&quot;total&quot;] if &quot;meta&quot; in serious else 0
+
+        comparison[drug] = {
+            &quot;total_events&quot;: total,
+            &quot;serious_events&quot;: serious_count,
+            &quot;serious_rate&quot;: (serious_count/total*100) if total &gt; 0 else 0
+        }
+
+    return comparison
+```
+
+### Pattern 4: Cross-Database Lookup
+
+Link data across multiple endpoints:
+
+```python
+def comprehensive_device_lookup(fda, device_name):
+    &quot;&quot;&quot;Look up device across all relevant databases.&quot;&quot;&quot;
+
+    return {
+        &quot;adverse_events&quot;: fda.query_device_events(device_name, limit=10),
+        &quot;510k_clearances&quot;: fda.query_device_510k(device_name=device_name),
+        &quot;recalls&quot;: fda.query(&quot;device&quot;, &quot;enforcement&quot;,
+                           search=f&quot;product_description:*{device_name}*&quot;),
+        &quot;udi_info&quot;: fda.query(&quot;device&quot;, &quot;udi&quot;,
+                            search=f&quot;brand_name:*{device_name}*&quot;)
+    }
+```
+
+## Working with Results
+
+### Response Structure
+
+All API responses follow this structure:
+
+```python
+{
+    &quot;meta&quot;: {
+        &quot;disclaimer&quot;: &quot;...&quot;,
+        &quot;results&quot;: {
+            &quot;skip&quot;: 0,
+            &quot;limit&quot;: 100,
+            &quot;total&quot;: 15234
+        }
+    },
+    &quot;results&quot;: [
+        # Array of result objects
+    ]
+}
+```
+
+### Error Handling
+
+Always handle potential errors:
+
+```python
+result = fda.query_drug_events(&quot;aspirin&quot;, limit=10)
+
+if &quot;error&quot; in result:
+    print(f&quot;Error: {result[&#039;error&#039;]}&quot;)
+elif &quot;results&quot; not in result or len(result[&quot;results&quot;]) == 0:
+    print(&quot;No results found&quot;)
+else:
+    # Process results
+    for event in result[&quot;results&quot;]:
+        # Handle event data
+        pass
+```
+
+### Pagination
+
+For large result sets, use pagination:
+
+```python
+# Automatic pagination
+all_results = fda.query_all(
+    &quot;drug&quot;, &quot;event&quot;,
+    search=&quot;patient.drug.medicinalproduct:aspirin&quot;,
+    max_results=5000
+)
+
+# Manual pagination
+for skip in range(0, 1000, 100):
+    batch = fda.query(&quot;drug&quot;, &quot;event&quot;,
+                     search=&quot;...&quot;,
+                     limit=100,
+                     skip=skip)
+    # Process batch
+```
+
+## Best Practices
+
+### 1. Use Specific Searches
+
+**DO:**
+```python
+# Specific field search
+search=&quot;patient.drug.medicinalproduct:aspirin&quot;
+```
+
+**DON&#039;T:**
+```python
+# Overly broad wildcard
+search=&quot;*aspirin*&quot;
+```
+
+### 2. Implement Rate Limiting
+
+The `FDAQuery` class handles rate limiting automatically, but be aware of limits:
+- 240 requests per minute
+- 120,000 requests per day (with API key)
+
+### 3. Cache Frequently Accessed Data
+
+The `FDAQuery` class includes built-in caching (enabled by default):
+
+```python
+# Caching is automatic
+fda = FDAQuery(api_key=api_key, use_cache=True, cache_ttl=3600)
+```
+
+### 4. Use Exact Matching for Counting
+
+When counting/aggregating, use `.exact` suffix:
+
+```python
+# Count exact phrases
+fda.count_by_field(&quot;drug&quot;, &quot;event&quot;,
+                  search=&quot;...&quot;,
+                  field=&quot;patient.reaction.reactionmeddrapt&quot;,
+                  exact=True)  # Adds .exact automatically
+```
+
+### 5. Validate Input Data
+
+Clean and validate search terms:
+
+```python
+def clean_drug_name(name):
+    &quot;&quot;&quot;Clean drug name for query.&quot;&quot;&quot;
+    return name.strip().replace(&#039;&quot;&#039;, &#039;\\&quot;&#039;)
+
+drug_name = clean_drug_name(user_input)
+```
+
+## API Reference
+
+For detailed information about:
+- **Authentication and rate limits** → See `references/api_basics.md`
+- **Drug databases** → See `references/drugs.md`
+- **Device databases** → See `references/devices.md`
+- **Food databases** → See `references/foods.md`
+- **Animal/veterinary databases** → See `references/animal_veterinary.md`
+- **Substance databases** → See `references/other.md`
+
+## Scripts
+
+### `scripts/fda_query.py`
+
+Main query module with `FDAQuery` class providing:
+- Unified interface to all FDA endpoints
+- Automatic rate limiting and caching
+- Error handling and retry logic
+- Common query patterns
+
+### `scripts/fda_examples.py`
+
+Comprehensive examples demonstrating:
+- Drug safety profile analysis
+- Device surveillance monitoring
+- Food recall tracking
+- Substance lookup
+- Comparative drug analysis
+- Veterinary drug analysis
+
+Run examples:
+```bash
+python scripts/fda_examples.py
+```
+
+## Additional Resources
+
+- **openFDA Homepage**: https://open.fda.gov/
+- **API Documentation**: https://open.fda.gov/apis/
+- **Interactive API Explorer**: https://open.fda.gov/apis/try-the-api/
+- **GitHub Repository**: https://github.com/FDA/openfda
+- **Terms of Service**: https://open.fda.gov/terms/
+
+## Support and Troubleshooting
+
+### Common Issues
+
+**Issue**: Rate limit exceeded
+- **Solution**: Use API key, implement delays, or reduce request frequency
+
+**Issue**: No results found
+- **Solution**: Try broader search terms, check spelling, use wildcards
+
+**Issue**: Invalid query syntax
+- **Solution**: Review query syntax in `references/api_basics.md`
+
+**Issue**: Missing fields in results
+- **Solution**: Not all records contain all fields; always check field existence
+
+### Getting Help
+
+- **GitHub Issues**: https://github.com/FDA/openfda/issues
+- **Email**: open-fda@fda.hhs.gov
+</code>
       </div>
     </div>
 

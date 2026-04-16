@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,449 @@
     <p class="desc">"JavaScript SDK usage for PocketBase client applications. Use when calling PocketBase from frontend or Node.js, authenticating users, subscribing to realtime events, uploading files, or working with the PocketBase JS/TS SDK. Covers CRUD, auth flows, authStore, realtime SSE, file handling, batch operations, and query syntax."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pb-sdk</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/pb-sdk</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: &quot;PocketBase SDK&quot;
+description: &quot;JavaScript SDK usage for PocketBase client applications. Use when calling PocketBase from frontend or Node.js, authenticating users, subscribing to realtime events, uploading files, or working with the PocketBase JS/TS SDK. Covers CRUD, auth flows, authStore, realtime SSE, file handling, batch operations, and query syntax.&quot;
+---
+
+# PocketBase JavaScript SDK
+
+## Installation &amp; Setup
+
+```bash
+npm install pocketbase
+# or
+yarn add pocketbase
+# or
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/pocketbase@0.36.6/dist/pocketbase.umd.js&quot;&gt;&lt;/script&gt;
+```
+
+```js
+import PocketBase from &#039;pocketbase&#039;
+
+const pb = new PocketBase(&#039;http://127.0.0.1:8090&#039;)
+```
+
+## CRUD Operations
+
+### List records
+
+```js
+const records = await pb.collection(&#039;posts&#039;).getList(1, 20, {
+    filter: &#039;status = &quot;active&quot; &amp;&amp; created &gt; &quot;2024-01-01&quot;&#039;,
+    sort: &#039;-created,title&#039;,
+    expand: &#039;author,tags&#039;,
+    fields: &#039;id,title,author,created&#039;,  // partial response
+    skipTotal: true,  // skip COUNT query for better performance
+})
+
+// records.page, records.perPage, records.totalItems, records.totalPages, records.items
+```
+
+### Get full list (auto-paginate)
+
+```js
+const allRecords = await pb.collection(&#039;posts&#039;).getFullList({
+    filter: &#039;status = &quot;active&quot;&#039;,
+    sort: &#039;-created&#039;,
+    batch: 200,  // records per request (default: 200)
+})
+```
+
+### View single record
+
+```js
+const record = await pb.collection(&#039;posts&#039;).getOne(&#039;RECORD_ID&#039;, {
+    expand: &#039;author&#039;,
+})
+```
+
+### Get first matching record
+
+```js
+const record = await pb.collection(&#039;posts&#039;).getFirstListItem(&#039;slug = &quot;my-post&quot;&#039;, {
+    expand: &#039;author&#039;,
+})
+```
+
+### Create record
+
+```js
+const record = await pb.collection(&#039;posts&#039;).create({
+    title: &#039;My Post&#039;,
+    body: &#039;Content here&#039;,
+    author: &#039;USER_ID&#039;,
+    status: &#039;draft&#039;,
+})
+```
+
+### Update record
+
+```js
+const record = await pb.collection(&#039;posts&#039;).update(&#039;RECORD_ID&#039;, {
+    title: &#039;Updated Title&#039;,
+    status: &#039;published&#039;,
+})
+```
+
+### Delete record
+
+```js
+await pb.collection(&#039;posts&#039;).delete(&#039;RECORD_ID&#039;)
+```
+
+## Query Parameters
+
+### Filter syntax
+
+Same as API rules filter syntax. Common patterns:
+
+```js
+// Equality
+filter: &#039;status = &quot;active&quot;&#039;
+
+// Contains (LIKE)
+filter: &#039;title ~ &quot;hello&quot;&#039;
+
+// Multi-relation contains
+filter: &#039;tags ?= &quot;TAG_ID&quot;&#039;
+
+// Date comparison
+filter: &#039;created &gt; &quot;2024-01-01 00:00:00&quot;&#039;
+
+// Relative dates
+filter: &#039;created &gt; @now - 7d&#039;
+
+// Logical operators
+filter: &#039;status = &quot;active&quot; &amp;&amp; author = &quot;USER_ID&quot;&#039;
+filter: &#039;(type = &quot;a&quot; || type = &quot;b&quot;) &amp;&amp; active = true&#039;
+
+// Null check
+filter: &#039;parent = null&#039;
+filter: &#039;parent != null&#039;
+```
+
+### Sort syntax
+
+```js
+sort: &#039;-created&#039;          // descending by created
+sort: &#039;title&#039;             // ascending by title
+sort: &#039;-created,title&#039;    // multi-field sort
+sort: &#039;@random&#039;           // random order
+```
+
+### Expand relations
+
+```js
+expand: &#039;author&#039;                    // single relation
+expand: &#039;author,tags&#039;               // multiple relations
+expand: &#039;author.team&#039;               // nested expand (author&#039;s team)
+expand: &#039;comments_via_post&#039;         // back-relation (comments that reference this post)
+expand: &#039;comments_via_post.author&#039;  // nested back-relation expand
+```
+
+### Fields (partial response)
+
+```js
+fields: &#039;id,title,created&#039;
+fields: &#039;id,expand.author.name&#039;     // include expanded field
+fields: &#039;*,expand.author.name&#039;      // all fields + specific expand
+```
+
+## Authentication
+
+### Email/password
+
+```js
+const authData = await pb.collection(&#039;users&#039;).authWithPassword(&#039;user@example.com&#039;, &#039;password123&#039;)
+// authData.token, authData.record
+```
+
+### OAuth2 (all-in-one)
+
+```js
+// Opens popup/redirect for OAuth2 provider
+const authData = await pb.collection(&#039;users&#039;).authWithOAuth2({ provider: &#039;google&#039; })
+// or with redirect
+const authData = await pb.collection(&#039;users&#039;).authWithOAuth2({
+    provider: &#039;google&#039;,
+    urlCallback: (url) =&gt; { window.location.href = url }
+})
+```
+
+### OTP (one-time password)
+
+```js
+// Step 1: Request OTP
+const result = await pb.collection(&#039;users&#039;).requestOTP(&#039;user@example.com&#039;)
+// result.otpId
+
+// Step 2: Verify OTP
+const authData = await pb.collection(&#039;users&#039;).authWithOTP(result.otpId, &#039;123456&#039;)
+```
+
+### MFA (multi-factor authentication)
+
+MFA is triggered automatically when enabled. After primary auth returns a `mfaId`:
+
+```js
+try {
+    await pb.collection(&#039;users&#039;).authWithPassword(&#039;user@example.com&#039;, &#039;password&#039;)
+} catch (err) {
+    if (err.response?.mfaId) {
+        // Need second factor — e.g., OTP
+        const otpResult = await pb.collection(&#039;users&#039;).requestOTP(&#039;user@example.com&#039;)
+        await pb.collection(&#039;users&#039;).authWithOTP(otpResult.otpId, &#039;123456&#039;, {
+            mfaId: err.response.mfaId
+        })
+    }
+}
+```
+
+### Auth store
+
+```js
+pb.authStore.token       // current JWT token
+pb.authStore.record      // current auth record
+pb.authStore.isValid     // token not expired
+pb.authStore.isAdmin     // deprecated — check record.collectionName === &#039;_superusers&#039;
+pb.authStore.isSuperuser // check if superuser
+
+// Listen for auth changes
+pb.authStore.onChange((token, record) =&gt; {
+    console.log(&#039;Auth changed:&#039;, record?.id)
+})
+
+// Clear auth
+pb.authStore.clear()
+
+// Refresh auth (get fresh token + record)
+await pb.collection(&#039;users&#039;).authRefresh()
+```
+
+### Password reset
+
+```js
+// Request reset email
+await pb.collection(&#039;users&#039;).requestPasswordReset(&#039;user@example.com&#039;)
+
+// Confirm reset (usually from email link)
+await pb.collection(&#039;users&#039;).confirmPasswordReset(token, newPassword, newPasswordConfirm)
+```
+
+### Email verification
+
+```js
+await pb.collection(&#039;users&#039;).requestVerification(&#039;user@example.com&#039;)
+await pb.collection(&#039;users&#039;).confirmVerification(token)
+```
+
+### Email change
+
+```js
+await pb.collection(&#039;users&#039;).requestEmailChange(&#039;new@example.com&#039;)
+await pb.collection(&#039;users&#039;).confirmEmailChange(token, password)
+```
+
+## Realtime (SSE)
+
+### Subscribe to record changes
+
+```js
+// Subscribe to all changes in a collection
+pb.collection(&#039;posts&#039;).subscribe(&#039;*&#039;, function(e) {
+    // e.action: &#039;create&#039; | &#039;update&#039; | &#039;delete&#039;
+    // e.record: the affected record
+    console.log(e.action, e.record.id)
+}, {
+    expand: &#039;author&#039;,  // expand relations in realtime events
+    filter: &#039;status = &quot;active&quot;&#039;,  // only receive matching records
+})
+
+// Subscribe to a specific record
+pb.collection(&#039;posts&#039;).subscribe(&#039;RECORD_ID&#039;, function(e) {
+    console.log(&#039;Record changed:&#039;, e.record)
+})
+
+// Unsubscribe
+pb.collection(&#039;posts&#039;).unsubscribe(&#039;*&#039;)        // from specific topic
+pb.collection(&#039;posts&#039;).unsubscribe(&#039;RECORD_ID&#039;)
+pb.collection(&#039;posts&#039;).unsubscribe()            // from all collection topics
+pb.realtime.unsubscribe()                       // from everything
+```
+
+### Connection management
+
+```js
+// The SDK auto-reconnects on disconnect
+// You can listen for connect/disconnect:
+pb.realtime.onConnect = function() {
+    console.log(&#039;Connected&#039;)
+}
+pb.realtime.onDisconnect = function() {
+    console.log(&#039;Disconnected&#039;)
+}
+```
+
+## File Upload &amp; Download
+
+### Upload files
+
+```js
+// Via FormData (browser)
+const formData = new FormData()
+formData.append(&#039;title&#039;, &#039;My Post&#039;)
+formData.append(&#039;document&#039;, fileInput.files[0])
+formData.append(&#039;images&#039;, fileInput1.files[0])  // multi-file
+formData.append(&#039;images&#039;, fileInput2.files[0])
+
+const record = await pb.collection(&#039;posts&#039;).create(formData)
+
+// Via object (Node.js or when you have the file as a Blob/File)
+const record = await pb.collection(&#039;posts&#039;).create({
+    title: &#039;My Post&#039;,
+    document: new File([blob], &#039;file.pdf&#039;),
+})
+```
+
+### Delete a file
+
+```js
+// Set field to empty to delete
+await pb.collection(&#039;posts&#039;).update(&#039;RECORD_ID&#039;, {
+    document: null,  // deletes the file
+})
+
+// For multi-file: remove specific file
+await pb.collection(&#039;posts&#039;).update(&#039;RECORD_ID&#039;, {
+    &#039;images-&#039;: [&#039;filename_to_remove.jpg&#039;],  // minus suffix removes
+})
+```
+
+### Get file URL
+
+```js
+const url = pb.files.getURL(record, record.document)
+// https://example.com/api/files/COLLECTION_ID/RECORD_ID/filename.pdf
+
+// With thumbnail (for image fields)
+const thumb = pb.files.getURL(record, record.cover, { thumb: &#039;100x100&#039; })
+// Supported: WxH, WxHt (top), WxHb (bottom), WxHf (fit), 0xH, Wx0
+```
+
+### Protected files
+
+For files in collections with view rules, include the auth token:
+
+```js
+const url = pb.files.getURL(record, record.document, { token: pb.authStore.token })
+```
+
+## Batch Operations
+
+Send multiple create/update/delete in one request (transactional):
+
+```js
+const batch = pb.createBatch()
+
+batch.collection(&#039;posts&#039;).create({ title: &#039;Post 1&#039; })
+batch.collection(&#039;posts&#039;).create({ title: &#039;Post 2&#039; })
+batch.collection(&#039;posts&#039;).update(&#039;RECORD_ID&#039;, { title: &#039;Updated&#039; })
+batch.collection(&#039;comments&#039;).delete(&#039;COMMENT_ID&#039;)
+
+const results = await batch.send()
+// results[0], results[1], ... correspond to each operation
+```
+
+## Error Handling
+
+```js
+try {
+    const record = await pb.collection(&#039;posts&#039;).create(data)
+} catch (err) {
+    // err.status — HTTP status code
+    // err.response — full error response
+    // err.response.message — error message
+    // err.response.data — field-level validation errors
+    //   e.g., { title: { code: &quot;validation_required&quot;, message: &quot;Missing required value.&quot; } }
+    // err.isAbort — true if request was cancelled
+
+    if (err.status === 400) {
+        // Validation error
+        for (const [field, error] of Object.entries(err.response.data)) {
+            console.log(`${field}: ${error.message}`)
+        }
+    }
+}
+```
+
+## Advanced
+
+### Auto-cancellation
+
+By default, duplicate pending requests to the same endpoint are auto-cancelled. Disable per-request:
+
+```js
+await pb.collection(&#039;posts&#039;).getList(1, 20, {
+    requestKey: null,  // disable auto-cancel for this request
+})
+
+// Or use a custom key to group cancellations
+await pb.collection(&#039;posts&#039;).getList(1, 20, {
+    requestKey: &#039;my-custom-key&#039;,
+})
+```
+
+### Custom headers
+
+```js
+// Per-request
+await pb.collection(&#039;posts&#039;).getList(1, 20, {
+    headers: { &#039;X-Custom&#039;: &#039;value&#039; }
+})
+
+// Global (all requests)
+pb.beforeSend = function(url, options) {
+    options.headers[&#039;X-Custom&#039;] = &#039;value&#039;
+    return { url, options }
+}
+
+// Intercept response
+pb.afterSend = function(response, data) {
+    // modify data if needed
+    return data
+}
+```
+
+### SSR / Server-side
+
+```js
+// Load auth from cookie (e.g., in Next.js/SvelteKit)
+pb.authStore.loadFromCookie(request.headers.get(&#039;cookie&#039;) || &#039;&#039;)
+
+// Export auth to cookie
+const cookie = pb.authStore.exportToCookie({ httpOnly: false })
+response.headers.set(&#039;set-cookie&#039;, cookie)
+```
+
+### Sending as superuser
+
+```js
+const pb = new PocketBase(&#039;http://127.0.0.1:8090&#039;)
+await pb.collection(&#039;_superusers&#039;).authWithPassword(&#039;admin@example.com&#039;, &#039;password&#039;)
+// Now all requests are authenticated as superuser
+```
+</code>
       </div>
     </div>
 

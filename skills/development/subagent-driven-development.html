@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,257 @@
     <p class="desc">Use when executing implementation plans with independent tasks in the current session</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/subagent-driven-development</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/subagent-driven-development</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: subagent-driven-development
+description: Use when executing implementation plans with independent tasks in the current session
+---
+
+# Subagent-Driven Development
+
+Execute plan by dispatching fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review.
+
+**Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
+
+## When to Use
+
+```dot
+digraph when_to_use {
+    &quot;Have implementation plan?&quot; [shape=diamond];
+    &quot;Tasks mostly independent?&quot; [shape=diamond];
+    &quot;Stay in this session?&quot; [shape=diamond];
+    &quot;subagent-driven-development&quot; [shape=box];
+    &quot;executing-plans&quot; [shape=box];
+    &quot;Manual execution or brainstorm first&quot; [shape=box];
+
+    &quot;Have implementation plan?&quot; -&gt; &quot;Tasks mostly independent?&quot; [label=&quot;yes&quot;];
+    &quot;Have implementation plan?&quot; -&gt; &quot;Manual execution or brainstorm first&quot; [label=&quot;no&quot;];
+    &quot;Tasks mostly independent?&quot; -&gt; &quot;Stay in this session?&quot; [label=&quot;yes&quot;];
+    &quot;Tasks mostly independent?&quot; -&gt; &quot;Manual execution or brainstorm first&quot; [label=&quot;no - tightly coupled&quot;];
+    &quot;Stay in this session?&quot; -&gt; &quot;subagent-driven-development&quot; [label=&quot;yes&quot;];
+    &quot;Stay in this session?&quot; -&gt; &quot;executing-plans&quot; [label=&quot;no - parallel session&quot;];
+}
+```
+
+**vs. Executing Plans (parallel session):**
+- Same session (no context switch)
+- Fresh subagent per task (no context pollution)
+- Two-stage review after each task: spec compliance first, then code quality
+- Faster iteration (no human-in-loop between tasks)
+
+## The Process
+
+```dot
+digraph process {
+    rankdir=TB;
+
+    subgraph cluster_per_task {
+        label=&quot;Per Task&quot;;
+        &quot;Dispatch implementer subagent (./implementer-prompt.md)&quot; [shape=box];
+        &quot;Implementer subagent asks questions?&quot; [shape=diamond];
+        &quot;Answer questions, provide context&quot; [shape=box];
+        &quot;Implementer subagent implements, tests, commits, self-reviews&quot; [shape=box];
+        &quot;Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)&quot; [shape=box];
+        &quot;Spec reviewer subagent confirms code matches spec?&quot; [shape=diamond];
+        &quot;Implementer subagent fixes spec gaps&quot; [shape=box];
+        &quot;Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)&quot; [shape=box];
+        &quot;Code quality reviewer subagent approves?&quot; [shape=diamond];
+        &quot;Implementer subagent fixes quality issues&quot; [shape=box];
+        &quot;Mark task complete in TodoWrite&quot; [shape=box];
+    }
+
+    &quot;Read plan, extract all tasks with full text, note context, create TodoWrite&quot; [shape=box];
+    &quot;More tasks remain?&quot; [shape=diamond];
+    &quot;Dispatch final code reviewer subagent for entire implementation&quot; [shape=box];
+    &quot;Use superpowers:finishing-a-development-branch&quot; [shape=box style=filled fillcolor=lightgreen];
+
+    &quot;Read plan, extract all tasks with full text, note context, create TodoWrite&quot; -&gt; &quot;Dispatch implementer subagent (./implementer-prompt.md)&quot;;
+    &quot;Dispatch implementer subagent (./implementer-prompt.md)&quot; -&gt; &quot;Implementer subagent asks questions?&quot;;
+    &quot;Implementer subagent asks questions?&quot; -&gt; &quot;Answer questions, provide context&quot; [label=&quot;yes&quot;];
+    &quot;Answer questions, provide context&quot; -&gt; &quot;Dispatch implementer subagent (./implementer-prompt.md)&quot;;
+    &quot;Implementer subagent asks questions?&quot; -&gt; &quot;Implementer subagent implements, tests, commits, self-reviews&quot; [label=&quot;no&quot;];
+    &quot;Implementer subagent implements, tests, commits, self-reviews&quot; -&gt; &quot;Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)&quot;;
+    &quot;Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)&quot; -&gt; &quot;Spec reviewer subagent confirms code matches spec?&quot;;
+    &quot;Spec reviewer subagent confirms code matches spec?&quot; -&gt; &quot;Implementer subagent fixes spec gaps&quot; [label=&quot;no&quot;];
+    &quot;Implementer subagent fixes spec gaps&quot; -&gt; &quot;Dispatch spec reviewer subagent (./spec-reviewer-prompt.md)&quot; [label=&quot;re-review&quot;];
+    &quot;Spec reviewer subagent confirms code matches spec?&quot; -&gt; &quot;Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)&quot; [label=&quot;yes&quot;];
+    &quot;Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)&quot; -&gt; &quot;Code quality reviewer subagent approves?&quot;;
+    &quot;Code quality reviewer subagent approves?&quot; -&gt; &quot;Implementer subagent fixes quality issues&quot; [label=&quot;no&quot;];
+    &quot;Implementer subagent fixes quality issues&quot; -&gt; &quot;Dispatch code quality reviewer subagent (./code-quality-reviewer-prompt.md)&quot; [label=&quot;re-review&quot;];
+    &quot;Code quality reviewer subagent approves?&quot; -&gt; &quot;Mark task complete in TodoWrite&quot; [label=&quot;yes&quot;];
+    &quot;Mark task complete in TodoWrite&quot; -&gt; &quot;More tasks remain?&quot;;
+    &quot;More tasks remain?&quot; -&gt; &quot;Dispatch implementer subagent (./implementer-prompt.md)&quot; [label=&quot;yes&quot;];
+    &quot;More tasks remain?&quot; -&gt; &quot;Dispatch final code reviewer subagent for entire implementation&quot; [label=&quot;no&quot;];
+    &quot;Dispatch final code reviewer subagent for entire implementation&quot; -&gt; &quot;Use superpowers:finishing-a-development-branch&quot;;
+}
+```
+
+## Prompt Templates
+
+- `./implementer-prompt.md` - Dispatch implementer subagent
+- `./spec-reviewer-prompt.md` - Dispatch spec compliance reviewer subagent
+- `./code-quality-reviewer-prompt.md` - Dispatch code quality reviewer subagent
+
+## Example Workflow
+
+```
+You: I&#039;m using Subagent-Driven Development to execute this plan.
+
+[Read plan file once: docs/plans/feature-plan.md]
+[Extract all 5 tasks with full text and context]
+[Create TodoWrite with all tasks]
+
+Task 1: Hook installation script
+
+[Get Task 1 text and context (already extracted)]
+[Dispatch implementation subagent with full task text + context]
+
+Implementer: &quot;Before I begin - should the hook be installed at user or system level?&quot;
+
+You: &quot;User level (~/.config/superpowers/hooks/)&quot;
+
+Implementer: &quot;Got it. Implementing now...&quot;
+[Later] Implementer:
+  - Implemented install-hook command
+  - Added tests, 5/5 passing
+  - Self-review: Found I missed --force flag, added it
+  - Committed
+
+[Dispatch spec compliance reviewer]
+Spec reviewer: ✅ Spec compliant - all requirements met, nothing extra
+
+[Get git SHAs, dispatch code quality reviewer]
+Code reviewer: Strengths: Good test coverage, clean. Issues: None. Approved.
+
+[Mark Task 1 complete]
+
+Task 2: Recovery modes
+
+[Get Task 2 text and context (already extracted)]
+[Dispatch implementation subagent with full task text + context]
+
+Implementer: [No questions, proceeds]
+Implementer:
+  - Added verify/repair modes
+  - 8/8 tests passing
+  - Self-review: All good
+  - Committed
+
+[Dispatch spec compliance reviewer]
+Spec reviewer: ❌ Issues:
+  - Missing: Progress reporting (spec says &quot;report every 100 items&quot;)
+  - Extra: Added --json flag (not requested)
+
+[Implementer fixes issues]
+Implementer: Removed --json flag, added progress reporting
+
+[Spec reviewer reviews again]
+Spec reviewer: ✅ Spec compliant now
+
+[Dispatch code quality reviewer]
+Code reviewer: Strengths: Solid. Issues (Important): Magic number (100)
+
+[Implementer fixes]
+Implementer: Extracted PROGRESS_INTERVAL constant
+
+[Code reviewer reviews again]
+Code reviewer: ✅ Approved
+
+[Mark Task 2 complete]
+
+...
+
+[After all tasks]
+[Dispatch final code-reviewer]
+Final reviewer: All requirements met, ready to merge
+
+Done!
+```
+
+## Advantages
+
+**vs. Manual execution:**
+- Subagents follow TDD naturally
+- Fresh context per task (no confusion)
+- Parallel-safe (subagents don&#039;t interfere)
+- Subagent can ask questions (before AND during work)
+
+**vs. Executing Plans:**
+- Same session (no handoff)
+- Continuous progress (no waiting)
+- Review checkpoints automatic
+
+**Efficiency gains:**
+- No file reading overhead (controller provides full text)
+- Controller curates exactly what context is needed
+- Subagent gets complete information upfront
+- Questions surfaced before work begins (not after)
+
+**Quality gates:**
+- Self-review catches issues before handoff
+- Two-stage review: spec compliance, then code quality
+- Review loops ensure fixes actually work
+- Spec compliance prevents over/under-building
+- Code quality ensures implementation is well-built
+
+**Cost:**
+- More subagent invocations (implementer + 2 reviewers per task)
+- Controller does more prep work (extracting all tasks upfront)
+- Review loops add iterations
+- But catches issues early (cheaper than debugging later)
+
+## Red Flags
+
+**Never:**
+- Skip reviews (spec compliance OR code quality)
+- Proceed with unfixed issues
+- Dispatch multiple implementation subagents in parallel (conflicts)
+- Make subagent read plan file (provide full text instead)
+- Skip scene-setting context (subagent needs to understand where task fits)
+- Ignore subagent questions (answer before letting them proceed)
+- Accept &quot;close enough&quot; on spec compliance (spec reviewer found issues = not done)
+- Skip review loops (reviewer found issues = implementer fixes = review again)
+- Let implementer self-review replace actual review (both are needed)
+- **Start code quality review before spec compliance is ✅** (wrong order)
+- Move to next task while either review has open issues
+
+**If subagent asks questions:**
+- Answer clearly and completely
+- Provide additional context if needed
+- Don&#039;t rush them into implementation
+
+**If reviewer finds issues:**
+- Implementer (same subagent) fixes them
+- Reviewer reviews again
+- Repeat until approved
+- Don&#039;t skip the re-review
+
+**If subagent fails task:**
+- Dispatch fix subagent with specific instructions
+- Don&#039;t try to fix manually (context pollution)
+
+## Integration
+
+**Required workflow skills:**
+- **superpowers:writing-plans** - Creates the plan this skill executes
+- **superpowers:requesting-code-review** - Code review template for reviewer subagents
+- **superpowers:finishing-a-development-branch** - Complete development after all tasks
+
+**Subagents should use:**
+- **superpowers:test-driven-development** - Subagents follow TDD for each task
+
+**Alternative workflow:**
+- **superpowers:executing-plans** - Use for parallel session instead of same-session execution
+</code>
       </div>
     </div>
 

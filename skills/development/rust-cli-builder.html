@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,552 @@
     <p class="desc">Plan and build production-ready Rust CLI tools using clap for argument parsing, with subcommands, config file support, colored output, and proper error handling. Uses interview-driven planning to clarify commands, input/output formats, and distribution strategy before writing any code.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/rust-cli-builder</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/rust-cli-builder</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: rust-cli-builder
+description: Plan and build production-ready Rust CLI tools using clap for argument parsing, with subcommands, config file support, colored output, and proper error handling. Uses interview-driven planning to clarify commands, input/output formats, and distribution strategy before writing any code.
+tags: [rust, cli, clap, terminal, command-line, devtools]
+---
+
+# Rust CLI Tool Builder
+
+## When to use
+
+Use this skill when you need to:
+
+- Scaffold a new Rust CLI tool from scratch with clap
+- Add subcommands to an existing CLI application
+- Implement config file loading (TOML/JSON/YAML)
+- Set up proper error handling with anyhow/thiserror
+- Add colored and formatted terminal output
+- Structure a CLI project for distribution via cargo install or GitHub releases
+
+## Phase 1: Explore (Plan Mode)
+
+Enter plan mode. Before writing any code, explore the existing project:
+
+### If extending an existing project
+- Find `Cargo.toml` and check current dependencies (clap version, serde, tokio, etc.)
+- Locate the CLI entry point (`src/main.rs` or `src/cli.rs`)
+- Check if clap is using derive macros or builder pattern
+- Identify existing subcommand structure
+- Look for existing error types, config structs, and output formatting
+- Check if there&#039;s a `src/lib.rs` separating library logic from CLI
+
+### If starting from scratch
+- Check the workspace for any existing Rust projects or workspace `Cargo.toml`
+- Look for a `.cargo/config.toml` with custom settings
+- Check for `rust-toolchain.toml` to know the target Rust edition
+
+## Phase 2: Interview (AskUserQuestion)
+
+Use AskUserQuestion to clarify requirements. Ask in rounds.
+
+### Round 1: Tool purpose and commands
+
+```
+Question: &quot;What kind of CLI tool are you building?&quot;
+Header: &quot;Tool type&quot;
+Options:
+  - &quot;Single command (like ripgrep, curl)&quot; — One main action with flags and arguments
+  - &quot;Multi-command (like git, cargo)&quot; — Multiple subcommands under one binary
+  - &quot;Interactive REPL (like psql)&quot; — Persistent session with a prompt loop
+  - &quot;Pipeline tool (like jq, sed)&quot; — Reads stdin, transforms, writes stdout
+
+Question: &quot;What will the tool operate on?&quot;
+Header: &quot;Input&quot;
+Options:
+  - &quot;Files/directories&quot; — Read, process, or generate files
+  - &quot;Network/API&quot; — HTTP requests, TCP connections, API calls
+  - &quot;System resources&quot; — Processes, hardware info, OS config
+  - &quot;Data streams (stdin/stdout)&quot; — Pipe-friendly text/binary processing
+```
+
+### Round 2: Subcommands (if multi-command)
+
+```
+Question: &quot;Describe the subcommands you need (e.g., &#039;init&#039;, &#039;build&#039;, &#039;deploy&#039;)&quot;
+Header: &quot;Commands&quot;
+Options:
+  - &quot;2-3 subcommands (I&#039;ll describe them)&quot; — Small focused tool
+  - &quot;4-8 subcommands with groups&quot; — Medium tool, may need command groups
+  - &quot;I have a rough list, help me design the API&quot; — Collaborative command design
+```
+
+### Round 3: Configuration and output
+
+```
+Question: &quot;How should the tool be configured?&quot;
+Header: &quot;Config&quot;
+Options:
+  - &quot;CLI flags only (Recommended)&quot; — All config via command-line arguments
+  - &quot;Config file (TOML)&quot; — Load defaults from ~/.config/toolname/config.toml
+  - &quot;Config file + CLI overrides&quot; — Config file for defaults, flags override specific values
+  - &quot;Environment variables + flags&quot; — Env vars for secrets, flags for everything else
+
+Question: &quot;What output format does the tool need?&quot;
+Header: &quot;Output&quot;
+Options:
+  - &quot;Human-readable (colored text)&quot; — Pretty terminal output with colors and formatting
+  - &quot;Machine-readable (JSON)&quot; — Structured output for piping to other tools
+  - &quot;Both (--format flag)&quot; — Default human, --json or --format=json for machines
+  - &quot;Minimal (exit codes only)&quot; — Success/failure via exit code, errors to stderr
+```
+
+### Round 4: Async and error handling
+
+```
+Question: &quot;Does the tool need async operations?&quot;
+Header: &quot;Async&quot;
+Options:
+  - &quot;No — synchronous is fine (Recommended)&quot; — File I/O, computation, simple operations
+  - &quot;Yes — tokio (network I/O)&quot; — HTTP requests, concurrent connections, async file I/O
+  - &quot;Yes — tokio multi-threaded&quot; — Heavy parallelism, multiple concurrent tasks
+
+Question: &quot;How should errors be presented to users?&quot;
+Header: &quot;Errors&quot;
+Options:
+  - &quot;Simple messages (anyhow) (Recommended)&quot; — Human-readable error chains, good for most CLIs
+  - &quot;Typed errors (thiserror)&quot; — Custom error enum with specific variants for each failure
+  - &quot;Both (thiserror for lib, anyhow for bin)&quot; — Library code is typed, CLI wraps with anyhow
+```
+
+## Phase 3: Plan (ExitPlanMode)
+
+Write a concrete implementation plan covering:
+
+1. **Project structure** — `Cargo.toml` dependencies, `src/` file layout
+2. **CLI definition** — clap derive structs for all commands, args, and flags
+3. **Config loading** — config file format and merge strategy with CLI args
+4. **Core logic** — main functions for each subcommand, separated from CLI layer
+5. **Error types** — error enum or anyhow usage, user-facing error messages
+6. **Output formatting** — colored output, JSON mode, progress indicators
+7. **Tests** — unit tests for core logic, integration tests for CLI behavior
+
+Present via ExitPlanMode for user approval.
+
+## Phase 4: Execute
+
+After approval, implement following this order:
+
+### Step 1: Project setup (Cargo.toml)
+
+```toml
+[package]
+name = &quot;toolname&quot;
+version = &quot;0.1.0&quot;
+edition = &quot;2021&quot;
+description = &quot;Short description of the tool&quot;
+
+[dependencies]
+clap = { version = &quot;4&quot;, features = [&quot;derive&quot;, &quot;env&quot;] }
+serde = { version = &quot;1&quot;, features = [&quot;derive&quot;] }
+anyhow = &quot;1&quot;
+# Add based on interview:
+# thiserror = &quot;2&quot;              # if typed errors
+# tokio = { version = &quot;1&quot;, features = [&quot;full&quot;] }  # if async
+# serde_json = &quot;1&quot;             # if JSON output
+# toml = &quot;0.8&quot;                 # if TOML config
+# colored = &quot;2&quot;                # if colored output
+# indicatif = &quot;0.17&quot;           # if progress bars
+# dirs = &quot;5&quot;                   # if config file (~/.config/)
+```
+
+### Step 2: CLI definition with clap derive
+
+```rust
+use clap::{Parser, Subcommand};
+
+/// Short one-line description of the tool
+#[derive(Parser, Debug)]
+#[command(name = &quot;toolname&quot;, version, about, long_about = None)]
+pub struct Cli {
+    /// Increase verbosity (-v, -vv, -vvv)
+    #[arg(short, long, action = clap::ArgAction::Count, global = true)]
+    pub verbose: u8,
+
+    /// Output format
+    #[arg(long, default_value = &quot;text&quot;, global = true)]
+    pub format: OutputFormat,
+
+    /// Path to config file
+    #[arg(long, global = true)]
+    pub config: Option&lt;std::path::PathBuf&gt;,
+
+    #[command(subcommand)]
+    pub command: Commands,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum Commands {
+    /// Initialize a new project
+    Init {
+        /// Project name
+        name: String,
+
+        /// Template to use
+        #[arg(short, long, default_value = &quot;default&quot;)]
+        template: String,
+    },
+
+    /// Build the project
+    Build {
+        /// Build in release mode
+        #[arg(short, long)]
+        release: bool,
+
+        /// Target directory
+        #[arg(short, long)]
+        output: Option&lt;std::path::PathBuf&gt;,
+    },
+
+    /// Show project status
+    Status,
+}
+
+#[derive(clap::ValueEnum, Clone, Debug)]
+pub enum OutputFormat {
+    Text,
+    Json,
+}
+```
+
+### Step 3: Error handling
+
+```rust
+// With anyhow (simple approach):
+use anyhow::{Context, Result};
+
+fn load_config(path: &amp;Path) -&gt; Result&lt;Config&gt; {
+    let content = std::fs::read_to_string(path)
+        .with_context(|| format!(&quot;Failed to read config file: {}&quot;, path.display()))?;
+    let config: Config = toml::from_str(&amp;content)
+        .context(&quot;Invalid TOML in config file&quot;)?;
+    Ok(config)
+}
+
+// With thiserror (typed approach):
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum AppError {
+    #[error(&quot;Config file not found: {path}&quot;)]
+    ConfigNotFound { path: std::path::PathBuf },
+
+    #[error(&quot;Invalid config: {0}&quot;)]
+    InvalidConfig(#[from] toml::de::Error),
+
+    #[error(&quot;Network error: {0}&quot;)]
+    Network(#[from] reqwest::Error),
+
+    #[error(&quot;{0}&quot;)]
+    Custom(String),
+}
+```
+
+### Step 4: Config file loading
+
+```rust
+use serde::Deserialize;
+use std::path::{Path, PathBuf};
+
+#[derive(Deserialize, Debug, Default)]
+pub struct Config {
+    pub default_template: Option&lt;String&gt;,
+    pub output_dir: Option&lt;PathBuf&gt;,
+    // ... fields from interview
+}
+
+impl Config {
+    pub fn load(explicit_path: Option&lt;&amp;Path&gt;) -&gt; anyhow::Result&lt;Self&gt; {
+        let path = match explicit_path {
+            Some(p) =&gt; p.to_path_buf(),
+            None =&gt; Self::default_path(),
+        };
+
+        if !path.exists() {
+            return Ok(Config::default());
+        }
+
+        let content = std::fs::read_to_string(&amp;path)?;
+        let config: Config = toml::from_str(&amp;content)?;
+        Ok(config)
+    }
+
+    fn default_path() -&gt; PathBuf {
+        dirs::config_dir()
+            .unwrap_or_else(|| PathBuf::from(&quot;.&quot;))
+            .join(&quot;toolname&quot;)
+            .join(&quot;config.toml&quot;)
+    }
+}
+```
+
+### Step 5: Colored output and formatting
+
+```rust
+use colored::Colorize;
+
+pub struct Output {
+    format: OutputFormat,
+    verbose: u8,
+}
+
+impl Output {
+    pub fn new(format: OutputFormat, verbose: u8) -&gt; Self {
+        Self { format, verbose }
+    }
+
+    pub fn success(&amp;self, msg: &amp;str) {
+        match self.format {
+            OutputFormat::Text =&gt; eprintln!(&quot;{} {}&quot;, &quot;✓&quot;.green().bold(), msg),
+            OutputFormat::Json =&gt; {} // JSON output goes to stdout only
+        }
+    }
+
+    pub fn error(&amp;self, msg: &amp;str) {
+        match self.format {
+            OutputFormat::Text =&gt; eprintln!(&quot;{} {}&quot;, &quot;✗&quot;.red().bold(), msg),
+            OutputFormat::Json =&gt; {
+                let err = serde_json::json!({&quot;error&quot;: msg});
+                println!(&quot;{}&quot;, serde_json::to_string(&amp;err).unwrap());
+            }
+        }
+    }
+
+    pub fn info(&amp;self, msg: &amp;str) {
+        if self.verbose &gt;= 1 {
+            match self.format {
+                OutputFormat::Text =&gt; eprintln!(&quot;{} {}&quot;, &quot;ℹ&quot;.blue(), msg),
+                OutputFormat::Json =&gt; {}
+            }
+        }
+    }
+
+    pub fn data&lt;T: serde::Serialize&gt;(&amp;self, data: &amp;T) {
+        match self.format {
+            OutputFormat::Text =&gt; {
+                // Pretty print for humans — customize per subcommand
+                println!(&quot;{:#?}&quot;, data);
+            }
+            OutputFormat::Json =&gt; {
+                println!(&quot;{}&quot;, serde_json::to_string_pretty(data).unwrap());
+            }
+        }
+    }
+}
+```
+
+### Step 6: Main entry point
+
+```rust
+use clap::Parser;
+
+fn main() -&gt; anyhow::Result&lt;()&gt; {
+    let cli = Cli::parse();
+    let config = Config::load(cli.config.as_deref())?;
+    let output = Output::new(cli.format.clone(), cli.verbose);
+
+    match cli.command {
+        Commands::Init { name, template } =&gt; {
+            cmd_init(&amp;name, &amp;template, &amp;config, &amp;output)?;
+        }
+        Commands::Build { release, output_dir } =&gt; {
+            let dir = output_dir
+                .or(config.output_dir.clone())
+                .unwrap_or_else(|| PathBuf::from(&quot;./dist&quot;));
+            cmd_build(release, &amp;dir, &amp;output)?;
+        }
+        Commands::Status =&gt; {
+            cmd_status(&amp;config, &amp;output)?;
+        }
+    }
+
+    Ok(())
+}
+
+// If async (tokio):
+// #[tokio::main]
+// async fn main() -&gt; anyhow::Result&lt;()&gt; { ... }
+```
+
+### Step 7: Subcommand implementations
+
+```rust
+fn cmd_init(name: &amp;str, template: &amp;str, config: &amp;Config, out: &amp;Output) -&gt; anyhow::Result&lt;()&gt; {
+    let template = if template == &quot;default&quot; {
+        config.default_template.as_deref().unwrap_or(&quot;default&quot;)
+    } else {
+        template
+    };
+
+    out.info(&amp;format!(&quot;Using template: {}&quot;, template));
+
+    let project_dir = Path::new(name);
+    if project_dir.exists() {
+        anyhow::bail!(&quot;Directory &#039;{}&#039; already exists&quot;, name);
+    }
+
+    std::fs::create_dir_all(project_dir)?;
+    // ... scaffold project files based on template
+
+    out.success(&amp;format!(&quot;Created project &#039;{}&#039; with template &#039;{}&#039;&quot;, name, template));
+    Ok(())
+}
+```
+
+### Step 8: Tests
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_config_default() {
+        let config = Config::default();
+        assert!(config.default_template.is_none());
+    }
+
+    #[test]
+    fn test_config_parse_toml() {
+        let toml_str = r#&quot;
+            default_template = &quot;react&quot;
+            output_dir = &quot;./build&quot;
+        &quot;#;
+        let config: Config = toml::from_str(toml_str).unwrap();
+        assert_eq!(config.default_template.unwrap(), &quot;react&quot;);
+    }
+}
+
+// Integration tests (tests/cli.rs):
+use assert_cmd::Command;
+use predicates::prelude::*;
+
+#[test]
+fn test_help_flag() {
+    Command::cargo_bin(&quot;toolname&quot;)
+        .unwrap()
+        .arg(&quot;--help&quot;)
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(&quot;Usage:&quot;));
+}
+
+#[test]
+fn test_version_flag() {
+    Command::cargo_bin(&quot;toolname&quot;)
+        .unwrap()
+        .arg(&quot;--version&quot;)
+        .assert()
+        .success();
+}
+
+#[test]
+fn test_init_creates_directory() {
+    let dir = tempfile::tempdir().unwrap();
+    let project_name = dir.path().join(&quot;test-project&quot;);
+
+    Command::cargo_bin(&quot;toolname&quot;)
+        .unwrap()
+        .args([&quot;init&quot;, project_name.to_str().unwrap()])
+        .assert()
+        .success();
+
+    assert!(project_name.exists());
+}
+
+#[test]
+fn test_init_existing_directory_fails() {
+    let dir = tempfile::tempdir().unwrap();
+
+    Command::cargo_bin(&quot;toolname&quot;)
+        .unwrap()
+        .args([&quot;init&quot;, dir.path().to_str().unwrap()])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains(&quot;already exists&quot;));
+}
+
+#[test]
+fn test_json_output_format() {
+    Command::cargo_bin(&quot;toolname&quot;)
+        .unwrap()
+        .args([&quot;--format&quot;, &quot;json&quot;, &quot;status&quot;])
+        .assert()
+        .success()
+        .stdout(predicate::str::starts_with(&quot;{&quot;));
+}
+```
+
+## Project structure reference
+
+```
+toolname/
+├── Cargo.toml
+├── src/
+│   ├── main.rs          # Entry point, CLI parsing, command dispatch
+│   ├── cli.rs           # Clap derive structs (Cli, Commands, Args)
+│   ├── config.rs        # Config file loading and merging
+│   ├── output.rs        # Output formatting (text/JSON/colored)
+│   ├── error.rs         # Error types (if using thiserror)
+│   └── commands/
+│       ├── mod.rs
+│       ├── init.rs      # Init subcommand logic
+│       ├── build.rs     # Build subcommand logic
+│       └── status.rs    # Status subcommand logic
+└── tests/
+    └── cli.rs           # Integration tests with assert_cmd
+```
+
+## Best practices
+
+### Separate CLI from logic
+Keep clap structs and argument parsing in `cli.rs`. Put business logic in `commands/`. This makes the core logic testable without invoking the CLI.
+
+### Use stderr for status, stdout for data
+Human-readable messages (progress, success, errors) go to `stderr`. Machine-readable data goes to `stdout`. This lets users pipe output cleanly: `toolname status --format json | jq &#039;.items&#039;`.
+
+### Respect NO_COLOR
+Check the `NO_COLOR` environment variable and disable colors when set:
+```rust
+if std::env::var(&quot;NO_COLOR&quot;).is_ok() {
+    colored::control::set_override(false);
+}
+```
+
+### Exit codes
+Use meaningful exit codes: 0 for success, 1 for general errors, 2 for usage errors (clap handles this automatically).
+
+### Dev dependencies for testing
+
+```toml
+[dev-dependencies]
+assert_cmd = &quot;2&quot;
+predicates = &quot;3&quot;
+tempfile = &quot;3&quot;
+```
+
+## Checklist before finishing
+
+- [ ] `clap` derive structs have doc comments (they become --help text)
+- [ ] All subcommands have short and long descriptions
+- [ ] Config file has sensible defaults and doesn&#039;t error when missing
+- [ ] `--format json` outputs valid, parseable JSON to stdout
+- [ ] Errors show context (file paths, what went wrong, how to fix it)
+- [ ] Integration tests verify CLI behavior end-to-end
+- [ ] `cargo clippy` passes with no warnings
+- [ ] `cargo fmt` has been run
+</code>
       </div>
     </div>
 

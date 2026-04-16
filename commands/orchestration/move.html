@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,236 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/move</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/move</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># Task Move Command
+
+Move tasks between status folders following the task management protocol.
+
+## Usage
+
+```
+/task-move TASK-ID new-status [reason]
+```
+
+## Description
+
+Updates task status by moving files between status folders and updating tracking information. Follows all protocol rules including validation and audit trails.
+
+## Basic Commands
+
+### Start Working on a Task
+```
+/task-move TASK-001 in_progress
+```
+Moves from todos → in_progress
+
+### Complete Implementation
+```
+/task-move TASK-001 qa &quot;Implementation complete, ready for testing&quot;
+```
+Moves from in_progress → qa
+
+### Task Passed QA
+```
+/task-move TASK-001 completed &quot;All tests passed&quot;
+```
+Moves from qa → completed
+
+### Block a Task
+```
+/task-move TASK-004 on_hold &quot;Waiting for TASK-001 API completion&quot;
+```
+Moves to on_hold with reason
+
+### Unblock a Task
+```
+/task-move TASK-004 todos &quot;Dependencies resolved&quot;
+```
+Moves from on_hold → todos
+
+### Failed QA
+```
+/task-move TASK-001 in_progress &quot;Failed integration test - fixing null pointer&quot;
+```
+Moves from qa → in_progress
+
+## Bulk Operations
+
+### Move Multiple Tasks
+```
+/task-move TASK-001,TASK-002,TASK-003 in_progress
+```
+
+### Move by Filter
+```
+/task-move --filter &quot;priority:high status:todos&quot; in_progress
+```
+
+### Move with Pattern
+```
+/task-move TASK-00* qa &quot;Batch testing ready&quot;
+```
+
+## Validation Rules
+
+The command enforces:
+1. **Valid Transitions**: Only allowed status changes
+2. **One Task Per Agent**: Warns if agent has task in_progress
+3. **Dependency Check**: Warns if dependencies not met
+4. **File Existence**: Verifies task exists before moving
+
+## Status Transition Map
+
+```
+todos ──────→ in_progress ──────→ qa ──────→ completed
+  ↓               ↓               ↓
+  └───────────→ on_hold ←─────────┘
+                  ↓
+                todos/in_progress
+```
+
+## Options
+
+### Force Move
+```
+/task-move TASK-001 completed --force
+```
+Bypasses validation (use with caution)
+
+### Dry Run
+```
+/task-move TASK-001 qa --dry-run
+```
+Shows what would happen without executing
+
+### With Assignment
+```
+/task-move TASK-001 in_progress --assign dev-frontend
+```
+Assigns task to specific agent
+
+### With Time Estimate
+```
+/task-move TASK-001 in_progress --estimate 4h
+```
+Updates time estimate when starting
+
+## Error Handling
+
+### Task Not Found
+```
+Error: TASK-999 not found in any status folder
+Suggestion: Use /task-status to see available tasks
+```
+
+### Invalid Transition
+```
+Error: Cannot move from &#039;completed&#039; to &#039;todos&#039;
+Valid transitions from completed: None (terminal state)
+```
+
+### Agent Conflict
+```
+Warning: dev-frontend already has TASK-002 in progress
+Continue? (y/n)
+```
+
+### Dependency Block
+```
+Warning: TASK-004 depends on TASK-001 (currently in_progress)
+Moving to on_hold instead? (y/n)
+```
+
+## Automation
+
+### Auto-move on Completion
+```
+/task-move TASK-001 --auto-progress
+```
+Automatically moves to next status when conditions met
+
+### Scheduled Moves
+```
+/task-move TASK-005 in_progress --at &quot;tomorrow 9am&quot;
+```
+
+### Conditional Moves
+```
+/task-move TASK-007 qa --when &quot;TASK-006 completed&quot;
+```
+
+## Examples
+
+### Example 1: Developer Workflow
+```
+# Start work
+/task-move TASK-001 in_progress
+
+# Complete and test
+/task-move TASK-001 qa &quot;Implementation done, tests passing&quot;
+
+# After review
+/task-move TASK-001 completed &quot;Code review approved&quot;
+```
+
+### Example 2: Handling Blocks
+```
+# Block due to dependency
+/task-move TASK-004 on_hold &quot;Waiting for auth API from TASK-001&quot;
+
+# Unblock when ready
+/task-move TASK-004 todos &quot;TASK-001 now in QA, API available&quot;
+```
+
+### Example 3: QA Workflow
+```
+# QA picks up task
+/task-move TASK-001 qa --assign qa-engineer
+
+# Found issues
+/task-move TASK-001 in_progress &quot;Bug: handling empty responses&quot;
+
+# Fixed and retesting
+/task-move TASK-001 qa &quot;Bug fixed, ready for retest&quot;
+```
+
+## Status Update Details
+
+Each move updates:
+1. **File Location**: Physical file movement
+2. **Status Tracker**: TASK-STATUS-TRACKER.yaml entry
+3. **Task Metadata**: Status field in task file
+4. **Execution Tracker**: Overall progress metrics
+
+## Best Practices
+
+1. **Always Provide Reasons**: Especially for blocks and failures
+2. **Check Dependencies**: Before moving to in_progress
+3. **Update Estimates**: When starting work
+4. **Clear Block Reasons**: Help others understand delays
+
+## Integration
+
+- Use after `/task-status` to see available tasks
+- Updates reflected in `/task-report`
+- Triggers notifications if configured
+- Logs all moves for audit trail
+
+## Notes
+
+- Moves are atomic - either fully complete or rolled back
+- Status history is permanent and cannot be edited
+- Timestamp uses current time in ISO-8601 format
+- Agent name is automatically detected from context</code>
       </div>
     </div>
 

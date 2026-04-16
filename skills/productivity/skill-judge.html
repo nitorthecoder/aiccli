@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,769 @@
     <p class="desc">Evaluate Agent Skill design quality against official specifications and best practices. Use when reviewing, auditing, or improving SKILL.md files and skill packages. Provides multi-dimensional scoring and actionable improvement suggestions.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/skill-judge</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/skill-judge</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: skill-judge
+description: Evaluate Agent Skill design quality against official specifications and best practices. Use when reviewing, auditing, or improving SKILL.md files and skill packages. Provides multi-dimensional scoring and actionable improvement suggestions.
+---
+
+# Skill Judge
+
+Evaluate Agent Skills against official specifications and patterns derived from 17+ official examples.
+
+---
+
+## Core Philosophy
+
+### What is a Skill?
+
+A Skill is NOT a tutorial. A Skill is a **knowledge externalization mechanism**.
+
+Traditional AI knowledge is locked in model parameters. To teach new capabilities:
+```
+Traditional: Collect data → GPU cluster → Train → Deploy new version
+Cost: $10,000 - $1,000,000+
+Timeline: Weeks to months
+```
+
+Skills change this:
+```
+Skill: Edit SKILL.md → Save → Takes effect on next invocation
+Cost: $0
+Timeline: Instant
+```
+
+This is the paradigm shift from &quot;training AI&quot; to &quot;educating AI&quot; — like a hot-swappable LoRA adapter that requires no training. You edit a Markdown file in natural language, and the model&#039;s behavior changes.
+
+### The Core Formula
+
+&gt; **Good Skill = Expert-only Knowledge − What Claude Already Knows**
+
+A Skill&#039;s value is measured by its **knowledge delta** — the gap between what it provides and what the model already knows.
+
+- **Expert-only knowledge**: Decision trees, trade-offs, edge cases, anti-patterns, domain-specific thinking frameworks — things that take years of experience to accumulate
+- **What Claude already knows**: Basic concepts, standard library usage, common programming patterns, general best practices
+
+When a Skill explains &quot;what is PDF&quot; or &quot;how to write a for-loop&quot;, it&#039;s compressing knowledge Claude already has. This is **token waste** — context window is a public resource shared with system prompts, conversation history, other Skills, and user requests.
+
+### Tool vs Skill
+
+| Concept | Essence | Function | Example |
+|---------|---------|----------|---------|
+| **Tool** | What model CAN do | Execute actions | bash, read_file, write_file, WebSearch |
+| **Skill** | What model KNOWS how to do | Guide decisions | PDF processing, MCP building, frontend design |
+
+Tools define capability boundaries — without bash tool, model can&#039;t execute commands.
+Skills inject knowledge — without frontend-design Skill, model produces generic UI.
+
+**The equation**:
+```
+General Agent + Excellent Skill = Domain Expert Agent
+```
+
+Same Claude model, different Skills loaded, becomes different experts.
+
+### Three Types of Knowledge in Skills
+
+When evaluating, categorize each section:
+
+| Type | Definition | Treatment |
+|------|------------|-----------|
+| **Expert** | Claude genuinely doesn&#039;t know this | Must keep — this is the Skill&#039;s value |
+| **Activation** | Claude knows but may not think of | Keep if brief — serves as reminder |
+| **Redundant** | Claude definitely knows this | Should delete — wastes tokens |
+
+The art of Skill design is maximizing Expert content, using Activation sparingly, and eliminating Redundant ruthlessly.
+
+---
+
+## Evaluation Dimensions (120 points total)
+
+### D1: Knowledge Delta (20 points) — THE CORE DIMENSION
+
+The most important dimension. Does the Skill add genuine expert knowledge?
+
+| Score | Criteria |
+|-------|----------|
+| 0-5 | Explains basics Claude knows (what is X, how to write code, standard library tutorials) |
+| 6-10 | Mixed: some expert knowledge diluted by obvious content |
+| 11-15 | Mostly expert knowledge with minimal redundancy |
+| 16-20 | Pure knowledge delta — every paragraph earns its tokens |
+
+**Red flags** (instant score ≤5):
+- &quot;What is [basic concept]&quot; sections
+- Step-by-step tutorials for standard operations
+- Explaining how to use common libraries
+- Generic best practices (&quot;write clean code&quot;, &quot;handle errors&quot;)
+- Definitions of industry-standard terms
+
+**Green flags** (indicators of high knowledge delta):
+- Decision trees for non-obvious choices (&quot;when X fails, try Y because Z&quot;)
+- Trade-offs only an expert would know (&quot;A is faster but B handles edge case C&quot;)
+- Edge cases from real-world experience
+- &quot;NEVER do X because [non-obvious reason]&quot;
+- Domain-specific thinking frameworks
+
+**Evaluation questions**:
+1. For each section, ask: &quot;Does Claude already know this?&quot;
+2. If explaining something, ask: &quot;Is this explaining TO Claude or FOR Claude?&quot;
+3. Count paragraphs that are Expert vs Activation vs Redundant
+
+---
+
+### D2: Mindset + Appropriate Procedures (15 points)
+
+Does the Skill transfer expert **thinking patterns** along with **necessary domain-specific procedures**?
+
+The difference between experts and novices isn&#039;t &quot;knowing how to operate&quot; — it&#039;s &quot;how to think about the problem.&quot; But thinking patterns alone aren&#039;t enough when Claude lacks domain-specific procedural knowledge.
+
+**Key distinction**:
+| Type | Example | Value |
+|------|---------|-------|
+| **Thinking patterns** | &quot;Before designing, ask: What makes this memorable?&quot; | High — shapes decision-making |
+| **Domain-specific procedures** | &quot;OOXML workflow: unpack → edit XML → validate → pack&quot; | High — Claude may not know this |
+| **Generic procedures** | &quot;Step 1: Open file, Step 2: Edit, Step 3: Save&quot; | Low — Claude already knows |
+
+| Score | Criteria |
+|-------|----------|
+| 0-3 | Only generic procedures Claude already knows |
+| 4-7 | Has domain procedures but lacks thinking frameworks |
+| 8-11 | Good balance: thinking patterns + domain-specific workflows |
+| 12-15 | Expert-level: shapes thinking AND provides procedures Claude wouldn&#039;t know |
+
+**What counts as valuable procedures**:
+- Workflows Claude hasn&#039;t been trained on (new tools, proprietary systems)
+- Correct ordering that&#039;s non-obvious (e.g., &quot;validate BEFORE packing, not after&quot;)
+- Critical steps that are easy to miss (e.g., &quot;MUST recalculate formulas after editing&quot;)
+- Domain-specific sequences (e.g., MCP server&#039;s 4-phase development process)
+
+**What counts as redundant procedures**:
+- Generic file operations (open, read, write, save)
+- Standard programming patterns (loops, conditionals, error handling)
+- Common library usage that&#039;s well-documented
+
+**Expert thinking patterns look like**:
+```markdown
+Before [action], ask yourself:
+- **Purpose**: What problem does this solve? Who uses it?
+- **Constraints**: What are the hidden requirements?
+- **Differentiation**: What makes this solution memorable?
+```
+
+**Valuable domain procedures look like**:
+```markdown
+### Redlining Workflow (Claude wouldn&#039;t know this sequence)
+1. Convert to markdown: `pandoc --track-changes=all`
+2. Map text to XML: grep for text in document.xml
+3. Implement changes in batches of 3-10
+4. Pack and verify: check ALL changes were applied
+```
+
+**Redundant generic procedures look like**:
+```markdown
+Step 1: Open the file
+Step 2: Find the section
+Step 3: Make the change
+Step 4: Save and test
+```
+
+**The test**:
+1. Does it tell Claude WHAT to think about? (thinking patterns)
+2. Does it tell Claude HOW to do things it wouldn&#039;t know? (domain procedures)
+
+A good Skill provides both when needed.
+
+---
+
+### D3: Anti-Pattern Quality (15 points)
+
+Does the Skill have effective NEVER lists?
+
+**Why this matters**: Half of expert knowledge is knowing what NOT to do. A senior designer sees purple gradient on white background and instinctively cringes — &quot;too AI-generated.&quot; This intuition for &quot;what absolutely not to do&quot; comes from stepping on countless landmines.
+
+Claude hasn&#039;t stepped on these landmines. It doesn&#039;t know Inter font is overused, doesn&#039;t know purple gradients are the signature of AI-generated content. Good Skills must explicitly state these &quot;absolute don&#039;ts.&quot;
+
+| Score | Criteria |
+|-------|----------|
+| 0-3 | No anti-patterns mentioned |
+| 4-7 | Generic warnings (&quot;avoid errors&quot;, &quot;be careful&quot;, &quot;consider edge cases&quot;) |
+| 8-11 | Specific NEVER list with some reasoning |
+| 12-15 | Expert-grade anti-patterns with WHY — things only experience teaches |
+
+**Expert anti-patterns** (specific + reason):
+```markdown
+NEVER use generic AI-generated aesthetics like:
+- Overused font families (Inter, Roboto, Arial)
+- Cliched color schemes (particularly purple gradients on white backgrounds)
+- Predictable layouts and component patterns
+- Default border-radius on everything
+```
+
+**Weak anti-patterns** (vague, no reasoning):
+```markdown
+Avoid making mistakes.
+Be careful with edge cases.
+Don&#039;t write bad code.
+```
+
+**The test**: Would an expert read the anti-pattern list and say &quot;yes, I learned this the hard way&quot;? Or would they say &quot;this is obvious to everyone&quot;?
+
+---
+
+### D4: Specification Compliance — Especially Description (15 points)
+
+Does the Skill follow official format requirements? **Special focus on description quality.**
+
+| Score | Criteria |
+|-------|----------|
+| 0-5 | Missing frontmatter or invalid format |
+| 6-10 | Has frontmatter but description is vague or incomplete |
+| 11-13 | Valid frontmatter, description has WHAT but weak on WHEN |
+| 14-15 | Perfect: comprehensive description with WHAT, WHEN, and trigger keywords |
+
+**Frontmatter requirements**:
+- `name`: lowercase, alphanumeric + hyphens only, ≤64 characters
+- `description`: **THE MOST CRITICAL FIELD** — determines if skill gets used at all
+
+---
+
+**Why description is THE MOST IMPORTANT field**:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  SKILL ACTIVATION FLOW                                              │
+│                                                                     │
+│  User Request → Agent sees ALL skill descriptions → Decides which  │
+│                 (only descriptions, not bodies!)     to activate    │
+│                                                                     │
+│  If description doesn&#039;t match → Skill NEVER gets loaded            │
+│  If description is vague → Skill might not trigger when it should  │
+│  If description lacks keywords → Skill is invisible to the Agent   │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**The brutal truth**: A Skill with perfect content but poor description is **useless** — it will never be activated. The description is the **only chance** to tell the Agent &quot;use me in these situations.&quot;
+
+---
+
+**Description must answer THREE questions**:
+
+1. **WHAT**: What does this Skill do? (functionality)
+2. **WHEN**: In what situations should it be used? (trigger scenarios)
+3. **KEYWORDS**: What terms should trigger this Skill? (searchable terms)
+
+**Excellent description** (all three elements):
+```yaml
+description: &quot;Comprehensive document creation, editing, and analysis with support
+for tracked changes, comments, formatting preservation, and text extraction.
+When Claude needs to work with professional documents (.docx files) for:
+(1) Creating new documents, (2) Modifying or editing content,
+(3) Working with tracked changes, (4) Adding comments, or any other document tasks&quot;
+```
+
+Analysis:
+- WHAT: creation, editing, analysis, tracked changes, comments
+- WHEN: &quot;When Claude needs to work with... for: (1)... (2)... (3)...&quot;
+- KEYWORDS: .docx files, tracked changes, professional documents
+
+**Poor description** (missing elements):
+```yaml
+description: &quot;处理文档相关功能&quot;
+```
+
+Problems:
+- WHAT: vague (&quot;文档相关功能&quot; — what specifically?)
+- WHEN: missing (when should Agent use this?)
+- KEYWORDS: missing (no &quot;.docx&quot;, no specific scenarios)
+
+**Another poor example**:
+```yaml
+description: &quot;A helpful skill for various tasks&quot;
+```
+
+This is useless — Agent has no idea when to activate it.
+
+---
+
+**Description quality checklist**:
+- [ ] Lists specific capabilities (not just &quot;helps with X&quot;)
+- [ ] Includes explicit trigger scenarios (&quot;Use when...&quot;, &quot;When user asks for...&quot;)
+- [ ] Contains searchable keywords (file extensions, domain terms, action verbs)
+- [ ] Specific enough that Agent knows EXACTLY when to use it
+- [ ] Includes scenarios where this skill MUST be used (not just &quot;can be used&quot;)
+
+---
+
+### D5: Progressive Disclosure (15 points)
+
+Does the Skill implement proper content layering?
+
+Skill loading has three layers:
+```
+Layer 1: Metadata (always in memory)
+         Only name + description
+         ~100 tokens per skill
+
+Layer 2: SKILL.md Body (loaded after triggering)
+         Detailed guidelines, code examples, decision trees
+         Ideal: &lt; 500 lines
+
+Layer 3: Resources (loaded on demand)
+         scripts/, references/, assets/
+         No limit
+```
+
+| Score | Criteria |
+|-------|----------|
+| 0-5 | Everything dumped in SKILL.md (&gt;500 lines, no structure) |
+| 6-10 | Has references but unclear when to load them |
+| 11-13 | Good layering with MANDATORY triggers present |
+| 14-15 | Perfect: decision trees + explicit triggers + &quot;Do NOT Load&quot; guidance |
+
+**For Skills WITH references directory**, check Loading Trigger Quality:
+
+| Trigger Quality | Characteristics |
+|-----------------|-----------------|
+| Poor | References listed at end, no loading guidance |
+| Mediocre | Some triggers but not embedded in workflow |
+| Good | MANDATORY triggers in workflow steps |
+| Excellent | Scenario detection + conditional triggers + &quot;Do NOT Load&quot; |
+
+**The loading problem**:
+```
+Loading too little ◄─────────────────────────────────► Loading too much
+- References sit unused                    - Wastes context space
+- Agent doesn&#039;t know when to load          - Irrelevant info dilutes key content
+- Knowledge is there but never accessed    - Unnecessary token overhead
+```
+
+**Good loading trigger** (embedded in workflow):
+```markdown
+### Creating New Document
+
+**MANDATORY - READ ENTIRE FILE**: Before proceeding, you MUST read
+[`docx-js.md`](docx-js.md) (~500 lines) completely from start to finish.
+**NEVER set any range limits when reading this file.**
+
+**Do NOT load** `ooxml.md` or `redlining.md` for this task.
+```
+
+**Bad loading trigger** (just listed):
+```markdown
+## References
+- docx-js.md - for creating documents
+- ooxml.md - for editing
+- redlining.md - for tracking changes
+```
+
+**For simple Skills** (no references, &lt;100 lines): Score based on conciseness and self-containment.
+
+---
+
+### D6: Freedom Calibration (15 points)
+
+Is the level of specificity appropriate for the task&#039;s fragility?
+
+Different tasks need different levels of constraint. This is about matching freedom to fragility.
+
+| Score | Criteria |
+|-------|----------|
+| 0-5 | Severely mismatched (rigid scripts for creative tasks, vague for fragile ops) |
+| 6-10 | Partially appropriate, some mismatches |
+| 11-13 | Good calibration for most scenarios |
+| 14-15 | Perfect freedom calibration throughout |
+
+**The freedom spectrum**:
+
+| Task Type | Should Have | Why | Example Skill |
+|-----------|-------------|-----|---------------|
+| Creative/Design | High freedom | Multiple valid approaches, differentiation is value | frontend-design |
+| Code review | Medium freedom | Principles exist but judgment required | code-review |
+| File format operations | Low freedom | One wrong byte corrupts file, consistency critical | docx, xlsx, pdf |
+
+**High freedom** (text-based instructions):
+```markdown
+Commit to a BOLD aesthetic direction. Pick an extreme: brutally minimal,
+maximalist chaos, retro-futuristic, organic natural...
+```
+
+**Medium freedom** (pseudocode or parameterized):
+```markdown
+Review priority:
+1. Security vulnerabilities (must fix)
+2. Logic errors (must fix)
+3. Performance issues (should fix)
+4. Maintainability (optional)
+```
+
+**Low freedom** (specific scripts, exact steps):
+```markdown
+**MANDATORY**: Use exact script in `scripts/create-doc.py`
+Parameters: --title &quot;X&quot; --author &quot;Y&quot;
+Do NOT modify the script.
+```
+
+**The test**: Ask &quot;if Agent makes a mistake, what&#039;s the consequence?&quot;
+- High consequence → Low freedom
+- Low consequence → High freedom
+
+---
+
+### D7: Pattern Recognition (10 points)
+
+Does the Skill follow an established official pattern?
+
+Through analyzing 17 official Skills, we identified 5 main design patterns:
+
+| Pattern | ~Lines | Key Characteristics | Example | When to Use |
+|---------|--------|---------------------|---------|-------------|
+| **Mindset** | ~50 | Thinking &gt; technique, strong NEVER list, high freedom | frontend-design | Creative tasks requiring taste |
+| **Navigation** | ~30 | Minimal SKILL.md, routes to sub-files | internal-comms | Multiple distinct scenarios |
+| **Philosophy** | ~150 | Two-step: Philosophy → Express, emphasizes craft | canvas-design | Art/creation requiring originality |
+| **Process** | ~200 | Phased workflow, checkpoints, medium freedom | mcp-builder | Complex multi-step projects |
+| **Tool** | ~300 | Decision trees, code examples, low freedom | docx, pdf, xlsx | Precise operations on specific formats |
+
+| Score | Criteria |
+|-------|----------|
+| 0-3 | No recognizable pattern, chaotic structure |
+| 4-6 | Partially follows a pattern with significant deviations |
+| 7-8 | Clear pattern with minor deviations |
+| 9-10 | Masterful application of appropriate pattern |
+
+**Pattern selection guide**:
+
+| Your Task Characteristics | Recommended Pattern |
+|---------------------------|---------------------|
+| Needs taste and creativity | Mindset (~50 lines) |
+| Needs originality and craft quality | Philosophy (~150 lines) |
+| Has multiple distinct sub-scenarios | Navigation (~30 lines) |
+| Complex multi-step project | Process (~200 lines) |
+| Precise operations on specific format | Tool (~300 lines) |
+
+---
+
+### D8: Practical Usability (15 points)
+
+Can an Agent actually use this Skill effectively?
+
+| Score | Criteria |
+|-------|----------|
+| 0-5 | Confusing, incomplete, contradictory, or untested guidance |
+| 6-10 | Usable but with noticeable gaps |
+| 11-13 | Clear guidance for common cases |
+| 14-15 | Comprehensive coverage including edge cases and error handling |
+
+**Check for**:
+- **Decision trees**: For multi-path scenarios, is there clear guidance on which path to take?
+- **Code examples**: Do they actually work? Or are they pseudocode that breaks?
+- **Error handling**: What if the main approach fails? Are fallbacks provided?
+- **Edge cases**: Are unusual but realistic scenarios covered?
+- **Actionability**: Can Agent immediately act, or needs to figure things out?
+
+**Good usability** (decision tree + fallback):
+```markdown
+| Task | Primary Tool | Fallback | When to Use Fallback |
+|------|-------------|----------|----------------------|
+| Read text | pdftotext | PyMuPDF | Need layout info |
+| Extract tables | camelot-py | tabula-py | camelot fails |
+
+**Common issues**:
+- Scanned PDF: pdftotext returns blank → Use OCR first
+- Encrypted PDF: Permission error → Use PyMuPDF with password
+```
+
+**Poor usability** (vague):
+```markdown
+Use appropriate tools for PDF processing.
+Handle errors properly.
+Consider edge cases.
+```
+
+---
+
+## NEVER Do When Evaluating
+
+- **NEVER** give high scores just because it &quot;looks professional&quot; or is well-formatted
+- **NEVER** ignore token waste — every redundant paragraph should result in deduction
+- **NEVER** let length impress you — a 43-line Skill can outperform a 500-line Skill
+- **NEVER** skip mentally testing the decision trees — do they actually lead to correct choices?
+- **NEVER** forgive explaining basics with &quot;but it provides helpful context&quot;
+- **NEVER** overlook missing anti-patterns — if there&#039;s no NEVER list, that&#039;s a significant gap
+- **NEVER** assume all procedures are valuable — distinguish domain-specific from generic
+- **NEVER** undervalue the description field — poor description = skill never gets used
+- **NEVER** put &quot;when to use&quot; info only in the body — Agent only sees description before loading
+
+---
+
+## Evaluation Protocol
+
+### Step 1: First Pass — Knowledge Delta Scan
+
+Read SKILL.md completely and for each section ask:
+&gt; &quot;Does Claude already know this?&quot;
+
+Mark each section as:
+- **[E] Expert**: Claude genuinely doesn&#039;t know this — value-add
+- **[A] Activation**: Claude knows but brief reminder is useful — acceptable
+- **[R] Redundant**: Claude definitely knows this — should be deleted
+
+Calculate rough ratio: E:A:R
+- Good Skill: &gt;70% Expert, &lt;20% Activation, &lt;10% Redundant
+- Mediocre Skill: 40-70% Expert, high Activation
+- Bad Skill: &lt;40% Expert, high Redundant
+
+### Step 2: Structure Analysis
+
+```
+[ ] Check frontmatter validity
+[ ] Count total lines in SKILL.md
+[ ] List all reference files and their sizes
+[ ] Identify which pattern the Skill follows
+[ ] Check for loading triggers (if references exist)
+```
+
+### Step 3: Score Each Dimension
+
+For each of the 8 dimensions:
+1. Find specific evidence (quote relevant lines)
+2. Assign score with one-line justification
+3. Note specific improvements if score &lt; max
+
+### Step 4: Calculate Total &amp; Grade
+
+```
+Total = D1 + D2 + D3 + D4 + D5 + D6 + D7 + D8
+Max = 120 points
+```
+
+**Grade Scale** (percentage-based):
+| Grade | Percentage | Meaning |
+|-------|------------|---------|
+| A | 90%+ (108+) | Excellent — production-ready expert Skill |
+| B | 80-89% (96-107) | Good — minor improvements needed |
+| C | 70-79% (84-95) | Adequate — clear improvement path |
+| D | 60-69% (72-83) | Below Average — significant issues |
+| F | &lt;60% (&lt;72) | Poor — needs fundamental redesign |
+
+### Step 5: Generate Report
+
+```markdown
+# Skill Evaluation Report: [Skill Name]
+
+## Summary
+- **Total Score**: X/120 (X%)
+- **Grade**: [A/B/C/D/F]
+- **Pattern**: [Mindset/Navigation/Philosophy/Process/Tool]
+- **Knowledge Ratio**: E:A:R = X:Y:Z
+- **Verdict**: [One sentence assessment]
+
+## Dimension Scores
+
+| Dimension | Score | Max | Notes |
+|-----------|-------|-----|-------|
+| D1: Knowledge Delta | X | 20 | |
+| D2: Mindset vs Mechanics | X | 15 | |
+| D3: Anti-Pattern Quality | X | 15 | |
+| D4: Specification Compliance | X | 15 | |
+| D5: Progressive Disclosure | X | 15 | |
+| D6: Freedom Calibration | X | 15 | |
+| D7: Pattern Recognition | X | 10 | |
+| D8: Practical Usability | X | 15 | |
+
+## Critical Issues
+[List must-fix problems that significantly impact the Skill&#039;s effectiveness]
+
+## Top 3 Improvements
+1. [Highest impact improvement with specific guidance]
+2. [Second priority improvement]
+3. [Third priority improvement]
+
+## Detailed Analysis
+[For each dimension scoring below 80%, provide:
+- What&#039;s missing or problematic
+- Specific examples from the Skill
+- Concrete suggestions for improvement]
+```
+
+---
+
+## Common Failure Patterns
+
+### Pattern 1: The Tutorial
+```
+Symptom: Explains what PDF is, how Python works, basic library usage
+Root cause: Author assumes Skill should &quot;teach&quot; the model
+Fix: Claude already knows this. Delete all basic explanations.
+     Focus on expert decisions, trade-offs, and anti-patterns.
+```
+
+### Pattern 2: The Dump
+```
+Symptom: SKILL.md is 800+ lines with everything included
+Root cause: No progressive disclosure design
+Fix: Core routing and decision trees in SKILL.md (&lt;300 lines ideal)
+     Detailed content in references/, loaded on-demand
+```
+
+### Pattern 3: The Orphan References
+```
+Symptom: References directory exists but files are never loaded
+Root cause: No explicit loading triggers
+Fix: Add &quot;MANDATORY - READ ENTIRE FILE&quot; at workflow decision points
+     Add &quot;Do NOT Load&quot; to prevent over-loading
+```
+
+### Pattern 4: The Checkbox Procedure
+```
+Symptom: Step 1, Step 2, Step 3... mechanical procedures
+Root cause: Author thinks in procedures, not thinking frameworks
+Fix: Transform into &quot;Before doing X, ask yourself...&quot;
+     Focus on decision principles, not operation sequences
+```
+
+### Pattern 5: The Vague Warning
+```
+Symptom: &quot;Be careful&quot;, &quot;avoid errors&quot;, &quot;consider edge cases&quot;
+Root cause: Author knows things can go wrong but hasn&#039;t articulated specifics
+Fix: Specific NEVER list with concrete examples and non-obvious reasons
+     &quot;NEVER use X because [specific problem that takes experience to learn]&quot;
+```
+
+### Pattern 6: The Invisible Skill
+```
+Symptom: Great content but skill rarely gets activated
+Root cause: Description is vague, missing keywords, or lacks trigger scenarios
+Fix: Description must answer WHAT, WHEN, and include KEYWORDS
+     &quot;Use when...&quot; + specific scenarios + searchable terms
+
+Example fix:
+BAD:  &quot;Helps with document tasks&quot;
+GOOD: &quot;Create, edit, and analyze .docx files. Use when working with
+       Word documents, tracked changes, or professional document formatting.&quot;
+```
+
+### Pattern 7: The Wrong Location
+```
+Symptom: &quot;When to use this Skill&quot; section in body, not in description
+Root cause: Misunderstanding of three-layer loading
+Fix: Move all triggering information to description field
+     Body is only loaded AFTER triggering decision is made
+```
+
+### Pattern 8: The Over-Engineered
+```
+Symptom: README.md, CHANGELOG.md, INSTALLATION_GUIDE.md, CONTRIBUTING.md
+Root cause: Treating Skill like a software project
+Fix: Delete all auxiliary files. Only include what Agent needs for the task.
+     No documentation about the Skill itself.
+```
+
+### Pattern 9: The Freedom Mismatch
+```
+Symptom: Rigid scripts for creative tasks, vague guidance for fragile operations
+Root cause: Not considering task fragility
+Fix: High freedom for creative (principles, not steps)
+     Low freedom for fragile (exact scripts, no parameters)
+```
+
+---
+
+## Quick Reference Checklist
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  SKILL EVALUATION QUICK CHECK                                           │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  KNOWLEDGE DELTA (most important):                                      │
+│    [ ] No &quot;What is X&quot; explanations for basic concepts                   │
+│    [ ] No step-by-step tutorials for standard operations                │
+│    [ ] Has decision trees for non-obvious choices                       │
+│    [ ] Has trade-offs only experts would know                           │
+│    [ ] Has edge cases from real-world experience                        │
+│                                                                         │
+│  MINDSET + PROCEDURES:                                                  │
+│    [ ] Transfers thinking patterns (how to think about problems)        │
+│    [ ] Has &quot;Before doing X, ask yourself...&quot; frameworks                 │
+│    [ ] Includes domain-specific procedures Claude wouldn&#039;t know         │
+│    [ ] Distinguishes valuable procedures from generic ones              │
+│                                                                         │
+│  ANTI-PATTERNS:                                                         │
+│    [ ] Has explicit NEVER list                                          │
+│    [ ] Anti-patterns are specific, not vague                            │
+│    [ ] Includes WHY (non-obvious reasons)                               │
+│                                                                         │
+│  SPECIFICATION (description is critical!):                              │
+│    [ ] Valid YAML frontmatter                                           │
+│    [ ] name: lowercase, ≤64 chars                                       │
+│    [ ] description answers: WHAT does it do?                            │
+│    [ ] description answers: WHEN should it be used?                     │
+│    [ ] description contains trigger KEYWORDS                            │
+│    [ ] description is specific enough for Agent to know when to use     │
+│                                                                         │
+│  STRUCTURE:                                                             │
+│    [ ] SKILL.md &lt; 500 lines (ideal &lt; 300)                               │
+│    [ ] Heavy content in references/                                     │
+│    [ ] Loading triggers embedded in workflow                            │
+│    [ ] Has &quot;Do NOT Load&quot; for preventing over-loading                    │
+│                                                                         │
+│  FREEDOM:                                                               │
+│    [ ] Creative tasks → High freedom (principles)                       │
+│    [ ] Fragile operations → Low freedom (exact scripts)                 │
+│                                                                         │
+│  USABILITY:                                                             │
+│    [ ] Decision trees for multi-path scenarios                          │
+│    [ ] Working code examples                                            │
+│    [ ] Error handling and fallbacks                                     │
+│    [ ] Edge cases covered                                               │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## The Meta-Question
+
+When evaluating any Skill, always return to this fundamental question:
+
+&gt; **&quot;Would an expert in this domain, looking at this Skill, say:**
+&gt; **&#039;Yes, this captures knowledge that took me years to learn&#039;?&quot;**
+
+If the answer is yes → the Skill has genuine value.
+If the answer is no → it&#039;s compressing what Claude already knows.
+
+The best Skills are **compressed expert brains** — they take a designer&#039;s 10 years of aesthetic accumulation and compress it into 43 lines, or a document expert&#039;s operational experience into a 200-line decision tree.
+
+What gets compressed must be things Claude doesn&#039;t have. Otherwise, it&#039;s garbage compression.
+
+---
+
+## Self-Evaluation Note
+
+This Skill (skill-judge) should itself pass evaluation:
+
+- **Knowledge Delta**: Provides specific evaluation criteria Claude wouldn&#039;t generate on its own
+- **Mindset**: Shapes how to think about Skill quality, not just checklist items
+- **Anti-Patterns**: &quot;NEVER Do When Evaluating&quot; section with specific don&#039;ts
+- **Specification**: Valid frontmatter with comprehensive description
+- **Progressive Disclosure**: Self-contained, no external references needed
+- **Freedom**: Medium freedom appropriate for evaluation task
+- **Pattern**: Follows Tool pattern with decision frameworks
+- **Usability**: Clear protocol, report template, quick reference
+
+
+
+Evaluate this Skill against itself as a calibration exercise.
+</code>
       </div>
     </div>
 

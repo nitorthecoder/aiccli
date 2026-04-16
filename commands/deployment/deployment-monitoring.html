@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,1243 @@
     <p class="desc">Comprehensive deployment monitoring with observability, alerting, health checks, and performance tracking</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/deployment-monitoring</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Read, Write, Edit, Bash
+argument-hint: [monitoring-type] | setup | dashboard | alerts | metrics | health | performance
+description: Comprehensive deployment monitoring with observability, alerting, health checks, and performance tracking
+---
+
+# Deployment Monitoring &amp; Observability
+
+Setup comprehensive deployment monitoring: $ARGUMENTS
+
+## Current Monitoring State
+
+- Existing monitoring: !`kubectl get pods -n monitoring 2&gt;/dev/null || docker ps | grep -E &quot;(prometheus|grafana|jaeger)&quot; || echo &quot;No monitoring detected&quot;`
+- Health endpoints: !`curl -s https://api.example.com/health 2&gt;/dev/null | jq -r &#039;.status // &quot;Unknown&quot;&#039; || echo &quot;Health endpoint needed&quot;`
+- Metrics exposure: !`curl -s https://api.example.com/metrics 2&gt;/dev/null | head -5 || echo &quot;Metrics endpoint needed&quot;`
+- Log aggregation: !`kubectl get pods -n logging 2&gt;/dev/null || echo &quot;Log aggregation setup needed&quot;`
+- APM integration: Check for application performance monitoring setup
+
+## Task
+
+Implement comprehensive monitoring and observability for deployments with real-time insights, alerting, and automated response capabilities.
+
+## Monitoring Architecture
+
+### 1. **Core Monitoring Stack**
+
+#### Prometheus Configuration
+```yaml
+# prometheus-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      
+    rule_files:
+      - &quot;/etc/prometheus/rules/*.yml&quot;
+      
+    scrape_configs:
+      # Application metrics
+      - job_name: &#039;myapp&#039;
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+            
+      # Kubernetes cluster metrics
+      - job_name: &#039;kubernetes-pods&#039;
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_phase]
+            action: keep
+            regex: Running
+            
+      # Node exporter for infrastructure metrics
+      - job_name: &#039;node-exporter&#039;
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_endpoints_name]
+            action: keep
+            regex: node-exporter
+            
+      # Deployment-specific metrics
+      - job_name: &#039;deployment-metrics&#039;
+        static_configs:
+          - targets: [&#039;deployment-exporter:9090&#039;]
+        metrics_path: /metrics
+        scrape_interval: 30s
+
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets: [&#039;alertmanager:9093&#039;]
+
+---
+# Prometheus Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      serviceAccountName: prometheus
+      containers:
+      - name: prometheus
+        image: prom/prometheus:v2.40.0
+        args:
+          - &#039;--config.file=/etc/prometheus/prometheus.yml&#039;
+          - &#039;--storage.tsdb.path=/prometheus&#039;
+          - &#039;--web.console.libraries=/etc/prometheus/console_libraries&#039;
+          - &#039;--web.console.templates=/etc/prometheus/consoles&#039;
+          - &#039;--storage.tsdb.retention.time=30d&#039;
+          - &#039;--web.enable-lifecycle&#039;
+          - &#039;--web.enable-admin-api&#039;
+        ports:
+        - containerPort: 9090
+        volumeMounts:
+        - name: prometheus-config
+          mountPath: /etc/prometheus
+        - name: prometheus-storage
+          mountPath: /prometheus
+        resources:
+          requests:
+            memory: &quot;512Mi&quot;
+            cpu: &quot;250m&quot;
+          limits:
+            memory: &quot;2Gi&quot;
+            cpu: &quot;1000m&quot;
+      volumes:
+      - name: prometheus-config
+        configMap:
+          name: prometheus-config
+      - name: prometheus-storage
+        persistentVolumeClaim:
+          claimName: prometheus-pvc
+```
+
+#### Grafana Dashboard Configuration
+```yaml
+# grafana-dashboard-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: deployment-dashboard
+  namespace: monitoring
+data:
+  deployment-monitoring.json: |
+    {
+      &quot;dashboard&quot;: {
+        &quot;id&quot;: null,
+        &quot;title&quot;: &quot;Deployment Monitoring Dashboard&quot;,
+        &quot;tags&quot;: [&quot;deployment&quot;, &quot;monitoring&quot;],
+        &quot;timezone&quot;: &quot;browser&quot;,
+        &quot;panels&quot;: [
+          {
+            &quot;id&quot;: 1,
+            &quot;title&quot;: &quot;Deployment Status&quot;,
+            &quot;type&quot;: &quot;stat&quot;,
+            &quot;targets&quot;: [
+              {
+                &quot;expr&quot;: &quot;up{job=\&quot;myapp\&quot;}&quot;,
+                &quot;legendFormat&quot;: &quot;{{instance}}&quot;
+              }
+            ],
+            &quot;fieldConfig&quot;: {
+              &quot;defaults&quot;: {
+                &quot;thresholds&quot;: {
+                  &quot;steps&quot;: [
+                    {&quot;color&quot;: &quot;red&quot;, &quot;value&quot;: 0},
+                    {&quot;color&quot;: &quot;green&quot;, &quot;value&quot;: 1}
+                  ]
+                }
+              }
+            }
+          },
+          {
+            &quot;id&quot;: 2,
+            &quot;title&quot;: &quot;Request Rate&quot;,
+            &quot;type&quot;: &quot;graph&quot;,
+            &quot;targets&quot;: [
+              {
+                &quot;expr&quot;: &quot;rate(http_requests_total[5m])&quot;,
+                &quot;legendFormat&quot;: &quot;{{method}} {{status}}&quot;
+              }
+            ]
+          },
+          {
+            &quot;id&quot;: 3,
+            &quot;title&quot;: &quot;Error Rate&quot;,
+            &quot;type&quot;: &quot;graph&quot;,
+            &quot;targets&quot;: [
+              {
+                &quot;expr&quot;: &quot;rate(http_requests_total{status=~\&quot;5..\&quot;}[5m]) / rate(http_requests_total[5m]) * 100&quot;,
+                &quot;legendFormat&quot;: &quot;Error Rate %&quot;
+              }
+            ]
+          },
+          {
+            &quot;id&quot;: 4,
+            &quot;title&quot;: &quot;Response Time&quot;,
+            &quot;type&quot;: &quot;graph&quot;,
+            &quot;targets&quot;: [
+              {
+                &quot;expr&quot;: &quot;histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))&quot;,
+                &quot;legendFormat&quot;: &quot;95th percentile&quot;
+              },
+              {
+                &quot;expr&quot;: &quot;histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))&quot;,
+                &quot;legendFormat&quot;: &quot;50th percentile&quot;
+              }
+            ]
+          },
+          {
+            &quot;id&quot;: 5,
+            &quot;title&quot;: &quot;Pod Resource Usage&quot;,
+            &quot;type&quot;: &quot;graph&quot;,
+            &quot;targets&quot;: [
+              {
+                &quot;expr&quot;: &quot;rate(container_cpu_usage_seconds_total{pod=~\&quot;myapp-.*\&quot;}[5m]) * 100&quot;,
+                &quot;legendFormat&quot;: &quot;CPU Usage - {{pod}}&quot;
+              },
+              {
+                &quot;expr&quot;: &quot;container_memory_usage_bytes{pod=~\&quot;myapp-.*\&quot;} / 1024 / 1024&quot;,
+                &quot;legendFormat&quot;: &quot;Memory Usage MB - {{pod}}&quot;
+              }
+            ]
+          },
+          {
+            &quot;id&quot;: 6,
+            &quot;title&quot;: &quot;Deployment Events&quot;,
+            &quot;type&quot;: &quot;logs&quot;,
+            &quot;targets&quot;: [
+              {
+                &quot;expr&quot;: &quot;{job=\&quot;kubernetes-events\&quot;} |= \&quot;myapp\&quot;&quot;,
+                &quot;legendFormat&quot;: &quot;&quot;
+              }
+            ]
+          }
+        ],
+        &quot;time&quot;: {
+          &quot;from&quot;: &quot;now-1h&quot;,
+          &quot;to&quot;: &quot;now&quot;
+        },
+        &quot;refresh&quot;: &quot;30s&quot;
+      }
+    }
+```
+
+### 2. **Application Health Monitoring**
+
+#### Health Check Implementation
+```javascript
+// health-check.js - Application health endpoint
+const express = require(&#039;express&#039;);
+const { promisify } = require(&#039;util&#039;);
+
+class HealthMonitor {
+  constructor() {
+    this.checks = new Map();
+    this.status = &#039;healthy&#039;;
+    this.lastCheck = new Date();
+  }
+
+  registerCheck(name, checkFunction, options = {}) {
+    this.checks.set(name, {
+      check: checkFunction,
+      timeout: options.timeout || 5000,
+      critical: options.critical || false,
+      lastStatus: null,
+      lastCheck: null,
+      errorCount: 0
+    });
+  }
+
+  async runHealthChecks() {
+    const results = {};
+    let overallHealthy = true;
+    
+    for (const [name, config] of this.checks) {
+      try {
+        const startTime = Date.now();
+        const result = await Promise.race([
+          config.check(),
+          new Promise((_, reject) =&gt; 
+            setTimeout(() =&gt; reject(new Error(&#039;Health check timeout&#039;)), config.timeout)
+          )
+        ]);
         
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/deployment-monitoring</code>
-        </div>
+        const duration = Date.now() - startTime;
+        
+        results[name] = {
+          status: &#039;healthy&#039;,
+          duration,
+          details: result,
+          lastCheck: new Date().toISOString()
+        };
+        
+        config.lastStatus = &#039;healthy&#039;;
+        config.errorCount = 0;
+      } catch (error) {
+        results[name] = {
+          status: &#039;unhealthy&#039;,
+          error: error.message,
+          lastCheck: new Date().toISOString()
+        };
+        
+        config.lastStatus = &#039;unhealthy&#039;;
+        config.errorCount++;
+        
+        if (config.critical) {
+          overallHealthy = false;
+        }
+      }
+      
+      config.lastCheck = new Date();
+    }
+    
+    this.status = overallHealthy ? &#039;healthy&#039; : &#039;unhealthy&#039;;
+    this.lastCheck = new Date();
+    
+    return {
+      status: this.status,
+      timestamp: this.lastCheck.toISOString(),
+      checks: results,
+      uptime: process.uptime(),
+      version: process.env.APP_VERSION || &#039;unknown&#039;
+    };
+  }
+
+  setupEndpoints(app) {
+    // Liveness probe - basic application health
+    app.get(&#039;/health&#039;, async (req, res) =&gt; {
+      const health = await this.runHealthChecks();
+      const statusCode = health.status === &#039;healthy&#039; ? 200 : 503;
+      res.status(statusCode).json(health);
+    });
+
+    // Readiness probe - ready to receive traffic
+    app.get(&#039;/ready&#039;, async (req, res) =&gt; {
+      const health = await this.runHealthChecks();
+      
+      // Additional readiness checks
+      const readinessChecks = {
+        memoryUsage: process.memoryUsage().heapUsed / process.memoryUsage().heapTotal &lt; 0.9,
+        activeConnections: true, // Check active connections if applicable
+      };
+      
+      const isReady = health.status === &#039;healthy&#039; &amp;&amp; 
+                     Object.values(readinessChecks).every(check =&gt; check);
+      
+      res.status(isReady ? 200 : 503).json({
+        ...health,
+        ready: isReady,
+        readinessChecks
+      });
+    });
+
+    // Startup probe - application has started
+    app.get(&#039;/startup&#039;, (req, res) =&gt; {
+      res.status(200).json({
+        status: &#039;started&#039;,
+        timestamp: new Date().toISOString(),
+        pid: process.pid,
+        uptime: process.uptime()
+      });
+    });
+  }
+}
+
+// Usage example
+const healthMonitor = new HealthMonitor();
+
+// Register health checks
+healthMonitor.registerCheck(&#039;database&#039;, async () =&gt; {
+  // Database connectivity check
+  await db.query(&#039;SELECT 1&#039;);
+  return { connected: true };
+}, { critical: true, timeout: 3000 });
+
+healthMonitor.registerCheck(&#039;redis&#039;, async () =&gt; {
+  // Redis connectivity check
+  await redis.ping();
+  return { connected: true };
+}, { critical: false, timeout: 2000 });
+
+healthMonitor.registerCheck(&#039;external-api&#039;, async () =&gt; {
+  // External service check
+  const response = await fetch(&#039;https://api.external-service.com/health&#039;);
+  return { status: response.status, healthy: response.ok };
+}, { critical: false, timeout: 5000 });
+
+module.exports = healthMonitor;
+```
+
+### 3. **Custom Metrics and Instrumentation**
+
+#### Application Metrics
+```javascript
+// metrics.js - Application metrics collection
+const promClient = require(&#039;prom-client&#039;);
+
+class DeploymentMetrics {
+  constructor() {
+    // Default metrics
+    promClient.collectDefaultMetrics({
+      prefix: &#039;myapp_&#039;,
+      timeout: 5000,
+    });
+
+    // Custom deployment metrics
+    this.deploymentInfo = new promClient.Gauge({
+      name: &#039;myapp_deployment_info&#039;,
+      help: &#039;Deployment information&#039;,
+      labelNames: [&#039;version&#039;, &#039;environment&#039;, &#039;commit_sha&#039;]
+    });
+
+    this.httpRequestsTotal = new promClient.Counter({
+      name: &#039;myapp_http_requests_total&#039;,
+      help: &#039;Total HTTP requests&#039;,
+      labelNames: [&#039;method&#039;, &#039;status_code&#039;, &#039;route&#039;]
+    });
+
+    this.httpRequestDuration = new promClient.Histogram({
+      name: &#039;myapp_http_request_duration_seconds&#039;,
+      help: &#039;HTTP request duration in seconds&#039;,
+      labelNames: [&#039;method&#039;, &#039;status_code&#039;, &#039;route&#039;],
+      buckets: [0.1, 0.5, 1, 2, 5]
+    });
+
+    this.activeConnections = new promClient.Gauge({
+      name: &#039;myapp_active_connections&#039;,
+      help: &#039;Number of active connections&#039;
+    });
+
+    this.deploymentEvents = new promClient.Counter({
+      name: &#039;myapp_deployment_events_total&#039;,
+      help: &#039;Deployment events&#039;,
+      labelNames: [&#039;event_type&#039;, &#039;status&#039;]
+    });
+
+    this.healthCheckStatus = new promClient.Gauge({
+      name: &#039;myapp_health_check_status&#039;,
+      help: &#039;Health check status (1 = healthy, 0 = unhealthy)&#039;,
+      labelNames: [&#039;check_name&#039;]
+    });
+
+    // Business metrics
+    this.businessMetrics = {
+      activeUsers: new promClient.Gauge({
+        name: &#039;myapp_active_users&#039;,
+        help: &#039;Number of active users&#039;
+      }),
+      
+      transactionsTotal: new promClient.Counter({
+        name: &#039;myapp_transactions_total&#039;,
+        help: &#039;Total transactions processed&#039;,
+        labelNames: [&#039;type&#039;, &#039;status&#039;]
+      }),
+      
+      errorRate: new promClient.Gauge({
+        name: &#039;myapp_error_rate&#039;,
+        help: &#039;Application error rate percentage&#039;
+      })
+    };
+
+    this.initializeMetrics();
+  }
+
+  initializeMetrics() {
+    // Set deployment information
+    this.deploymentInfo.set({
+      version: process.env.APP_VERSION || &#039;unknown&#039;,
+      environment: process.env.NODE_ENV || &#039;development&#039;,
+      commit_sha: process.env.GIT_COMMIT_SHA || &#039;unknown&#039;
+    }, 1);
+  }
+
+  recordHttpRequest(req, res, duration) {
+    const labels = {
+      method: req.method,
+      status_code: res.statusCode,
+      route: req.route?.path || req.path
+    };
+
+    this.httpRequestsTotal.inc(labels);
+    this.httpRequestDuration.observe(labels, duration);
+  }
+
+  recordDeploymentEvent(eventType, status) {
+    this.deploymentEvents.inc({
+      event_type: eventType,
+      status: status
+    });
+  }
+
+  updateHealthCheckStatus(checkName, isHealthy) {
+    this.healthCheckStatus.set(
+      { check_name: checkName },
+      isHealthy ? 1 : 0
+    );
+  }
+
+  updateActiveConnections(count) {
+    this.activeConnections.set(count);
+  }
+
+  // Middleware for Express.js
+  expressMiddleware() {
+    return (req, res, next) =&gt; {
+      const start = Date.now();
+      
+      res.on(&#039;finish&#039;, () =&gt; {
+        const duration = (Date.now() - start) / 1000;
+        this.recordHttpRequest(req, res, duration);
+      });
+      
+      next();
+    };
+  }
+
+  // Get metrics endpoint
+  getMetricsHandler() {
+    return async (req, res) =&gt; {
+      res.set(&#039;Content-Type&#039;, promClient.register.contentType);
+      const metrics = await promClient.register.metrics();
+      res.end(metrics);
+    };
+  }
+}
+
+module.exports = DeploymentMetrics;
+```
+
+### 4. **Alert Configuration**
+
+#### Alertmanager Configuration
+```yaml
+# alertmanager-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: monitoring
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: &#039;smtp.gmail.com:587&#039;
+      smtp_from: &#039;alerts@example.com&#039;
+      smtp_auth_username: &#039;alerts@example.com&#039;
+      smtp_auth_password: &#039;password&#039;
+      
+    route:
+      group_by: [&#039;alertname&#039;, &#039;environment&#039;]
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 1h
+      receiver: &#039;default&#039;
+      routes:
+      - match:
+          severity: critical
+        receiver: &#039;critical-alerts&#039;
+        continue: true
+      - match:
+          alertname: DeploymentFailed
+        receiver: &#039;deployment-alerts&#039;
+        continue: true
+      - match:
+          service: myapp
+        receiver: &#039;app-alerts&#039;
+        
+    receivers:
+    - name: &#039;default&#039;
+      slack_configs:
+      - api_url: &#039;https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK&#039;
+        channel: &#039;#monitoring&#039;
+        title: &#039;Alert: {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}&#039;
+        text: &#039;{{ range .Alerts }}{{ .Annotations.description }}{{ end }}&#039;
+        
+    - name: &#039;critical-alerts&#039;
+      slack_configs:
+      - api_url: &#039;https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK&#039;
+        channel: &#039;#critical-alerts&#039;
+        title: &#039;🚨 CRITICAL: {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}&#039;
+        text: &#039;{{ range .Alerts }}{{ .Annotations.description }}{{ end }}&#039;
+      email_configs:
+      - to: &#039;oncall@example.com&#039;
+        subject: &#039;CRITICAL Alert: {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}&#039;
+        body: |
+          Alert Details:
+          {{ range .Alerts }}
+          - Alert: {{ .Annotations.summary }}
+          - Description: {{ .Annotations.description }}
+          - Severity: {{ .Labels.severity }}
+          - Environment: {{ .Labels.environment }}
+          {{ end }}
+          
+    - name: &#039;deployment-alerts&#039;
+      slack_configs:
+      - api_url: &#039;https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK&#039;
+        channel: &#039;#deployments&#039;
+        title: &#039;🚀 Deployment Alert: {{ range .Alerts }}{{ .Annotations.summary }}{{ end }}&#039;
+        
+    - name: &#039;app-alerts&#039;
+      slack_configs:
+      - api_url: &#039;https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK&#039;
+        channel: &#039;#app-monitoring&#039;
+        
+    inhibit_rules:
+    - source_match:
+        severity: &#039;critical&#039;
+      target_match:
+        severity: &#039;warning&#039;
+      equal: [&#039;alertname&#039;, &#039;environment&#039;, &#039;service&#039;]
+```
+
+#### Deployment Alert Rules
+```yaml
+# deployment-alert-rules.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: deployment-monitoring-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: deployment-health
+    rules:
+    # Application availability
+    - alert: ApplicationDown
+      expr: up{job=&quot;myapp&quot;} == 0
+      for: 1m
+      labels:
+        severity: critical
+        service: myapp
+      annotations:
+        summary: &quot;Application instance is down&quot;
+        description: &quot;{{ $labels.instance }} has been down for more than 1 minute&quot;
+        runbook_url: &quot;https://wiki.example.com/runbooks/app-down&quot;
+        
+    # High error rate
+    - alert: HighErrorRate
+      expr: rate(myapp_http_requests_total{status_code=~&quot;5..&quot;}[5m]) / rate(myapp_http_requests_total[5m]) * 100 &gt; 5
+      for: 2m
+      labels:
+        severity: critical
+        service: myapp
+      annotations:
+        summary: &quot;High error rate detected&quot;
+        description: &quot;Error rate is {{ $value }}% for the last 5 minutes&quot;
+        
+    # Slow response times
+    - alert: SlowResponseTime
+      expr: histogram_quantile(0.95, rate(myapp_http_request_duration_seconds_bucket[5m])) &gt; 2
+      for: 5m
+      labels:
+        severity: warning
+        service: myapp
+      annotations:
+        summary: &quot;Slow response times detected&quot;
+        description: &quot;95th percentile response time is {{ $value }}s&quot;
+        
+    # Memory usage
+    - alert: HighMemoryUsage
+      expr: container_memory_usage_bytes{pod=~&quot;myapp-.*&quot;} / container_spec_memory_limit_bytes * 100 &gt; 80
+      for: 5m
+      labels:
+        severity: warning
+        service: myapp
+      annotations:
+        summary: &quot;High memory usage&quot;
+        description: &quot;Pod {{ $labels.pod }} memory usage is {{ $value }}%&quot;
+        
+    # CPU usage
+    - alert: HighCPUUsage
+      expr: rate(container_cpu_usage_seconds_total{pod=~&quot;myapp-.*&quot;}[5m]) * 100 &gt; 80
+      for: 10m
+      labels:
+        severity: warning
+        service: myapp
+      annotations:
+        summary: &quot;High CPU usage&quot;
+        description: &quot;Pod {{ $labels.pod }} CPU usage is {{ $value }}%&quot;
+        
+  - name: deployment-events
+    rules:
+    # Deployment failed
+    - alert: DeploymentFailed
+      expr: increase(kube_deployment_status_replicas_unavailable{deployment=~&quot;myapp-.*&quot;}[5m]) &gt; 0
+      for: 2m
+      labels:
+        severity: critical
+        service: myapp
+      annotations:
+        summary: &quot;Deployment has failed pods&quot;
+        description: &quot;Deployment {{ $labels.deployment }} has {{ $value }} unavailable replicas&quot;
+        
+    # Deployment stuck
+    - alert: DeploymentStuck
+      expr: kube_deployment_spec_replicas{deployment=~&quot;myapp-.*&quot;} != kube_deployment_status_ready_replicas{deployment=~&quot;myapp-.*&quot;}
+      for: 10m
+      labels:
+        severity: warning
+        service: myapp
+      annotations:
+        summary: &quot;Deployment appears stuck&quot;
+        description: &quot;Deployment {{ $labels.deployment }} has been in progress for more than 10 minutes&quot;
+        
+    # Pod crash looping
+    - alert: PodCrashLooping
+      expr: rate(kube_pod_container_status_restarts_total{pod=~&quot;myapp-.*&quot;}[5m]) &gt; 0.1
+      for: 2m
+      labels:
+        severity: critical
+        service: myapp
+      annotations:
+        summary: &quot;Pod is crash looping&quot;
+        description: &quot;Pod {{ $labels.pod }} is restarting frequently&quot;
+        
+  - name: business-metrics
+    rules:
+    # Transaction failure rate
+    - alert: HighTransactionFailureRate
+      expr: rate(myapp_transactions_total{status=&quot;failed&quot;}[5m]) / rate(myapp_transactions_total[5m]) * 100 &gt; 1
+      for: 5m
+      labels:
+        severity: warning
+        service: myapp
+      annotations:
+        summary: &quot;High transaction failure rate&quot;
+        description: &quot;Transaction failure rate is {{ $value }}%&quot;
+        
+    # Low active users (potential issue indicator)
+    - alert: LowActiveUsers
+      expr: myapp_active_users &lt; 10 and hour() &gt; 8 and hour() &lt; 18  # During business hours
+      for: 15m
+      labels:
+        severity: warning
+        service: myapp
+      annotations:
+        summary: &quot;Unusually low active user count&quot;
+        description: &quot;Only {{ $value }} active users during business hours&quot;
+```
+
+### 5. **Log Aggregation and Analysis**
+
+#### Fluentd Configuration
+```yaml
+# fluentd-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-config
+  namespace: logging
+data:
+  fluent.conf: |
+    &lt;source&gt;
+      @type tail
+      @id myapp_logs
+      path /var/log/containers/myapp-*.log
+      pos_file /var/log/fluentd-myapp.log.pos
+      tag kubernetes.myapp
+      format json
+      time_key time
+      time_format %Y-%m-%dT%H:%M:%S.%NZ
+    &lt;/source&gt;
+    
+    &lt;filter kubernetes.myapp&gt;
+      @type kubernetes_metadata
+      @id kubernetes_metadata
+    &lt;/filter&gt;
+    
+    &lt;filter kubernetes.myapp&gt;
+      @type parser
+      key_name log
+      reserve_data true
+      &lt;parse&gt;
+        @type json
+        time_key timestamp
+        time_format %Y-%m-%dT%H:%M:%S.%L%z
+      &lt;/parse&gt;
+    &lt;/filter&gt;
+    
+    # Deployment event logs
+    &lt;filter kubernetes.myapp&gt;
+      @type record_transformer
+      enable_ruby true
+      &lt;record&gt;
+        deployment_info ${record.dig(&quot;kubernetes&quot;, &quot;labels&quot;, &quot;deployment&quot;) || &quot;unknown&quot;}
+        environment ${record.dig(&quot;kubernetes&quot;, &quot;labels&quot;, &quot;environment&quot;) || &quot;unknown&quot;}
+        version ${record.dig(&quot;kubernetes&quot;, &quot;labels&quot;, &quot;version&quot;) || &quot;unknown&quot;}
+        log_level ${record[&quot;level&quot;] || &quot;info&quot;}
+        component ${record[&quot;component&quot;] || &quot;application&quot;}
+      &lt;/record&gt;
+    &lt;/filter&gt;
+    
+    # Error log alerts
+    &lt;filter kubernetes.myapp&gt;
+      @type grep
+      &lt;regexp&gt;
+        key log_level
+        pattern /error|fatal|panic/i
+      &lt;/regexp&gt;
+      &lt;record&gt;
+        alert_type error
+        needs_attention true
+      &lt;/record&gt;
+    &lt;/filter&gt;
+    
+    &lt;match kubernetes.myapp&gt;
+      @type elasticsearch
+      @id out_es_myapp
+      hosts elasticsearch.logging.svc.cluster.local:9200
+      logstash_format true
+      logstash_prefix myapp-deployment
+      include_tag_key true
+      tag_key @log_name
+      flush_interval 10s
+      
+      &lt;buffer&gt;
+        @type file
+        path /var/log/fluentd-buffers/myapp.buffer
+        flush_mode interval
+        retry_type exponential_backoff
+        flush_thread_count 2
+        flush_interval 5s
+        retry_forever
+        retry_max_interval 30
+        chunk_limit_size 2M
+        queue_limit_length 8
+        overflow_action block
+      &lt;/buffer&gt;
+    &lt;/match&gt;
+```
+
+### 6. **Performance Monitoring**
+
+#### APM Integration with Jaeger
+```javascript
+// tracing.js - Distributed tracing setup
+const { NodeSDK } = require(&#039;@opentelemetry/sdk-node&#039;);
+const { getNodeAutoInstrumentations } = require(&#039;@opentelemetry/auto-instrumentations-node&#039;);
+const { JaegerExporter } = require(&#039;@opentelemetry/exporter-jaeger&#039;);
+const { Resource } = require(&#039;@opentelemetry/resources&#039;);
+const { SemanticResourceAttributes } = require(&#039;@opentelemetry/semantic-conventions&#039;);
+
+const jaegerExporter = new JaegerExporter({
+  endpoint: process.env.JAEGER_ENDPOINT || &#039;http://jaeger-collector:14268/api/traces&#039;,
+});
+
+const sdk = new NodeSDK({
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: &#039;myapp&#039;,
+    [SemanticResourceAttributes.SERVICE_VERSION]: process.env.APP_VERSION || &#039;unknown&#039;,
+    [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: process.env.NODE_ENV || &#039;development&#039;,
+  }),
+  traceExporter: jaegerExporter,
+  instrumentations: [
+    getNodeAutoInstrumentations({
+      // Customize instrumentation
+      &#039;@opentelemetry/instrumentation-http&#039;: {
+        requestHook: (span, request) =&gt; {
+          span.setAttribute(&#039;deployment.version&#039;, process.env.APP_VERSION);
+          span.setAttribute(&#039;deployment.environment&#039;, process.env.NODE_ENV);
+        },
+      },
+    }),
+  ],
+});
+
+sdk.start();
+
+// Custom deployment tracing
+const { trace, context } = require(&#039;@opentelemetry/api&#039;);
+
+class DeploymentTracer {
+  constructor() {
+    this.tracer = trace.getTracer(&#039;deployment-monitor&#039;, &#039;1.0.0&#039;);
+  }
+
+  traceDeploymentEvent(eventName, metadata, callback) {
+    const span = this.tracer.startSpan(`deployment.${eventName}`, {
+      attributes: {
+        &#039;deployment.event&#039;: eventName,
+        &#039;deployment.version&#039;: metadata.version,
+        &#039;deployment.environment&#039;: metadata.environment,
+        &#039;deployment.timestamp&#039;: new Date().toISOString(),
+      },
+    });
+
+    return context.with(trace.setSpan(context.active(), span), async () =&gt; {
+      try {
+        const result = await callback();
+        span.setStatus({ code: trace.SpanStatusCode.OK });
+        span.setAttribute(&#039;deployment.result&#039;, &#039;success&#039;);
+        return result;
+      } catch (error) {
+        span.setStatus({
+          code: trace.SpanStatusCode.ERROR,
+          message: error.message,
+        });
+        span.setAttribute(&#039;deployment.result&#039;, &#039;failure&#039;);
+        span.setAttribute(&#039;deployment.error&#039;, error.message);
+        throw error;
+      } finally {
+        span.end();
+      }
+    });
+  }
+}
+
+module.exports = { DeploymentTracer, sdk };
+```
+
+### 7. **Monitoring Dashboard Setup Script**
+
+#### Complete Monitoring Setup
+```bash
+#!/bin/bash
+# setup-monitoring.sh
+
+set -e
+
+NAMESPACE_MONITORING=&quot;monitoring&quot;
+NAMESPACE_LOGGING=&quot;logging&quot;
+APP_NAME=&quot;myapp&quot;
+
+log() {
+    echo -e &quot;\033[32m[$(date &#039;+%Y-%m-%d %H:%M:%S&#039;)] $1\033[0m&quot;
+}
+
+error() {
+    echo -e &quot;\033[31m[ERROR] $1\033[0m&quot;
+    exit 1
+}
+
+# Create namespaces
+create_namespaces() {
+    log &quot;Creating monitoring namespaces...&quot;
+    
+    kubectl create namespace $NAMESPACE_MONITORING --dry-run=client -o yaml | kubectl apply -f -
+    kubectl create namespace $NAMESPACE_LOGGING --dry-run=client -o yaml | kubectl apply -f -
+    
+    # Add labels
+    kubectl label namespace $NAMESPACE_MONITORING monitoring=enabled --overwrite
+    kubectl label namespace $NAMESPACE_LOGGING logging=enabled --overwrite
+}
+
+# Deploy Prometheus
+deploy_prometheus() {
+    log &quot;Deploying Prometheus...&quot;
+    
+    # Create service account
+    cat &lt;&lt;EOF | kubectl apply -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prometheus
+  namespace: $NAMESPACE_MONITORING
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prometheus
+rules:
+- apiGroups: [&quot;&quot;]
+  resources: [&quot;nodes&quot;, &quot;services&quot;, &quot;endpoints&quot;, &quot;pods&quot;]
+  verbs: [&quot;get&quot;, &quot;list&quot;, &quot;watch&quot;]
+- apiGroups: [&quot;extensions&quot;]
+  resources: [&quot;ingresses&quot;]
+  verbs: [&quot;get&quot;, &quot;list&quot;, &quot;watch&quot;]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: $NAMESPACE_MONITORING
+EOF
+    
+    # Create PVC for Prometheus data
+    cat &lt;&lt;EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-pvc
+  namespace: $NAMESPACE_MONITORING
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+EOF
+    
+    # Apply Prometheus configuration and deployment
+    kubectl apply -f k8s/monitoring/prometheus/
+    
+    log &quot;Prometheus deployed successfully&quot;
+}
+
+# Deploy Grafana
+deploy_grafana() {
+    log &quot;Deploying Grafana...&quot;
+    
+    # Create Grafana secret for admin password
+    kubectl create secret generic grafana-admin \
+        --from-literal=admin-user=admin \
+        --from-literal=admin-password=admin123 \
+        -n $NAMESPACE_MONITORING \
+        --dry-run=client -o yaml | kubectl apply -f -
+    
+    # Deploy Grafana
+    kubectl apply -f k8s/monitoring/grafana/
+    
+    log &quot;Grafana deployed successfully&quot;
+    log &quot;Access Grafana at: http://localhost:3000 (after port-forward)&quot;
+    log &quot;Credentials: admin / admin123&quot;
+}
+
+# Deploy Alertmanager
+deploy_alertmanager() {
+    log &quot;Deploying Alertmanager...&quot;
+    
+    kubectl apply -f k8s/monitoring/alertmanager/
+    
+    log &quot;Alertmanager deployed successfully&quot;
+}
+
+# Deploy logging stack
+deploy_logging() {
+    log &quot;Deploying logging stack...&quot;
+    
+    # Deploy Elasticsearch
+    kubectl apply -f k8s/logging/elasticsearch/
+    
+    # Wait for Elasticsearch to be ready
+    kubectl wait --for=condition=ready pod -l app=elasticsearch -n $NAMESPACE_LOGGING --timeout=300s
+    
+    # Deploy Fluentd
+    kubectl apply -f k8s/logging/fluentd/
+    
+    # Deploy Kibana
+    kubectl apply -f k8s/logging/kibana/
+    
+    log &quot;Logging stack deployed successfully&quot;
+}
+
+# Setup application monitoring
+setup_app_monitoring() {
+    log &quot;Setting up application monitoring...&quot;
+    
+    # Add monitoring annotations to application deployment
+    kubectl patch deployment $APP_NAME -p &#039;{
+        &quot;spec&quot;: {
+            &quot;template&quot;: {
+                &quot;metadata&quot;: {
+                    &quot;annotations&quot;: {
+                        &quot;prometheus.io/scrape&quot;: &quot;true&quot;,
+                        &quot;prometheus.io/port&quot;: &quot;3000&quot;,
+                        &quot;prometheus.io/path&quot;: &quot;/metrics&quot;
+                    }
+                }
+            }
+        }
+    }&#039;
+    
+    # Create ServiceMonitor for Prometheus Operator (if using)
+    cat &lt;&lt;EOF | kubectl apply -f -
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ${APP_NAME}-monitor
+  namespace: $NAMESPACE_MONITORING
+spec:
+  selector:
+    matchLabels:
+      app: $APP_NAME
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+EOF
+    
+    log &quot;Application monitoring configured&quot;
+}
+
+# Create port-forward scripts
+create_access_scripts() {
+    log &quot;Creating access scripts...&quot;
+    
+    cat &gt; port-forward-monitoring.sh &lt;&lt;EOF
+#!/bin/bash
+echo &quot;Starting port-forwards for monitoring stack...&quot;
+echo &quot;Prometheus: http://localhost:9090&quot;
+echo &quot;Grafana: http://localhost:3000&quot;
+echo &quot;Alertmanager: http://localhost:9093&quot;
+
+kubectl port-forward -n $NAMESPACE_MONITORING svc/prometheus 9090:9090 &amp;
+kubectl port-forward -n $NAMESPACE_MONITORING svc/grafana 3000:3000 &amp;
+kubectl port-forward -n $NAMESPACE_MONITORING svc/alertmanager 9093:9093 &amp;
+
+echo &quot;Press Ctrl+C to stop all port-forwards&quot;
+wait
+EOF
+    
+    chmod +x port-forward-monitoring.sh
+    
+    cat &gt; port-forward-logging.sh &lt;&lt;EOF
+#!/bin/bash
+echo &quot;Starting port-forwards for logging stack...&quot;
+echo &quot;Kibana: http://localhost:5601&quot;
+echo &quot;Elasticsearch: http://localhost:9200&quot;
+
+kubectl port-forward -n $NAMESPACE_LOGGING svc/kibana 5601:5601 &amp;
+kubectl port-forward -n $NAMESPACE_LOGGING svc/elasticsearch 9200:9200 &amp;
+
+echo &quot;Press Ctrl+C to stop all port-forwards&quot;
+wait
+EOF
+    
+    chmod +x port-forward-logging.sh
+    
+    log &quot;Access scripts created: port-forward-monitoring.sh and port-forward-logging.sh&quot;
+}
+
+# Verify deployment
+verify_deployment() {
+    log &quot;Verifying monitoring deployment...&quot;
+    
+    # Check if all pods are running
+    kubectl get pods -n $NAMESPACE_MONITORING
+    kubectl get pods -n $NAMESPACE_LOGGING
+    
+    # Wait for all pods to be ready
+    kubectl wait --for=condition=ready pod --all -n $NAMESPACE_MONITORING --timeout=300s
+    kubectl wait --for=condition=ready pod --all -n $NAMESPACE_LOGGING --timeout=300s
+    
+    log &quot;✅ Monitoring stack deployed and running successfully!&quot;
+    log &quot;&quot;
+    log &quot;Next steps:&quot;
+    log &quot;1. Run ./port-forward-monitoring.sh to access monitoring UIs&quot;
+    log &quot;2. Import Grafana dashboards from k8s/monitoring/grafana/dashboards/&quot;
+    log &quot;3. Configure Slack/email notifications in Alertmanager&quot;
+    log &quot;4. Set up log parsing rules in Kibana&quot;
+}
+
+# Main deployment function
+main() {
+    log &quot;Setting up comprehensive deployment monitoring...&quot;
+    
+    create_namespaces
+    deploy_prometheus
+    deploy_grafana
+    deploy_alertmanager
+    deploy_logging
+    setup_app_monitoring
+    create_access_scripts
+    verify_deployment
+    
+    log &quot;🎉 Deployment monitoring setup completed!&quot;
+}
+
+# Script execution
+case &quot;${1:-deploy}&quot; in
+    &quot;deploy&quot;)
+        main
+        ;;
+    &quot;monitoring-only&quot;)
+        create_namespaces
+        deploy_prometheus
+        deploy_grafana
+        deploy_alertmanager
+        setup_app_monitoring
+        create_access_scripts
+        verify_deployment
+        ;;
+    &quot;logging-only&quot;)
+        create_namespaces
+        deploy_logging
+        verify_deployment
+        ;;
+    &quot;cleanup&quot;)
+        log &quot;Cleaning up monitoring stack...&quot;
+        kubectl delete namespace $NAMESPACE_MONITORING
+        kubectl delete namespace $NAMESPACE_LOGGING
+        rm -f port-forward-*.sh
+        log &quot;Cleanup completed&quot;
+        ;;
+    *)
+        echo &quot;Usage: $0 {deploy|monitoring-only|logging-only|cleanup}&quot;
+        echo &quot;&quot;
+        echo &quot;Commands:&quot;
+        echo &quot;  deploy          - Deploy complete monitoring and logging stack&quot;
+        echo &quot;  monitoring-only - Deploy only monitoring (Prometheus, Grafana, Alertmanager)&quot;
+        echo &quot;  logging-only    - Deploy only logging stack (ELK)&quot;
+        echo &quot;  cleanup         - Remove all monitoring components&quot;
+        exit 1
+        ;;
+esac
+```
+
+This comprehensive deployment monitoring system provides:
+
+- **Complete observability stack** with Prometheus, Grafana, and Alertmanager
+- **Application performance monitoring** with custom metrics and tracing
+- **Log aggregation and analysis** with ELK stack
+- **Real-time alerting** for deployment issues and performance degradation
+- **Health monitoring** with liveness, readiness, and startup probes
+- **Business metrics tracking** for deployment impact assessment
+- **Automated setup and configuration** with verification scripts
+
+The system enables proactive monitoring of deployments with comprehensive insights into application health, performance, and user impact.</code>
       </div>
     </div>
 

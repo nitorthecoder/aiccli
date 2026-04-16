@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,228 @@
     <p class="desc">Python interface to OpenMS for mass spectrometry data analysis. Use for LC-MS/MS proteomics and metabolomics workflows including file handling (mzML, mzXML, mzTab, FASTA, pepXML, protXML, mzIdentML), signal processing, feature detection, peptide identification, and quantitative analysis. Apply when working with mass spectrometry data, analyzing proteomics experiments, or processing metabolomics datasets.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pyopenms</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/pyopenms</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: pyopenms
+description: Python interface to OpenMS for mass spectrometry data analysis. Use for LC-MS/MS proteomics and metabolomics workflows including file handling (mzML, mzXML, mzTab, FASTA, pepXML, protXML, mzIdentML), signal processing, feature detection, peptide identification, and quantitative analysis. Apply when working with mass spectrometry data, analyzing proteomics experiments, or processing metabolomics datasets.
+---
+
+# PyOpenMS
+
+## Overview
+
+PyOpenMS provides Python bindings to the OpenMS library for computational mass spectrometry, enabling analysis of proteomics and metabolomics data. Use for handling mass spectrometry file formats, processing spectral data, detecting features, identifying peptides/proteins, and performing quantitative analysis.
+
+## Installation
+
+Install using uv:
+
+```bash
+uv uv pip install pyopenms
+```
+
+Verify installation:
+
+```python
+import pyopenms
+print(pyopenms.__version__)
+```
+
+## Core Capabilities
+
+PyOpenMS organizes functionality into these domains:
+
+### 1. File I/O and Data Formats
+
+Handle mass spectrometry file formats and convert between representations.
+
+**Supported formats**: mzML, mzXML, TraML, mzTab, FASTA, pepXML, protXML, mzIdentML, featureXML, consensusXML, idXML
+
+Basic file reading:
+
+```python
+import pyopenms as ms
+
+# Read mzML file
+exp = ms.MSExperiment()
+ms.MzMLFile().load(&quot;data.mzML&quot;, exp)
+
+# Access spectra
+for spectrum in exp:
+    mz, intensity = spectrum.get_peaks()
+    print(f&quot;Spectrum: {len(mz)} peaks&quot;)
+```
+
+**For detailed file handling**: See `references/file_io.md`
+
+### 2. Signal Processing
+
+Process raw spectral data with smoothing, filtering, centroiding, and normalization.
+
+Basic spectrum processing:
+
+```python
+# Smooth spectrum with Gaussian filter
+gaussian = ms.GaussFilter()
+params = gaussian.getParameters()
+params.setValue(&quot;gaussian_width&quot;, 0.1)
+gaussian.setParameters(params)
+gaussian.filterExperiment(exp)
+```
+
+**For algorithm details**: See `references/signal_processing.md`
+
+### 3. Feature Detection
+
+Detect and link features across spectra and samples for quantitative analysis.
+
+```python
+# Detect features
+ff = ms.FeatureFinder()
+ff.run(&quot;centroided&quot;, exp, features, params, ms.FeatureMap())
+```
+
+**For complete workflows**: See `references/feature_detection.md`
+
+### 4. Peptide and Protein Identification
+
+Integrate with search engines and process identification results.
+
+**Supported engines**: Comet, Mascot, MSGFPlus, XTandem, OMSSA, Myrimatch
+
+Basic identification workflow:
+
+```python
+# Load identification data
+protein_ids = []
+peptide_ids = []
+ms.IdXMLFile().load(&quot;identifications.idXML&quot;, protein_ids, peptide_ids)
+
+# Apply FDR filtering
+fdr = ms.FalseDiscoveryRate()
+fdr.apply(peptide_ids)
+```
+
+**For detailed workflows**: See `references/identification.md`
+
+### 5. Metabolomics Analysis
+
+Perform untargeted metabolomics preprocessing and analysis.
+
+Typical workflow:
+1. Load and process raw data
+2. Detect features
+3. Align retention times across samples
+4. Link features to consensus map
+5. Annotate with compound databases
+
+**For complete metabolomics workflows**: See `references/metabolomics.md`
+
+## Data Structures
+
+PyOpenMS uses these primary objects:
+
+- **MSExperiment**: Collection of spectra and chromatograms
+- **MSSpectrum**: Single mass spectrum with m/z and intensity pairs
+- **MSChromatogram**: Chromatographic trace
+- **Feature**: Detected chromatographic peak with quality metrics
+- **FeatureMap**: Collection of features
+- **PeptideIdentification**: Search results for peptides
+- **ProteinIdentification**: Search results for proteins
+
+**For detailed documentation**: See `references/data_structures.md`
+
+## Common Workflows
+
+### Quick Start: Load and Explore Data
+
+```python
+import pyopenms as ms
+
+# Load mzML file
+exp = ms.MSExperiment()
+ms.MzMLFile().load(&quot;sample.mzML&quot;, exp)
+
+# Get basic statistics
+print(f&quot;Number of spectra: {exp.getNrSpectra()}&quot;)
+print(f&quot;Number of chromatograms: {exp.getNrChromatograms()}&quot;)
+
+# Examine first spectrum
+spec = exp.getSpectrum(0)
+print(f&quot;MS level: {spec.getMSLevel()}&quot;)
+print(f&quot;Retention time: {spec.getRT()}&quot;)
+mz, intensity = spec.get_peaks()
+print(f&quot;Peaks: {len(mz)}&quot;)
+```
+
+### Parameter Management
+
+Most algorithms use a parameter system:
+
+```python
+# Get algorithm parameters
+algo = ms.GaussFilter()
+params = algo.getParameters()
+
+# View available parameters
+for param in params.keys():
+    print(f&quot;{param}: {params.getValue(param)}&quot;)
+
+# Modify parameters
+params.setValue(&quot;gaussian_width&quot;, 0.2)
+algo.setParameters(params)
+```
+
+### Export to Pandas
+
+Convert data to pandas DataFrames for analysis:
+
+```python
+import pyopenms as ms
+import pandas as pd
+
+# Load feature map
+fm = ms.FeatureMap()
+ms.FeatureXMLFile().load(&quot;features.featureXML&quot;, fm)
+
+# Convert to DataFrame
+df = fm.get_df()
+print(df.head())
+```
+
+## Integration with Other Tools
+
+PyOpenMS integrates with:
+- **Pandas**: Export data to DataFrames
+- **NumPy**: Work with peak arrays
+- **Scikit-learn**: Machine learning on MS data
+- **Matplotlib/Seaborn**: Visualization
+- **R**: Via rpy2 bridge
+
+## Resources
+
+- **Official documentation**: https://pyopenms.readthedocs.io
+- **OpenMS documentation**: https://www.openms.org
+- **GitHub**: https://github.com/OpenMS/OpenMS
+
+## References
+
+- `references/file_io.md` - Comprehensive file format handling
+- `references/signal_processing.md` - Signal processing algorithms
+- `references/feature_detection.md` - Feature detection and linking
+- `references/identification.md` - Peptide and protein identification
+- `references/metabolomics.md` - Metabolomics-specific workflows
+- `references/data_structures.md` - Core objects and data structures
+</code>
       </div>
     </div>
 

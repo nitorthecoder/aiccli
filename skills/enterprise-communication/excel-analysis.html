@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,264 @@
     <p class="desc">Analyze Excel spreadsheets, create pivot tables, generate charts, and perform data analysis. Use when analyzing Excel files, spreadsheets, tabular data, or .xlsx files.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/excel-analysis</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/excel-analysis</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: Excel Analysis
+description: Analyze Excel spreadsheets, create pivot tables, generate charts, and perform data analysis. Use when analyzing Excel files, spreadsheets, tabular data, or .xlsx files.
+---
+
+# Excel Analysis
+
+## Quick start
+
+Read Excel files with pandas:
+
+```python
+import pandas as pd
+
+# Read Excel file
+df = pd.read_excel(&quot;data.xlsx&quot;, sheet_name=&quot;Sheet1&quot;)
+
+# Display first few rows
+print(df.head())
+
+# Basic statistics
+print(df.describe())
+```
+
+## Reading multiple sheets
+
+Process all sheets in a workbook:
+
+```python
+import pandas as pd
+
+# Read all sheets
+excel_file = pd.ExcelFile(&quot;workbook.xlsx&quot;)
+
+for sheet_name in excel_file.sheet_names:
+    df = pd.read_excel(excel_file, sheet_name=sheet_name)
+    print(f&quot;\n{sheet_name}:&quot;)
+    print(df.head())
+```
+
+## Data analysis
+
+Perform common analysis tasks:
+
+```python
+import pandas as pd
+
+df = pd.read_excel(&quot;sales.xlsx&quot;)
+
+# Group by and aggregate
+sales_by_region = df.groupby(&quot;region&quot;)[&quot;sales&quot;].sum()
+print(sales_by_region)
+
+# Filter data
+high_sales = df[df[&quot;sales&quot;] &gt; 10000]
+
+# Calculate metrics
+df[&quot;profit_margin&quot;] = (df[&quot;revenue&quot;] - df[&quot;cost&quot;]) / df[&quot;revenue&quot;]
+
+# Sort by column
+df_sorted = df.sort_values(&quot;sales&quot;, ascending=False)
+```
+
+## Creating Excel files
+
+Write data to Excel with formatting:
+
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    &quot;Product&quot;: [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;],
+    &quot;Sales&quot;: [100, 200, 150],
+    &quot;Profit&quot;: [20, 40, 30]
+})
+
+# Write to Excel
+writer = pd.ExcelWriter(&quot;output.xlsx&quot;, engine=&quot;openpyxl&quot;)
+df.to_excel(writer, sheet_name=&quot;Sales&quot;, index=False)
+
+# Get worksheet for formatting
+worksheet = writer.sheets[&quot;Sales&quot;]
+
+# Auto-adjust column widths
+for column in worksheet.columns:
+    max_length = 0
+    column_letter = column[0].column_letter
+    for cell in column:
+        if len(str(cell.value)) &gt; max_length:
+            max_length = len(str(cell.value))
+    worksheet.column_dimensions[column_letter].width = max_length + 2
+
+writer.close()
+```
+
+## Pivot tables
+
+Create pivot tables programmatically:
+
+```python
+import pandas as pd
+
+df = pd.read_excel(&quot;sales_data.xlsx&quot;)
+
+# Create pivot table
+pivot = pd.pivot_table(
+    df,
+    values=&quot;sales&quot;,
+    index=&quot;region&quot;,
+    columns=&quot;product&quot;,
+    aggfunc=&quot;sum&quot;,
+    fill_value=0
+)
+
+print(pivot)
+
+# Save pivot table
+pivot.to_excel(&quot;pivot_report.xlsx&quot;)
+```
+
+## Charts and visualization
+
+Generate charts from Excel data:
+
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_excel(&quot;data.xlsx&quot;)
+
+# Create bar chart
+df.plot(x=&quot;category&quot;, y=&quot;value&quot;, kind=&quot;bar&quot;)
+plt.title(&quot;Sales by Category&quot;)
+plt.xlabel(&quot;Category&quot;)
+plt.ylabel(&quot;Sales&quot;)
+plt.tight_layout()
+plt.savefig(&quot;chart.png&quot;)
+
+# Create pie chart
+df.set_index(&quot;category&quot;)[&quot;value&quot;].plot(kind=&quot;pie&quot;, autopct=&quot;%1.1f%%&quot;)
+plt.title(&quot;Market Share&quot;)
+plt.ylabel(&quot;&quot;)
+plt.savefig(&quot;pie_chart.png&quot;)
+```
+
+## Data cleaning
+
+Clean and prepare Excel data:
+
+```python
+import pandas as pd
+
+df = pd.read_excel(&quot;messy_data.xlsx&quot;)
+
+# Remove duplicates
+df = df.drop_duplicates()
+
+# Handle missing values
+df = df.fillna(0)  # or df.dropna()
+
+# Remove whitespace
+df[&quot;name&quot;] = df[&quot;name&quot;].str.strip()
+
+# Convert data types
+df[&quot;date&quot;] = pd.to_datetime(df[&quot;date&quot;])
+df[&quot;amount&quot;] = pd.to_numeric(df[&quot;amount&quot;], errors=&quot;coerce&quot;)
+
+# Save cleaned data
+df.to_excel(&quot;cleaned_data.xlsx&quot;, index=False)
+```
+
+## Merging and joining
+
+Combine multiple Excel files:
+
+```python
+import pandas as pd
+
+# Read multiple files
+df1 = pd.read_excel(&quot;sales_q1.xlsx&quot;)
+df2 = pd.read_excel(&quot;sales_q2.xlsx&quot;)
+
+# Concatenate vertically
+combined = pd.concat([df1, df2], ignore_index=True)
+
+# Merge on common column
+customers = pd.read_excel(&quot;customers.xlsx&quot;)
+sales = pd.read_excel(&quot;sales.xlsx&quot;)
+
+merged = pd.merge(sales, customers, on=&quot;customer_id&quot;, how=&quot;left&quot;)
+
+merged.to_excel(&quot;merged_data.xlsx&quot;, index=False)
+```
+
+## Advanced formatting
+
+Apply conditional formatting and styles:
+
+```python
+import pandas as pd
+from openpyxl import load_workbook
+from openpyxl.styles import PatternFill, Font
+
+# Create Excel file
+df = pd.DataFrame({
+    &quot;Product&quot;: [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;],
+    &quot;Sales&quot;: [100, 200, 150]
+})
+
+df.to_excel(&quot;formatted.xlsx&quot;, index=False)
+
+# Load workbook for formatting
+wb = load_workbook(&quot;formatted.xlsx&quot;)
+ws = wb.active
+
+# Apply conditional formatting
+red_fill = PatternFill(start_color=&quot;FF0000&quot;, end_color=&quot;FF0000&quot;, fill_type=&quot;solid&quot;)
+green_fill = PatternFill(start_color=&quot;00FF00&quot;, end_color=&quot;00FF00&quot;, fill_type=&quot;solid&quot;)
+
+for row in range(2, len(df) + 2):
+    cell = ws[f&quot;B{row}&quot;]
+    if cell.value &lt; 150:
+        cell.fill = red_fill
+    else:
+        cell.fill = green_fill
+
+# Bold headers
+for cell in ws[1]:
+    cell.font = Font(bold=True)
+
+wb.save(&quot;formatted.xlsx&quot;)
+```
+
+## Performance tips
+
+- Use `read_excel` with `usecols` to read specific columns only
+- Use `chunksize` for very large files
+- Consider using `engine=&#039;openpyxl&#039;` or `engine=&#039;xlrd&#039;` based on file type
+- Use `dtype` parameter to specify column types for faster reading
+
+## Available packages
+
+- **pandas** - Data analysis and manipulation (primary)
+- **openpyxl** - Excel file creation and formatting
+- **xlrd** - Reading older .xls files
+- **xlsxwriter** - Advanced Excel writing capabilities
+- **matplotlib** - Chart generation
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,281 @@
     <p class="desc">"Schema migrations and versioning for PocketBase. Use when creating migrations, managing schema versions, syncing collections between environments, using automigrate, or creating collections programmatically. Covers migrate commands, migration file format, snapshot imports, and the _migrations tracking table."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pb-migrations</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/pb-migrations</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: &quot;PocketBase Migrations&quot;
+description: &quot;Schema migrations and versioning for PocketBase. Use when creating migrations, managing schema versions, syncing collections between environments, using automigrate, or creating collections programmatically. Covers migrate commands, migration file format, snapshot imports, and the _migrations tracking table.&quot;
+---
+
+# PocketBase Migrations &amp; Schema Versioning
+
+## Overview
+
+PocketBase supports two approaches to schema management:
+
+1. **Auto-migrate** (default in dev) — Dashboard changes auto-generate migration files in `pb_migrations/`
+2. **Manual migrations** — write migration files by hand for full control
+
+## CLI Commands
+
+```bash
+# Create a new empty migration file
+./pocketbase migrate create &quot;add_posts_collection&quot;
+# Creates: pb_migrations/1234567890_add_posts_collection.js
+
+# Apply all pending migrations
+./pocketbase migrate up
+
+# Revert the last applied migration
+./pocketbase migrate down
+
+# Generate a full snapshot of all current collections
+./pocketbase migrate collections
+# Creates a migration file that recreates all collections from scratch
+
+# Sync migration history with actual DB state (mark all as applied)
+./pocketbase migrate history-sync
+```
+
+## Auto-migrate Mode
+
+Enabled by default. When you change collections in the Dashboard, PocketBase auto-generates migration files in `pb_migrations/`.
+
+```bash
+# Start with auto-migrate (default)
+./pocketbase serve
+
+# Disable auto-migrate (production)
+./pocketbase serve --automigrate=0
+```
+
+**Workflow**:
+1. Develop with auto-migrate ON — use Dashboard to design schema
+2. Migration files are auto-generated in `pb_migrations/`
+3. Commit these files to git
+4. Deploy: migrations run automatically on `serve` start
+5. In production: use `--automigrate=0` to prevent Dashboard changes from generating new migrations
+
+## Migration File Format
+
+```js
+// pb_migrations/1234567890_add_posts_collection.js
+
+migrate(
+    // UP — apply migration
+    function(app) {
+        var collection = new Collection({
+            name: &quot;posts&quot;,
+            type: &quot;base&quot;,
+            fields: [
+                { name: &quot;title&quot;, type: &quot;text&quot;, required: true },
+                { name: &quot;body&quot;, type: &quot;editor&quot; },
+                { name: &quot;author&quot;, type: &quot;relation&quot;, collectionId: &quot;USERS_COLLECTION_ID&quot;, cascadeDelete: false, maxSelect: 1, required: true },
+                { name: &quot;status&quot;, type: &quot;select&quot;, values: [&quot;draft&quot;, &quot;published&quot;, &quot;archived&quot;] },
+                { name: &quot;published_at&quot;, type: &quot;date&quot; },
+                { name: &quot;tags&quot;, type: &quot;relation&quot;, collectionId: &quot;TAGS_COLLECTION_ID&quot;, maxSelect: 0 }
+            ],
+            indexes: [
+                &quot;CREATE INDEX idx_posts_author ON posts (author)&quot;,
+                &quot;CREATE INDEX idx_posts_status ON posts (status)&quot;,
+                &quot;CREATE UNIQUE INDEX idx_posts_title ON posts (title)&quot;
+            ],
+            listRule: &quot;&quot;,   // WARNING: &quot;&quot; means public access — use a filter or null to restrict
+            viewRule: &quot;&quot;,   // WARNING: &quot;&quot; means public access — use a filter or null to restrict
+            createRule: &quot;@request.auth.id != &#039;&#039;&quot;,
+            updateRule: &quot;author = @request.auth.id&quot;,
+            deleteRule: &quot;author = @request.auth.id&quot;
+        })
+        app.save(collection)
+    },
+    // DOWN — revert migration
+    function(app) {
+        var collection = app.findCollectionByNameOrId(&quot;posts&quot;)
+        app.delete(collection)
+    }
+)
+```
+
+**Important**: the `app` inside migrations is a transactional instance. If any error occurs, the entire migration is rolled back.
+
+## Creating Collections Programmatically
+
+### Base collection
+
+```js
+var collection = new Collection({
+    name: &quot;posts&quot;,
+    type: &quot;base&quot;,
+    fields: [
+        { name: &quot;title&quot;, type: &quot;text&quot;, required: true, min: 3, max: 200 },
+        { name: &quot;slug&quot;, type: &quot;text&quot;, required: true, autogenerate: { pattern: &quot;slugify(title)&quot; } },
+        { name: &quot;body&quot;, type: &quot;editor&quot; },
+        { name: &quot;cover&quot;, type: &quot;file&quot;, maxSelect: 1, maxSize: 5242880, mimeTypes: [&quot;image/jpeg&quot;, &quot;image/png&quot;, &quot;image/webp&quot;] },
+        { name: &quot;views&quot;, type: &quot;number&quot;, min: 0 },
+        { name: &quot;metadata&quot;, type: &quot;json&quot;, maxSize: 2000000 },
+        { name: &quot;featured&quot;, type: &quot;bool&quot; },
+        { name: &quot;published_at&quot;, type: &quot;date&quot; }
+    ]
+})
+app.save(collection)
+```
+
+### Auth collection
+
+```js
+var collection = new Collection({
+    name: &quot;users&quot;,
+    type: &quot;auth&quot;,
+    fields: [
+        { name: &quot;name&quot;, type: &quot;text&quot;, required: true },
+        { name: &quot;avatar&quot;, type: &quot;file&quot;, maxSelect: 1, maxSize: 5242880 },
+        { name: &quot;role&quot;, type: &quot;select&quot;, values: [&quot;user&quot;, &quot;editor&quot;, &quot;admin&quot;], required: true }
+    ],
+    passwordAuth: { enabled: true, identityFields: [&quot;email&quot;, &quot;username&quot;] },
+    oauth2: { enabled: true },
+    otp: { enabled: false },
+    mfa: { enabled: false },
+    authToken: { duration: 604800 }  // 7 days
+})
+app.save(collection)
+```
+
+### View collection
+
+```js
+var collection = new Collection({
+    name: &quot;posts_stats&quot;,
+    type: &quot;view&quot;,
+    viewQuery: &quot;SELECT p.id, p.title, COUNT(c.id) as comments_count, p.views FROM posts p LEFT JOIN comments c ON c.post = p.id GROUP BY p.id&quot;,
+    listRule: &quot;&quot;,
+    viewRule: &quot;&quot;
+})
+app.save(collection)
+```
+
+## Modifying Existing Collections
+
+```js
+migrate(function(app) {
+    var collection = app.findCollectionByNameOrId(&quot;posts&quot;)
+
+    // Add a new field
+    collection.fields.add({
+        name: &quot;subtitle&quot;,
+        type: &quot;text&quot;,
+        max: 500
+    })
+
+    // Remove a field
+    collection.fields.removeByName(&quot;old_field&quot;)
+
+    // Update API rules
+    collection.listRule = &quot;@request.auth.id != &#039;&#039;&quot;
+    collection.viewRule = &quot;&quot;
+
+    // Add index
+    collection.indexes.push(&quot;CREATE INDEX idx_posts_subtitle ON posts (subtitle)&quot;)
+
+    app.save(collection)
+}, function(app) {
+    var collection = app.findCollectionByNameOrId(&quot;posts&quot;)
+    collection.fields.removeByName(&quot;subtitle&quot;)
+    app.save(collection)
+})
+```
+
+## Raw SQL in Migrations
+
+```js
+migrate(function(app) {
+    app.db().newQuery(&quot;ALTER TABLE posts ADD COLUMN legacy_id TEXT DEFAULT &#039;&#039;&quot;).execute()
+    app.db().newQuery(&quot;UPDATE posts SET legacy_id = id WHERE legacy_id = &#039;&#039;&quot;).execute()
+}, function(app) {
+    app.db().newQuery(&quot;ALTER TABLE posts DROP COLUMN legacy_id&quot;).execute()
+})
+```
+
+**Warning**: raw SQL bypasses PocketBase&#039;s schema cache. Run `migrate collections` afterward to re-sync if needed.
+
+## Settings &amp; Superuser in Migrations
+
+### Initialize app settings
+
+```js
+onBootstrap(function(e) {
+    var settings = e.app.settings()
+    settings.meta.appName = &quot;My App&quot;
+    settings.meta.appURL = &quot;https://myapp.com&quot;
+    settings.meta.senderName = &quot;My App&quot;
+    settings.meta.senderAddress = &quot;noreply@myapp.com&quot;
+    settings.smtp.enabled = true
+    settings.smtp.host = &quot;smtp.example.com&quot;
+    settings.smtp.port = 587
+    settings.smtp.username = $os.getenv(&quot;SMTP_USER&quot;)
+    settings.smtp.password = $os.getenv(&quot;SMTP_PASS&quot;)
+    e.app.save(settings)
+    return e.next()
+})
+```
+
+### Create superuser in migration
+
+```js
+migrate(function(app) {
+    var superusers = app.findCollectionByNameOrId(&quot;_superusers&quot;)
+    var record = new Record(superusers)
+    // IMPORTANT: always set PB_ADMIN_EMAIL and PB_ADMIN_PASSWORD env vars
+    var email = $os.getenv(&quot;PB_ADMIN_EMAIL&quot;)
+    var password = $os.getenv(&quot;PB_ADMIN_PASSWORD&quot;)
+    if (!email || !password) {
+        throw new Error(&quot;PB_ADMIN_EMAIL and PB_ADMIN_PASSWORD env vars are required&quot;)
+    }
+    record.set(&quot;email&quot;, email)
+    record.set(&quot;password&quot;, password)
+    app.save(record)
+})
+```
+
+## Snapshot Migrations
+
+`./pocketbase migrate collections` generates a complete snapshot — useful for:
+- Bootstrapping a new environment
+- Resetting migration history
+- Reviewing full schema in one file
+
+The generated file uses `app.importCollections(collections)` which supports two modes:
+- **Default (merge/extend)**: adds new collections and fields, updates existing ones, doesn&#039;t delete anything
+- **Delete missing**: `app.importCollections(collections, true)` — deletes collections/fields not in the snapshot
+
+## `_migrations` Table
+
+PocketBase tracks applied migrations in the internal `_migrations` table:
+- `id` — auto-generated
+- `file` — migration filename
+- `applied` — timestamp
+
+`migrate history-sync` marks all existing migration files as applied without running them — useful when importing an existing database.
+
+## Best Practices
+
+1. **Dev**: use auto-migrate + Dashboard for schema design, commit generated files
+2. **Staging/Prod**: deploy with `--automigrate=0`, migrations run on startup
+3. **Always write DOWN migrations** — reversibility saves you when things go wrong
+4. **One concern per migration** — don&#039;t mix unrelated schema changes
+5. **Test migrations**: apply on a copy of production data before deploying
+6. **Use `migrate collections`** periodically to snapshot current state for documentation
+7. **Never edit applied migrations** — create a new migration to fix issues
+8. **Seed data**: prefer a dedicated migration for one-time initial data; if using `onBootstrap`, make the seed logic idempotent (existence checks/upserts) because bootstrap runs on every app start
+</code>
       </div>
     </div>
 

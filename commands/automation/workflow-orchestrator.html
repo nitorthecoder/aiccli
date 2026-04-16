@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,591 @@
     <p class="desc">Orchestrate complex automation workflows with task dependencies, scheduling, and cross-platform execution</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/workflow-orchestrator</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/workflow-orchestrator</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Read, Write, Edit, Bash
+argument-hint: [workflow-name] | create | run | schedule | monitor
+description: Orchestrate complex automation workflows with task dependencies, scheduling, and cross-platform execution
+---
+
+# Workflow Orchestrator
+
+Orchestrate complex automation workflows: $ARGUMENTS
+
+## Current Workflow State
+
+- Existing workflows: !`find . -name &quot;*.workflow.json&quot; -o -name &quot;workflow.yml&quot; -o -name &quot;Taskfile.yml&quot; | head -5`
+- Cron jobs: !`crontab -l 2&gt;/dev/null || echo &quot;No crontab found&quot;`
+- Running processes: !`ps aux | grep -E &quot;(workflow|task|job)&quot; | head -3`
+- System capabilities: !`which docker node python3 | head -3`
+- Configuration: @.workflow-config.json or @workflows/ (if exists)
+
+## Task
+
+Create and manage complex automation workflows with dependency management, scheduling, and monitoring.
+
+## Workflow Definition Structure
+
+### Basic Workflow Schema
+```json
+{
+  &quot;name&quot;: &quot;deployment-workflow&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;description&quot;: &quot;Complete deployment automation with testing and rollback&quot;,
+  &quot;trigger&quot;: {
+    &quot;type&quot;: &quot;manual|schedule|webhook|file_change&quot;,
+    &quot;config&quot;: {
+      &quot;schedule&quot;: &quot;0 2 * * *&quot;,
+      &quot;files&quot;: [&quot;src/**/*&quot;, &quot;package.json&quot;],
+      &quot;webhook&quot;: &quot;/trigger/deploy&quot;
+    }
+  },
+  &quot;environment&quot;: {
+    &quot;NODE_ENV&quot;: &quot;production&quot;,
+    &quot;LOG_LEVEL&quot;: &quot;info&quot;
+  },
+  &quot;tasks&quot;: [
+    {
+      &quot;id&quot;: &quot;pre-build&quot;,
+      &quot;name&quot;: &quot;Pre-build validation&quot;,
+      &quot;type&quot;: &quot;shell&quot;,
+      &quot;command&quot;: &quot;npm run validate&quot;,
+      &quot;timeout&quot;: 300,
+      &quot;retry&quot;: {
+        &quot;attempts&quot;: 3,
+        &quot;delay&quot;: 5000
+      }
+    },
+    {
+      &quot;id&quot;: &quot;build&quot;,
+      &quot;name&quot;: &quot;Build application&quot;,
+      &quot;type&quot;: &quot;shell&quot;,
+      &quot;command&quot;: &quot;npm run build&quot;,
+      &quot;depends_on&quot;: [&quot;pre-build&quot;],
+      &quot;parallel&quot;: false,
+      &quot;timeout&quot;: 600
+    },
+    {
+      &quot;id&quot;: &quot;test&quot;,
+      &quot;name&quot;: &quot;Run tests&quot;,
+      &quot;type&quot;: &quot;shell&quot;,
+      &quot;command&quot;: &quot;npm run test:ci&quot;,
+      &quot;depends_on&quot;: [&quot;build&quot;],
+      &quot;condition&quot;: &quot;${env.SKIP_TESTS} != &#039;true&#039;&quot;
+    },
+    {
+      &quot;id&quot;: &quot;deploy&quot;,
+      &quot;name&quot;: &quot;Deploy to staging&quot;,
+      &quot;type&quot;: &quot;shell&quot;,
+      &quot;command&quot;: &quot;npm run deploy:staging&quot;,
+      &quot;depends_on&quot;: [&quot;test&quot;],
+      &quot;on_success&quot;: [&quot;notify-success&quot;],
+      &quot;on_failure&quot;: [&quot;rollback&quot;, &quot;notify-failure&quot;]
+    }
+  ],
+  &quot;notifications&quot;: {
+    &quot;channels&quot;: [&quot;slack&quot;, &quot;email&quot;],
+    &quot;on_completion&quot;: true,
+    &quot;on_failure&quot;: true
+  }
+}
+```
+
+## Advanced Workflow Features
+
+### 1. **Conditional Execution**
+```json
+{
+  &quot;id&quot;: &quot;conditional-deploy&quot;,
+  &quot;name&quot;: &quot;Deploy if tests pass&quot;,
+  &quot;type&quot;: &quot;conditional&quot;,
+  &quot;condition&quot;: &quot;${tasks.test.exit_code} == 0 &amp;&amp; ${env.DEPLOY_ENABLED} == &#039;true&#039;&quot;,
+  &quot;then&quot;: {
+    &quot;type&quot;: &quot;shell&quot;,
+    &quot;command&quot;: &quot;npm run deploy&quot;
+  },
+  &quot;else&quot;: {
+    &quot;type&quot;: &quot;shell&quot;,
+    &quot;command&quot;: &quot;echo &#039;Skipping deployment&#039;&quot;
+  }
+}
+```
+
+### 2. **Parallel Task Execution**
+```json
+{
+  &quot;id&quot;: &quot;parallel-tests&quot;,
+  &quot;name&quot;: &quot;Run parallel test suites&quot;,
+  &quot;type&quot;: &quot;parallel&quot;,
+  &quot;tasks&quot;: [
+    {
+      &quot;id&quot;: &quot;unit-tests&quot;,
+      &quot;command&quot;: &quot;npm run test:unit&quot;
+    },
+    {
+      &quot;id&quot;: &quot;integration-tests&quot;, 
+      &quot;command&quot;: &quot;npm run test:integration&quot;
+    },
+    {
+      &quot;id&quot;: &quot;e2e-tests&quot;,
+      &quot;command&quot;: &quot;npm run test:e2e&quot;
+    }
+  ],
+  &quot;wait_for&quot;: &quot;all|any|first&quot;,
+  &quot;timeout&quot;: 1800
+}
+```
+
+### 3. **Loop and Iteration**
+```json
+{
+  &quot;id&quot;: &quot;deploy-multiple-envs&quot;,
+  &quot;name&quot;: &quot;Deploy to multiple environments&quot;,
+  &quot;type&quot;: &quot;loop&quot;,
+  &quot;items&quot;: [&quot;staging&quot;, &quot;qa&quot;, &quot;production&quot;],
+  &quot;task&quot;: {
+    &quot;type&quot;: &quot;shell&quot;,
+    &quot;command&quot;: &quot;npm run deploy -- --env ${item}&quot;,
+    &quot;timeout&quot;: 300
+  },
+  &quot;parallel&quot;: false,
+  &quot;stop_on_failure&quot;: true
+}
+```
+
+### 4. **File and Data Processing**
+```json
+{
+  &quot;id&quot;: &quot;process-data&quot;,
+  &quot;name&quot;: &quot;Process data files&quot;,
+  &quot;type&quot;: &quot;data_processor&quot;,
+  &quot;input&quot;: {
+    &quot;type&quot;: &quot;file&quot;,
+    &quot;path&quot;: &quot;data/*.json&quot;
+  },
+  &quot;processor&quot;: {
+    &quot;type&quot;: &quot;javascript&quot;,
+    &quot;script&quot;: &quot;scripts/process-data.js&quot;
+  },
+  &quot;output&quot;: {
+    &quot;type&quot;: &quot;file&quot;,
+    &quot;path&quot;: &quot;processed/output.json&quot;
+  }
+}
+```
+
+## Workflow Orchestration Engine
+
+### Core Engine Implementation
+```javascript
+class WorkflowOrchestrator {
+  constructor(config) {
+    this.config = config;
+    this.tasks = new Map();
+    this.running = new Set();
+    this.completed = new Set();
+    this.failed = new Set();
+    this.logger = new Logger(config.logLevel);
+  }
+
+  async execute(workflowPath) {
+    const workflow = await this.loadWorkflow(workflowPath);
+    
+    try {
+      await this.validateWorkflow(workflow);
+      await this.setupEnvironment(workflow.environment);
+      
+      const result = await this.executeWorkflow(workflow);
+      await this.cleanup();
+      
+      return result;
+    } catch (error) {
+      await this.handleError(error, workflow);
+      throw error;
+    }
+  }
+
+  async executeWorkflow(workflow) {
+    const taskGraph = this.buildDependencyGraph(workflow.tasks);
+    const execution = {
+      id: this.generateExecutionId(),
+      workflow: workflow.name,
+      startTime: Date.now(),
+      tasks: {}
+    };
+
+    while (this.hasRunnableTasks(taskGraph)) {
+      const runnableTasks = this.getRunnableTasks(taskGraph);
+      
+      if (runnableTasks.length === 0) {
+        break; // Circular dependency or all failed
+      }
+
+      await this.executeTaskBatch(runnableTasks, execution);
+    }
+
+    return this.generateExecutionReport(execution);
+  }
+
+  async executeTask(task, execution) {
+    const taskExecution = {
+      id: task.id,
+      name: task.name,
+      startTime: Date.now(),
+      status: &#039;running&#039;
+    };
+
+    execution.tasks[task.id] = taskExecution;
+    this.running.add(task.id);
+
+    try {
+      // Pre-execution hooks
+      await this.runPreHooks(task);
+      
+      // Task execution
+      const result = await this.runTaskByType(task);
+      
+      // Post-execution hooks
+      await this.runPostHooks(task, result);
+
+      taskExecution.endTime = Date.now();
+      taskExecution.duration = taskExecution.endTime - taskExecution.startTime;
+      taskExecution.status = &#039;completed&#039;;
+      taskExecution.result = result;
+
+      this.completed.add(task.id);
+      this.running.delete(task.id);
+
+      // Handle success callbacks
+      if (task.on_success) {
+        await this.executeCallbacks(task.on_success, taskExecution);
+      }
+
+      return result;
+    } catch (error) {
+      taskExecution.endTime = Date.now();
+      taskExecution.duration = taskExecution.endTime - taskExecution.startTime;
+      taskExecution.status = &#039;failed&#039;;
+      taskExecution.error = error.message;
+
+      this.failed.add(task.id);
+      this.running.delete(task.id);
+
+      // Handle failure callbacks
+      if (task.on_failure) {
+        await this.executeCallbacks(task.on_failure, taskExecution);
+      }
+
+      throw error;
+    }
+  }
+
+  async runTaskByType(task) {
+    switch (task.type) {
+      case &#039;shell&#039;:
+        return await this.executeShellTask(task);
+      case &#039;http&#039;:
+        return await this.executeHttpTask(task);
+      case &#039;docker&#039;:
+        return await this.executeDockerTask(task);
+      case &#039;javascript&#039;:
+        return await this.executeJavaScriptTask(task);
+      case &#039;python&#039;:
+        return await this.executePythonTask(task);
+      default:
+        throw new Error(`Unknown task type: ${task.type}`);
+    }
+  }
+}
+```
+
+### Task Types Implementation
+
+#### Shell Task
+```javascript
+async executeShellTask(task) {
+  const { spawn } = require(&#039;child_process&#039;);
+  
+  return new Promise((resolve, reject) =&gt; {
+    const process = spawn(&#039;sh&#039;, [&#039;-c&#039;, task.command], {
+      cwd: task.cwd || process.cwd(),
+      env: { ...process.env, ...task.environment },
+      stdio: [&#039;pipe&#039;, &#039;pipe&#039;, &#039;pipe&#039;]
+    });
+
+    let stdout = &#039;&#039;;
+    let stderr = &#039;&#039;;
+
+    process.stdout.on(&#039;data&#039;, (data) =&gt; {
+      stdout += data.toString();
+      if (task.live_output) {
+        console.log(data.toString());
+      }
+    });
+
+    process.stderr.on(&#039;data&#039;, (data) =&gt; {
+      stderr += data.toString();
+    });
+
+    const timeout = setTimeout(() =&gt; {
+      process.kill(&#039;SIGKILL&#039;);
+      reject(new Error(`Task timeout after ${task.timeout}ms`));
+    }, task.timeout || 300000);
+
+    process.on(&#039;close&#039;, (code) =&gt; {
+      clearTimeout(timeout);
+      if (code === 0) {
+        resolve({ stdout, stderr, exitCode: code });
+      } else {
+        reject(new Error(`Shell command failed with exit code ${code}: ${stderr}`));
+      }
+    });
+  });
+}
+```
+
+#### HTTP Task
+```javascript
+async executeHttpTask(task) {
+  const axios = require(&#039;axios&#039;);
+  
+  const config = {
+    method: task.method || &#039;GET&#039;,
+    url: task.url,
+    headers: task.headers || {},
+    timeout: task.timeout || 30000
+  };
+
+  if (task.data) {
+    config.data = task.data;
+  }
+
+  if (task.auth) {
+    config.auth = task.auth;
+  }
+
+  try {
+    const response = await axios(config);
+    return {
+      status: response.status,
+      data: response.data,
+      headers: response.headers
+    };
+  } catch (error) {
+    throw new Error(`HTTP request failed: ${error.message}`);
+  }
+}
+```
+
+## Workflow Scheduling
+
+### Cron Integration
+```bash
+#!/bin/bash
+# setup-workflow-cron.sh
+
+# Daily backup workflow
+0 2 * * * cd /path/to/project &amp;&amp; node workflow-engine.js run backup-workflow.json
+
+# Hourly health check
+0 * * * * cd /path/to/project &amp;&amp; node workflow-engine.js run health-check.json
+
+# Weekly cleanup
+0 0 * * 0 cd /path/to/project &amp;&amp; node workflow-engine.js run cleanup-workflow.json
+```
+
+### Systemd Timer (Linux)
+```ini
+# /etc/systemd/system/workflow-orchestrator.timer
+[Unit]
+Description=Workflow Orchestrator Timer
+Requires=workflow-orchestrator.service
+
+[Timer]
+OnCalendar=*:0/5
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+## Monitoring and Alerting
+
+### Workflow Metrics Dashboard
+```javascript
+class WorkflowMonitor {
+  constructor() {
+    this.metrics = {
+      totalRuns: 0,
+      successfulRuns: 0,
+      failedRuns: 0,
+      averageDuration: 0,
+      taskMetrics: new Map()
+    };
+  }
+
+  recordExecution(execution) {
+    this.metrics.totalRuns++;
+    
+    if (execution.status === &#039;completed&#039;) {
+      this.metrics.successfulRuns++;
+    } else {
+      this.metrics.failedRuns++;
+    }
+
+    // Update average duration
+    const totalDuration = this.metrics.averageDuration * (this.metrics.totalRuns - 1) + execution.duration;
+    this.metrics.averageDuration = totalDuration / this.metrics.totalRuns;
+
+    // Record task metrics
+    for (const [taskId, task] of Object.entries(execution.tasks)) {
+      if (!this.metrics.taskMetrics.has(taskId)) {
+        this.metrics.taskMetrics.set(taskId, {
+          runs: 0,
+          failures: 0,
+          averageDuration: 0
+        });
+      }
+
+      const taskMetrics = this.metrics.taskMetrics.get(taskId);
+      taskMetrics.runs++;
+      
+      if (task.status === &#039;failed&#039;) {
+        taskMetrics.failures++;
+      }
+
+      const taskTotalDuration = taskMetrics.averageDuration * (taskMetrics.runs - 1) + task.duration;
+      taskMetrics.averageDuration = taskTotalDuration / taskMetrics.runs;
+    }
+  }
+
+  getHealthReport() {
+    const successRate = (this.metrics.successfulRuns / this.metrics.totalRuns) * 100;
+    
+    return {
+      overall: {
+        successRate: successRate.toFixed(2) + &#039;%&#039;,
+        totalRuns: this.metrics.totalRuns,
+        averageDuration: (this.metrics.averageDuration / 1000).toFixed(2) + &#039;s&#039;
+      },
+      tasks: this.getTaskHealthReport()
+    };
+  }
+}
+```
+
+### Alert Configuration
+```json
+{
+  &quot;alerts&quot;: [
+    {
+      &quot;name&quot;: &quot;workflow-failure&quot;,
+      &quot;condition&quot;: &quot;execution.status === &#039;failed&#039;&quot;,
+      &quot;channels&quot;: [&quot;slack&quot;, &quot;email&quot;],
+      &quot;template&quot;: &quot;Workflow ${workflow.name} failed: ${error.message}&quot;
+    },
+    {
+      &quot;name&quot;: &quot;high-failure-rate&quot;,
+      &quot;condition&quot;: &quot;metrics.successRate &lt; 90&quot;,
+      &quot;channels&quot;: [&quot;slack&quot;],
+      &quot;template&quot;: &quot;Workflow success rate dropped to ${metrics.successRate}%&quot;
+    },
+    {
+      &quot;name&quot;: &quot;long-duration&quot;,
+      &quot;condition&quot;: &quot;execution.duration &gt; workflow.expected_duration * 2&quot;,
+      &quot;channels&quot;: [&quot;email&quot;],
+      &quot;template&quot;: &quot;Workflow taking unusually long: ${execution.duration}ms&quot;
+    }
+  ]
+}
+```
+
+## CLI Interface
+
+### Command-line Usage
+```bash
+# Create new workflow
+workflow create --name &quot;deployment&quot; --template &quot;web-app&quot;
+
+# Run workflow
+workflow run deployment-workflow.json
+
+# Schedule workflow
+workflow schedule --cron &quot;0 2 * * *&quot; backup-workflow.json
+
+# Monitor workflows
+workflow monitor --live
+
+# View execution history
+workflow history --limit 10
+
+# Get workflow status
+workflow status --execution-id abc123
+
+# Validate workflow
+workflow validate deployment-workflow.json
+
+# Generate workflow from template
+workflow generate --type &quot;ci-cd&quot; --output ci-workflow.json
+```
+
+## Integration Examples
+
+### Slack Integration
+```javascript
+async function sendSlackNotification(message, channel = &#039;#deployments&#039;) {
+  const webhook = process.env.SLACK_WEBHOOK_URL;
+  
+  await axios.post(webhook, {
+    channel: channel,
+    text: message,
+    username: &#039;Workflow Orchestrator&#039;,
+    icon_emoji: &#039;:gear:&#039;
+  });
+}
+```
+
+### Docker Integration
+```json
+{
+  &quot;id&quot;: &quot;docker-build&quot;,
+  &quot;name&quot;: &quot;Build Docker image&quot;,
+  &quot;type&quot;: &quot;docker&quot;,
+  &quot;config&quot;: {
+    &quot;dockerfile&quot;: &quot;Dockerfile&quot;,
+    &quot;context&quot;: &quot;.&quot;,
+    &quot;tags&quot;: [&quot;myapp:latest&quot;, &quot;myapp:${env.BUILD_NUMBER}&quot;],
+    &quot;build_args&quot;: {
+      &quot;NODE_ENV&quot;: &quot;production&quot;
+    }
+  }
+}
+```
+
+### Database Integration
+```json
+{
+  &quot;id&quot;: &quot;db-migration&quot;,
+  &quot;name&quot;: &quot;Run database migrations&quot;,
+  &quot;type&quot;: &quot;database&quot;,
+  &quot;config&quot;: {
+    &quot;connection&quot;: &quot;${env.DATABASE_URL}&quot;,
+    &quot;migrations_path&quot;: &quot;migrations/&quot;,
+    &quot;rollback_on_failure&quot;: true
+  }
+}
+```
+
+This workflow orchestrator provides enterprise-grade automation capabilities with dependency management, monitoring, and cross-platform execution support.</code>
       </div>
     </div>
 

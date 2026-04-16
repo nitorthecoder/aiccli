@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,312 @@
     <p class="desc">"Build communication features with Twilio: SMS messaging, voice calls, WhatsApp Business API, and user verification (2FA). Covers the full spectrum from simple notifications to complex IVR systems and multi-channel authentication. Critical focus on compliance, rate limits, and error handling. Use when: twilio, send SMS, text message, voice call, phone verification."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/twilio-communications</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/twilio-communications</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: twilio-communications
+description: &quot;Build communication features with Twilio: SMS messaging, voice calls, WhatsApp Business API, and user verification (2FA). Covers the full spectrum from simple notifications to complex IVR systems and multi-channel authentication. Critical focus on compliance, rate limits, and error handling. Use when: twilio, send SMS, text message, voice call, phone verification.&quot;
+source: vibeship-spawner-skills (Apache 2.0)
+---
+
+# Twilio Communications
+
+## Patterns
+
+### SMS Sending Pattern
+
+Basic pattern for sending SMS messages with Twilio.
+Handles the fundamentals: phone number formatting, message delivery,
+and delivery status callbacks.
+
+Key considerations:
+- Phone numbers must be in E.164 format (+1234567890)
+- Default rate limit: 80 messages per second (MPS)
+- Messages over 160 characters are split (and cost more)
+- Carrier filtering can block messages (especially to US numbers)
+
+
+**When to use**: [&#039;Sending notifications to users&#039;, &#039;Transactional messages (order confirmations, shipping)&#039;, &#039;Alerts and reminders&#039;]
+
+```python
+from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
+import os
+import re
+
+class TwilioSMS:
+    &quot;&quot;&quot;
+    SMS sending with proper error handling and validation.
+    &quot;&quot;&quot;
+
+    def __init__(self):
+        self.client = Client(
+            os.environ[&quot;TWILIO_ACCOUNT_SID&quot;],
+            os.environ[&quot;TWILIO_AUTH_TOKEN&quot;]
+        )
+        self.from_number = os.environ[&quot;TWILIO_PHONE_NUMBER&quot;]
+
+    def validate_e164(self, phone: str) -&gt; bool:
+        &quot;&quot;&quot;Validate phone number is in E.164 format.&quot;&quot;&quot;
+        pattern = r&#039;^\+[1-9]\d{1,14}$&#039;
+        return bool(re.match(pattern, phone))
+
+    def send_sms(
+        self,
+        to: str,
+        body: str,
+        status_callback: str = None
+    ) -&gt; dict:
+        &quot;&quot;&quot;
+        Send an SMS message.
+
+        Args:
+            to: Recipient phone number in E.164 format
+            body: Message text (160 chars = 1 segment)
+            status_callback: URL for delivery status webhooks
+
+        Returns:
+            Message SID and status
+        &quot;&quot;&quot;
+        # Validate phone number format
+        if not self.validate_e164(to):
+            return {
+                &quot;success&quot;: False,
+                &quot;error&quot;: &quot;Phone number must be in E.164 format (+1234567890)&quot;
+            }
+
+        # Check message length (warn about segmentation)
+        segment_count = (len(body) + 159) // 160
+        if segment_count &gt; 1:
+            print(f&quot;Warning: Message will be sent as {segment_count} segments&quot;)
+
+        try:
+            message = self.client.messages.create(
+                to=to,
+                from_=self.from_number,
+                body=body,
+                status_callback=status_callback
+            )
+
+            return {
+                &quot;success&quot;: True,
+                &quot;message_sid&quot;: message.sid,
+                &quot;status&quot;: message.status,
+                &quot;segments&quot;: segment_count
+            }
+
+        except TwilioRestException as e:
+            return self._handle_error(e)
+
+    def _handle_error(self, error: Twilio
+```
+
+### Twilio Verify Pattern (2FA/OTP)
+
+Use Twilio Verify for phone number verification and 2FA.
+Handles code generation, delivery, rate limiting, and fraud prevention.
+
+Key benefits over DIY OTP:
+- Twilio manages code generation and expiration
+- Built-in fraud prevention (saved customers $82M+ blocking 747M attempts)
+- Handles rate limiting automatically
+- Multi-channel: SMS, Voice, Email, Push, WhatsApp
+
+Google found SMS 2FA blocks &quot;100% of automated bots, 96% of bulk
+phishing attacks, and 76% of targeted attacks.&quot;
+
+
+**When to use**: [&#039;User phone number verification at signup&#039;, &#039;Two-factor authentication (2FA)&#039;, &#039;Password reset verification&#039;, &#039;High-value transaction confirmation&#039;]
+
+```python
+from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
+import os
+from enum import Enum
+from typing import Optional
+
+class VerifyChannel(Enum):
+    SMS = &quot;sms&quot;
+    CALL = &quot;call&quot;
+    EMAIL = &quot;email&quot;
+    WHATSAPP = &quot;whatsapp&quot;
+
+class TwilioVerify:
+    &quot;&quot;&quot;
+    Phone verification with Twilio Verify.
+    Never store OTP codes - Twilio handles it.
+    &quot;&quot;&quot;
+
+    def __init__(self, verify_service_sid: str = None):
+        self.client = Client(
+            os.environ[&quot;TWILIO_ACCOUNT_SID&quot;],
+            os.environ[&quot;TWILIO_AUTH_TOKEN&quot;]
+        )
+        # Create a Verify Service in Twilio Console first
+        self.service_sid = verify_service_sid or os.environ[&quot;TWILIO_VERIFY_SID&quot;]
+
+    def send_verification(
+        self,
+        to: str,
+        channel: VerifyChannel = VerifyChannel.SMS,
+        locale: str = &quot;en&quot;
+    ) -&gt; dict:
+        &quot;&quot;&quot;
+        Send verification code to phone/email.
+
+        Args:
+            to: Phone number (E.164) or email
+            channel: SMS, call, email, or whatsapp
+            locale: Language code for message
+
+        Returns:
+            Verification status
+        &quot;&quot;&quot;
+        try:
+            verification = self.client.verify \
+                .v2 \
+                .services(self.service_sid) \
+                .verifications \
+                .create(
+                    to=to,
+                    channel=channel.value,
+                    locale=locale
+                )
+
+            return {
+                &quot;success&quot;: True,
+                &quot;status&quot;: verification.status,  # &quot;pending&quot;
+                &quot;channel&quot;: channel.value,
+                &quot;valid&quot;: verification.valid
+            }
+
+        except TwilioRestException as e:
+            return self._handle_verify_error(e)
+
+    def check_verification(self, to: str, code: str) -&gt; dict:
+        &quot;&quot;&quot;
+        Check if verification code is correct.
+
+        Args:
+            to: Phone number or email that received code
+            code: The code entered by user
+
+        R
+```
+
+### TwiML IVR Pattern
+
+Build Interactive Voice Response (IVR) systems using TwiML.
+TwiML (Twilio Markup Language) is XML that tells Twilio what to do
+when receiving calls.
+
+Core TwiML verbs:
+- &lt;Say&gt;: Text-to-speech
+- &lt;Play&gt;: Play audio file
+- &lt;Gather&gt;: Collect keypad/speech input
+- &lt;Dial&gt;: Connect to another number
+- &lt;Record&gt;: Record caller&#039;s voice
+- &lt;Redirect&gt;: Move to another TwiML endpoint
+
+Key insight: Twilio makes HTTP request to your webhook, you return
+TwiML, Twilio executes it. Stateless, so use URL params or sessions.
+
+
+**When to use**: [&#039;Phone menu systems (press 1 for sales...)&#039;, &#039;Automated customer support&#039;, &#039;Appointment reminders with confirmation&#039;, &#039;Voicemail systems&#039;]
+
+```python
+from flask import Flask, request, Response
+from twilio.twiml.voice_response import VoiceResponse, Gather
+from twilio.request_validator import RequestValidator
+import os
+
+app = Flask(__name__)
+
+def validate_twilio_request(f):
+    &quot;&quot;&quot;Decorator to validate requests are from Twilio.&quot;&quot;&quot;
+    def wrapper(*args, **kwargs):
+        validator = RequestValidator(os.environ[&quot;TWILIO_AUTH_TOKEN&quot;])
+
+        # Get request details
+        url = request.url
+        params = request.form.to_dict()
+        signature = request.headers.get(&quot;X-Twilio-Signature&quot;, &quot;&quot;)
+
+        if not validator.validate(url, params, signature):
+            return &quot;Invalid request&quot;, 403
+
+        return f(*args, **kwargs)
+    wrapper.__name__ = f.__name__
+    return wrapper
+
+@app.route(&quot;/voice/incoming&quot;, methods=[&quot;POST&quot;])
+@validate_twilio_request
+def incoming_call():
+    &quot;&quot;&quot;Handle incoming call with IVR menu.&quot;&quot;&quot;
+    response = VoiceResponse()
+
+    # Gather digits with timeout
+    gather = Gather(
+        num_digits=1,
+        action=&quot;/voice/menu-selection&quot;,
+        method=&quot;POST&quot;,
+        timeout=5
+    )
+    gather.say(
+        &quot;Welcome to Acme Corp. &quot;
+        &quot;Press 1 for sales. &quot;
+        &quot;Press 2 for support. &quot;
+        &quot;Press 3 to leave a message.&quot;
+    )
+    response.append(gather)
+
+    # If no input, repeat
+    response.redirect(&quot;/voice/incoming&quot;)
+
+    return Response(str(response), mimetype=&quot;text/xml&quot;)
+
+@app.route(&quot;/voice/menu-selection&quot;, methods=[&quot;POST&quot;])
+@validate_twilio_request
+def menu_selection():
+    &quot;&quot;&quot;Route based on menu selection.&quot;&quot;&quot;
+    response = VoiceResponse()
+    digit = request.form.get(&quot;Digits&quot;, &quot;&quot;)
+
+    if digit == &quot;1&quot;:
+        # Transfer to sales
+        response.say(&quot;Connecting you to sales.&quot;)
+        response.dial(os.environ[&quot;SALES_PHONE&quot;])
+
+    elif digit == &quot;2&quot;:
+        # Transfer to support
+        response.say(&quot;Connecting you to support.&quot;)
+        response.dial(os.environ[&quot;SUPPORT_PHONE&quot;])
+
+    elif digit == &quot;3&quot;:
+        # Voicemail
+        response.say(&quot;Please leave a message after 
+```
+
+## ⚠️ Sharp Edges
+
+| Issue | Severity | Solution |
+|-------|----------|----------|
+| Issue | high | ## Track opt-out status in your database |
+| Issue | medium | ## Implement retry logic for transient failures |
+| Issue | high | ## Register for A2P 10DLC (US requirement) |
+| Issue | critical | ## ALWAYS validate the signature |
+| Issue | high | ## Track session windows per user |
+| Issue | critical | ## Never hardcode credentials |
+| Issue | medium | ## Implement application-level rate limiting too |
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,361 @@
     <p class="desc">Converts OpenAPI 3.0 JSON/YAML to TypeScript interfaces and type guards. This skill should be used when the user asks to generate types from OpenAPI, convert schema to TS, create API interfaces, or generate TypeScript types from an API specification.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/openapi-to-typescript</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/openapi-to-typescript</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: openapi-to-typescript
+description: Converts OpenAPI 3.0 JSON/YAML to TypeScript interfaces and type guards. This skill should be used when the user asks to generate types from OpenAPI, convert schema to TS, create API interfaces, or generate TypeScript types from an API specification.
+---
+
+# OpenAPI to TypeScript
+
+Converts OpenAPI 3.0 specifications to TypeScript interfaces and type guards.
+
+**Input:** OpenAPI file (JSON or YAML)
+**Output:** TypeScript file with interfaces and type guards
+
+## When to Use
+
+- &quot;generate types from openapi&quot;
+- &quot;convert openapi to typescript&quot;
+- &quot;create API interfaces&quot;
+- &quot;generate types from spec&quot;
+
+## Workflow
+
+1. Request the OpenAPI file path (if not provided)
+2. Read and validate the file (must be OpenAPI 3.0.x)
+3. Extract schemas from `components/schemas`
+4. Extract endpoints from `paths` (request/response types)
+5. Generate TypeScript (interfaces + type guards)
+6. Ask where to save (default: `types/api.ts` in current directory)
+7. Write the file
+
+## OpenAPI Validation
+
+Check before processing:
+
+```
+- Field &quot;openapi&quot; must exist and start with &quot;3.0&quot;
+- Field &quot;paths&quot; must exist
+- Field &quot;components.schemas&quot; must exist (if there are types)
+```
+
+If invalid, report the error and stop.
+
+## Type Mapping
+
+### Primitives
+
+| OpenAPI     | TypeScript   |
+|-------------|--------------|
+| `string`    | `string`     |
+| `number`    | `number`     |
+| `integer`   | `number`     |
+| `boolean`   | `boolean`    |
+| `null`      | `null`       |
+
+### Format Modifiers
+
+| Format        | TypeScript              |
+|---------------|-------------------------|
+| `uuid`        | `string` (comment UUID) |
+| `date`        | `string` (comment date) |
+| `date-time`   | `string` (comment ISO)  |
+| `email`       | `string` (comment email)|
+| `uri`         | `string` (comment URI)  |
+
+### Complex Types
+
+**Object:**
+```typescript
+// OpenAPI: type: object, properties: {id, name}, required: [id]
+interface Example {
+  id: string;      // required: no ?
+  name?: string;   // optional: with ?
+}
+```
+
+**Array:**
+```typescript
+// OpenAPI: type: array, items: {type: string}
+type Names = string[];
+```
+
+**Enum:**
+```typescript
+// OpenAPI: type: string, enum: [active, draft]
+type Status = &quot;active&quot; | &quot;draft&quot;;
+```
+
+**oneOf (Union):**
+```typescript
+// OpenAPI: oneOf: [{$ref: Cat}, {$ref: Dog}]
+type Pet = Cat | Dog;
+```
+
+**allOf (Intersection/Extends):**
+```typescript
+// OpenAPI: allOf: [{$ref: Base}, {type: object, properties: ...}]
+interface Extended extends Base {
+  extraField: string;
+}
+```
+
+## Code Generation
+
+### File Header
+
+```typescript
+/**
+ * Auto-generated from: {source_file}
+ * Generated at: {timestamp}
+ *
+ * DO NOT EDIT MANUALLY - Regenerate from OpenAPI schema
+ */
+```
+
+### Interfaces (from components/schemas)
+
+For each schema in `components/schemas`:
+
+```typescript
+export interface Product {
+  /** Product unique identifier */
+  id: string;
+
+  /** Product title */
+  title: string;
+
+  /** Product price */
+  price: number;
+
+  /** Created timestamp */
+  created_at?: string;
+}
+```
+
+- Use OpenAPI description as JSDoc
+- Fields in `required[]` have no `?`
+- Fields outside `required[]` have `?`
+
+### Request/Response Types (from paths)
+
+For each endpoint in `paths`:
+
+```typescript
+// GET /products - query params
+export interface GetProductsRequest {
+  page?: number;
+  limit?: number;
+}
+
+// GET /products - response 200
+export type GetProductsResponse = ProductList;
+
+// POST /products - request body
+export interface CreateProductRequest {
+  title: string;
+  price: number;
+}
+
+// POST /products - response 201
+export type CreateProductResponse = Product;
+```
+
+Naming convention:
+- `{Method}{Path}Request` for params/body
+- `{Method}{Path}Response` for response
+
+### Type Guards
+
+For each main interface, generate a type guard:
+
+```typescript
+export function isProduct(value: unknown): value is Product {
+  return (
+    typeof value === &#039;object&#039; &amp;&amp;
+    value !== null &amp;&amp;
+    &#039;id&#039; in value &amp;&amp;
+    typeof (value as any).id === &#039;string&#039; &amp;&amp;
+    &#039;title&#039; in value &amp;&amp;
+    typeof (value as any).title === &#039;string&#039; &amp;&amp;
+    &#039;price&#039; in value &amp;&amp;
+    typeof (value as any).price === &#039;number&#039;
+  );
+}
+```
+
+Type guard rules:
+- Check `typeof value === &#039;object&#039; &amp;&amp; value !== null`
+- For each required field: check `&#039;field&#039; in value`
+- For primitive fields: check `typeof`
+- For arrays: check `Array.isArray()`
+- For enums: check `.includes()`
+
+### Error Type (always include)
+
+```typescript
+export interface ApiError {
+  status: number;
+  error: string;
+  detail?: string;
+}
+
+export function isApiError(value: unknown): value is ApiError {
+  return (
+    typeof value === &#039;object&#039; &amp;&amp;
+    value !== null &amp;&amp;
+    &#039;status&#039; in value &amp;&amp;
+    typeof (value as any).status === &#039;number&#039; &amp;&amp;
+    &#039;error&#039; in value &amp;&amp;
+    typeof (value as any).error === &#039;string&#039;
+  );
+}
+```
+
+## $ref Resolution
+
+When encountering `{&quot;$ref&quot;: &quot;#/components/schemas/Product&quot;}`:
+1. Extract the schema name (`Product`)
+2. Use the type directly (don&#039;t resolve inline)
+
+```typescript
+// OpenAPI: items: {$ref: &quot;#/components/schemas/Product&quot;}
+// TypeScript:
+items: Product[]  // reference, not inline
+```
+
+## Complete Example
+
+**Input (OpenAPI):**
+```json
+{
+  &quot;openapi&quot;: &quot;3.0.0&quot;,
+  &quot;components&quot;: {
+    &quot;schemas&quot;: {
+      &quot;User&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+          &quot;id&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;format&quot;: &quot;uuid&quot;},
+          &quot;email&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;format&quot;: &quot;email&quot;},
+          &quot;role&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: [&quot;admin&quot;, &quot;user&quot;]}
+        },
+        &quot;required&quot;: [&quot;id&quot;, &quot;email&quot;, &quot;role&quot;]
+      }
+    }
+  },
+  &quot;paths&quot;: {
+    &quot;/users/{id}&quot;: {
+      &quot;get&quot;: {
+        &quot;parameters&quot;: [{&quot;name&quot;: &quot;id&quot;, &quot;in&quot;: &quot;path&quot;, &quot;required&quot;: true}],
+        &quot;responses&quot;: {
+          &quot;200&quot;: {
+            &quot;content&quot;: {
+              &quot;application/json&quot;: {
+                &quot;schema&quot;: {&quot;$ref&quot;: &quot;#/components/schemas/User&quot;}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Output (TypeScript):**
+```typescript
+/**
+ * Auto-generated from: api.openapi.json
+ * Generated at: 2025-01-15T10:30:00Z
+ *
+ * DO NOT EDIT MANUALLY - Regenerate from OpenAPI schema
+ */
+
+// ============================================================================
+// Types
+// ============================================================================
+
+export type UserRole = &quot;admin&quot; | &quot;user&quot;;
+
+export interface User {
+  /** UUID */
+  id: string;
+
+  /** Email */
+  email: string;
+
+  role: UserRole;
+}
+
+// ============================================================================
+// Request/Response Types
+// ============================================================================
+
+export interface GetUserByIdRequest {
+  id: string;
+}
+
+export type GetUserByIdResponse = User;
+
+// ============================================================================
+// Type Guards
+// ============================================================================
+
+export function isUser(value: unknown): value is User {
+  return (
+    typeof value === &#039;object&#039; &amp;&amp;
+    value !== null &amp;&amp;
+    &#039;id&#039; in value &amp;&amp;
+    typeof (value as any).id === &#039;string&#039; &amp;&amp;
+    &#039;email&#039; in value &amp;&amp;
+    typeof (value as any).email === &#039;string&#039; &amp;&amp;
+    &#039;role&#039; in value &amp;&amp;
+    [&#039;admin&#039;, &#039;user&#039;].includes((value as any).role)
+  );
+}
+
+// ============================================================================
+// Error Types
+// ============================================================================
+
+export interface ApiError {
+  status: number;
+  error: string;
+  detail?: string;
+}
+
+export function isApiError(value: unknown): value is ApiError {
+  return (
+    typeof value === &#039;object&#039; &amp;&amp;
+    value !== null &amp;&amp;
+    &#039;status&#039; in value &amp;&amp;
+    typeof (value as any).status === &#039;number&#039; &amp;&amp;
+    &#039;error&#039; in value &amp;&amp;
+    typeof (value as any).error === &#039;string&#039;
+  );
+}
+```
+
+## Common Errors
+
+| Error | Action |
+|-------|--------|
+| OpenAPI version != 3.0.x | Report that only 3.0 is supported |
+| $ref not found | List missing refs |
+| Unknown type | Use `unknown` and warn |
+| Circular reference | Use type alias with lazy reference |
+</code>
       </div>
     </div>
 

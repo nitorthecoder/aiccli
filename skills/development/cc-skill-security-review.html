@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,512 @@
     <p class="desc">Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/cc-skill-security-review</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/cc-skill-security-review</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: security-review
+description: Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.
+author: affaan-m
+version: &quot;1.0&quot;
+---
+
+# Security Review Skill
+
+This skill ensures all code follows security best practices and identifies potential vulnerabilities.
+
+## When to Activate
+
+- Implementing authentication or authorization
+- Handling user input or file uploads
+- Creating new API endpoints
+- Working with secrets or credentials
+- Implementing payment features
+- Storing or transmitting sensitive data
+- Integrating third-party APIs
+
+## Security Checklist
+
+### 1. Secrets Management
+
+#### ❌ NEVER Do This
+```typescript
+const apiKey = &quot;sk-proj-xxxxx&quot;  // Hardcoded secret
+const dbPassword = &quot;password123&quot; // In source code
+```
+
+#### ✅ ALWAYS Do This
+```typescript
+const apiKey = process.env.OPENAI_API_KEY
+const dbUrl = process.env.DATABASE_URL
+
+// Verify secrets exist
+if (!apiKey) {
+  throw new Error(&#039;OPENAI_API_KEY not configured&#039;)
+}
+```
+
+#### Verification Steps
+- [ ] No hardcoded API keys, tokens, or passwords
+- [ ] All secrets in environment variables
+- [ ] `.env.local` in .gitignore
+- [ ] No secrets in git history
+- [ ] Production secrets in hosting platform (Vercel, Railway)
+
+### 2. Input Validation
+
+#### Always Validate User Input
+```typescript
+import { z } from &#039;zod&#039;
+
+// Define validation schema
+const CreateUserSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1).max(100),
+  age: z.number().int().min(0).max(150)
+})
+
+// Validate before processing
+export async function createUser(input: unknown) {
+  try {
+    const validated = CreateUserSchema.parse(input)
+    return await db.users.create(validated)
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return { success: false, errors: error.errors }
+    }
+    throw error
+  }
+}
+```
+
+#### File Upload Validation
+```typescript
+function validateFileUpload(file: File) {
+  // Size check (5MB max)
+  const maxSize = 5 * 1024 * 1024
+  if (file.size &gt; maxSize) {
+    throw new Error(&#039;File too large (max 5MB)&#039;)
+  }
+
+  // Type check
+  const allowedTypes = [&#039;image/jpeg&#039;, &#039;image/png&#039;, &#039;image/gif&#039;]
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error(&#039;Invalid file type&#039;)
+  }
+
+  // Extension check
+  const allowedExtensions = [&#039;.jpg&#039;, &#039;.jpeg&#039;, &#039;.png&#039;, &#039;.gif&#039;]
+  const extension = file.name.toLowerCase().match(/\.[^.]+$/)?.[0]
+  if (!extension || !allowedExtensions.includes(extension)) {
+    throw new Error(&#039;Invalid file extension&#039;)
+  }
+
+  return true
+}
+```
+
+#### Verification Steps
+- [ ] All user inputs validated with schemas
+- [ ] File uploads restricted (size, type, extension)
+- [ ] No direct use of user input in queries
+- [ ] Whitelist validation (not blacklist)
+- [ ] Error messages don&#039;t leak sensitive info
+
+### 3. SQL Injection Prevention
+
+#### ❌ NEVER Concatenate SQL
+```typescript
+// DANGEROUS - SQL Injection vulnerability
+const query = `SELECT * FROM users WHERE email = &#039;${userEmail}&#039;`
+await db.query(query)
+```
+
+#### ✅ ALWAYS Use Parameterized Queries
+```typescript
+// Safe - parameterized query
+const { data } = await supabase
+  .from(&#039;users&#039;)
+  .select(&#039;*&#039;)
+  .eq(&#039;email&#039;, userEmail)
+
+// Or with raw SQL
+await db.query(
+  &#039;SELECT * FROM users WHERE email = $1&#039;,
+  [userEmail]
+)
+```
+
+#### Verification Steps
+- [ ] All database queries use parameterized queries
+- [ ] No string concatenation in SQL
+- [ ] ORM/query builder used correctly
+- [ ] Supabase queries properly sanitized
+
+### 4. Authentication &amp; Authorization
+
+#### JWT Token Handling
+```typescript
+// ❌ WRONG: localStorage (vulnerable to XSS)
+localStorage.setItem(&#039;token&#039;, token)
+
+// ✅ CORRECT: httpOnly cookies
+res.setHeader(&#039;Set-Cookie&#039;,
+  `token=${token}; HttpOnly; Secure; SameSite=Strict; Max-Age=3600`)
+```
+
+#### Authorization Checks
+```typescript
+export async function deleteUser(userId: string, requesterId: string) {
+  // ALWAYS verify authorization first
+  const requester = await db.users.findUnique({
+    where: { id: requesterId }
+  })
+
+  if (requester.role !== &#039;admin&#039;) {
+    return NextResponse.json(
+      { error: &#039;Unauthorized&#039; },
+      { status: 403 }
+    )
+  }
+
+  // Proceed with deletion
+  await db.users.delete({ where: { id: userId } })
+}
+```
+
+#### Row Level Security (Supabase)
+```sql
+-- Enable RLS on all tables
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+
+-- Users can only view their own data
+CREATE POLICY &quot;Users view own data&quot;
+  ON users FOR SELECT
+  USING (auth.uid() = id);
+
+-- Users can only update their own data
+CREATE POLICY &quot;Users update own data&quot;
+  ON users FOR UPDATE
+  USING (auth.uid() = id);
+```
+
+#### Verification Steps
+- [ ] Tokens stored in httpOnly cookies (not localStorage)
+- [ ] Authorization checks before sensitive operations
+- [ ] Row Level Security enabled in Supabase
+- [ ] Role-based access control implemented
+- [ ] Session management secure
+
+### 5. XSS Prevention
+
+#### Sanitize HTML
+```typescript
+import DOMPurify from &#039;isomorphic-dompurify&#039;
+
+// ALWAYS sanitize user-provided HTML
+function renderUserContent(html: string) {
+  const clean = DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: [&#039;b&#039;, &#039;i&#039;, &#039;em&#039;, &#039;strong&#039;, &#039;p&#039;],
+    ALLOWED_ATTR: []
+  })
+  return &lt;div dangerouslySetInnerHTML={{ __html: clean }} /&gt;
+}
+```
+
+#### Content Security Policy
+```typescript
+// next.config.js
+const securityHeaders = [
+  {
+    key: &#039;Content-Security-Policy&#039;,
+    value: `
+      default-src &#039;self&#039;;
+      script-src &#039;self&#039; &#039;unsafe-eval&#039; &#039;unsafe-inline&#039;;
+      style-src &#039;self&#039; &#039;unsafe-inline&#039;;
+      img-src &#039;self&#039; data: https:;
+      font-src &#039;self&#039;;
+      connect-src &#039;self&#039; https://api.example.com;
+    `.replace(/\s{2,}/g, &#039; &#039;).trim()
+  }
+]
+```
+
+#### Verification Steps
+- [ ] User-provided HTML sanitized
+- [ ] CSP headers configured
+- [ ] No unvalidated dynamic content rendering
+- [ ] React&#039;s built-in XSS protection used
+
+### 6. CSRF Protection
+
+#### CSRF Tokens
+```typescript
+import { csrf } from &#039;@/lib/csrf&#039;
+
+export async function POST(request: Request) {
+  const token = request.headers.get(&#039;X-CSRF-Token&#039;)
+
+  if (!csrf.verify(token)) {
+    return NextResponse.json(
+      { error: &#039;Invalid CSRF token&#039; },
+      { status: 403 }
+    )
+  }
+
+  // Process request
+}
+```
+
+#### SameSite Cookies
+```typescript
+res.setHeader(&#039;Set-Cookie&#039;,
+  `session=${sessionId}; HttpOnly; Secure; SameSite=Strict`)
+```
+
+#### Verification Steps
+- [ ] CSRF tokens on state-changing operations
+- [ ] SameSite=Strict on all cookies
+- [ ] Double-submit cookie pattern implemented
+
+### 7. Rate Limiting
+
+#### API Rate Limiting
+```typescript
+import rateLimit from &#039;express-rate-limit&#039;
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per window
+  message: &#039;Too many requests&#039;
+})
+
+// Apply to routes
+app.use(&#039;/api/&#039;, limiter)
+```
+
+#### Expensive Operations
+```typescript
+// Aggressive rate limiting for searches
+const searchLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10, // 10 requests per minute
+  message: &#039;Too many search requests&#039;
+})
+
+app.use(&#039;/api/search&#039;, searchLimiter)
+```
+
+#### Verification Steps
+- [ ] Rate limiting on all API endpoints
+- [ ] Stricter limits on expensive operations
+- [ ] IP-based rate limiting
+- [ ] User-based rate limiting (authenticated)
+
+### 8. Sensitive Data Exposure
+
+#### Logging
+```typescript
+// ❌ WRONG: Logging sensitive data
+console.log(&#039;User login:&#039;, { email, password })
+console.log(&#039;Payment:&#039;, { cardNumber, cvv })
+
+// ✅ CORRECT: Redact sensitive data
+console.log(&#039;User login:&#039;, { email, userId })
+console.log(&#039;Payment:&#039;, { last4: card.last4, userId })
+```
+
+#### Error Messages
+```typescript
+// ❌ WRONG: Exposing internal details
+catch (error) {
+  return NextResponse.json(
+    { error: error.message, stack: error.stack },
+    { status: 500 }
+  )
+}
+
+// ✅ CORRECT: Generic error messages
+catch (error) {
+  console.error(&#039;Internal error:&#039;, error)
+  return NextResponse.json(
+    { error: &#039;An error occurred. Please try again.&#039; },
+    { status: 500 }
+  )
+}
+```
+
+#### Verification Steps
+- [ ] No passwords, tokens, or secrets in logs
+- [ ] Error messages generic for users
+- [ ] Detailed errors only in server logs
+- [ ] No stack traces exposed to users
+
+### 9. Blockchain Security (Solana)
+
+#### Wallet Verification
+```typescript
+import { verify } from &#039;@solana/web3.js&#039;
+
+async function verifyWalletOwnership(
+  publicKey: string,
+  signature: string,
+  message: string
+) {
+  try {
+    const isValid = verify(
+      Buffer.from(message),
+      Buffer.from(signature, &#039;base64&#039;),
+      Buffer.from(publicKey, &#039;base64&#039;)
+    )
+    return isValid
+  } catch (error) {
+    return false
+  }
+}
+```
+
+#### Transaction Verification
+```typescript
+async function verifyTransaction(transaction: Transaction) {
+  // Verify recipient
+  if (transaction.to !== expectedRecipient) {
+    throw new Error(&#039;Invalid recipient&#039;)
+  }
+
+  // Verify amount
+  if (transaction.amount &gt; maxAmount) {
+    throw new Error(&#039;Amount exceeds limit&#039;)
+  }
+
+  // Verify user has sufficient balance
+  const balance = await getBalance(transaction.from)
+  if (balance &lt; transaction.amount) {
+    throw new Error(&#039;Insufficient balance&#039;)
+  }
+
+  return true
+}
+```
+
+#### Verification Steps
+- [ ] Wallet signatures verified
+- [ ] Transaction details validated
+- [ ] Balance checks before transactions
+- [ ] No blind transaction signing
+
+### 10. Dependency Security
+
+#### Regular Updates
+```bash
+# Check for vulnerabilities
+npm audit
+
+# Fix automatically fixable issues
+npm audit fix
+
+# Update dependencies
+npm update
+
+# Check for outdated packages
+npm outdated
+```
+
+#### Lock Files
+```bash
+# ALWAYS commit lock files
+git add package-lock.json
+
+# Use in CI/CD for reproducible builds
+npm ci  # Instead of npm install
+```
+
+#### Verification Steps
+- [ ] Dependencies up to date
+- [ ] No known vulnerabilities (npm audit clean)
+- [ ] Lock files committed
+- [ ] Dependabot enabled on GitHub
+- [ ] Regular security updates
+
+## Security Testing
+
+### Automated Security Tests
+```typescript
+// Test authentication
+test(&#039;requires authentication&#039;, async () =&gt; {
+  const response = await fetch(&#039;/api/protected&#039;)
+  expect(response.status).toBe(401)
+})
+
+// Test authorization
+test(&#039;requires admin role&#039;, async () =&gt; {
+  const response = await fetch(&#039;/api/admin&#039;, {
+    headers: { Authorization: `Bearer ${userToken}` }
+  })
+  expect(response.status).toBe(403)
+})
+
+// Test input validation
+test(&#039;rejects invalid input&#039;, async () =&gt; {
+  const response = await fetch(&#039;/api/users&#039;, {
+    method: &#039;POST&#039;,
+    body: JSON.stringify({ email: &#039;not-an-email&#039; })
+  })
+  expect(response.status).toBe(400)
+})
+
+// Test rate limiting
+test(&#039;enforces rate limits&#039;, async () =&gt; {
+  const requests = Array(101).fill(null).map(() =&gt;
+    fetch(&#039;/api/endpoint&#039;)
+  )
+
+  const responses = await Promise.all(requests)
+  const tooManyRequests = responses.filter(r =&gt; r.status === 429)
+
+  expect(tooManyRequests.length).toBeGreaterThan(0)
+})
+```
+
+## Pre-Deployment Security Checklist
+
+Before ANY production deployment:
+
+- [ ] **Secrets**: No hardcoded secrets, all in env vars
+- [ ] **Input Validation**: All user inputs validated
+- [ ] **SQL Injection**: All queries parameterized
+- [ ] **XSS**: User content sanitized
+- [ ] **CSRF**: Protection enabled
+- [ ] **Authentication**: Proper token handling
+- [ ] **Authorization**: Role checks in place
+- [ ] **Rate Limiting**: Enabled on all endpoints
+- [ ] **HTTPS**: Enforced in production
+- [ ] **Security Headers**: CSP, X-Frame-Options configured
+- [ ] **Error Handling**: No sensitive data in errors
+- [ ] **Logging**: No sensitive data logged
+- [ ] **Dependencies**: Up to date, no vulnerabilities
+- [ ] **Row Level Security**: Enabled in Supabase
+- [ ] **CORS**: Properly configured
+- [ ] **File Uploads**: Validated (size, type)
+- [ ] **Wallet Signatures**: Verified (if blockchain)
+
+## Resources
+
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [Next.js Security](https://nextjs.org/docs/security)
+- [Supabase Security](https://supabase.com/docs/guides/auth)
+- [Web Security Academy](https://portswigger.net/web-security)
+
+---
+
+**Remember**: Security is not optional. One vulnerability can compromise the entire platform. When in doubt, err on the side of caution.</code>
       </div>
     </div>
 

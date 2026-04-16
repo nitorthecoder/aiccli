@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,385 @@
     <p class="desc">"Build production-ready Bright Data integrations with best practices baked in. Reference documentation for developers using coding assistants (Claude Code, Cursor, etc.) to implement web scraping, search, browser automation, and structured data extraction. Covers Web Unlocker API, SERP API, Web Scraper API, and Browser API (Scraping Browser)."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/bright-data-best-practices</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/bright-data-best-practices</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: bright-data-best-practices
+description: &quot;Build production-ready Bright Data integrations with best practices baked in. Reference documentation for developers using coding assistants (Claude Code, Cursor, etc.) to implement web scraping, search, browser automation, and structured data extraction. Covers Web Unlocker API, SERP API, Web Scraper API, and Browser API (Scraping Browser).&quot;
+user-invocable: false
+---
+
+# Bright Data APIs
+
+Bright Data provides infrastructure for web data extraction at scale. Four primary APIs cover different use cases — always pick the most specific tool for the job.
+
+## Choosing the Right API
+
+| Use Case | API | Why |
+|----------|-----|-----|
+| Scrape any webpage by URL (no interaction) | Web Unlocker | HTTP-based, auto-bypasses bot detection, cheapest |
+| Google / Bing / Yandex search results | SERP API | Specialized for SERP extraction, returns structured data |
+| Structured data from Amazon, LinkedIn, Instagram, TikTok, etc. | Web Scraper API | Pre-built scrapers, no parsing needed |
+| Click, scroll, fill forms, run JS, intercept XHR | Browser API | Full browser automation |
+| Puppeteer / Playwright / Selenium automation | Browser API | Connects via CDP/WebDriver |
+
+## Authentication Pattern (All APIs)
+
+All APIs share the same authentication model:
+
+```bash
+export BRIGHTDATA_API_KEY=&quot;your-api-key&quot;         # From Control Panel &gt; Account Settings
+export BRIGHTDATA_UNLOCKER_ZONE=&quot;zone-name&quot;       # Web Unlocker zone name
+export BRIGHTDATA_SERP_ZONE=&quot;serp-zone-name&quot;      # SERP API zone name
+export BROWSER_AUTH=&quot;brd-customer-ID-zone-NAME:PASSWORD&quot;  # Browser API credentials
+```
+
+REST API authentication header for Web Unlocker and SERP API:
+```
+Authorization: Bearer YOUR_API_KEY
+```
+
+---
+
+## Web Unlocker API
+
+HTTP-based scraping proxy. Best for simple page fetches without browser interaction.
+
+**Endpoint:** `POST https://api.brightdata.com/request`
+
+```python
+import requests
+
+response = requests.post(
+    &quot;https://api.brightdata.com/request&quot;,
+    headers={&quot;Authorization&quot;: f&quot;Bearer {API_KEY}&quot;},
+    json={
+        &quot;zone&quot;: &quot;YOUR_ZONE_NAME&quot;,
+        &quot;url&quot;: &quot;https://example.com/product/123&quot;,
+        &quot;format&quot;: &quot;raw&quot;
+    }
+)
+html = response.text
+```
+
+### Key Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `zone` | string | Zone name (required) |
+| `url` | string | Target URL with `http://` or `https://` (required) |
+| `format` | string | `&quot;raw&quot;` (HTML) or `&quot;json&quot;` (structured wrapper) (required) |
+| `method` | string | HTTP verb, default `&quot;GET&quot;` |
+| `country` | string | 2-letter ISO for geo-targeting (e.g., `&quot;us&quot;`, `&quot;de&quot;`) |
+| `data_format` | string | Transform: `&quot;markdown&quot;` or `&quot;screenshot&quot;` |
+| `async` | boolean | `true` for async mode |
+
+### Quick Patterns
+
+```python
+# Get markdown (best for LLM input)
+response = requests.post(
+    &quot;https://api.brightdata.com/request&quot;,
+    headers={&quot;Authorization&quot;: f&quot;Bearer {API_KEY}&quot;},
+    json={&quot;zone&quot;: ZONE, &quot;url&quot;: url, &quot;format&quot;: &quot;raw&quot;, &quot;data_format&quot;: &quot;markdown&quot;}
+)
+
+# Geo-targeted request
+json={&quot;zone&quot;: ZONE, &quot;url&quot;: url, &quot;format&quot;: &quot;raw&quot;, &quot;country&quot;: &quot;de&quot;}
+
+# Screenshot for debugging
+json={&quot;zone&quot;: ZONE, &quot;url&quot;: url, &quot;format&quot;: &quot;raw&quot;, &quot;data_format&quot;: &quot;screenshot&quot;}
+
+# Async for bulk processing
+json={&quot;zone&quot;: ZONE, &quot;url&quot;: url, &quot;format&quot;: &quot;raw&quot;, &quot;async&quot;: True}
+```
+
+**Critical rule:** Never use Web Unlocker with Puppeteer, Playwright, Selenium, or anti-detect browsers. Use Browser API instead.
+
+See **[references/web-unlocker.md](references/web-unlocker.md)** for complete reference including proxy interface, special headers, async flow, features, and billing.
+
+---
+
+## SERP API
+
+Structured search engine result extraction for Google, Bing, Yandex, DuckDuckGo.
+
+**Endpoint:** `POST https://api.brightdata.com/request` (same as Web Unlocker)
+
+```python
+response = requests.post(
+    &quot;https://api.brightdata.com/request&quot;,
+    headers={&quot;Authorization&quot;: f&quot;Bearer {API_KEY}&quot;},
+    json={
+        &quot;zone&quot;: &quot;YOUR_SERP_ZONE&quot;,
+        &quot;url&quot;: &quot;https://www.google.com/search?q=python+web+scraping&amp;brd_json=1&amp;gl=us&amp;hl=en&quot;,
+        &quot;format&quot;: &quot;raw&quot;
+    }
+)
+data = response.json()
+for result in data.get(&quot;organic&quot;, []):
+    print(result[&quot;rank&quot;], result[&quot;title&quot;], result[&quot;link&quot;])
+```
+
+### Essential Google URL Parameters
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `q` | Search query | `q=python+web+scraping` |
+| `brd_json` | Parsed JSON output | `brd_json=1` (always use for data pipelines) |
+| `gl` | Country for search | `gl=us` |
+| `hl` | Language | `hl=en` |
+| `start` | Pagination offset | `start=10` (page 2), `start=20` (page 3) |
+| `tbm` | Search type | `tbm=nws` (news), `tbm=isch` (images), `tbm=vid` (videos) |
+| `brd_mobile` | Device | `brd_mobile=1` (mobile), `brd_mobile=ios` |
+| `brd_browser` | Browser | `brd_browser=chrome` |
+| `brd_ai_overview` | Trigger AI Overview | `brd_ai_overview=2` |
+| `uule` | Encoded geo location | for precise location targeting |
+
+**Note:** `num` parameter is **deprecated** as of September 2025. Use `start` for pagination.
+
+### Parsed JSON Response Structure
+
+```json
+{
+  &quot;organic&quot;: [{&quot;rank&quot;: 1, &quot;global_rank&quot;: 1, &quot;title&quot;: &quot;...&quot;, &quot;link&quot;: &quot;...&quot;, &quot;description&quot;: &quot;...&quot;}],
+  &quot;paid&quot;: [],
+  &quot;people_also_ask&quot;: [],
+  &quot;knowledge_graph&quot;: {},
+  &quot;related_searches&quot;: [],
+  &quot;general&quot;: {&quot;results_cnt&quot;: 1240000000, &quot;query&quot;: &quot;...&quot;}
+}
+```
+
+### Bing Key Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `q` | Search query |
+| `setLang` | Language (prefer 4-letter: `en-US`) |
+| `cc` | Country code |
+| `first` | Pagination (increment by 10: 1, 11, 21...) |
+| `safesearch` | `off`, `moderate`, `strict` |
+| `brd_mobile` | Device type |
+
+### Async for Bulk SERP
+
+```python
+# Submit
+response = requests.post(
+    &quot;https://api.brightdata.com/request&quot;,
+    params={&quot;async&quot;: &quot;1&quot;},
+    headers={&quot;Authorization&quot;: f&quot;Bearer {API_KEY}&quot;},
+    json={&quot;zone&quot;: SERP_ZONE, &quot;url&quot;: &quot;https://www.google.com/search?q=test&amp;brd_json=1&quot;, &quot;format&quot;: &quot;raw&quot;}
+)
+response_id = response.headers.get(&quot;x-response-id&quot;)
+
+# Retrieve (retrieve calls are NOT billed)
+result = requests.get(
+    &quot;https://api.brightdata.com/serp/get_result&quot;,
+    params={&quot;response_id&quot;: response_id},
+    headers={&quot;Authorization&quot;: f&quot;Bearer {API_KEY}&quot;}
+)
+```
+
+**Billing:** Pay per 1,000 successful requests only. Async retrieve calls are not billed.
+
+See **[references/serp-api.md](references/serp-api.md)** for complete reference including Maps, Trends, Reviews, Lens, Hotels, Flights parameters.
+
+---
+
+## Web Scraper API
+
+Pre-built scrapers for structured data extraction from 100+ platforms. No parsing logic needed.
+
+**Sync Endpoint:** `POST https://api.brightdata.com/datasets/v3/scrape`
+**Async Endpoint:** `POST https://api.brightdata.com/datasets/v3/trigger`
+
+```python
+# Sync (up to 20 URLs, returns immediately)
+response = requests.post(
+    &quot;https://api.brightdata.com/datasets/v3/scrape&quot;,
+    params={&quot;dataset_id&quot;: &quot;YOUR_DATASET_ID&quot;, &quot;format&quot;: &quot;json&quot;},
+    headers={&quot;Authorization&quot;: f&quot;Bearer {API_KEY}&quot;},
+    json={&quot;input&quot;: [{&quot;url&quot;: &quot;https://www.amazon.com/dp/B09X7M8TBQ&quot;}]}
+)
+
+if response.status_code == 200:
+    data = response.json()  # Results ready
+elif response.status_code == 202:
+    snapshot_id = response.json()[&quot;snapshot_id&quot;]  # Poll for completion
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `dataset_id` | string | Scraper identifier from the Scraper Library (required) |
+| `format` | string | `json` (default), `ndjson`, `jsonl`, `csv` |
+| `custom_output_fields` | string | Pipe-separated fields: `url\|title\|price` |
+| `include_errors` | boolean | Include error info in results |
+
+### Request Body
+
+```json
+{
+  &quot;input&quot;: [
+    { &quot;url&quot;: &quot;https://www.amazon.com/dp/B09X7M8TBQ&quot; },
+    { &quot;url&quot;: &quot;https://www.amazon.com/dp/B0B7CTCPKN&quot; }
+  ]
+}
+```
+
+### Poll for Async Results
+
+```python
+import time
+
+# Trigger
+snapshot_id = requests.post(
+    &quot;https://api.brightdata.com/datasets/v3/trigger&quot;,
+    params={&quot;dataset_id&quot;: DATASET_ID, &quot;format&quot;: &quot;json&quot;},
+    headers={&quot;Authorization&quot;: f&quot;Bearer {API_KEY}&quot;},
+    json={&quot;input&quot;: [{&quot;url&quot;: u} for u in urls]}
+).json()[&quot;snapshot_id&quot;]
+
+# Poll
+while True:
+    status = requests.get(
+        f&quot;https://api.brightdata.com/datasets/v3/progress/{snapshot_id}&quot;,
+        headers={&quot;Authorization&quot;: f&quot;Bearer {API_KEY}&quot;}
+    ).json()[&quot;status&quot;]
+
+    if status == &quot;ready&quot;: break
+    if status == &quot;failed&quot;: raise Exception(&quot;Job failed&quot;)
+    time.sleep(10)
+
+# Download
+data = requests.get(
+    f&quot;https://api.brightdata.com/datasets/v3/snapshot/{snapshot_id}&quot;,
+    params={&quot;format&quot;: &quot;json&quot;},
+    headers={&quot;Authorization&quot;: f&quot;Bearer {API_KEY}&quot;}
+).json()
+```
+
+**Progress status values:** `starting` → `running` → `ready` | `failed`
+**Data retention:** 30 days.
+**Billing:** Per delivered record. Invalid input URLs that fail are still billable.
+
+See **[references/web-scraper-api.md](references/web-scraper-api.md)** for complete reference including scraper types, output formats, delivery options, and billing details.
+
+---
+
+## Browser API (Scraping Browser)
+
+Full browser automation via CDP/WebDriver. Handles CAPTCHA, fingerprinting, and anti-bot detection automatically.
+
+**Connection:**
+- Playwright/Puppeteer: `wss://${AUTH}@brd.superproxy.io:9222`
+- Selenium: `https://${AUTH}@brd.superproxy.io:9515`
+
+```javascript
+const { chromium } = require(&quot;playwright-core&quot;);
+
+const AUTH = process.env.BROWSER_AUTH;
+const browser = await chromium.connectOverCDP(`wss://${AUTH}@brd.superproxy.io:9222`);
+const page = await browser.newPage();
+page.setDefaultNavigationTimeout(120000); // Always set to 2 minutes
+
+await page.goto(&quot;https://example.com&quot;, { waitUntil: &quot;domcontentloaded&quot; });
+const html = await page.content();
+await browser.close();
+```
+
+```python
+from playwright.async_api import async_playwright
+
+async with async_playwright() as p:
+    browser = await p.chromium.connect_over_cdp(f&quot;wss://{AUTH}@brd.superproxy.io:9222&quot;)
+    page = await browser.new_page()
+    page.set_default_navigation_timeout(120000)
+    await page.goto(&quot;https://example.com&quot;, wait_until=&quot;domcontentloaded&quot;)
+    html = await page.content()
+    await browser.close()
+```
+
+### Custom CDP Functions
+
+| Function | Purpose |
+|----------|---------|
+| `Captcha.solve` | Manually trigger CAPTCHA solving |
+| `Captcha.setAutoSolve` | Enable/disable auto CAPTCHA solving |
+| `Proxy.setLocation` | Set precise geo location (call BEFORE goto) |
+| `Proxy.useSession` | Maintain same IP across sessions |
+| `Emulation.setDevice` | Apply device profile (iPhone 14, etc.) |
+| `Emulation.getSupportedDevices` | List available device profiles |
+| `Unblocker.enableAdBlock` | Block ads to save bandwidth |
+| `Unblocker.disableAdBlock` | Re-enable ads |
+| `Input.type` | Fast text input for bulk form filling |
+| `Browser.addCertificate` | Install client SSL cert for session |
+| `Page.inspect` | Get DevTools debug URL for live session |
+
+```javascript
+// CDP session pattern for custom functions
+const client = await page.target().createCDPSession();
+
+// CAPTCHA solve with timeout
+const result = await client.send(&quot;Captcha.solve&quot;, { timeout: 30000 });
+
+// Precise geo location (must be before goto)
+await client.send(&quot;Proxy.setLocation&quot;, {
+  latitude: 37.7749,
+  longitude: -122.4194,
+  distance: 10,
+  strict: true
+});
+
+// Block unnecessary resources
+await client.send(&quot;Network.setBlockedURLs&quot;, { urls: [&quot;*google-analytics*&quot;, &quot;*.ads.*&quot;] });
+
+// Device emulation
+await client.send(&quot;Emulation.setDevice&quot;, { deviceName: &quot;iPhone 14&quot; });
+```
+
+### Session Rules
+- **One initial navigation per session** — new URL = new session
+- **Idle timeout:** 5 minutes
+- **Max duration:** 30 minutes
+
+### Geolocation
+- Country-level: append `-country-us` to credentials username
+- EU-wide: append `-country-eu` (routes through 29+ European countries)
+- Precise: use `Proxy.setLocation` CDP command (before navigation)
+
+### Error Codes
+
+| Code | Issue | Fix |
+|------|-------|-----|
+| `407` | Wrong port | Playwright/Puppeteer → `9222`, Selenium → `9515` |
+| `403` | Bad auth | Check credentials format and zone type |
+| `503` | Service scaling | Wait 1 minute, reconnect |
+
+**Billing:** Traffic-based only. Block images/CSS/fonts to reduce costs.
+
+See **[references/browser-api.md](references/browser-api.md)** for complete reference including all CDP functions, bandwidth optimization, CAPTCHA patterns, and debugging.
+
+---
+
+## Detailed References
+
+- **[references/web-unlocker.md](references/web-unlocker.md)** — Web Unlocker: full parameter list, proxy interface, special headers, async flow, features, billing, anti-patterns
+- **[references/serp-api.md](references/serp-api.md)** — SERP API: all Google params (Maps, Trends, Reviews, Lens, Hotels, Flights), Bing params, parsed JSON structure, async, billing
+- **[references/web-scraper-api.md](references/web-scraper-api.md)** — Web Scraper API: sync vs async, all parameters, polling, scraper types, output formats, billing
+- **[references/browser-api.md](references/browser-api.md)** — Browser API: connection strings, session rules, all CDP functions, geo-targeting, bandwidth optimization, CAPTCHA, debugging, error codes
+</code>
       </div>
     </div>
 

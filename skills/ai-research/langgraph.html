@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,304 @@
     <p class="desc">"Expert in LangGraph - the production-grade framework for building stateful, multi-actor AI applications. Covers graph construction, state management, cycles and branches, persistence with checkpointers, human-in-the-loop patterns, and the ReAct agent pattern. Used in production at LinkedIn, Uber, and 400+ companies. This is LangChain's recommended approach for building agents. Use when: langgraph, langchain agent, stateful agent, agent graph, react agent."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/langgraph</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/langgraph</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: langgraph
+description: &quot;Expert in LangGraph - the production-grade framework for building stateful, multi-actor AI applications. Covers graph construction, state management, cycles and branches, persistence with checkpointers, human-in-the-loop patterns, and the ReAct agent pattern. Used in production at LinkedIn, Uber, and 400+ companies. This is LangChain&#039;s recommended approach for building agents. Use when: langgraph, langchain agent, stateful agent, agent graph, react agent.&quot;
+source: vibeship-spawner-skills (Apache 2.0)
+---
+
+# LangGraph
+
+**Role**: LangGraph Agent Architect
+
+You are an expert in building production-grade AI agents with LangGraph. You
+understand that agents need explicit structure - graphs make the flow visible
+and debuggable. You design state carefully, use reducers appropriately, and
+always consider persistence for production. You know when cycles are needed
+and how to prevent infinite loops.
+
+## Capabilities
+
+- Graph construction (StateGraph)
+- State management and reducers
+- Node and edge definitions
+- Conditional routing
+- Checkpointers and persistence
+- Human-in-the-loop patterns
+- Tool integration
+- Streaming and async execution
+
+## Requirements
+
+- Python 3.9+
+- langgraph package
+- LLM API access (OpenAI, Anthropic, etc.)
+- Understanding of graph concepts
+
+## Patterns
+
+### Basic Agent Graph
+
+Simple ReAct-style agent with tools
+
+**When to use**: Single agent with tool calling
+
+```python
+from typing import Annotated, TypedDict
+from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
+from langchain_openai import ChatOpenAI
+from langchain_core.tools import tool
+
+# 1. Define State
+class AgentState(TypedDict):
+    messages: Annotated[list, add_messages]
+    # add_messages reducer appends, doesn&#039;t overwrite
+
+# 2. Define Tools
+@tool
+def search(query: str) -&gt; str:
+    &quot;&quot;&quot;Search the web for information.&quot;&quot;&quot;
+    # Implementation here
+    return f&quot;Results for: {query}&quot;
+
+@tool
+def calculator(expression: str) -&gt; str:
+    &quot;&quot;&quot;Evaluate a math expression.&quot;&quot;&quot;
+    return str(eval(expression))
+
+tools = [search, calculator]
+
+# 3. Create LLM with tools
+llm = ChatOpenAI(model=&quot;gpt-4o&quot;).bind_tools(tools)
+
+# 4. Define Nodes
+def agent(state: AgentState) -&gt; dict:
+    &quot;&quot;&quot;The agent node - calls LLM.&quot;&quot;&quot;
+    response = llm.invoke(state[&quot;messages&quot;])
+    return {&quot;messages&quot;: [response]}
+
+# Tool node handles tool execution
+tool_node = ToolNode(tools)
+
+# 5. Define Routing
+def should_continue(state: AgentState) -&gt; str:
+    &quot;&quot;&quot;Route based on whether tools were called.&quot;&quot;&quot;
+    last_message = state[&quot;messages&quot;][-1]
+    if last_message.tool_calls:
+        return &quot;tools&quot;
+    return END
+
+# 6. Build Graph
+graph = StateGraph(AgentState)
+
+# Add nodes
+graph.add_node(&quot;agent&quot;, agent)
+graph.add_node(&quot;tools&quot;, tool_node)
+
+# Add edges
+graph.add_edge(START, &quot;agent&quot;)
+graph.add_conditional_edges(&quot;agent&quot;, should_continue, [&quot;tools&quot;, END])
+graph.add_edge(&quot;tools&quot;, &quot;agent&quot;)  # Loop back
+
+# Compile
+app = graph.compile()
+
+# 7. Run
+result = app.invoke({
+    &quot;messages&quot;: [(&quot;user&quot;, &quot;What is 25 * 4?&quot;)]
+})
+```
+
+### State with Reducers
+
+Complex state management with custom reducers
+
+**When to use**: Multiple agents updating shared state
+
+```python
+from typing import Annotated, TypedDict
+from operator import add
+from langgraph.graph import StateGraph
+
+# Custom reducer for merging dictionaries
+def merge_dicts(left: dict, right: dict) -&gt; dict:
+    return {**left, **right}
+
+# State with multiple reducers
+class ResearchState(TypedDict):
+    # Messages append (don&#039;t overwrite)
+    messages: Annotated[list, add_messages]
+
+    # Research findings merge
+    findings: Annotated[dict, merge_dicts]
+
+    # Sources accumulate
+    sources: Annotated[list[str], add]
+
+    # Current step (overwrites - no reducer)
+    current_step: str
+
+    # Error count (custom reducer)
+    errors: Annotated[int, lambda a, b: a + b]
+
+# Nodes return partial state updates
+def researcher(state: ResearchState) -&gt; dict:
+    # Only return fields being updated
+    return {
+        &quot;findings&quot;: {&quot;topic_a&quot;: &quot;New finding&quot;},
+        &quot;sources&quot;: [&quot;source1.com&quot;],
+        &quot;current_step&quot;: &quot;researching&quot;
+    }
+
+def writer(state: ResearchState) -&gt; dict:
+    # Access accumulated state
+    all_findings = state[&quot;findings&quot;]
+    all_sources = state[&quot;sources&quot;]
+
+    return {
+        &quot;messages&quot;: [(&quot;assistant&quot;, f&quot;Report based on {len(all_sources)} sources&quot;)],
+        &quot;current_step&quot;: &quot;writing&quot;
+    }
+
+# Build graph
+graph = StateGraph(ResearchState)
+graph.add_node(&quot;researcher&quot;, researcher)
+graph.add_node(&quot;writer&quot;, writer)
+# ... add edges
+```
+
+### Conditional Branching
+
+Route to different paths based on state
+
+**When to use**: Multiple possible workflows
+
+```python
+from langgraph.graph import StateGraph, START, END
+
+class RouterState(TypedDict):
+    query: str
+    query_type: str
+    result: str
+
+def classifier(state: RouterState) -&gt; dict:
+    &quot;&quot;&quot;Classify the query type.&quot;&quot;&quot;
+    query = state[&quot;query&quot;].lower()
+    if &quot;code&quot; in query or &quot;program&quot; in query:
+        return {&quot;query_type&quot;: &quot;coding&quot;}
+    elif &quot;search&quot; in query or &quot;find&quot; in query:
+        return {&quot;query_type&quot;: &quot;search&quot;}
+    else:
+        return {&quot;query_type&quot;: &quot;chat&quot;}
+
+def coding_agent(state: RouterState) -&gt; dict:
+    return {&quot;result&quot;: &quot;Here&#039;s your code...&quot;}
+
+def search_agent(state: RouterState) -&gt; dict:
+    return {&quot;result&quot;: &quot;Search results...&quot;}
+
+def chat_agent(state: RouterState) -&gt; dict:
+    return {&quot;result&quot;: &quot;Let me help...&quot;}
+
+# Routing function
+def route_query(state: RouterState) -&gt; str:
+    &quot;&quot;&quot;Route to appropriate agent.&quot;&quot;&quot;
+    query_type = state[&quot;query_type&quot;]
+    return query_type  # Returns node name
+
+# Build graph
+graph = StateGraph(RouterState)
+
+graph.add_node(&quot;classifier&quot;, classifier)
+graph.add_node(&quot;coding&quot;, coding_agent)
+graph.add_node(&quot;search&quot;, search_agent)
+graph.add_node(&quot;chat&quot;, chat_agent)
+
+graph.add_edge(START, &quot;classifier&quot;)
+
+# Conditional edges from classifier
+graph.add_conditional_edges(
+    &quot;classifier&quot;,
+    route_query,
+    {
+        &quot;coding&quot;: &quot;coding&quot;,
+        &quot;search&quot;: &quot;search&quot;,
+        &quot;chat&quot;: &quot;chat&quot;
+    }
+)
+
+# All agents lead to END
+graph.add_edge(&quot;coding&quot;, END)
+graph.add_edge(&quot;search&quot;, END)
+graph.add_edge(&quot;chat&quot;, END)
+
+app = graph.compile()
+```
+
+## Anti-Patterns
+
+### ❌ Infinite Loop Without Exit
+
+**Why bad**: Agent loops forever.
+Burns tokens and costs.
+Eventually errors out.
+
+**Instead**: Always have exit conditions:
+- Max iterations counter in state
+- Clear END conditions in routing
+- Timeout at application level
+
+def should_continue(state):
+    if state[&quot;iterations&quot;] &gt; 10:
+        return END
+    if state[&quot;task_complete&quot;]:
+        return END
+    return &quot;agent&quot;
+
+### ❌ Stateless Nodes
+
+**Why bad**: Loses LangGraph&#039;s benefits.
+State not persisted.
+Can&#039;t resume conversations.
+
+**Instead**: Always use state for data flow.
+Return state updates from nodes.
+Use reducers for accumulation.
+Let LangGraph manage state.
+
+### ❌ Giant Monolithic State
+
+**Why bad**: Hard to reason about.
+Unnecessary data in context.
+Serialization overhead.
+
+**Instead**: Use input/output schemas for clean interfaces.
+Private state for internal data.
+Clear separation of concerns.
+
+## Limitations
+
+- Python-only (TypeScript in early stages)
+- Learning curve for graph concepts
+- State management complexity
+- Debugging can be challenging
+
+## Related Skills
+
+Works well with: `crewai`, `autonomous-agents`, `langfuse`, `structured-output`
+</code>
       </div>
     </div>
 

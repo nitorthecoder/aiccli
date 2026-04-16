@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,359 @@
     <p class="desc">This skill should be used when the user asks to "set up a web server", "configure HTTP or HTTPS", "perform SNMP enumeration", "configure SMB shares", "test network services", or needs guidance on configuring and testing network services for penetration testing labs.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/network-101</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/network-101</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: Network 101
+description: This skill should be used when the user asks to &quot;set up a web server&quot;, &quot;configure HTTP or HTTPS&quot;, &quot;perform SNMP enumeration&quot;, &quot;configure SMB shares&quot;, &quot;test network services&quot;, or needs guidance on configuring and testing network services for penetration testing labs.
+metadata:
+  author: zebbern
+  version: &quot;1.1&quot;
+---
+
+# Network 101
+
+## Purpose
+
+Configure and test common network services (HTTP, HTTPS, SNMP, SMB) for penetration testing lab environments. Enable hands-on practice with service enumeration, log analysis, and security testing against properly configured target systems.
+
+## Inputs/Prerequisites
+
+- Windows Server or Linux system for hosting services
+- Kali Linux or similar for testing
+- Administrative access to target system
+- Basic networking knowledge (IP addressing, ports)
+- Firewall access for port configuration
+
+## Outputs/Deliverables
+
+- Configured HTTP/HTTPS web server
+- SNMP service with accessible communities
+- SMB file shares with various permission levels
+- Captured logs for analysis
+- Documented enumeration results
+
+## Core Workflow
+
+### 1. Configure HTTP Server (Port 80)
+
+Set up a basic HTTP web server for testing:
+
+**Windows IIS Setup:**
+1. Open IIS Manager (Internet Information Services)
+2. Right-click Sites → Add Website
+3. Configure site name and physical path
+4. Bind to IP address and port 80
+
+**Linux Apache Setup:**
+
+```bash
+# Install Apache
+sudo apt update &amp;&amp; sudo apt install apache2
+
+# Start service
+sudo systemctl start apache2
+sudo systemctl enable apache2
+
+# Create test page
+echo &quot;&lt;html&gt;&lt;body&gt;&lt;h1&gt;Test Page&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;&quot; | sudo tee /var/www/html/index.html
+
+# Verify service
+curl http://localhost
+```
+
+**Configure Firewall for HTTP:**
+
+```bash
+# Linux (UFW)
+sudo ufw allow 80/tcp
+
+# Windows PowerShell
+New-NetFirewallRule -DisplayName &quot;HTTP&quot; -Direction Inbound -Protocol TCP -LocalPort 80 -Action Allow
+```
+
+### 2. Configure HTTPS Server (Port 443)
+
+Set up secure HTTPS with SSL/TLS:
+
+**Generate Self-Signed Certificate:**
+
+```bash
+# Linux - Generate certificate
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout /etc/ssl/private/apache-selfsigned.key \
+  -out /etc/ssl/certs/apache-selfsigned.crt
+
+# Enable SSL module
+sudo a2enmod ssl
+sudo systemctl restart apache2
+```
+
+**Configure Apache for HTTPS:**
+
+```bash
+# Edit SSL virtual host
+sudo nano /etc/apache2/sites-available/default-ssl.conf
+
+# Enable site
+sudo a2ensite default-ssl
+sudo systemctl reload apache2
+```
+
+**Verify HTTPS Setup:**
+
+```bash
+# Check port 443 is open
+nmap -p 443 192.168.1.1
+
+# Test SSL connection
+openssl s_client -connect 192.168.1.1:443
+
+# Check certificate
+curl -kv https://192.168.1.1
+```
+
+### 3. Configure SNMP Service (Port 161)
+
+Set up SNMP for enumeration practice:
+
+**Linux SNMP Setup:**
+
+```bash
+# Install SNMP daemon
+sudo apt install snmpd snmp
+
+# Configure community strings
+sudo nano /etc/snmp/snmpd.conf
+
+# Add these lines:
+# rocommunity public
+# rwcommunity private
+
+# Restart service
+sudo systemctl restart snmpd
+```
+
+**Windows SNMP Setup:**
+1. Open Server Manager → Add Features
+2. Select SNMP Service
+3. Configure community strings in Services → SNMP Service → Properties
+
+**SNMP Enumeration Commands:**
+
+```bash
+# Basic SNMP walk
+snmpwalk -c public -v1 192.168.1.1
+
+# Enumerate system info
+snmpwalk -c public -v1 192.168.1.1 1.3.6.1.2.1.1
+
+# Get running processes
+snmpwalk -c public -v1 192.168.1.1 1.3.6.1.2.1.25.4.2.1.2
+
+# SNMP check tool
+snmp-check 192.168.1.1 -c public
+
+# Brute force community strings
+onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings.txt 192.168.1.1
+```
+
+### 4. Configure SMB Service (Port 445)
+
+Set up SMB file shares for enumeration:
+
+**Windows SMB Share:**
+1. Create folder to share
+2. Right-click → Properties → Sharing → Advanced Sharing
+3. Enable sharing and set permissions
+4. Configure NTFS permissions
+
+**Linux Samba Setup:**
+
+```bash
+# Install Samba
+sudo apt install samba
+
+# Create share directory
+sudo mkdir -p /srv/samba/share
+sudo chmod 777 /srv/samba/share
+
+# Configure Samba
+sudo nano /etc/samba/smb.conf
+
+# Add share:
+# [public]
+#    path = /srv/samba/share
+#    browsable = yes
+#    guest ok = yes
+#    read only = no
+
+# Restart service
+sudo systemctl restart smbd
+```
+
+**SMB Enumeration Commands:**
+
+```bash
+# List shares anonymously
+smbclient -L //192.168.1.1 -N
+
+# Connect to share
+smbclient //192.168.1.1/share -N
+
+# Enumerate with smbmap
+smbmap -H 192.168.1.1
+
+# Full enumeration
+enum4linux -a 192.168.1.1
+
+# Check for vulnerabilities
+nmap --script smb-vuln* 192.168.1.1
+```
+
+### 5. Analyze Service Logs
+
+Review logs for security analysis:
+
+**HTTP/HTTPS Logs:**
+
+```bash
+# Apache access log
+sudo tail -f /var/log/apache2/access.log
+
+# Apache error log
+sudo tail -f /var/log/apache2/error.log
+
+# Windows IIS logs
+# Location: C:\inetpub\logs\LogFiles\W3SVC1\
+```
+
+**Parse Log for Credentials:**
+
+```bash
+# Search for POST requests
+grep &quot;POST&quot; /var/log/apache2/access.log
+
+# Extract user agents
+awk &#039;{print $12}&#039; /var/log/apache2/access.log | sort | uniq -c
+```
+
+## Quick Reference
+
+### Essential Ports
+
+| Service | Port | Protocol |
+|---------|------|----------|
+| HTTP | 80 | TCP |
+| HTTPS | 443 | TCP |
+| SNMP | 161 | UDP |
+| SMB | 445 | TCP |
+| NetBIOS | 137-139 | TCP/UDP |
+
+### Service Verification Commands
+
+```bash
+# Check HTTP
+curl -I http://target
+
+# Check HTTPS
+curl -kI https://target
+
+# Check SNMP
+snmpwalk -c public -v1 target
+
+# Check SMB
+smbclient -L //target -N
+```
+
+### Common Enumeration Tools
+
+| Tool | Purpose |
+|------|---------|
+| nmap | Port scanning and scripts |
+| nikto | Web vulnerability scanning |
+| snmpwalk | SNMP enumeration |
+| enum4linux | SMB/NetBIOS enumeration |
+| smbclient | SMB connection |
+| gobuster | Directory brute forcing |
+
+## Constraints
+
+- Self-signed certificates trigger browser warnings
+- SNMP v1/v2c communities transmit in cleartext
+- Anonymous SMB access is often disabled by default
+- Firewall rules must allow inbound connections
+- Lab environments should be isolated from production
+
+## Examples
+
+### Example 1: Complete HTTP Lab Setup
+
+```bash
+# Install and configure
+sudo apt install apache2
+sudo systemctl start apache2
+
+# Create login page
+cat &lt;&lt; &#039;EOF&#039; | sudo tee /var/www/html/login.html
+&lt;html&gt;
+&lt;body&gt;
+&lt;form method=&quot;POST&quot; action=&quot;login.php&quot;&gt;
+Username: &lt;input type=&quot;text&quot; name=&quot;user&quot;&gt;&lt;br&gt;
+Password: &lt;input type=&quot;password&quot; name=&quot;pass&quot;&gt;&lt;br&gt;
+&lt;input type=&quot;submit&quot; value=&quot;Login&quot;&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+EOF
+
+# Allow through firewall
+sudo ufw allow 80/tcp
+```
+
+### Example 2: SNMP Testing Setup
+
+```bash
+# Quick SNMP configuration
+sudo apt install snmpd
+echo &quot;rocommunity public&quot; | sudo tee -a /etc/snmp/snmpd.conf
+sudo systemctl restart snmpd
+
+# Test enumeration
+snmpwalk -c public -v1 localhost
+```
+
+### Example 3: SMB Anonymous Access
+
+```bash
+# Configure anonymous share
+sudo apt install samba
+sudo mkdir /srv/samba/anonymous
+sudo chmod 777 /srv/samba/anonymous
+
+# Test access
+smbclient //localhost/anonymous -N
+```
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Port not accessible | Check firewall rules (ufw, iptables, Windows Firewall) |
+| Service not starting | Check logs with `journalctl -u service-name` |
+| SNMP timeout | Verify UDP 161 is open, check community string |
+| SMB access denied | Verify share permissions and user credentials |
+| HTTPS certificate error | Accept self-signed cert or add to trusted store |
+| Cannot connect remotely | Bind service to 0.0.0.0 instead of localhost |
+</code>
       </div>
     </div>
 

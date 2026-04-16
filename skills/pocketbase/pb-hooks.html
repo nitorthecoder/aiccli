@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,620 @@
     <p class="desc">"Server-side JavaScript hooks for PocketBase (pb_hooks). Use when writing custom routes, event hooks, cron jobs, sending emails, making HTTP requests, querying the database, or extending PocketBase with server-side logic. Covers the goja ES5 runtime, routing, middleware, all event hooks, DB queries, record operations, and global APIs."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pb-hooks</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/pb-hooks</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: &quot;PocketBase Hooks&quot;
+description: &quot;Server-side JavaScript hooks for PocketBase (pb_hooks). Use when writing custom routes, event hooks, cron jobs, sending emails, making HTTP requests, querying the database, or extending PocketBase with server-side logic. Covers the goja ES5 runtime, routing, middleware, all event hooks, DB queries, record operations, and global APIs.&quot;
+---
+
+# PocketBase Server-Side JavaScript (pb_hooks)
+
+## Runtime Basics
+
+- Files go in `pb_hooks/*.pb.js` (must end with `.pb.js`)
+- Engine: **goja** — ES5.1 + some ES6. **No ES6 modules** (`import`/`export`), **no async/await**, **no arrow functions in older versions**. Use `function(){}` and CommonJS `require()`.
+- Each file is loaded on app start and on hot-reload
+- `__hooks` — absolute path to the pb_hooks directory
+- TypeScript declarations: `pb_data/types.d.ts` (auto-generated, useful for IDE support)
+- `--hooksPool=25` flag controls concurrent JS goroutines (default: 25)
+- Each handler runs in an isolated context — no shared mutable state between requests
+
+## Routing
+
+### Adding routes
+
+```js
+routerAdd(&quot;GET&quot;, &quot;/api/hello/{name}&quot;, function(e) {
+    var name = e.request.pathValue(&quot;name&quot;)
+    return e.json(200, { &quot;message&quot;: &quot;Hello &quot; + name })
+}, /* optional middleware */)
+```
+
+### Path patterns
+- `{name}` — named path parameter
+- `{path...}` — wildcard (matches rest of path)
+- `{$}` — exact match (no trailing slash)
+
+### Response methods
+
+| Method | Usage |
+|--------|-------|
+| `e.json(status, data)` | JSON response |
+| `e.string(status, text)` | Plain text |
+| `e.html(status, html)` | HTML response |
+| `e.redirect(status, url)` | Redirect (301/302) |
+| `e.blob(status, contentType, bytes)` | Binary data |
+| `e.stream(status, contentType, reader)` | Streaming response |
+| `e.noContent(status)` | No body (204) |
+
+### Reading request data
+
+```js
+// Body (JSON)
+var body = new DynamicModel({ name: &quot;&quot;, age: 0 })
+e.bindBody(body)
+
+// Query params
+var page = e.request.url.query().get(&quot;page&quot;)
+
+// Headers
+var token = e.request.header.get(&quot;Authorization&quot;)
+
+// Uploaded files
+var files = e.findUploadedFiles(&quot;document&quot;)  // returns array of *filesystem.File
+
+// Auth state
+var user = e.auth          // current auth record or null
+var isSuper = e.hasSuperuserAuth()
+```
+
+## Middleware
+
+### Built-in middleware
+
+```js
+routerAdd(&quot;GET&quot;, &quot;/api/protected&quot;, handler,
+    $apis.requireAuth(),                // any authenticated user
+    // OR
+    $apis.requireAuth(&quot;users&quot;),         // only &quot;users&quot; collection
+    // OR
+    $apis.requireSuperuserAuth(),       // superusers only
+    // OR
+    $apis.requireGuestOnly(),           // unauthenticated only
+    // OR
+    $apis.bodyLimit(5 * 1024 * 1024),   // 5MB body limit
+    // OR
+    $apis.gzip()                        // gzip compression
+)
+```
+
+### Global middleware
+
+```js
+routerUse(function(e) {
+    // runs before every request
+    console.log(e.request.method, e.request.url.path)
+    return e.next()  // MUST call e.next() to continue
+})
+```
+
+### Custom route middleware
+
+```js
+function myMiddleware(e) {
+    // pre-processing
+    var result = e.next()  // call next handler
+    // post-processing
+    return result
+}
+
+routerAdd(&quot;GET&quot;, &quot;/api/test&quot;, handler, myMiddleware)
+```
+
+Priority: middleware runs in order — first registered, first executed.
+
+## Event Hooks
+
+### Record lifecycle
+
+Each record event has 3 variants:
+- `onRecord*Execute` — wraps the default action. Call `e.next()` to proceed.
+- `onRecord*AfterSuccess` — runs after successful execution
+- `onRecord*AfterError` — runs after execution error
+
+```js
+// Before/during create
+onRecordCreateExecute(function(e) {
+    // e.record — the record being created
+    e.record.set(&quot;status&quot;, &quot;pending&quot;)
+    return e.next()  // proceed with creation
+}, &quot;posts&quot;)  // optional collection filter
+
+// After successful create
+onRecordAfterCreateSuccess(function(e) {
+    // e.record — the created record (has ID now)
+    console.log(&quot;Created:&quot;, e.record.id)
+}, &quot;posts&quot;)
+
+// After failed create
+onRecordAfterCreateError(function(e) {
+    // e.error — the error
+    console.log(&quot;Failed:&quot;, e.error)
+}, &quot;posts&quot;)
+```
+
+### All record hooks
+
+| Hook | Event object fields |
+|------|-------------------|
+| `onRecordCreateExecute` | `e.record` |
+| `onRecordUpdateExecute` | `e.record` |
+| `onRecordDeleteExecute` | `e.record` |
+| `onRecordAfterCreateSuccess` | `e.record` — after successful create |
+| `onRecordAfterUpdateSuccess` | `e.record` — after successful update |
+| `onRecordAfterDeleteSuccess` | `e.record` — after successful delete |
+| `onRecordAfterCreateError` | `e.record`, `e.error` — after failed create |
+| `onRecordAfterUpdateError` | `e.record`, `e.error` — after failed update |
+| `onRecordAfterDeleteError` | `e.record`, `e.error` — after failed delete |
+| `onRecordValidate` | `e.record` — add custom validation errors |
+| `onRecordEnrich` | `e.record` — modify API response (hide/add fields) |
+| `onRecordsListRequest` | `e.records`, `e.result` — modify list response |
+| `onRecordRequestCreate` | `e.record` — during API create request |
+| `onRecordRequestUpdate` | `e.record` — during API update request |
+| `onRecordRequestDelete` | `e.record` — during API delete request |
+
+### Auth hooks
+
+```js
+onRecordAuthWithPasswordRequest(function(e) {
+    // e.record — the auth record
+    // e.password — the provided password
+    return e.next()
+}, &quot;users&quot;)
+
+onRecordAuthWithOAuth2Request(function(e) {
+    // e.record — the auth record (may be new)
+    // e.oAuth2User — OAuth2 user data
+    // e.isNewRecord — true if first OAuth2 login
+    return e.next()
+}, &quot;users&quot;)
+
+onRecordAuthWithOTPRequest(function(e) {
+    // e.record — the auth record
+    return e.next()
+}, &quot;users&quot;)
+
+onRecordAuthRefreshRequest(function(e) {
+    return e.next()
+}, &quot;users&quot;)
+```
+
+### Realtime hooks
+
+```js
+onRealtimeConnectRequest(function(e) {
+    // e.client — the SSE client
+    // e.idleTimeout — connection timeout
+    return e.next()
+})
+
+onRealtimeSubscribeRequest(function(e) {
+    // e.client
+    // e.subscriptions — requested subscriptions
+    return e.next()
+})
+```
+
+### Other hooks
+
+```js
+onFileDownloadRequest(function(e) {
+    // e.record, e.fileField, e.servedPath, e.servedName
+    return e.next()
+}, &quot;documents&quot;)
+
+onBatchRequest(function(e) {
+    // e.batch — array of sub-requests
+    return e.next()
+})
+
+onCollectionCreateExecute(function(e) {
+    // e.collection
+    return e.next()
+})
+
+// App lifecycle
+onBootstrap(function(e) {
+    // runs once on app start (after DB is ready)
+    return e.next()
+})
+
+onTerminate(function(e) {
+    // runs on graceful shutdown
+    return e.next()
+})
+```
+
+### Validation hook
+
+```js
+onRecordValidate(function(e) {
+    if (e.record.getString(&quot;title&quot;).length &lt; 3) {
+        e.error = new ValidationError(&quot;title&quot;, &quot;Title must be at least 3 characters&quot;)
+    }
+    return e.next()
+}, &quot;posts&quot;)
+```
+
+### Enrich hook (modify API response)
+
+```js
+onRecordEnrich(function(e) {
+    // Hide field from non-owners
+    if (!e.requestInfo.auth || e.requestInfo.auth.id !== e.record.getString(&quot;author&quot;)) {
+        e.record.hide(&quot;private_notes&quot;)
+    }
+    // Add computed field
+    e.record.withCustomData(true)
+    e.record.set(&quot;displayName&quot;, e.record.getString(&quot;first&quot;) + &quot; &quot; + e.record.getString(&quot;last&quot;))
+    return e.next()
+}, &quot;users&quot;)
+```
+
+## Database
+
+### Query builder
+
+```js
+var results = arrayOf(new DynamicModel({ id: &quot;&quot;, title: &quot;&quot;, count: 0 }))
+
+$app.db()
+    .select(&quot;id&quot;, &quot;title&quot;, &quot;COUNT(comments) as count&quot;)
+    .from(&quot;posts&quot;)
+    .where($dbx.hashExp({ status: &quot;active&quot; }))
+    .andWhere($dbx.like(&quot;title&quot;, &quot;hello&quot;))
+    .orderBy(&quot;created DESC&quot;)
+    .limit(10)
+    .offset(0)
+    .all(results)  // populates results array
+```
+
+### Execution methods
+
+| Method | Returns |
+|--------|---------|
+| `.all(results)` | Populates array |
+| `.one(result)` | Single record |
+| `.execute()` | For INSERT/UPDATE/DELETE |
+
+### Raw queries
+
+```js
+$app.db().newQuery(&quot;SELECT * FROM posts WHERE status = {:status}&quot;)
+    .bind({ status: &quot;active&quot; })
+    .all(results)
+```
+
+**Always use named params `{:param}`** — never concatenate SQL strings.
+
+### $dbx expressions
+
+```js
+$dbx.hashExp({ field: &quot;value&quot; })           // field = &quot;value&quot;
+$dbx.hashExp({ field: [&quot;a&quot;, &quot;b&quot;] })        // field IN (&quot;a&quot;, &quot;b&quot;)
+$dbx.not($dbx.hashExp({ field: &quot;value&quot; })) // NOT (field = &quot;value&quot;)
+$dbx.and(expr1, expr2)                     // expr1 AND expr2
+$dbx.or(expr1, expr2)                      // expr1 OR expr2
+$dbx.like(&quot;field&quot;, &quot;val&quot;)                  // field LIKE &quot;%val%&quot;
+$dbx.orLike(&quot;field&quot;, &quot;a&quot;, &quot;b&quot;)            // field LIKE &quot;%a%&quot; OR field LIKE &quot;%b%&quot;
+$dbx.notLike(&quot;field&quot;, &quot;val&quot;)              // field NOT LIKE &quot;%val%&quot;
+$dbx.in(&quot;field&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;)           // field IN (&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
+$dbx.notIn(&quot;field&quot;, &quot;a&quot;, &quot;b&quot;)             // field NOT IN (&quot;a&quot;, &quot;b&quot;)
+$dbx.between(&quot;field&quot;, 1, 10)              // field BETWEEN 1 AND 10
+$dbx.exists($dbx.exp(&quot;SELECT 1 FROM t WHERE ...&quot;))
+$dbx.exp(&quot;raw SQL expression&quot;, optionalParams)
+```
+
+### Transactions
+
+```js
+$app.runInTransaction(function(txApp) {
+    // use txApp instead of $app inside transaction
+    var record = txApp.findRecordById(&quot;posts&quot;, &quot;RECORD_ID&quot;)
+    record.set(&quot;views&quot;, record.getInt(&quot;views&quot;) + 1)
+    txApp.save(record)
+})
+```
+
+## Record Operations
+
+### Find records
+
+```js
+// By ID
+var record = $app.findRecordById(&quot;posts&quot;, &quot;RECORD_ID&quot;)
+
+// By field value
+var record = $app.findFirstRecordByData(&quot;users&quot;, &quot;email&quot;, &quot;user@example.com&quot;)
+
+// By filter expression (same syntax as API rules)
+var record = $app.findFirstRecordByFilter(&quot;posts&quot;, &quot;slug = {:slug}&quot;, { slug: &quot;my-post&quot; })
+
+// Multiple records with filter
+var records = $app.findRecordsByFilter(
+    &quot;posts&quot;,                    // collection
+    &quot;status = &#039;active&#039;&quot;,        // filter
+    &quot;-created&quot;,                 // sort
+    10,                         // limit
+    0                           // offset
+)
+
+// All records (no limit)
+var records = $app.findAllRecords(&quot;posts&quot;, $dbx.hashExp({ status: &quot;active&quot; }))
+
+// Count
+var total = $app.countRecords(&quot;posts&quot;, $dbx.hashExp({ status: &quot;active&quot; }))
+```
+
+### Create records
+
+```js
+var collection = $app.findCollectionByNameOrId(&quot;posts&quot;)
+var record = new Record(collection)
+record.set(&quot;title&quot;, &quot;My Post&quot;)
+record.set(&quot;author&quot;, &quot;USER_ID&quot;)
+record.set(&quot;tags&quot;, [&quot;tag1&quot;, &quot;tag2&quot;])  // multi-relation
+$app.save(record)
+// record.id is now set
+```
+
+### Update records
+
+```js
+var record = $app.findRecordById(&quot;posts&quot;, &quot;RECORD_ID&quot;)
+record.set(&quot;title&quot;, &quot;Updated Title&quot;)
+$app.save(record)
+```
+
+### Delete records
+
+```js
+var record = $app.findRecordById(&quot;posts&quot;, &quot;RECORD_ID&quot;)
+$app.delete(record)
+```
+
+### Record getters
+
+```js
+record.id
+record.getString(&quot;title&quot;)
+record.getInt(&quot;count&quot;)
+record.getFloat(&quot;price&quot;)
+record.getBool(&quot;active&quot;)
+record.getStringSlice(&quot;tags&quot;)  // for multi-valued fields
+record.getDateTime(&quot;created&quot;)  // returns DateTime object
+record.get(&quot;field&quot;)            // raw interface{} value
+```
+
+### Expand relations
+
+```js
+$app.expandRecord(record, [&quot;author&quot;, &quot;tags&quot;], null)
+var author = record.expandedOne(&quot;author&quot;)   // single relation
+var tags = record.expandedAll(&quot;tags&quot;)        // multi relation
+```
+
+### File operations
+
+```js
+// Assign file from path
+var file = $filesystem.fileFromPath(&quot;/path/to/file.pdf&quot;)
+record.set(&quot;document&quot;, file)
+
+// Assign file from bytes
+var file = $filesystem.fileFromBytes(byteArray, &quot;report.pdf&quot;)
+record.set(&quot;document&quot;, file)
+
+// Assign file from URL
+var file = $filesystem.fileFromURL(&quot;https://example.com/file.pdf&quot;)
+record.set(&quot;document&quot;, file)
+
+$app.save(record)
+```
+
+## Cron Jobs
+
+```js
+cronAdd(&quot;daily_cleanup&quot;, &quot;0 3 * * *&quot;, function() {
+    // runs every day at 3:00 AM
+    var old = $app.findRecordsByFilter(&quot;temp&quot;, &quot;created &lt; @now - 30d&quot;, &quot;&quot;, 0, 0)
+    for (var i = 0; i &lt; old.length; i++) {
+        $app.delete(old[i])
+    }
+})
+
+cronRemove(&quot;daily_cleanup&quot;)  // remove a previously registered job
+```
+
+Cron expressions: `minute hour day month weekday`
+Preview registered crons: Dashboard &gt; Settings &gt; Crons
+
+## Email
+
+```js
+var message = new MailerMessage()
+message.from = { address: $app.settings().meta.senderAddress, name: $app.settings().meta.senderName }
+message.to = [{ address: &quot;user@example.com&quot;, name: &quot;User&quot; }]
+message.subject = &quot;Hello&quot;
+message.html = &quot;&lt;h1&gt;Hello World&lt;/h1&gt;&quot;
+// message.bcc, message.cc — optional arrays
+// message.attachments — optional
+
+$app.newMailClient().send(message)
+```
+
+### Customize system emails
+
+```js
+onMailerRecordVerificationSend(function(e) {
+    // e.record, e.message
+    e.message.subject = &quot;Custom verification subject&quot;
+    e.message.html = &quot;&lt;p&gt;Custom HTML with token: &quot; + e.meta.token + &quot;&lt;/p&gt;&quot;
+    return e.next()
+}, &quot;users&quot;)
+
+// Similar hooks: onMailerRecordResetPasswordSend, onMailerRecordEmailChangeSend, onMailerRecordOTPSend
+```
+
+## HTTP Client
+
+```js
+var res = $http.send({
+    url: &quot;https://api.example.com/data&quot;,
+    method: &quot;POST&quot;,
+    body: JSON.stringify({ key: &quot;value&quot; }),
+    headers: { &quot;Content-Type&quot;: &quot;application/json&quot;, &quot;Authorization&quot;: &quot;Bearer TOKEN&quot; },
+    timeout: 30  // seconds
+})
+
+// Response
+res.statusCode  // number
+res.json         // parsed JSON (if applicable)
+res.headers      // object
+res.cookies      // object
+res.body         // raw string
+
+// Multipart upload
+var formData = new FormData()
+formData.append(&quot;file&quot;, $filesystem.fileFromPath(&quot;/path/to/file.pdf&quot;))
+formData.append(&quot;name&quot;, &quot;test&quot;)
+
+var res = $http.send({
+    url: &quot;https://api.example.com/upload&quot;,
+    method: &quot;POST&quot;,
+    body: formData
+})
+```
+
+**No streaming support** in `$http.send()`.
+
+## Error Types
+
+```js
+throw new BadRequestError(&quot;message&quot;, optionalData)     // 400
+throw new UnauthorizedError(&quot;message&quot;, optionalData)    // 401
+throw new ForbiddenError(&quot;message&quot;, optionalData)       // 403
+throw new NotFoundError(&quot;message&quot;, optionalData)        // 404
+throw new TooManyRequestsError(&quot;message&quot;, optionalData) // 429
+throw new InternalServerError(&quot;message&quot;, optionalData)  // 500
+throw new ApiError(statusCode, &quot;message&quot;, optionalData) // custom status
+
+// Validation errors (for onRecordValidate)
+new ValidationError(&quot;field_name&quot;, &quot;error message&quot;)
+```
+
+## Global Objects
+
+| Object | Purpose |
+|--------|---------|
+| `$app` | Main app instance — DB, records, collections, settings |
+| `$apis` | API middleware helpers |
+| `$security` | JWT, encryption, random string generation |
+| `$os` | OS operations: `$os.exec()`, `$os.readDir()`, `$os.tempDir()` |
+| `$http` | HTTP client |
+| `$filesystem` | File helpers (`fileFromPath`, `fileFromBytes`, `fileFromURL`) |
+| `$dbx` | SQL expression builders |
+
+### $security examples
+
+```js
+var token = $security.randomString(32)
+var hash = $security.hs256(&quot;data&quot;, &quot;secret&quot;)
+var encrypted = $security.encrypt(&quot;data&quot;, &quot;encryptionKey&quot;)
+var decrypted = $security.decrypt(encrypted, &quot;encryptionKey&quot;)
+```
+
+### $os examples
+
+```js
+var result = $os.exec(&quot;ls&quot;, [&quot;-la&quot;, &quot;/tmp&quot;])  // returns { code, output }
+var files = $os.readDir(&quot;/path&quot;)
+var tmp = $os.tempDir(&quot;prefix&quot;)
+```
+
+## Common Patterns
+
+### Auto-assign author on create
+
+```js
+onRecordCreateExecute(function(e) {
+    if (e.auth) {
+        e.record.set(&quot;author&quot;, e.auth.id)
+    }
+    return e.next()
+}, &quot;posts&quot;)
+```
+
+### Cascade custom logic on delete
+
+```js
+onRecordDeleteExecute(function(e) {
+    // Clean up related data not handled by cascadeDelete
+    var comments = $app.findRecordsByFilter(&quot;comments&quot;, &quot;post = {:id}&quot;, &quot;-created&quot;, 0, 0, { id: e.record.id })
+    for (var i = 0; i &lt; comments.length; i++) {
+        $app.delete(comments[i])
+    }
+    return e.next()
+}, &quot;posts&quot;)
+```
+
+### Rate limiting per user
+
+```js
+routerAdd(&quot;POST&quot;, &quot;/api/expensive-action&quot;, function(e) {
+    var recent = $app.countRecords(&quot;actions&quot;,
+        $dbx.hashExp({ user: e.auth.id }),
+        $dbx.exp(&quot;created &gt; {:cutoff}&quot;, { cutoff: new DateTime().sub(1 * 60) })  // last minute
+    )
+    if (recent &gt;= 5) {
+        throw new TooManyRequestsError(&quot;Rate limit exceeded&quot;)
+    }
+    // proceed with action
+    return e.json(200, { ok: true })
+}, $apis.requireAuth())
+```
+
+### Webhook on record change
+
+```js
+onRecordCreateAfterSuccessExecute(function(e) {
+    try {
+        $http.send({
+            url: &quot;https://hooks.example.com/webhook&quot;,
+            method: &quot;POST&quot;,
+            body: JSON.stringify({
+                event: &quot;record.create&quot;,
+                collection: e.record.collection().name,
+                record: e.record
+            }),
+            headers: { &quot;Content-Type&quot;: &quot;application/json&quot; },
+            timeout: 10
+        })
+    } catch (err) {
+        console.log(&quot;Webhook failed:&quot;, err)
+    }
+})
+```
+</code>
       </div>
     </div>
 

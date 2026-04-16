@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,81 @@
     <p class="desc">Generate LinkedIn posts from blog content with automatic media attachment via LinkedIn API</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/publisher-linkedin</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/publisher-linkedin</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Read, Write, Bash, Glob, WebFetch
+argument-hint: &lt;input&gt; [lang] [custom-file-path]
+description: Generate LinkedIn posts from blog content with automatic media attachment via LinkedIn API
+---
+
+# LinkedIn Post Generator
+
+Create professional LinkedIn posts from any content source with optional media attachment.
+
+**Usage:** `$ARGUMENTS`
+
+**Examples:**
+```bash
+/publisher:linkedin my-post                    # Auto-detect and attach blog diagrams
+/publisher:linkedin my-post en                 # English with diagrams
+/publisher:linkedin my-post en image.png       # Custom image attachment
+/publisher:linkedin my-post ja report.pdf      # Japanese with custom PDF
+```
+
+**Process:**
+
+1. **Parse Input Arguments**
+   - Content input (slug, file path, or URL)
+   - Optional language parameter (en/ja)
+   - Optional custom file path for attachment
+
+2. **Universal Input Detection**
+   - **File path**: Read and parse (markdown, PDF, HTML, text, JSON)
+   - **URL**: Use WebFetch to retrieve content
+   - **Slug**: Search codebase for matching blog post
+
+3. **Generate Professional LinkedIn Post**
+   - Use thought leadership tone for English
+   - Use professional business tone (敬語) for Japanese
+   - Extract key insights from actual content
+   - Include relevant hashtags (2-4 max)
+   - Add link to full article
+
+4. **Handle Media Attachment**
+   - **Custom file**: Use specified image/PDF if provided
+   - **Auto-detect**: Find blog diagrams if available
+   - Supported formats: PNG, JPG, JPEG, PDF
+
+5. **Post via LinkedIn API** (using Bash + curl)
+   - Check for credentials in .env file
+   - Handle OAuth flow if needed
+   - **CRITICAL**: Escape LinkedIn Little Text Format reserved characters: `| { } @ [ ] ( ) &lt; &gt; # * _ ~`
+   - Upload media file and get asset URN
+   - Create draft post with commentary and media
+   - Open LinkedIn in browser for review
+
+**LinkedIn API Authentication:**
+1. Create LinkedIn app at https://www.linkedin.com/developers/apps
+2. Add credentials to .env:
+   ```
+   LINKEDIN_CLIENT_ID=your_client_id
+   LINKEDIN_CLIENT_SECRET=your_secret
+   LINKEDIN_ACCESS_TOKEN=your_token (auto-generated on first use)
+   ```
+
+**Without API setup**: Command still generates the post content for manual copy-paste.
+
+**Note**: Works in ANY repo type (Python, Rust, Go, etc.) - uses only bash and curl, no Node.js required.
+</code>
       </div>
     </div>
 

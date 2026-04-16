@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,142 @@
     <p class="desc">"Collection and schema design for PocketBase. Use when creating collections, designing schemas, adding fields, setting up relations, or choosing between base/auth/view collection types. Prevents wrong field types, documents zero-default behavior, and covers relation cascading."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pb-collections</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/pb-collections</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: &quot;PocketBase Collections&quot;
+description: &quot;Collection and schema design for PocketBase. Use when creating collections, designing schemas, adding fields, setting up relations, or choosing between base/auth/view collection types. Prevents wrong field types, documents zero-default behavior, and covers relation cascading.&quot;
+---
+
+# PocketBase Collection &amp; Schema Design
+
+## Collection Types
+
+### Base Collection
+Standard data collection. System fields: `id`, `created`, `updated`.
+
+### Auth Collection
+Extends base with authentication. Additional system fields: `email`, `emailVisibility`, `verified`, `password`, `tokenKey`.
+
+Cannot delete system fields. Can disable email/password auth in collection options.
+
+### View Collection
+Read-only, backed by a SQL SELECT query. No create/update/delete. Fields are auto-detected from the query. Useful for aggregations, joins, and computed views.
+
+```sql
+-- Example: view collection query
+SELECT p.id, p.title, COUNT(c.id) as comments_count
+FROM posts p LEFT JOIN comments c ON c.post = p.id
+GROUP BY p.id
+```
+
+View collections support API rules (list/view only) and can be used in relations.
+
+## Field Types
+
+| Type | Go type | Zero default | Notes |
+|------|---------|-------------|-------|
+| `text` | `string` | `&quot;&quot;` | min/max length, regex pattern |
+| `editor` | `string` | `&quot;&quot;` | Rich text (sanitized HTML) |
+| `number` | `float64` | `0` | min/max, `noDecimal` option |
+| `bool` | `bool` | `false` | |
+| `email` | `string` | `&quot;&quot;` | Auto-validated format |
+| `url` | `string` | `&quot;&quot;` | Auto-validated format |
+| `date` | `string` | `&quot;&quot;` | ISO 8601 (`2024-01-01 00:00:00.000Z`) |
+| `select` | `string`/`[]string` | `&quot;&quot;`/`[]` | `values` list, `maxSelect` |
+| `file` | `string`/`[]string` | `&quot;&quot;`/`[]` | `maxSelect`, `maxSize`, `mimeTypes` |
+| `relation` | `string`/`[]string` | `&quot;&quot;`/`[]` | `collectionId`, `cascadeDelete`, `maxSelect` |
+| `json` | `any` | `null` | Only type that can be null! `maxSize` |
+| `autodate` | `string` | auto | `onCreate`/`onUpdate` modifiers |
+| `password` | `string` | `&quot;&quot;` | Stored hashed, never returned in API |
+
+**Critical**: all types default to their zero value, NOT null. Only `json` fields can be null.
+
+## Field Modifiers
+
+Use in collection schema definitions:
+
+- **`required`** — field cannot be empty/zero
+- **`unique`** — unique constraint (composite via unique indexes)
+- **`presentable`** — included in relation display
+- **`hidden`** — excluded from API responses unless explicitly requested
+- **`:autogenerate`** — for `text` fields: auto-generate value (e.g., slug from other field)
+
+## Relation Patterns
+
+### One-to-many
+```
+posts.author -&gt; users (maxSelect: 1)
+```
+Each post has one author. Query posts by author: `author = &quot;USER_ID&quot;`.
+
+### Many-to-many
+```
+posts.tags -&gt; tags (maxSelect: 0, meaning unlimited)
+```
+Multi-select relation. Filter: `tags ?= &quot;TAG_ID&quot;` (contains).
+
+### Back-relations
+No explicit back-relation field needed. Use `@collection.posts.author` in API rules or expand from either side:
+```
+GET /api/collections/users/records/USER_ID?expand=posts_via_author
+```
+
+### Cascade Delete
+Set `cascadeDelete: true` on the relation field. When the referenced record is deleted, all records pointing to it are also deleted. Default is `false` (sets to empty string).
+
+### Self-referencing
+A collection can reference itself:
+```
+categories.parent -&gt; categories (maxSelect: 1)
+```
+
+## Indexes
+
+- Created in the collection settings (not field-level)
+- Format: `CREATE [UNIQUE] INDEX idx_name ON collection (field1, field2)`
+- Unique indexes enforce composite uniqueness
+- Partial indexes: `CREATE INDEX ... WHERE condition`
+- Indexes on relation fields improve join performance
+
+## Auth Collection Specifics
+
+### OAuth2
+Enable per-provider in collection settings. Each provider needs client ID + secret. PocketBase handles the full OAuth2 flow.
+
+### OTP (One-Time Password)
+Enable in auth collection settings. Sends code via email. Configure `otp.enabled`, `otp.duration`, `otp.length`.
+
+### MFA (Multi-Factor Authentication)
+Enable in auth collection settings. Requires a second factor after primary auth. `mfa.enabled`, `mfa.duration`, `mfa.rule` (filter to determine which users need MFA).
+
+### Password Auth
+Enabled by default. Can customize `minPasswordLength`. Can disable entirely if using only OAuth2/OTP.
+
+### Auth Options
+- `authToken.duration` — token lifetime (seconds)
+- `passwordAuth.enabled` — toggle email/password
+- `passwordAuth.identityFields` — fields used for login (default: `email`; can add `username`)
+- `oauth2.enabled` — toggle OAuth2
+- `otp.enabled` — toggle OTP
+
+## Best Practices
+
+1. **Prefer `select` over `bool`** when there might be more than 2 states in the future
+2. **Use `relation` not `text`** for foreign keys — you get cascade, expand, and type safety
+3. **`json` fields** are schemaless — use sparingly, prefer typed fields
+4. **Name collections** in lowercase snake_case (e.g., `blog_posts`, `user_profiles`)
+5. **Index early** — add indexes for any field used in filters or sorts
+6. **`maxSelect: 1`** on relations returns a string ID; **`maxSelect: &gt;1` or `0`** returns an array
+</code>
       </div>
     </div>
 

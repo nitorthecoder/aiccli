@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,145 @@
     <p class="desc">Web search and research using Perplexity AI. Use when user says "search", "find", "look up", "ask", "research", or "what's the latest" for generic queries. NOT for library/framework docs (use Context7) or workspace questions.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/perplexity</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/perplexity</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: perplexity
+description: Web search and research using Perplexity AI. Use when user says &quot;search&quot;, &quot;find&quot;, &quot;look up&quot;, &quot;ask&quot;, &quot;research&quot;, or &quot;what&#039;s the latest&quot; for generic queries. NOT for library/framework docs (use Context7) or workspace questions.
+---
+
+# Perplexity Tools
+
+Use ONLY when user says &quot;search&quot;, &quot;find&quot;, &quot;look up&quot;, &quot;ask&quot;, &quot;research&quot;, or &quot;what&#039;s the latest&quot; for generic queries. NOT for library/framework docs (use Context7), gt CLI (use Graphite MCP), or workspace questions (use Nx MCP).
+
+## Quick Reference
+
+**Which Perplexity tool?**
+- Need search results/URLs? → **Perplexity Search**
+- Need conversational answer? → **Perplexity Ask**
+- Need deep research? → **Researcher agent** (`/research &lt;topic&gt;`)
+
+**NOT Perplexity - use these instead:**
+- Library/framework docs → **Context7 MCP**
+- Graphite `gt` CLI → **Graphite MCP**
+- THIS workspace → **Nx MCP**
+- Specific URL → **URL Crawler**
+
+## Perplexity Search
+
+**When to use:**
+- Generic searches, finding resources
+- Current best practices, recent information
+- Tutorial/blog post discovery
+- User says &quot;search for...&quot;, &quot;find...&quot;, &quot;look up...&quot;
+
+**Default parameters (ALWAYS USE):**
+```typescript
+mcp__perplexity__perplexity_search({
+  query: &quot;your search query&quot;,
+  max_results: 3,           // Default is 10 - too many!
+  max_tokens_per_page: 512  // Reduce per-result content
+})
+```
+
+**When to increase limits:**
+Only if:
+- User explicitly needs comprehensive results
+- Initial search found nothing useful
+- Complex topic needs multiple sources
+
+```typescript
+// Increased limits (use sparingly)
+mcp__perplexity__perplexity_search({
+  query: &quot;complex topic&quot;,
+  max_results: 5,
+  max_tokens_per_page: 1024
+})
+```
+
+## Perplexity Ask
+
+**When to use:**
+- Need conversational explanation, not search results
+- Synthesize information from web
+- Explain concepts with current context
+
+**Usage:**
+```typescript
+mcp__perplexity__perplexity_ask({
+  messages: [
+    {
+      role: &quot;user&quot;,
+      content: &quot;Explain how postgres advisory locks work&quot;
+    }
+  ]
+})
+```
+
+**NOT for:**
+- Library documentation (use Context7)
+- Deep multi-source research (use researcher agent)
+
+## Prohibited Tool
+
+**NEVER use:** `mcp__perplexity__perplexity_research`
+
+**Use instead:** Researcher agent (`/research &lt;topic&gt;`)
+- Token cost: 30-50k tokens
+- Provides multi-source synthesis with citations
+- Use sparingly for complex questions only
+
+## Tool Selection Chain
+
+**Priority order:**
+1. **Context7 MCP** - Library/framework docs
+2. **Graphite MCP** - Any `gt` CLI mention
+3. **Nx MCP** - THIS workspace questions
+4. **Perplexity Search** - Generic searches
+5. **Perplexity Ask** - Conversational answers
+6. **Researcher agent** - Deep multi-source research
+7. **WebSearch** - Last resort (after Perplexity exhausted)
+
+## Examples
+
+**✅ CORRECT - Use Perplexity Search:**
+- &quot;Find postgres migration best practices&quot;
+- &quot;Search for React testing tutorials&quot;
+- &quot;Look up latest trends in microservices&quot;
+
+**✅ CORRECT - Use Perplexity Ask:**
+- &quot;Explain how postgres advisory locks work&quot;
+- &quot;What are the trade-offs of microservices?&quot;
+
+**❌ WRONG - Use Context7 instead:**
+- &quot;Search for React hooks documentation&quot; → Context7 MCP
+- &quot;Find Next.js routing docs&quot; → Context7 MCP
+- &quot;Look up Temporal workflow API&quot; → Context7 MCP
+
+**❌ WRONG - Use Graphite MCP instead:**
+- &quot;Search for gt stack commands&quot; → Graphite MCP
+- &quot;Find gt branch workflow&quot; → Graphite MCP
+
+**❌ WRONG - Use Nx MCP instead:**
+- &quot;Search for build config&quot; (in THIS workspace) → Nx MCP
+- &quot;Find project dependencies&quot; (in THIS workspace) → Nx MCP
+
+## Key Points
+
+- **Default to limited results** - avoid context bloat
+- **Library docs = Context7** - ALWAYS try Context7 first
+- **&quot;gt&quot; = Graphite MCP** - ANY &quot;gt&quot; mention uses Graphite
+- **Deep research = /research** - NOT perplexity_research tool
+- **Fallback chain** - Search → Ask → WebSearch (last resort)
+</code>
       </div>
     </div>
 

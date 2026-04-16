@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,254 @@
     <p class="desc">Infer gene regulatory networks (GRNs) from gene expression data using scalable algorithms (GRNBoost2, GENIE3). Use when analyzing transcriptomics data (bulk RNA-seq, single-cell RNA-seq) to identify transcription factor-target gene relationships and regulatory interactions. Supports distributed computation for large-scale datasets.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/arboreto</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/arboreto</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: arboreto
+description: Infer gene regulatory networks (GRNs) from gene expression data using scalable algorithms (GRNBoost2, GENIE3). Use when analyzing transcriptomics data (bulk RNA-seq, single-cell RNA-seq) to identify transcription factor-target gene relationships and regulatory interactions. Supports distributed computation for large-scale datasets.
+---
+
+# Arboreto
+
+## Overview
+
+Arboreto is a computational library for inferring gene regulatory networks (GRNs) from gene expression data using parallelized algorithms that scale from single machines to multi-node clusters.
+
+**Core capability**: Identify which transcription factors (TFs) regulate which target genes based on expression patterns across observations (cells, samples, conditions).
+
+## Quick Start
+
+Install arboreto:
+```bash
+uv pip install arboreto
+```
+
+Basic GRN inference:
+```python
+import pandas as pd
+from arboreto.algo import grnboost2
+
+if __name__ == &#039;__main__&#039;:
+    # Load expression data (genes as columns)
+    expression_matrix = pd.read_csv(&#039;expression_data.tsv&#039;, sep=&#039;\t&#039;)
+
+    # Infer regulatory network
+    network = grnboost2(expression_data=expression_matrix)
+
+    # Save results (TF, target, importance)
+    network.to_csv(&#039;network.tsv&#039;, sep=&#039;\t&#039;, index=False, header=False)
+```
+
+**Critical**: Always use `if __name__ == &#039;__main__&#039;:` guard because Dask spawns new processes.
+
+## Core Capabilities
+
+### 1. Basic GRN Inference
+
+For standard GRN inference workflows including:
+- Input data preparation (Pandas DataFrame or NumPy array)
+- Running inference with GRNBoost2 or GENIE3
+- Filtering by transcription factors
+- Output format and interpretation
+
+**See**: `references/basic_inference.md`
+
+**Use the ready-to-run script**: `scripts/basic_grn_inference.py` for standard inference tasks:
+```bash
+python scripts/basic_grn_inference.py expression_data.tsv output_network.tsv --tf-file tfs.txt --seed 777
+```
+
+### 2. Algorithm Selection
+
+Arboreto provides two algorithms:
+
+**GRNBoost2 (Recommended)**:
+- Fast gradient boosting-based inference
+- Optimized for large datasets (10k+ observations)
+- Default choice for most analyses
+
+**GENIE3**:
+- Random Forest-based inference
+- Original multiple regression approach
+- Use for comparison or validation
+
+Quick comparison:
+```python
+from arboreto.algo import grnboost2, genie3
+
+# Fast, recommended
+network_grnboost = grnboost2(expression_data=matrix)
+
+# Classic algorithm
+network_genie3 = genie3(expression_data=matrix)
+```
+
+**For detailed algorithm comparison, parameters, and selection guidance**: `references/algorithms.md`
+
+### 3. Distributed Computing
+
+Scale inference from local multi-core to cluster environments:
+
+**Local (default)** - Uses all available cores automatically:
+```python
+network = grnboost2(expression_data=matrix)
+```
+
+**Custom local client** - Control resources:
+```python
+from distributed import LocalCluster, Client
+
+local_cluster = LocalCluster(n_workers=10, memory_limit=&#039;8GB&#039;)
+client = Client(local_cluster)
+
+network = grnboost2(expression_data=matrix, client_or_address=client)
+
+client.close()
+local_cluster.close()
+```
+
+**Cluster computing** - Connect to remote Dask scheduler:
+```python
+from distributed import Client
+
+client = Client(&#039;tcp://scheduler:8786&#039;)
+network = grnboost2(expression_data=matrix, client_or_address=client)
+```
+
+**For cluster setup, performance optimization, and large-scale workflows**: `references/distributed_computing.md`
+
+## Installation
+
+```bash
+uv pip install arboreto
+```
+
+**Dependencies**: scipy, scikit-learn, numpy, pandas, dask, distributed
+
+## Common Use Cases
+
+### Single-Cell RNA-seq Analysis
+```python
+import pandas as pd
+from arboreto.algo import grnboost2
+
+if __name__ == &#039;__main__&#039;:
+    # Load single-cell expression matrix (cells x genes)
+    sc_data = pd.read_csv(&#039;scrna_counts.tsv&#039;, sep=&#039;\t&#039;)
+
+    # Infer cell-type-specific regulatory network
+    network = grnboost2(expression_data=sc_data, seed=42)
+
+    # Filter high-confidence links
+    high_confidence = network[network[&#039;importance&#039;] &gt; 0.5]
+    high_confidence.to_csv(&#039;grn_high_confidence.tsv&#039;, sep=&#039;\t&#039;, index=False)
+```
+
+### Bulk RNA-seq with TF Filtering
+```python
+from arboreto.utils import load_tf_names
+from arboreto.algo import grnboost2
+
+if __name__ == &#039;__main__&#039;:
+    # Load data
+    expression_data = pd.read_csv(&#039;rnaseq_tpm.tsv&#039;, sep=&#039;\t&#039;)
+    tf_names = load_tf_names(&#039;human_tfs.txt&#039;)
+
+    # Infer with TF restriction
+    network = grnboost2(
+        expression_data=expression_data,
+        tf_names=tf_names,
+        seed=123
+    )
+
+    network.to_csv(&#039;tf_target_network.tsv&#039;, sep=&#039;\t&#039;, index=False)
+```
+
+### Comparative Analysis (Multiple Conditions)
+```python
+from arboreto.algo import grnboost2
+
+if __name__ == &#039;__main__&#039;:
+    # Infer networks for different conditions
+    conditions = [&#039;control&#039;, &#039;treatment_24h&#039;, &#039;treatment_48h&#039;]
+
+    for condition in conditions:
+        data = pd.read_csv(f&#039;{condition}_expression.tsv&#039;, sep=&#039;\t&#039;)
+        network = grnboost2(expression_data=data, seed=42)
+        network.to_csv(f&#039;{condition}_network.tsv&#039;, sep=&#039;\t&#039;, index=False)
+```
+
+## Output Interpretation
+
+Arboreto returns a DataFrame with regulatory links:
+
+| Column | Description |
+|--------|-------------|
+| `TF` | Transcription factor (regulator) |
+| `target` | Target gene |
+| `importance` | Regulatory importance score (higher = stronger) |
+
+**Filtering strategy**:
+- Top N links per target gene
+- Importance threshold (e.g., &gt; 0.5)
+- Statistical significance testing (permutation tests)
+
+## Integration with pySCENIC
+
+Arboreto is a core component of the SCENIC pipeline for single-cell regulatory network analysis:
+
+```python
+# Step 1: Use arboreto for GRN inference
+from arboreto.algo import grnboost2
+network = grnboost2(expression_data=sc_data, tf_names=tf_list)
+
+# Step 2: Use pySCENIC for regulon identification and activity scoring
+# (See pySCENIC documentation for downstream analysis)
+```
+
+## Reproducibility
+
+Always set a seed for reproducible results:
+```python
+network = grnboost2(expression_data=matrix, seed=777)
+```
+
+Run multiple seeds for robustness analysis:
+```python
+from distributed import LocalCluster, Client
+
+if __name__ == &#039;__main__&#039;:
+    client = Client(LocalCluster())
+
+    seeds = [42, 123, 777]
+    networks = []
+
+    for seed in seeds:
+        net = grnboost2(expression_data=matrix, client_or_address=client, seed=seed)
+        networks.append(net)
+
+    # Combine networks and filter consensus links
+    consensus = analyze_consensus(networks)
+```
+
+## Troubleshooting
+
+**Memory errors**: Reduce dataset size by filtering low-variance genes or use distributed computing
+
+**Slow performance**: Use GRNBoost2 instead of GENIE3, enable distributed client, filter TF list
+
+**Dask errors**: Ensure `if __name__ == &#039;__main__&#039;:` guard is present in scripts
+
+**Empty results**: Check data format (genes as columns), verify TF names match gene names
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,520 @@
     <p class="desc">This skill should be used when the user asks to "search for exposed devices on the internet," "perform Shodan reconnaissance," "find vulnerable services using Shodan," "scan IP ranges with Shodan," or "discover IoT devices and open ports." It provides comprehensive guidance for using Shodan's search engine, CLI, and API for penetration testing reconnaissance.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/shodan-reconnaissance</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: Shodan Reconnaissance and Pentesting
+description: This skill should be used when the user asks to &quot;search for exposed devices on the internet,&quot; &quot;perform Shodan reconnaissance,&quot; &quot;find vulnerable services using Shodan,&quot; &quot;scan IP ranges with Shodan,&quot; or &quot;discover IoT devices and open ports.&quot; It provides comprehensive guidance for using Shodan&#039;s search engine, CLI, and API for penetration testing reconnaissance.
+metadata:
+  author: zebbern
+  version: &quot;1.1&quot;
+---
+
+# Shodan Reconnaissance and Pentesting
+
+## Purpose
+
+Provide systematic methodologies for leveraging Shodan as a reconnaissance tool during penetration testing engagements. This skill covers the Shodan web interface, command-line interface (CLI), REST API, search filters, on-demand scanning, and network monitoring capabilities for discovering exposed services, vulnerable systems, and IoT devices.
+
+## Inputs / Prerequisites
+
+- **Shodan Account**: Free or paid account at shodan.io
+- **API Key**: Obtained from Shodan account dashboard
+- **Target Information**: IP addresses, domains, or network ranges to investigate
+- **Shodan CLI**: Python-based command-line tool installed
+- **Authorization**: Written permission for reconnaissance on target networks
+
+## Outputs / Deliverables
+
+- **Asset Inventory**: List of discovered hosts, ports, and services
+- **Vulnerability Report**: Identified CVEs and exposed vulnerable services
+- **Banner Data**: Service banners revealing software versions
+- **Network Mapping**: Geographic and organizational distribution of assets
+- **Screenshot Gallery**: Visual reconnaissance of exposed interfaces
+- **Exported Data**: JSON/CSV files for further analysis
+
+## Core Workflow
+
+### 1. Setup and Configuration
+
+#### Install Shodan CLI
+```bash
+# Using pip
+pip install shodan
+
+# Or easy_install
+easy_install shodan
+
+# On BlackArch/Arch Linux
+sudo pacman -S python-shodan
+```
+
+#### Initialize API Key
+```bash
+# Set your API key
+shodan init YOUR_API_KEY
+
+# Verify setup
+shodan info
+# Output: Query credits available: 100
+#         Scan credits available: 100
+```
+
+#### Check Account Status
+```bash
+# View credits and plan info
+shodan info
+
+# Check your external IP
+shodan myip
+
+# Check CLI version
+shodan version
+```
+
+### 2. Basic Host Reconnaissance
+
+#### Query Single Host
+```bash
+# Get all information about an IP
+shodan host 1.1.1.1
+
+# Example output:
+# 1.1.1.1
+# Hostnames: one.one.one.one
+# Country: Australia
+# Organization: Mountain View Communications
+# Number of open ports: 3
+# Ports:
+#   53/udp
+#   80/tcp
+#   443/tcp
+```
+
+#### Check if Host is Honeypot
+```bash
+# Get honeypot probability score
+shodan honeyscore 192.168.1.100
+
+# Output: Not a honeypot
+#         Score: 0.3
+```
+
+### 3. Search Queries
+
+#### Basic Search (Free)
+```bash
+# Simple keyword search (no credits consumed)
+shodan search apache
+
+# Specify output fields
+shodan search --fields ip_str,port,os smb
+```
+
+#### Filtered Search (1 Credit)
+```bash
+# Product-specific search
+shodan search product:mongodb
+
+# Search with multiple filters
+shodan search product:nginx country:US city:&quot;New York&quot;
+```
+
+#### Count Results
+```bash
+# Get result count without consuming credits
+shodan count openssh
+# Output: 23128
+
+shodan count openssh 7
+# Output: 219
+```
+
+#### Download Results
+```bash
+# Download 1000 results (default)
+shodan download results.json.gz &quot;apache country:US&quot;
+
+# Download specific number of results
+shodan download --limit 5000 results.json.gz &quot;nginx&quot;
+
+# Download all available results
+shodan download --limit -1 all_results.json.gz &quot;query&quot;
+```
+
+#### Parse Downloaded Data
+```bash
+# Extract specific fields from downloaded data
+shodan parse --fields ip_str,port,hostnames results.json.gz
+
+# Filter by specific criteria
+shodan parse --fields location.country_code3,ip_str -f port:22 results.json.gz
+
+# Export to CSV format
+shodan parse --fields ip_str,port,org --separator , results.json.gz &gt; results.csv
+```
+
+### 4. Search Filters Reference
+
+#### Network Filters
+```
+ip:1.2.3.4                  # Specific IP address
+net:192.168.0.0/24          # Network range (CIDR)
+hostname:example.com        # Hostname contains
+port:22                     # Specific port
+asn:AS15169                 # Autonomous System Number
+```
+
+#### Geographic Filters
+```
+country:US                  # Two-letter country code
+country:&quot;United States&quot;     # Full country name
+city:&quot;San Francisco&quot;        # City name
+state:CA                    # State/region
+postal:94102                # Postal/ZIP code
+geo:37.7,-122.4             # Lat/long coordinates
+```
+
+#### Organization Filters
+```
+org:&quot;Google&quot;                # Organization name
+isp:&quot;Comcast&quot;               # ISP name
+```
+
+#### Service/Product Filters
+```
+product:nginx               # Software product
+version:1.14.0              # Software version
+os:&quot;Windows Server 2019&quot;    # Operating system
+http.title:&quot;Dashboard&quot;      # HTTP page title
+http.html:&quot;login&quot;           # HTML content
+http.status:200             # HTTP status code
+ssl.cert.subject.cn:*.example.com  # SSL certificate
+ssl:true                    # Has SSL enabled
+```
+
+#### Vulnerability Filters
+```
+vuln:CVE-2019-0708          # Specific CVE
+has_vuln:true               # Has any vulnerability
+```
+
+#### Screenshot Filters
+```
+has_screenshot:true         # Has screenshot available
+screenshot.label:webcam     # Screenshot type
+```
+
+### 5. On-Demand Scanning
+
+#### Submit Scan
+```bash
+# Scan single IP (1 credit per IP)
+shodan scan submit 192.168.1.100
+
+# Scan with verbose output (shows scan ID)
+shodan scan submit --verbose 192.168.1.100
+
+# Scan and save results
+shodan scan submit --filename scan_results.json.gz 192.168.1.100
+```
+
+#### Monitor Scan Status
+```bash
+# List recent scans
+shodan scan list
+
+# Check specific scan status
+shodan scan status SCAN_ID
+
+# Download scan results later
+shodan download --limit -1 results.json.gz scan:SCAN_ID
+```
+
+#### Available Scan Protocols
+```bash
+# List available protocols/modules
+shodan scan protocols
+```
+
+### 6. Statistics and Analysis
+
+#### Get Search Statistics
+```bash
+# Default statistics (top 10 countries, orgs)
+shodan stats nginx
+
+# Custom facets
+shodan stats --facets domain,port,asn --limit 5 nginx
+
+# Save to CSV
+shodan stats --facets country,org -O stats.csv apache
+```
+
+### 7. Network Monitoring
+
+#### Setup Alerts (Web Interface)
+```
+1. Navigate to Monitor Dashboard
+2. Add IP, range, or domain to monitor
+3. Configure notification service (email, Slack, webhook)
+4. Select trigger events (new service, vulnerability, etc.)
+5. View dashboard for exposed services
+```
+
+### 8. REST API Usage
+
+#### Direct API Calls
+```bash
+# Get API info
+curl -s &quot;https://api.shodan.io/api-info?key=YOUR_KEY&quot; | jq
+
+# Host lookup
+curl -s &quot;https://api.shodan.io/shodan/host/1.1.1.1?key=YOUR_KEY&quot; | jq
+
+# Search query
+curl -s &quot;https://api.shodan.io/shodan/host/search?key=YOUR_KEY&amp;query=apache&quot; | jq
+```
+
+#### Python Library
+```python
+import shodan
+
+api = shodan.Shodan(&#039;YOUR_API_KEY&#039;)
+
+# Search
+results = api.search(&#039;apache&#039;)
+print(f&#039;Results found: {results[&quot;total&quot;]}&#039;)
+for result in results[&#039;matches&#039;]:
+    print(f&#039;IP: {result[&quot;ip_str&quot;]}&#039;)
+
+# Host lookup
+host = api.host(&#039;1.1.1.1&#039;)
+print(f&#039;IP: {host[&quot;ip_str&quot;]}&#039;)
+print(f&#039;Organization: {host.get(&quot;org&quot;, &quot;n/a&quot;)}&#039;)
+for item in host[&#039;data&#039;]:
+    print(f&#039;Port: {item[&quot;port&quot;]}&#039;)
+```
+
+## Quick Reference
+
+### Essential CLI Commands
+
+| Command | Description | Credits |
+|---------|-------------|---------|
+| `shodan init KEY` | Initialize API key | 0 |
+| `shodan info` | Show account info | 0 |
+| `shodan myip` | Show your IP | 0 |
+| `shodan host IP` | Host details | 0 |
+| `shodan count QUERY` | Result count | 0 |
+| `shodan search QUERY` | Basic search | 0* |
+| `shodan download FILE QUERY` | Save results | 1/100 results |
+| `shodan parse FILE` | Extract data | 0 |
+| `shodan stats QUERY` | Statistics | 1 |
+| `shodan scan submit IP` | On-demand scan | 1/IP |
+| `shodan honeyscore IP` | Honeypot check | 0 |
+
+*Filters consume 1 credit per query
+
+### Common Search Queries
+
+| Purpose | Query |
+|---------|-------|
+| Find webcams | `webcam has_screenshot:true` |
+| MongoDB databases | `product:mongodb` |
+| Redis servers | `product:redis` |
+| Elasticsearch | `product:elastic port:9200` |
+| Default passwords | `&quot;default password&quot;` |
+| Vulnerable RDP | `port:3389 vuln:CVE-2019-0708` |
+| Industrial systems | `port:502 modbus` |
+| Cisco devices | `product:cisco` |
+| Open VNC | `port:5900 authentication disabled` |
+| Exposed FTP | `port:21 anonymous` |
+| WordPress sites | `http.component:wordpress` |
+| Printers | `&quot;HP-ChaiSOE&quot; port:80` |
+| Cameras (RTSP) | `port:554 has_screenshot:true` |
+| Jenkins servers | `X-Jenkins port:8080` |
+| Docker APIs | `port:2375 product:docker` |
+
+### Useful Filter Combinations
+
+| Scenario | Query |
+|---------|-------|
+| Target org recon | `org:&quot;Company Name&quot;` |
+| Domain enumeration | `hostname:example.com` |
+| Network range scan | `net:192.168.0.0/24` |
+| SSL cert search | `ssl.cert.subject.cn:*.target.com` |
+| Vulnerable servers | `vuln:CVE-2021-44228 country:US` |
+| Exposed admin panels | `http.title:&quot;admin&quot; port:443` |
+| Database exposure | `port:3306,5432,27017,6379` |
+
+### Credit System
+
+| Action | Credit Type | Cost |
+|--------|-------------|------|
+| Basic search | Query | 0 (no filters) |
+| Filtered search | Query | 1 |
+| Download 100 results | Query | 1 |
+| Generate report | Query | 1 |
+| Scan 1 IP | Scan | 1 |
+| Network monitoring | Monitored IPs | Depends on plan |
+
+## Constraints and Limitations
+
+### Operational Boundaries
+- Rate limited to 1 request per second
+- Scan results not immediate (asynchronous)
+- Cannot re-scan same IP within 24 hours (non-Enterprise)
+- Free accounts have limited credits
+- Some data requires paid subscription
+
+### Data Freshness
+- Shodan crawls continuously but data may be days/weeks old
+- On-demand scans provide current data but cost credits
+- Historical data available with paid plans
+
+### Legal Requirements
+- Only perform reconnaissance on authorized targets
+- Passive reconnaissance generally legal but verify jurisdiction
+- Active scanning (scan submit) requires authorization
+- Document all reconnaissance activities
+
+## Examples
+
+### Example 1: Organization Reconnaissance
+```bash
+# Find all hosts belonging to target organization
+shodan search &#039;org:&quot;Target Company&quot;&#039;
+
+# Get statistics on their infrastructure
+shodan stats --facets port,product,country &#039;org:&quot;Target Company&quot;&#039;
+
+# Download detailed data
+shodan download target_data.json.gz &#039;org:&quot;Target Company&quot;&#039;
+
+# Parse for specific info
+shodan parse --fields ip_str,port,product target_data.json.gz
+```
+
+### Example 2: Vulnerable Service Discovery
+```bash
+# Find hosts vulnerable to BlueKeep (RDP CVE)
+shodan search &#039;vuln:CVE-2019-0708 country:US&#039;
+
+# Find exposed Elasticsearch with no auth
+shodan search &#039;product:elastic port:9200 -authentication&#039;
+
+# Find Log4j vulnerable systems
+shodan search &#039;vuln:CVE-2021-44228&#039;
+```
+
+### Example 3: IoT Device Discovery
+```bash
+# Find exposed webcams
+shodan search &#039;webcam has_screenshot:true country:US&#039;
+
+# Find industrial control systems
+shodan search &#039;port:502 product:modbus&#039;
+
+# Find exposed printers
+shodan search &#039;&quot;HP-ChaiSOE&quot; port:80&#039;
+
+# Find smart home devices
+shodan search &#039;product:nest&#039;
+```
+
+### Example 4: SSL/TLS Certificate Analysis
+```bash
+# Find hosts with specific SSL cert
+shodan search &#039;ssl.cert.subject.cn:*.example.com&#039;
+
+# Find expired certificates
+shodan search &#039;ssl.cert.expired:true org:&quot;Company&quot;&#039;
+
+# Find self-signed certificates
+shodan search &#039;ssl.cert.issuer.cn:self-signed&#039;
+```
+
+### Example 5: Python Automation Script
+```python
+#!/usr/bin/env python3
+import shodan
+import json
+
+API_KEY = &#039;YOUR_API_KEY&#039;
+api = shodan.Shodan(API_KEY)
+
+def recon_organization(org_name):
+    &quot;&quot;&quot;Perform reconnaissance on an organization&quot;&quot;&quot;
+    try:
+        # Search for organization
+        query = f&#039;org:&quot;{org_name}&quot;&#039;
+        results = api.search(query)
         
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/shodan-reconnaissance</code>
-        </div>
+        print(f&quot;[*] Found {results[&#039;total&#039;]} hosts for {org_name}&quot;)
+        
+        # Collect unique IPs and ports
+        hosts = {}
+        for result in results[&#039;matches&#039;]:
+            ip = result[&#039;ip_str&#039;]
+            port = result[&#039;port&#039;]
+            product = result.get(&#039;product&#039;, &#039;unknown&#039;)
+            
+            if ip not in hosts:
+                hosts[ip] = []
+            hosts[ip].append({&#039;port&#039;: port, &#039;product&#039;: product})
+        
+        # Output findings
+        for ip, services in hosts.items():
+            print(f&quot;\n[+] {ip}&quot;)
+            for svc in services:
+                print(f&quot;    - {svc[&#039;port&#039;]}/tcp ({svc[&#039;product&#039;]})&quot;)
+        
+        return hosts
+        
+    except shodan.APIError as e:
+        print(f&quot;Error: {e}&quot;)
+        return None
+
+if __name__ == &#039;__main__&#039;:
+    recon_organization(&quot;Target Company&quot;)
+```
+
+### Example 6: Network Range Assessment
+```bash
+# Scan a /24 network range
+shodan search &#039;net:192.168.1.0/24&#039;
+
+# Get port distribution
+shodan stats --facets port &#039;net:192.168.1.0/24&#039;
+
+# Find specific vulnerabilities in range
+shodan search &#039;net:192.168.1.0/24 vuln:CVE-2021-44228&#039;
+
+# Export all data for range
+shodan download network_scan.json.gz &#039;net:192.168.1.0/24&#039;
+```
+
+## Troubleshooting
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| No API Key Configured | Key not initialized | Run `shodan init YOUR_API_KEY` then verify with `shodan info` |
+| Query Credits Exhausted | Monthly credits consumed | Use credit-free queries (no filters), wait for reset, or upgrade |
+| Host Recently Crawled | Cannot re-scan IP within 24h | Use `shodan host IP` for existing data, or wait 24 hours |
+| Rate Limit Exceeded | &gt;1 request/second | Add `time.sleep(1)` between API requests |
+| Empty Search Results | Too specific or syntax error | Use quotes for phrases: `&#039;org:&quot;Company Name&quot;&#039;`; broaden criteria |
+| Downloaded File Won&#039;t Parse | Corrupted or wrong format | Verify with `gunzip -t file.gz`, re-download with `--limit` |
+</code>
       </div>
     </div>
 

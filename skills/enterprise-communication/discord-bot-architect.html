@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,294 @@
     <p class="desc">"Specialized skill for building production-ready Discord bots. Covers Discord.js (JavaScript) and Pycord (Python), gateway intents, slash commands, interactive components, rate limiting, and sharding."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/discord-bot-architect</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/discord-bot-architect</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: discord-bot-architect
+description: &quot;Specialized skill for building production-ready Discord bots. Covers Discord.js (JavaScript) and Pycord (Python), gateway intents, slash commands, interactive components, rate limiting, and sharding.&quot;
+source: vibeship-spawner-skills (Apache 2.0)
+---
+
+# Discord Bot Architect
+
+## Patterns
+
+### Discord.js v14 Foundation
+
+Modern Discord bot setup with Discord.js v14 and slash commands
+
+**When to use**: [&#039;Building Discord bots with JavaScript/TypeScript&#039;, &#039;Need full gateway connection with events&#039;, &#039;Building bots with complex interactions&#039;]
+
+```javascript
+```javascript
+// src/index.js
+const { Client, Collection, GatewayIntentBits, Events } = require(&#039;discord.js&#039;);
+const fs = require(&#039;node:fs&#039;);
+const path = require(&#039;node:path&#039;);
+require(&#039;dotenv&#039;).config();
+
+// Create client with minimal required intents
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    // Add only what you need:
+    // GatewayIntentBits.GuildMessages,
+    // GatewayIntentBits.MessageContent,  // PRIVILEGED - avoid if possible
+  ]
+});
+
+// Load commands
+client.commands = new Collection();
+const commandsPath = path.join(__dirname, &#039;commands&#039;);
+const commandFiles = fs.readdirSync(commandsPath).filter(f =&gt; f.endsWith(&#039;.js&#039;));
+
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  const command = require(filePath);
+  if (&#039;data&#039; in command &amp;&amp; &#039;execute&#039; in command) {
+    client.commands.set(command.data.name, command);
+  }
+}
+
+// Load events
+const eventsPath = path.join(__dirname, &#039;events&#039;);
+const eventFiles = fs.readdirSync(eventsPath).filter(f =&gt; f.endsWith(&#039;.js&#039;));
+
+for (const file of eventFiles) {
+  const filePath = path.join(eventsPath, file);
+  const event = require(filePath);
+  if (event.once) {
+    client.once(event.name, (...args) =&gt; event.execute(...args));
+  } else {
+    client.on(event.name, (...args) =&gt; event.execute(...args));
+  }
+}
+
+client.login(process.env.DISCORD_TOKEN);
+```
+
+```javascript
+// src/commands/ping.js
+const { SlashCommandBuilder } = require(&#039;discord.js&#039;);
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName(&#039;ping&#039;)
+    .setDescription(&#039;Replies with Pong!&#039;),
+
+  async execute(interaction) {
+    const sent = await interaction.reply({
+      content: &#039;Pinging...&#039;,
+      fetchReply: true
+    });
+
+    const latency = sent.createdTimestamp - interaction.createdTimestamp;
+    await interaction.editReply(`Pong! Latency: ${latency}ms`);
+  }
+};
+```
+
+```javascript
+// src/events/interactionCreate.js
+const { Events } = require(&#039;discord.js&#039;);
+
+module.exports = {
+  name: Event
+```
+
+### Pycord Bot Foundation
+
+Discord bot with Pycord (Python) and application commands
+
+**When to use**: [&#039;Building Discord bots with Python&#039;, &#039;Prefer async/await patterns&#039;, &#039;Need good slash command support&#039;]
+
+```python
+```python
+# main.py
+import os
+import discord
+from discord.ext import commands
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Configure intents - only enable what you need
+intents = discord.Intents.default()
+# intents.message_content = True  # PRIVILEGED - avoid if possible
+# intents.members = True          # PRIVILEGED
+
+bot = commands.Bot(
+    command_prefix=&quot;!&quot;,  # Legacy, prefer slash commands
+    intents=intents
+)
+
+@bot.event
+async def on_ready():
+    print(f&quot;Logged in as {bot.user}&quot;)
+    # Sync commands (do this carefully - see sharp edges)
+    # await bot.sync_commands()
+
+# Slash command
+@bot.slash_command(name=&quot;ping&quot;, description=&quot;Check bot latency&quot;)
+async def ping(ctx: discord.ApplicationContext):
+    latency = round(bot.latency * 1000)
+    await ctx.respond(f&quot;Pong! Latency: {latency}ms&quot;)
+
+# Slash command with options
+@bot.slash_command(name=&quot;greet&quot;, description=&quot;Greet a user&quot;)
+async def greet(
+    ctx: discord.ApplicationContext,
+    user: discord.Option(discord.Member, &quot;User to greet&quot;),
+    message: discord.Option(str, &quot;Custom message&quot;, required=False)
+):
+    msg = message or &quot;Hello!&quot;
+    await ctx.respond(f&quot;{user.mention}, {msg}&quot;)
+
+# Load cogs
+for filename in os.listdir(&quot;./cogs&quot;):
+    if filename.endswith(&quot;.py&quot;):
+        bot.load_extension(f&quot;cogs.{filename[:-3]}&quot;)
+
+bot.run(os.environ[&quot;DISCORD_TOKEN&quot;])
+```
+
+```python
+# cogs/general.py
+import discord
+from discord.ext import commands
+
+class General(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.slash_command(name=&quot;info&quot;, description=&quot;Bot information&quot;)
+    async def info(self, ctx: discord.ApplicationContext):
+        embed = discord.Embed(
+            title=&quot;Bot Info&quot;,
+            description=&quot;A helpful Discord bot&quot;,
+            color=discord.Color.blue()
+        )
+        embed.add_field(name=&quot;Servers&quot;, value=len(self.bot.guilds))
+        embed.add_field(name=&quot;Latency&quot;, value=f&quot;{round(self.bot.latency * 1000)}ms&quot;)
+        await ctx.respond(embed=embed)
+
+    @commands.Cog.
+```
+
+### Interactive Components Pattern
+
+Using buttons, select menus, and modals for rich UX
+
+**When to use**: [&#039;Need interactive user interfaces&#039;, &#039;Collecting user input beyond slash command options&#039;, &#039;Building menus, confirmations, or forms&#039;]
+
+```python
+```javascript
+// Discord.js - Buttons and Select Menus
+const {
+  SlashCommandBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  StringSelectMenuBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle
+} = require(&#039;discord.js&#039;);
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName(&#039;menu&#039;)
+    .setDescription(&#039;Shows an interactive menu&#039;),
+
+  async execute(interaction) {
+    // Button row
+    const buttonRow = new ActionRowBuilder()
+      .addComponents(
+        new ButtonBuilder()
+          .setCustomId(&#039;confirm&#039;)
+          .setLabel(&#039;Confirm&#039;)
+          .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+          .setCustomId(&#039;cancel&#039;)
+          .setLabel(&#039;Cancel&#039;)
+          .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
+          .setLabel(&#039;Documentation&#039;)
+          .setURL(&#039;https://discord.js.org&#039;)
+          .setStyle(ButtonStyle.Link)  // Link buttons don&#039;t emit events
+      );
+
+    // Select menu row (one per row, takes all 5 slots)
+    const selectRow = new ActionRowBuilder()
+      .addComponents(
+        new StringSelectMenuBuilder()
+          .setCustomId(&#039;select-role&#039;)
+          .setPlaceholder(&#039;Select a role&#039;)
+          .setMinValues(1)
+          .setMaxValues(3)
+          .addOptions([
+            { label: &#039;Developer&#039;, value: &#039;dev&#039;, emoji: &#039;💻&#039; },
+            { label: &#039;Designer&#039;, value: &#039;design&#039;, emoji: &#039;🎨&#039; },
+            { label: &#039;Community&#039;, value: &#039;community&#039;, emoji: &#039;🎉&#039; }
+          ])
+      );
+
+    await interaction.reply({
+      content: &#039;Choose an option:&#039;,
+      components: [buttonRow, selectRow]
+    });
+
+    // Collect responses
+    const collector = interaction.channel.createMessageComponentCollector({
+      filter: i =&gt; i.user.id === interaction.user.id,
+      time: 60_000  // 60 seconds timeout
+    });
+
+    collector.on(&#039;collect&#039;, async i =&gt; {
+      if (i.customId === &#039;confirm&#039;) {
+        await i.update({ content: &#039;Confirmed!&#039;, components: [] });
+        collector.stop();
+      } else if (i.custo
+```
+
+## Anti-Patterns
+
+### ❌ Message Content for Commands
+
+**Why bad**: Message Content Intent is privileged and deprecated for bot commands.
+Slash commands are the intended approach.
+
+### ❌ Syncing Commands on Every Start
+
+**Why bad**: Command registration is rate limited. Global commands take up to 1 hour
+to propagate. Syncing on every start wastes API calls and can hit limits.
+
+### ❌ Blocking the Event Loop
+
+**Why bad**: Discord gateway requires regular heartbeats. Blocking operations
+cause missed heartbeats and disconnections.
+
+## ⚠️ Sharp Edges
+
+| Issue | Severity | Solution |
+|-------|----------|----------|
+| Issue | critical | ## Acknowledge immediately, process later |
+| Issue | critical | ## Step 1: Enable in Developer Portal |
+| Issue | high | ## Use a separate deploy script (not on startup) |
+| Issue | critical | ## Never hardcode tokens |
+| Issue | high | ## Generate correct invite URL |
+| Issue | medium | ## Development: Use guild commands |
+| Issue | medium | ## Never block the event loop |
+| Issue | medium | ## Show modal immediately |
+</code>
       </div>
     </div>
 

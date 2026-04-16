@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,317 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/remove</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/remove</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># Orchestration Remove Command
+
+Safely remove a task from the orchestration system, updating all references and dependencies.
+
+## Usage
+
+```
+/orchestration/remove TASK-ID [options]
+```
+
+## Description
+
+Removes a task completely from the orchestration system, handling all dependencies, references, and related documentation. Provides impact analysis before removal and ensures system consistency.
+
+## Basic Commands
+
+### Remove Single Task
+```
+/orchestration/remove TASK-003
+```
+Shows impact analysis and confirms before removal.
+
+### Force Remove
+```
+/orchestration/remove TASK-003 --force
+```
+Skips confirmation (use with caution).
+
+### Dry Run
+```
+/orchestration/remove TASK-003 --dry-run
+```
+Shows what would be affected without making changes.
+
+## Impact Analysis
+
+Before removal, the system analyzes:
+
+```
+Task Removal Impact Analysis: TASK-003
+======================================
+
+Task Details:
+- Title: JWT token validation
+- Status: in_progress
+- Location: /tasks/in_progress/TASK-003-jwt-validation.md
+
+Dependencies:
+- Blocks: TASK-005 (User profile API)
+- Blocks: TASK-007 (Session management)
+- Depends on: None
+
+References Found:
+- MASTER-COORDINATION.md: Line 45 (Wave 1 tasks)
+- EXECUTION-TRACKER.md: Active task count
+- TASK-005: Lists TASK-003 as dependency
+- TASK-007: Lists TASK-003 as dependency
+
+Git History:
+- 2 commits reference this task
+- Branch: feature/jwt-auth
+
+Warning: This task has downstream dependencies!
+
+Proceed with removal? [y/N]
+```
+
+## Removal Process
+
+### 1. Update Dependent Tasks
+```
+Updating dependent tasks:
+- TASK-005: Removing dependency on TASK-003
+  New status: Ready to start (no blockers)
+  
+- TASK-007: Removing dependency on TASK-003
+  Warning: Still blocked by TASK-009
+```
+
+### 2. Update Tracking Files
+```yaml
+# TASK-STATUS-TRACKER.yaml updates:
+status_history:
+  TASK-003: [REMOVED - archived to .removed/]
+  
+current_status_summary:
+  in_progress: [TASK-003 removed from list]
+
+removal_log:
+  - task_id: TASK-003
+    removed_at: &quot;2024-03-15T16:00:00Z&quot;
+    removed_by: &quot;user&quot;
+    reason: &quot;Requirement changed&quot;
+    final_status: &quot;in_progress&quot;
+```
+
+### 3. Update Coordination Documents
+```
+Updates applied:
+✓ MASTER-COORDINATION.md - Removed from Wave 1
+✓ EXECUTION-TRACKER.md - Updated task counts
+✓ TASK-DEPENDENCIES.yaml - Removed all references
+✓ Dependency graph regenerated
+```
+
+## Options
+
+### Archive Instead of Delete
+```
+/orchestration/remove TASK-003 --archive
+```
+Moves to `.removed/` directory instead of deleting.
+
+### Remove Multiple Tasks
+```
+/orchestration/remove TASK-003,TASK-005,TASK-008
+```
+Analyzes and removes multiple tasks in dependency order.
+
+### Remove by Pattern
+```
+/orchestration/remove --pattern &quot;oauth-*&quot;
+```
+Removes all tasks matching pattern.
+
+### Cascade Removal
+```
+/orchestration/remove TASK-003 --cascade
+```
+Also removes tasks that depend on this task.
+
+## Handling Special Cases
+
+### Task with Commits
+```
+Warning: TASK-003 has associated commits:
+- abc123: &quot;feat(auth): implement JWT validation&quot;
+- def456: &quot;test(auth): add JWT tests&quot;
+
+Options:
+[1] Keep commits, remove task only
+[2] Add removal note to commit messages
+[3] Cancel removal
+```
+
+### Task in QA/Completed
+```
+Warning: TASK-003 is in &#039;completed&#039; status
+
+This usually means work was done. Consider:
+[1] Archive task instead of removing
+[2] Document why it&#039;s being removed
+[3] Check if commits should be reverted
+```
+
+### Critical Path Task
+```
+ERROR: TASK-003 is on the critical path!
+
+Removing this task will impact project timeline:
+- Current completion: 5 days
+- After removal: 7 days (due to replanning)
+
+Override with --force-critical
+```
+
+## Removal Strategies
+
+### Soft Remove (Default)
+```
+/orchestration/remove TASK-003
+```
+- Archives task file
+- Updates all references
+- Logs removal reason
+- Preserves git history
+
+### Hard Remove
+```
+/orchestration/remove TASK-003 --hard
+```
+- Deletes task file permanently
+- Removes all traces
+- Updates git tracking
+- No recovery possible
+
+### Replace Remove
+```
+/orchestration/remove TASK-003 --replace-with TASK-015
+```
+- Transfers dependencies to new task
+- Updates all references
+- Maintains continuity
+
+## Undo Capabilities
+
+### Recent Removal
+```
+/orchestration/remove --undo-last
+```
+Restores the most recently removed task.
+
+### Restore from Archive
+```
+/orchestration/remove --restore TASK-003
+```
+Restores archived task with all references.
+
+## Examples
+
+### Example 1: Obsolete Feature
+```
+/orchestration/remove TASK-008 --reason &quot;Feature descoped&quot;
+
+Removing TASK-008: OAuth provider integration
+- No dependencies
+- No commits yet
+- Safe to remove
+
+Task removed successfully.
+```
+
+### Example 2: Duplicate Task
+```
+/orchestration/remove TASK-012 --replace-with TASK-005
+
+Removing duplicate: TASK-012
+Transferring to: TASK-005
+- Dependencies transferred: 2
+- References updated: 4
+
+Duplicate removed, TASK-005 updated.
+```
+
+### Example 3: Changed Requirements
+```
+/orchestration/remove TASK-003,TASK-004,TASK-005 --reason &quot;Auth system redesigned&quot;
+
+Removing authentication task group:
+- 3 tasks to remove
+- 2 have commits (will archive)
+- 5 dependent tasks need updates
+
+Proceed? [y/N]
+```
+
+## Audit Trail
+
+All removals are logged:
+```yaml
+# .orchestration-audit.yaml
+removals:
+  - task_id: TASK-003
+    removed_at: &quot;2024-03-15T16:00:00Z&quot;
+    removed_by: &quot;user-id&quot;
+    reason: &quot;Requirement changed&quot;
+    status_at_removal: &quot;in_progress&quot;
+    dependencies_affected: [&quot;TASK-005&quot;, &quot;TASK-007&quot;]
+    commits_preserved: [&quot;abc123&quot;, &quot;def456&quot;]
+    archived_to: &quot;.removed/2024-03-15/TASK-003/&quot;
+```
+
+## Best Practices
+
+1. **Always Check Dependencies**: Review impact before removing
+2. **Document Reason**: Provide clear removal reason
+3. **Archive Important Work**: Use --archive for completed work
+4. **Update Team**: Notify about critical removals
+5. **Review Commits**: Check if code needs reverting
+
+## Integration
+
+### With Other Commands
+```
+# First check status
+/orchestration/status --task TASK-003
+
+# Then remove if needed
+/orchestration/remove TASK-003
+```
+
+### Bulk Operations
+```
+# Find and remove all on-hold tasks older than 30 days
+/orchestration/find --status on_hold --older-than 30d | /orchestration/remove --batch
+```
+
+## Safety Features
+
+- Confirmation required (unless --force)
+- Dependencies checked and warned
+- Commits preserved by default
+- Audit trail maintained
+- Undo capability for recent removals
+
+## Notes
+
+- Removed tasks are archived for 30 days by default
+- Git commits are never automatically reverted
+- Dependencies are gracefully handled
+- System consistency is maintained throughout</code>
       </div>
     </div>
 

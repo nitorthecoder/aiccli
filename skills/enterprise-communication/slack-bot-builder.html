@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,281 @@
     <p class="desc">"Build Slack apps using the Bolt framework across Python, JavaScript, and Java. Covers Block Kit for rich UIs, interactive components, slash commands, event handling, OAuth installation flows, and Workflow Builder integration. Focus on best practices for production-ready Slack apps. Use when: slack bot, slack app, bolt framework, block kit, slash command."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/slack-bot-builder</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/slack-bot-builder</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: slack-bot-builder
+description: &quot;Build Slack apps using the Bolt framework across Python, JavaScript, and Java. Covers Block Kit for rich UIs, interactive components, slash commands, event handling, OAuth installation flows, and Workflow Builder integration. Focus on best practices for production-ready Slack apps. Use when: slack bot, slack app, bolt framework, block kit, slash command.&quot;
+source: vibeship-spawner-skills (Apache 2.0)
+---
+
+# Slack Bot Builder
+
+## Patterns
+
+### Bolt App Foundation Pattern
+
+The Bolt framework is Slack&#039;s recommended approach for building apps.
+It handles authentication, event routing, request verification, and
+HTTP request processing so you can focus on app logic.
+
+Key benefits:
+- Event handling in a few lines of code
+- Security checks and payload validation built-in
+- Organized, consistent patterns
+- Works for experiments and production
+
+Available in: Python, JavaScript (Node.js), Java
+
+
+**When to use**: [&#039;Starting any new Slack app&#039;, &#039;Migrating from legacy Slack APIs&#039;, &#039;Building production Slack integrations&#039;]
+
+```python
+# Python Bolt App
+from slack_bolt import App
+from slack_bolt.adapter.socket_mode import SocketModeHandler
+import os
+
+# Initialize with tokens from environment
+app = App(
+    token=os.environ[&quot;SLACK_BOT_TOKEN&quot;],
+    signing_secret=os.environ[&quot;SLACK_SIGNING_SECRET&quot;]
+)
+
+# Handle messages containing &quot;hello&quot;
+@app.message(&quot;hello&quot;)
+def handle_hello(message, say):
+    &quot;&quot;&quot;Respond to messages containing &#039;hello&#039;.&quot;&quot;&quot;
+    user = message[&quot;user&quot;]
+    say(f&quot;Hey there &lt;@{user}&gt;!&quot;)
+
+# Handle slash command
+@app.command(&quot;/ticket&quot;)
+def handle_ticket_command(ack, body, client):
+    &quot;&quot;&quot;Handle /ticket slash command.&quot;&quot;&quot;
+    # Acknowledge immediately (within 3 seconds)
+    ack()
+
+    # Open a modal for ticket creation
+    client.views_open(
+        trigger_id=body[&quot;trigger_id&quot;],
+        view={
+            &quot;type&quot;: &quot;modal&quot;,
+            &quot;callback_id&quot;: &quot;ticket_modal&quot;,
+            &quot;title&quot;: {&quot;type&quot;: &quot;plain_text&quot;, &quot;text&quot;: &quot;Create Ticket&quot;},
+            &quot;submit&quot;: {&quot;type&quot;: &quot;plain_text&quot;, &quot;text&quot;: &quot;Submit&quot;},
+            &quot;blocks&quot;: [
+                {
+                    &quot;type&quot;: &quot;input&quot;,
+                    &quot;block_id&quot;: &quot;title_block&quot;,
+                    &quot;element&quot;: {
+                        &quot;type&quot;: &quot;plain_text_input&quot;,
+                        &quot;action_id&quot;: &quot;title_input&quot;
+                    },
+                    &quot;label&quot;: {&quot;type&quot;: &quot;plain_text&quot;, &quot;text&quot;: &quot;Title&quot;}
+                },
+                {
+                    &quot;type&quot;: &quot;input&quot;,
+                    &quot;block_id&quot;: &quot;desc_block&quot;,
+                    &quot;element&quot;: {
+                        &quot;type&quot;: &quot;plain_text_input&quot;,
+                        &quot;multiline&quot;: True,
+                        &quot;action_id&quot;: &quot;desc_input&quot;
+                    },
+                    &quot;label&quot;: {&quot;type&quot;: &quot;plain_text&quot;, &quot;text&quot;: &quot;Description&quot;}
+                },
+                {
+                    &quot;type&quot;: &quot;input&quot;,
+                    &quot;block_id&quot;: &quot;priority_block&quot;,
+                    &quot;element&quot;: {
+                        &quot;type&quot;: &quot;static_select&quot;,
+                        &quot;action_id&quot;: &quot;priority_select&quot;,
+   
+```
+
+### Block Kit UI Pattern
+
+Block Kit is Slack&#039;s UI framework for building rich, interactive messages.
+Compose messages using blocks (sections, actions, inputs) and elements
+(buttons, menus, text inputs).
+
+Limits:
+- Up to 50 blocks per message
+- Up to 100 blocks in modals/Home tabs
+- Block text limited to 3000 characters
+
+Use Block Kit Builder to prototype: https://app.slack.com/block-kit-builder
+
+
+**When to use**: [&#039;Building rich message layouts&#039;, &#039;Adding interactive components to messages&#039;, &#039;Creating forms in modals&#039;, &#039;Building Home tab experiences&#039;]
+
+```python
+from slack_bolt import App
+import os
+
+app = App(token=os.environ[&quot;SLACK_BOT_TOKEN&quot;])
+
+def build_notification_blocks(incident: dict) -&gt; list:
+    &quot;&quot;&quot;Build Block Kit blocks for incident notification.&quot;&quot;&quot;
+    severity_emoji = {
+        &quot;critical&quot;: &quot;:red_circle:&quot;,
+        &quot;high&quot;: &quot;:large_orange_circle:&quot;,
+        &quot;medium&quot;: &quot;:large_yellow_circle:&quot;,
+        &quot;low&quot;: &quot;:white_circle:&quot;
+    }
+
+    return [
+        # Header
+        {
+            &quot;type&quot;: &quot;header&quot;,
+            &quot;text&quot;: {
+                &quot;type&quot;: &quot;plain_text&quot;,
+                &quot;text&quot;: f&quot;{severity_emoji.get(incident[&#039;severity&#039;], &#039;&#039;)} Incident Alert&quot;
+            }
+        },
+        # Details section
+        {
+            &quot;type&quot;: &quot;section&quot;,
+            &quot;fields&quot;: [
+                {
+                    &quot;type&quot;: &quot;mrkdwn&quot;,
+                    &quot;text&quot;: f&quot;*Incident:*\n{incident[&#039;title&#039;]}&quot;
+                },
+                {
+                    &quot;type&quot;: &quot;mrkdwn&quot;,
+                    &quot;text&quot;: f&quot;*Severity:*\n{incident[&#039;severity&#039;].upper()}&quot;
+                },
+                {
+                    &quot;type&quot;: &quot;mrkdwn&quot;,
+                    &quot;text&quot;: f&quot;*Service:*\n{incident[&#039;service&#039;]}&quot;
+                },
+                {
+                    &quot;type&quot;: &quot;mrkdwn&quot;,
+                    &quot;text&quot;: f&quot;*Reported:*\n&lt;!date^{incident[&#039;timestamp&#039;]}^{date_short} {time}|{incident[&#039;timestamp&#039;]}&gt;&quot;
+                }
+            ]
+        },
+        # Description
+        {
+            &quot;type&quot;: &quot;section&quot;,
+            &quot;text&quot;: {
+                &quot;type&quot;: &quot;mrkdwn&quot;,
+                &quot;text&quot;: f&quot;*Description:*\n{incident[&#039;description&#039;][:2000]}&quot;
+            }
+        },
+        # Divider
+        {&quot;type&quot;: &quot;divider&quot;},
+        # Action buttons
+        {
+            &quot;type&quot;: &quot;actions&quot;,
+            &quot;block_id&quot;: f&quot;incident_actions_{incident[&#039;id&#039;]}&quot;,
+            &quot;elements&quot;: [
+                {
+                    &quot;type&quot;: &quot;button&quot;,
+                    &quot;text&quot;: {&quot;type&quot;: &quot;plain_text&quot;, &quot;text&quot;: &quot;Acknowledge&quot;},
+                    &quot;style&quot;: &quot;primary&quot;,
+                    &quot;action_id&quot;: &quot;acknowle
+```
+
+### OAuth Installation Pattern
+
+Enable users to install your app in their workspaces via OAuth 2.0.
+Bolt handles most of the OAuth flow, but you need to configure it
+and store tokens securely.
+
+Key OAuth concepts:
+- Scopes define permissions (request minimum needed)
+- Tokens are workspace-specific
+- Installation data must be stored persistently
+- Users can add scopes later (additive)
+
+70% of users abandon installation when confronted with excessive
+permission requests - request only what you need!
+
+
+**When to use**: [&#039;Distributing app to multiple workspaces&#039;, &#039;Building public Slack apps&#039;, &#039;Enterprise-grade integrations&#039;]
+
+```python
+from slack_bolt import App
+from slack_bolt.oauth.oauth_settings import OAuthSettings
+from slack_sdk.oauth.installation_store import FileInstallationStore
+from slack_sdk.oauth.state_store import FileOAuthStateStore
+import os
+
+# For production, use database-backed stores
+# For example: PostgreSQL, MongoDB, Redis
+
+class DatabaseInstallationStore:
+    &quot;&quot;&quot;Store installation data in your database.&quot;&quot;&quot;
+
+    async def save(self, installation):
+        &quot;&quot;&quot;Save installation when user completes OAuth.&quot;&quot;&quot;
+        await db.installations.upsert({
+            &quot;team_id&quot;: installation.team_id,
+            &quot;enterprise_id&quot;: installation.enterprise_id,
+            &quot;bot_token&quot;: encrypt(installation.bot_token),
+            &quot;bot_user_id&quot;: installation.bot_user_id,
+            &quot;bot_scopes&quot;: installation.bot_scopes,
+            &quot;user_id&quot;: installation.user_id,
+            &quot;installed_at&quot;: installation.installed_at
+        })
+
+    async def find_installation(self, *, enterprise_id, team_id, user_id=None, is_enterprise_install=False):
+        &quot;&quot;&quot;Find installation for a workspace.&quot;&quot;&quot;
+        record = await db.installations.find_one({
+            &quot;team_id&quot;: team_id,
+            &quot;enterprise_id&quot;: enterprise_id
+        })
+
+        if record:
+            return Installation(
+                bot_token=decrypt(record[&quot;bot_token&quot;]),
+                # ... other fields
+            )
+        return None
+
+# Initialize OAuth-enabled app
+app = App(
+    signing_secret=os.environ[&quot;SLACK_SIGNING_SECRET&quot;],
+    oauth_settings=OAuthSettings(
+        client_id=os.environ[&quot;SLACK_CLIENT_ID&quot;],
+        client_secret=os.environ[&quot;SLACK_CLIENT_SECRET&quot;],
+        scopes=[
+            &quot;channels:history&quot;,
+            &quot;channels:read&quot;,
+            &quot;chat:write&quot;,
+            &quot;commands&quot;,
+            &quot;users:read&quot;
+        ],
+        user_scopes=[],  # User token scopes if needed
+        installation_store=DatabaseInstallationStore(),
+        state_store=FileOAuthStateStore(expiration_seconds=600)
+    )
+)
+
+# OAuth routes are handled a
+```
+
+## ⚠️ Sharp Edges
+
+| Issue | Severity | Solution |
+|-------|----------|----------|
+| Issue | critical | ## Acknowledge immediately, process later |
+| Issue | critical | ## Proper state validation |
+| Issue | critical | ## Never hardcode or log tokens |
+| Issue | high | ## Request minimum required scopes |
+| Issue | medium | ## Know and respect the limits |
+| Issue | high | ## Socket Mode: Only for development |
+| Issue | critical | ## Bolt handles this automatically |
+</code>
       </div>
     </div>
 

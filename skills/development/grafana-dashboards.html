@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,401 @@
     <p class="desc">"Create and manage production-ready Grafana dashboards for comprehensive system observability."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/grafana-dashboards</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/grafana-dashboards</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: grafana-dashboards
+description: &quot;Create and manage production-ready Grafana dashboards for comprehensive system observability.&quot;
+risk: unknown
+source: community
+date_added: &quot;2026-02-27&quot;
+---
+
+# Grafana Dashboards
+
+Create and manage production-ready Grafana dashboards for comprehensive system observability.
+
+## Do not use this skill when
+
+- The task is unrelated to grafana dashboards
+- You need a different domain or tool outside this scope
+
+## Instructions
+
+- Clarify goals, constraints, and required inputs.
+- Apply relevant best practices and validate outcomes.
+- Provide actionable steps and verification.
+- If detailed examples are required, open `resources/implementation-playbook.md`.
+
+## Purpose
+
+Design effective Grafana dashboards for monitoring applications, infrastructure, and business metrics.
+
+## Use this skill when
+
+- Visualize Prometheus metrics
+- Create custom dashboards
+- Implement SLO dashboards
+- Monitor infrastructure
+- Track business KPIs
+
+## Dashboard Design Principles
+
+### 1. Hierarchy of Information
+```
+┌─────────────────────────────────────┐
+│  Critical Metrics (Big Numbers)     │
+├─────────────────────────────────────┤
+│  Key Trends (Time Series)           │
+├─────────────────────────────────────┤
+│  Detailed Metrics (Tables/Heatmaps) │
+└─────────────────────────────────────┘
+```
+
+### 2. RED Method (Services)
+- **Rate** - Requests per second
+- **Errors** - Error rate
+- **Duration** - Latency/response time
+
+### 3. USE Method (Resources)
+- **Utilization** - % time resource is busy
+- **Saturation** - Queue length/wait time
+- **Errors** - Error count
+
+## Dashboard Structure
+
+### API Monitoring Dashboard
+
+```json
+{
+  &quot;dashboard&quot;: {
+    &quot;title&quot;: &quot;API Monitoring&quot;,
+    &quot;tags&quot;: [&quot;api&quot;, &quot;production&quot;],
+    &quot;timezone&quot;: &quot;browser&quot;,
+    &quot;refresh&quot;: &quot;30s&quot;,
+    &quot;panels&quot;: [
+      {
+        &quot;title&quot;: &quot;Request Rate&quot;,
+        &quot;type&quot;: &quot;graph&quot;,
+        &quot;targets&quot;: [
+          {
+            &quot;expr&quot;: &quot;sum(rate(http_requests_total[5m])) by (service)&quot;,
+            &quot;legendFormat&quot;: &quot;{{service}}&quot;
+          }
+        ],
+        &quot;gridPos&quot;: {&quot;x&quot;: 0, &quot;y&quot;: 0, &quot;w&quot;: 12, &quot;h&quot;: 8}
+      },
+      {
+        &quot;title&quot;: &quot;Error Rate %&quot;,
+        &quot;type&quot;: &quot;graph&quot;,
+        &quot;targets&quot;: [
+          {
+            &quot;expr&quot;: &quot;(sum(rate(http_requests_total{status=~\&quot;5..\&quot;}[5m])) / sum(rate(http_requests_total[5m]))) * 100&quot;,
+            &quot;legendFormat&quot;: &quot;Error Rate&quot;
+          }
+        ],
+        &quot;alert&quot;: {
+          &quot;conditions&quot;: [
+            {
+              &quot;evaluator&quot;: {&quot;params&quot;: [5], &quot;type&quot;: &quot;gt&quot;},
+              &quot;operator&quot;: {&quot;type&quot;: &quot;and&quot;},
+              &quot;query&quot;: {&quot;params&quot;: [&quot;A&quot;, &quot;5m&quot;, &quot;now&quot;]},
+              &quot;type&quot;: &quot;query&quot;
+            }
+          ]
+        },
+        &quot;gridPos&quot;: {&quot;x&quot;: 12, &quot;y&quot;: 0, &quot;w&quot;: 12, &quot;h&quot;: 8}
+      },
+      {
+        &quot;title&quot;: &quot;P95 Latency&quot;,
+        &quot;type&quot;: &quot;graph&quot;,
+        &quot;targets&quot;: [
+          {
+            &quot;expr&quot;: &quot;histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service))&quot;,
+            &quot;legendFormat&quot;: &quot;{{service}}&quot;
+          }
+        ],
+        &quot;gridPos&quot;: {&quot;x&quot;: 0, &quot;y&quot;: 8, &quot;w&quot;: 24, &quot;h&quot;: 8}
+      }
+    ]
+  }
+}
+```
+
+**Reference:** See `assets/api-dashboard.json`
+
+## Panel Types
+
+### 1. Stat Panel (Single Value)
+```json
+{
+  &quot;type&quot;: &quot;stat&quot;,
+  &quot;title&quot;: &quot;Total Requests&quot;,
+  &quot;targets&quot;: [{
+    &quot;expr&quot;: &quot;sum(http_requests_total)&quot;
+  }],
+  &quot;options&quot;: {
+    &quot;reduceOptions&quot;: {
+      &quot;values&quot;: false,
+      &quot;calcs&quot;: [&quot;lastNotNull&quot;]
+    },
+    &quot;orientation&quot;: &quot;auto&quot;,
+    &quot;textMode&quot;: &quot;auto&quot;,
+    &quot;colorMode&quot;: &quot;value&quot;
+  },
+  &quot;fieldConfig&quot;: {
+    &quot;defaults&quot;: {
+      &quot;thresholds&quot;: {
+        &quot;mode&quot;: &quot;absolute&quot;,
+        &quot;steps&quot;: [
+          {&quot;value&quot;: 0, &quot;color&quot;: &quot;green&quot;},
+          {&quot;value&quot;: 80, &quot;color&quot;: &quot;yellow&quot;},
+          {&quot;value&quot;: 90, &quot;color&quot;: &quot;red&quot;}
+        ]
+      }
+    }
+  }
+}
+```
+
+### 2. Time Series Graph
+```json
+{
+  &quot;type&quot;: &quot;graph&quot;,
+  &quot;title&quot;: &quot;CPU Usage&quot;,
+  &quot;targets&quot;: [{
+    &quot;expr&quot;: &quot;100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\&quot;idle\&quot;}[5m])) * 100)&quot;
+  }],
+  &quot;yaxes&quot;: [
+    {&quot;format&quot;: &quot;percent&quot;, &quot;max&quot;: 100, &quot;min&quot;: 0},
+    {&quot;format&quot;: &quot;short&quot;}
+  ]
+}
+```
+
+### 3. Table Panel
+```json
+{
+  &quot;type&quot;: &quot;table&quot;,
+  &quot;title&quot;: &quot;Service Status&quot;,
+  &quot;targets&quot;: [{
+    &quot;expr&quot;: &quot;up&quot;,
+    &quot;format&quot;: &quot;table&quot;,
+    &quot;instant&quot;: true
+  }],
+  &quot;transformations&quot;: [
+    {
+      &quot;id&quot;: &quot;organize&quot;,
+      &quot;options&quot;: {
+        &quot;excludeByName&quot;: {&quot;Time&quot;: true},
+        &quot;indexByName&quot;: {},
+        &quot;renameByName&quot;: {
+          &quot;instance&quot;: &quot;Instance&quot;,
+          &quot;job&quot;: &quot;Service&quot;,
+          &quot;Value&quot;: &quot;Status&quot;
+        }
+      }
+    }
+  ]
+}
+```
+
+### 4. Heatmap
+```json
+{
+  &quot;type&quot;: &quot;heatmap&quot;,
+  &quot;title&quot;: &quot;Latency Heatmap&quot;,
+  &quot;targets&quot;: [{
+    &quot;expr&quot;: &quot;sum(rate(http_request_duration_seconds_bucket[5m])) by (le)&quot;,
+    &quot;format&quot;: &quot;heatmap&quot;
+  }],
+  &quot;dataFormat&quot;: &quot;tsbuckets&quot;,
+  &quot;yAxis&quot;: {
+    &quot;format&quot;: &quot;s&quot;
+  }
+}
+```
+
+## Variables
+
+### Query Variables
+```json
+{
+  &quot;templating&quot;: {
+    &quot;list&quot;: [
+      {
+        &quot;name&quot;: &quot;namespace&quot;,
+        &quot;type&quot;: &quot;query&quot;,
+        &quot;datasource&quot;: &quot;Prometheus&quot;,
+        &quot;query&quot;: &quot;label_values(kube_pod_info, namespace)&quot;,
+        &quot;refresh&quot;: 1,
+        &quot;multi&quot;: false
+      },
+      {
+        &quot;name&quot;: &quot;service&quot;,
+        &quot;type&quot;: &quot;query&quot;,
+        &quot;datasource&quot;: &quot;Prometheus&quot;,
+        &quot;query&quot;: &quot;label_values(kube_service_info{namespace=\&quot;$namespace\&quot;}, service)&quot;,
+        &quot;refresh&quot;: 1,
+        &quot;multi&quot;: true
+      }
+    ]
+  }
+}
+```
+
+### Use Variables in Queries
+```
+sum(rate(http_requests_total{namespace=&quot;$namespace&quot;, service=~&quot;$service&quot;}[5m]))
+```
+
+## Alerts in Dashboards
+
+```json
+{
+  &quot;alert&quot;: {
+    &quot;name&quot;: &quot;High Error Rate&quot;,
+    &quot;conditions&quot;: [
+      {
+        &quot;evaluator&quot;: {
+          &quot;params&quot;: [5],
+          &quot;type&quot;: &quot;gt&quot;
+        },
+        &quot;operator&quot;: {&quot;type&quot;: &quot;and&quot;},
+        &quot;query&quot;: {
+          &quot;params&quot;: [&quot;A&quot;, &quot;5m&quot;, &quot;now&quot;]
+        },
+        &quot;reducer&quot;: {&quot;type&quot;: &quot;avg&quot;},
+        &quot;type&quot;: &quot;query&quot;
+      }
+    ],
+    &quot;executionErrorState&quot;: &quot;alerting&quot;,
+    &quot;for&quot;: &quot;5m&quot;,
+    &quot;frequency&quot;: &quot;1m&quot;,
+    &quot;message&quot;: &quot;Error rate is above 5%&quot;,
+    &quot;noDataState&quot;: &quot;no_data&quot;,
+    &quot;notifications&quot;: [
+      {&quot;uid&quot;: &quot;slack-channel&quot;}
+    ]
+  }
+}
+```
+
+## Dashboard Provisioning
+
+**dashboards.yml:**
+```yaml
+apiVersion: 1
+
+providers:
+  - name: &#039;default&#039;
+    orgId: 1
+    folder: &#039;General&#039;
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/dashboards
+```
+
+## Common Dashboard Patterns
+
+### Infrastructure Dashboard
+
+**Key Panels:**
+- CPU utilization per node
+- Memory usage per node
+- Disk I/O
+- Network traffic
+- Pod count by namespace
+- Node status
+
+**Reference:** See `assets/infrastructure-dashboard.json`
+
+### Database Dashboard
+
+**Key Panels:**
+- Queries per second
+- Connection pool usage
+- Query latency (P50, P95, P99)
+- Active connections
+- Database size
+- Replication lag
+- Slow queries
+
+**Reference:** See `assets/database-dashboard.json`
+
+### Application Dashboard
+
+**Key Panels:**
+- Request rate
+- Error rate
+- Response time (percentiles)
+- Active users/sessions
+- Cache hit rate
+- Queue length
+
+## Best Practices
+
+1. **Start with templates** (Grafana community dashboards)
+2. **Use consistent naming** for panels and variables
+3. **Group related metrics** in rows
+4. **Set appropriate time ranges** (default: Last 6 hours)
+5. **Use variables** for flexibility
+6. **Add panel descriptions** for context
+7. **Configure units** correctly
+8. **Set meaningful thresholds** for colors
+9. **Use consistent colors** across dashboards
+10. **Test with different time ranges**
+
+## Dashboard as Code
+
+### Terraform Provisioning
+
+```hcl
+resource &quot;grafana_dashboard&quot; &quot;api_monitoring&quot; {
+  config_json = file(&quot;${path.module}/dashboards/api-monitoring.json&quot;)
+  folder      = grafana_folder.monitoring.id
+}
+
+resource &quot;grafana_folder&quot; &quot;monitoring&quot; {
+  title = &quot;Production Monitoring&quot;
+}
+```
+
+### Ansible Provisioning
+
+```yaml
+- name: Deploy Grafana dashboards
+  copy:
+    src: &quot;{{ item }}&quot;
+    dest: /etc/grafana/dashboards/
+  with_fileglob:
+    - &quot;dashboards/*.json&quot;
+  notify: restart grafana
+```
+
+## Reference Files
+
+- `assets/api-dashboard.json` - API monitoring dashboard
+- `assets/infrastructure-dashboard.json` - Infrastructure dashboard
+- `assets/database-dashboard.json` - Database monitoring dashboard
+- `references/dashboard-design.md` - Dashboard design guide
+
+## Related Skills
+
+- `prometheus-configuration` - For metric collection
+- `slo-implementation` - For SLO dashboards
+</code>
       </div>
     </div>
 

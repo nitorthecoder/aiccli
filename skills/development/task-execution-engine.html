@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,130 @@
     <p class="desc">Execute implementation tasks from design documents using markdown checkboxes. Use when (1) implementing features from feature-design-assistant output, (2) resuming interrupted work, (3) batch executing tasks. Triggers on 'start implementation', 'run tasks', 'resume'.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/task-execution-engine</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/task-execution-engine</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: task-execution-engine
+description: Execute implementation tasks from design documents using markdown checkboxes. Use when (1) implementing features from feature-design-assistant output, (2) resuming interrupted work, (3) batch executing tasks. Triggers on &#039;start implementation&#039;, &#039;run tasks&#039;, &#039;resume&#039;.
+---
+
+# Feature Pipeline
+
+Execute implementation tasks directly from design documents. Tasks are managed as markdown checkboxes - no separate session files needed.
+
+## Quick Reference
+
+```bash
+# Get next task
+python3 scripts/task_manager.py next --file &lt;design.md&gt;
+
+# Mark task completed
+python3 scripts/task_manager.py done --file &lt;design.md&gt; --task &quot;Task Title&quot;
+
+# Mark task failed
+python3 scripts/task_manager.py fail --file &lt;design.md&gt; --task &quot;Task Title&quot; --reason &quot;...&quot;
+
+# Show status
+python3 scripts/task_manager.py status --file &lt;design.md&gt;
+```
+
+## Task Format
+
+Tasks are written as markdown checkboxes in the design document:
+
+```markdown
+## Implementation Tasks
+
+- [ ] **Create User model** `priority:1` `phase:model`
+  - files: src/models/user.py, tests/models/test_user.py
+  - [ ] User model has email and password_hash fields
+  - [ ] Email validation implemented
+  - [ ] Password hashing uses bcrypt
+
+- [ ] **Implement JWT utils** `priority:2` `phase:model`
+  - files: src/utils/jwt.py
+  - [ ] generate_token() creates valid JWT
+  - [ ] verify_token() validates JWT
+
+- [ ] **Create auth API** `priority:3` `phase:api` `deps:Create User model,Implement JWT utils`
+  - files: src/api/auth.py
+  - [ ] POST /register endpoint
+  - [ ] POST /login endpoint
+```
+
+See [references/task-format.md](references/task-format.md) for full format specification.
+
+## Execution Loop
+
+```
+LOOP until no tasks remain:
+  1. GET next task (task_manager.py next)
+  2. READ task details (files, criteria)
+  3. IMPLEMENT the task
+  4. VERIFY acceptance criteria
+  5. UPDATE status (task_manager.py done/fail)
+  6. CONTINUE
+```
+
+### Unattended Mode Rules
+
+- **NO stopping** for questions
+- **NO asking** for clarification
+- Make autonomous decisions based on codebase patterns
+- If blocked, mark as failed and continue
+
+## Status Updates
+
+Completed task:
+```markdown
+- [x] **Create User model** `priority:1` `phase:model` ✅
+  - files: src/models/user.py
+  - [x] User model has email field
+  - [x] Password hashing implemented
+```
+
+Failed task:
+```markdown
+- [x] **Create User model** `priority:1` `phase:model` ❌
+  - files: src/models/user.py
+  - [ ] User model has email field
+  - reason: Missing database configuration
+```
+
+## Resume / Recovery
+
+To resume interrupted work, simply run again with the same design file:
+
+```
+/feature-pipeline docs/designs/xxx.md
+```
+
+The task manager will find the first uncompleted task and continue from there.
+
+## Integration
+
+This skill is typically triggered after `/feature-analyzer` completes:
+
+```
+User: /feature-analyzer implement user auth
+
+Claude: [designs feature, generates task list]
+        Design saved to docs/designs/2026-01-02-user-auth.md
+        Ready to start implementation?
+
+User: Yes / 开始实现
+
+Claude: [executes tasks via task-execution-engine]
+```
+</code>
       </div>
     </div>
 

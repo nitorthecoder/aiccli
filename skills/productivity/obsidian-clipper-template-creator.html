@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,71 @@
     <p class="desc">Guide for creating templates for the Obsidian Web Clipper. Use when you want to create a new clipping template, understand available variables, or format clipped content.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/obsidian-clipper-template-creator</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/obsidian-clipper-template-creator</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: obsidian-clipper-template-creator
+description: Guide for creating templates for the Obsidian Web Clipper. Use when you want to create a new clipping template, understand available variables, or format clipped content.
+---
+
+# Obsidian Web Clipper Template Creator
+
+This skill helps you create importable JSON templates for the Obsidian Web Clipper.
+
+## Workflow
+
+1.  **Identify User Intent:** specific site (YouTube), specific type (Recipe), or general clipping?
+2.  **Check Existing Bases:** The user likely has a &quot;Base&quot; schema defined in `Templates/Bases/`.
+    *   **Action:** Read `Templates/Bases/*.base` to find a matching category (e.g., `Recipes.base`).
+    *   **Action:** Use the properties defined in the Base to structure the Clipper template properties.
+    *   See [references/bases-workflow.md](references/bases-workflow.md) for details.
+3.  **Fetch &amp; Analyze Reference URL:** Validate variables against a real page.
+    *   **Action:** Ask the user for a sample URL of the content they want to clip (if not provided).
+    *   **Action:** Use `WebFetch` to retrieve the page HTML.
+    *   **Action:** Analyze the HTML for Schema.org JSON, Meta tags, and CSS selectors.
+    *   See [references/analysis-workflow.md](references/analysis-workflow.md) for analysis techniques.
+4.  **Draft the JSON:** Create a valid JSON object following the schema.
+    *   See [references/json-schema.md](references/json-schema.md).
+5.  **Verify Variables:** Ensure the chosen variables (Preset, Schema, Selector) exist in your analysis.
+    *   See [references/variables.md](references/variables.md).
+
+## Output Format
+
+**ALWAYS** output the final result as a JSON code block that the user can copy and import.
+
+```json
+{
+  &quot;schemaVersion&quot;: &quot;0.1.0&quot;,
+  &quot;name&quot;: &quot;My Template&quot;,
+  ...
+}
+```
+
+## Resources
+
+*   [references/variables.md](references/variables.md) - Available data variables.
+*   [references/filters.md](references/filters.md) - Formatting filters.
+*   [references/json-schema.md](references/json-schema.md) - JSON structure documentation.
+*   [references/bases-workflow.md](references/bases-workflow.md) - How to map Bases to Templates.
+*   [references/analysis-workflow.md](references/analysis-workflow.md) - How to validate page data.
+
+### Official Documentation
+*   [Variables](https://help.obsidian.md/web-clipper/variables)
+*   [Filters](https://help.obsidian.md/web-clipper/filters)
+*   [Templates](https://help.obsidian.md/web-clipper/templates)
+
+## Examples
+
+See [assets/](assets/) for JSON examples.
+</code>
       </div>
     </div>
 

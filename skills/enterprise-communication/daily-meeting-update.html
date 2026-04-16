@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,425 @@
     <p class="desc">"Interactive daily standup/meeting update generator. Use when user says 'daily', 'standup', 'scrum update', 'status update', 'what did I do yesterday', 'prepare for meeting', 'morning update', or 'team sync'. Pulls activity from GitHub, Jira, and Claude Code session history. Conducts 4-question interview (yesterday, today, blockers, discussion topics) and generates formatted Markdown update."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/daily-meeting-update</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/daily-meeting-update</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: daily-meeting-update
+description: &quot;Interactive daily standup/meeting update generator. Use when user says &#039;daily&#039;, &#039;standup&#039;, &#039;scrum update&#039;, &#039;status update&#039;, &#039;what did I do yesterday&#039;, &#039;prepare for meeting&#039;, &#039;morning update&#039;, or &#039;team sync&#039;. Pulls activity from GitHub, Jira, and Claude Code session history. Conducts 4-question interview (yesterday, today, blockers, discussion topics) and generates formatted Markdown update.&quot;
+user-invocable: true
+---
+
+# Daily Meeting Update
+
+Generate a daily standup/meeting update through an **interactive interview**. Never assume tools are configured—ask first.
+
+---
+
+## Workflow
+
+```
+START
+  │
+  ▼
+┌─────────────────────────────────────────────────────┐
+│ Phase 1: DETECT &amp; OFFER INTEGRATIONS                │
+│ • Check: Claude Code history? gh CLI? jira CLI?     │
+│ • Claude Code → Pull yesterday&#039;s session digest     │
+│   → User selects relevant items via multiSelect     │
+│ • GitHub/Jira → Ask user, pull if approved          │
+│ • Pull data NOW (before interview)                  │
+├─────────────────────────────────────────────────────┤
+│ Phase 2: INTERVIEW (with insights)                  │
+│ • Show pulled data as context                       │
+│ • Yesterday: &quot;I see you merged PR #123, what else?&quot; │
+│ • Today: What will you work on?                     │
+│ • Blockers: Anything blocking you?                  │
+│ • Topics: Anything to discuss at end of meeting?    │
+├─────────────────────────────────────────────────────┤
+│ Phase 3: GENERATE UPDATE                            │
+│ • Combine interview answers + tool data             │
+│ • Format as clean Markdown                          │
+│ • Present to user                                   │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## Phase 1: Detect &amp; Offer Integrations
+
+### Step 1: Silent Detection
+
+Check for available integrations **silently** (suppress errors, don&#039;t show to user):
+
+| Integration | Detection |
+|-------------|-----------|
+| **Claude Code History** | `~/.claude/projects` directory exists with `.jsonl` files |
+| GitHub CLI | `gh auth status` succeeds |
+| Jira CLI | `jira` command exists |
+| Atlassian MCP | `mcp__atlassian__*` tools available |
+| Git | Inside a git repository |
+
+### Step 2: Offer GitHub/Jira Integrations (if available)
+
+&gt; **Claude Code users:** Use `AskUserQuestionTool` tool for all questions in this phase.
+
+**GitHub/Git:**
+
+If `HAS_GH` or `HAS_GIT`:
+
+```
+&quot;I detected you have GitHub/Git configured. Want me to pull your recent activity (commits, PRs, reviews)?&quot;
+
+Options:
+- &quot;Yes, pull the info&quot;
+- &quot;No, I&#039;ll provide everything manually&quot;
+```
+
+If yes:
+
+```
+&quot;Which repositories/projects should I check?&quot;
+
+Options:
+- &quot;Just the current directory&quot; (if in a git repo)
+- &quot;I&#039;ll list the repos&quot; → user provides list
+```
+
+**Jira:**
+
+If `HAS_JIRA_CLI` or `HAS_ATLASSIAN_MCP`:
+
+```
+&quot;I detected you have Jira configured. Want me to pull your tickets?&quot;
+
+Options:
+- &quot;Yes, pull my tickets&quot;
+- &quot;No, I&#039;ll provide everything manually&quot;
+```
+
+### Step 3: Pull GitHub/Jira Data (if approved)
+
+**GitHub/Git** — For each approved repo:
+- Commits by user since yesterday
+- PRs opened/merged by user
+- Reviews done by user
+
+**Jira** — Tickets assigned to user, updated in last 24h
+
+**Key insight**: Store results to use as context in Phase 2 interview.
+
+### Step 4: Offer Claude Code History
+
+This integration captures everything you worked on with Claude Code — useful for recalling work that isn&#039;t in git or Jira.
+
+**Detection:**
+```bash
+ls ~/.claude/projects/*/*.jsonl 2&gt;/dev/null | head -1
+```
+
+**If Claude Code history exists, ask:**
+
+```
+&quot;I can also pull your Claude Code session history from yesterday. This can help recall work that isn&#039;t in git/Jira (research, debugging, planning). Want me to check?&quot;
+
+Options:
+- &quot;Yes, pull my Claude Code sessions&quot;
+- &quot;No, I have everything I need&quot;
+```
+
+**If yes, run the digest script:**
+
+```bash
+python3 ~/.claude/skills/daily-meeting-update/scripts/claude_digest.py --format json
+```
+
+**Then present sessions with multiSelect:**
+
+Use `AskUserQuestionTool` with `multiSelect: true` to let user pick relevant items:
+
+```
+&quot;Here are your Claude Code sessions from yesterday. Select the ones relevant to your standup:&quot;
+
+Options (multiSelect):
+- &quot;Fix authentication bug (backend-api)&quot;
+- &quot;Implement OAuth flow (backend-api)&quot;
+- &quot;Update homepage styles (frontend-app)&quot;
+- &quot;Research payment providers (docs)&quot;
+```
+
+**Key insight:** User selects which sessions are work-related. Personal projects or experiments can be excluded.
+
+**Do NOT run digest script when:**
+- User explicitly says &quot;No&quot; to Claude Code history
+- User says they&#039;ll provide everything manually
+- `~/.claude/projects` directory doesn&#039;t exist
+
+**If digest script fails:**
+- Fallback: Skip Claude Code integration silently, proceed with interview
+- Common issues: Python not installed, no sessions from yesterday, permission errors
+- Do NOT block the standup flow — the script is supplemental, not required
+
+---
+
+## Phase 2: Interview (with insights)
+
+&gt; **Claude Code users:** Use `AskUserQuestionTool` tool to conduct the interview. This provides a better UX with structured options.
+
+**Use pulled data as context** to make questions smarter.
+
+### Question 1: Yesterday
+
+**If data was pulled**, show it first:
+
+```
+&quot;Here&#039;s what I found from your activity:
+- Merged PR #123: fix login timeout
+- 3 commits in backend-api
+- Reviewed PR #456 (approved)
+
+Anything else you worked on yesterday that I missed?&quot;
+```
+
+**If no data pulled:**
+
+```
+&quot;What did you work on yesterday/since the last standup?&quot;
+```
+
+If user response is vague, ask follow-up:
+- &quot;Can you give more details about X?&quot;
+- &quot;Did you complete anything specific?&quot;
+
+### Question 2: Today
+
+```
+&quot;What will you work on today?&quot;
+
+Options:
+- [Text input - user types freely]
+```
+
+**If Jira data was pulled**, you can suggest:
+
+```
+&quot;I see you have these tickets assigned:
+- PROJ-123: Implement OAuth flow (In Progress)
+- PROJ-456: Fix payment bug (To Do)
+
+Will you work on any of these today?&quot;
+```
+
+### Question 3: Blockers
+
+```
+&quot;Do you have any blockers or impediments?&quot;
+
+Options:
+- &quot;No blockers&quot;
+- &quot;Yes, I have blockers&quot; → follow-up for details
+```
+
+### Question 4: Topics for Discussion
+
+```
+&quot;Any topic you want to bring up at the end of the daily?&quot;
+
+Options:
+- &quot;No, nothing to discuss&quot;
+- &quot;Yes&quot; → follow-up for details
+
+Examples of topics:
+- Technical decision that needs input
+- Alignment with another team
+- Question about prioritization
+- Announcement or info for the team
+```
+
+---
+
+## Phase 3: Generate Update
+
+Combine all information into clean Markdown:
+
+```markdown
+# Daily Update - [DATE]
+
+## Yesterday
+- [Items from interview]
+- [Items from GitHub/Jira if pulled]
+
+## Today
+- [Items from interview]
+
+## Blockers
+- [Blockers or &quot;No blockers&quot;]
+
+## PRs &amp; Reviews (if pulled from GitHub)
+- [PRs opened]
+- [PRs merged]
+- [Reviews done]
+
+## Jira (if pulled from Jira)
+- [Tickets updated]
+
+## Topics for Discussion
+- [Topics or &quot;None&quot;]
+
+---
+*Links:*
+- [PR links]
+- [Ticket links]
+```
+
+---
+
+## Core Principles
+
+1. **Interview is primary** — Tools supplement, they don&#039;t replace human context
+2. **Consent before access** — Always ask before pulling from any integration
+3. **Context-aware questions** — Show pulled data during interview to trigger memory (&quot;I see you merged PR #123...&quot;)
+
+---
+
+## Quick Reference
+
+| Phase | Action | Tool |
+|-------|--------|------|
+| 1. Detect &amp; Offer | Check gh/jira/claude history, ask user, pull data | Bash (silent), AskUserQuestionTool* |
+| 2. Interview | Ask 4 questions with insights | AskUserQuestionTool* |
+| 3. Generate | Format Markdown | Output text |
+
+*Claude Code only: Use `AskUserQuestionTool` tool for structured questions.
+
+### Claude Code Digest Script
+
+```bash
+# Get yesterday&#039;s sessions as JSON
+python3 ~/.claude/skills/daily-meeting-update/scripts/claude_digest.py --format json
+
+# Get today&#039;s sessions
+python3 ~/.claude/skills/daily-meeting-update/scripts/claude_digest.py --date today --format json
+
+# Filter to specific project
+python3 ~/.claude/skills/daily-meeting-update/scripts/claude_digest.py --project ~/my-app --format json
+```
+
+---
+
+## Example Session
+
+```
+Claude: &quot;Let&#039;s prepare your daily! I detected GitHub configured. Want me to pull your recent activity?&quot;
+User: &quot;Yes&quot;
+
+Claude: &quot;Which repos should I check?&quot;
+User: &quot;backend-api and frontend-app&quot;
+
+[Claude pulls GitHub data silently]
+
+Claude: &quot;I can also pull your Claude Code session history from yesterday. Want me to check?&quot;
+User: &quot;Yes&quot;
+
+[Claude runs digest script, gets 5 sessions]
+
+Claude: &quot;Here are your Claude Code sessions from yesterday. Select the ones relevant to your standup:&quot;
+  ☑ Fix authentication timeout bug (backend-api)
+  ☑ Implement OAuth flow (backend-api)
+  ☐ Update personal blog (blog) - [user unchecks personal project]
+  ☑ Research payment providers (docs)
+  ☐ Debugging test failures (experiments)
+
+User: [selects 3 relevant items]
+
+Claude: &quot;Here&#039;s what I found from your activity:
+- Merged PR #120: fix login timeout
+- Opened PR #125: feat: add OAuth flow
+- Reviewed PR #123 (approved), PR #456 (changes requested)
+- 5 commits in backend-api
+- [From Claude Code] Fix authentication timeout bug
+- [From Claude Code] Implement OAuth flow
+- [From Claude Code] Research payment providers
+
+Anything else you worked on yesterday that I missed?&quot;
+User: &quot;No, that covers it&quot;
+
+Claude: &quot;What will you work on today?&quot;
+User: &quot;Continue the OAuth feature and deploy to staging&quot;
+
+Claude: &quot;Any blockers?&quot;
+User: &quot;No&quot;
+
+Claude: &quot;Any topic to bring up at the end of the daily?&quot;
+User: &quot;Yes, I want to discuss the architecture of the new payments module&quot;
+
+[Claude generates update]
+```
+
+---
+
+## Output Example
+
+```markdown
+# Daily Update - 2026-01-22
+
+## Yesterday
+- Worked on authentication feature
+- Research on payment providers
+- Merged PR #120 (fix: login timeout)
+- Opened PR #125 (feat: add OAuth flow)
+
+## Today
+- Continue OAuth feature
+- Deploy to staging
+
+## Blockers
+- No blockers
+
+## PRs &amp; Reviews
+- **Opened:** PR #125 - feat: add OAuth flow
+- **Merged:** PR #120 - fix: login timeout
+- **Reviews:** PR #123 (approved), PR #456 (changes requested)
+
+## Topics for Discussion
+- Architecture of the new payments module
+
+---
+*Links:*
+- https://github.com/org/repo/pull/125
+- https://github.com/org/repo/pull/120
+```
+
+---
+
+## Anti-Patterns
+
+| Avoid | Why (Expert Knowledge) | Instead |
+|-------|------------------------|---------|
+| Run gh/jira without asking | Users may have personal repos visible, or be in a sensitive project context they don&#039;t want exposed | Always ask first, let user choose repos |
+| Assume current directory is the only project | Developers often work on 2-5 repos simultaneously (frontend, backend, infra) | Ask &quot;Which projects are you working on?&quot; |
+| Skip interview even with tool data | Tools capture WHAT happened but miss WHY and context (research, meetings, planning) | Interview is primary, tools supplement |
+| Generate update before all 4 questions | User might have critical blocker or discussion topic that changes the narrative | Complete interview, then generate |
+| Include raw commit messages | Commit messages are often cryptic (&quot;fix&quot;, &quot;wip&quot;) and don&#039;t tell the story | Summarize into human-readable outcomes |
+| Ask for data after interview | Showing insights during interview makes questions smarter (&quot;I see you merged PR #123, anything else?&quot;) | Pull data first, then interview with context |
+
+---
+
+## NEVER
+
+- **NEVER assume tools are configured** — Many devs have gh installed but not authenticated, or jira CLI pointing to wrong instance
+- **NEVER skip the &quot;Topics for Discussion&quot; question** — This is often the most valuable part of standup that tools can&#039;t capture
+- **NEVER generate more than 15 bullets** — Standup should be &lt;2 minutes to read; long updates lose the audience
+- **NEVER include ticket/PR numbers without context** — &quot;PROJ-123&quot; means nothing; always include title or summary
+- **NEVER pull data from repos user didn&#039;t explicitly approve** — Even if you can see other repos, respect boundaries
+</code>
       </div>
     </div>
 

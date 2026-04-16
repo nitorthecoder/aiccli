@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,393 @@
     <p class="desc">Manage and automate CI/CD pipeline configuration with GitHub Actions, multi-environment support, and deployment strategies</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/ci-pipeline</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/ci-pipeline</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Read, Write, Edit, Bash
+argument-hint: [pipeline-name] | setup | status | fix
+description: Manage and automate CI/CD pipeline configuration with GitHub Actions, multi-environment support, and deployment strategies
+---
+
+# CI/CD Pipeline Manager
+
+Manage CI/CD pipeline automation: $ARGUMENTS
+
+## Current Pipeline State
+
+- GitHub Actions: !`find .github/workflows -name &quot;*.yml&quot; -o -name &quot;*.yaml&quot; 2&gt;/dev/null | head -5`
+- CI configuration: @.github/workflows/ (if exists)
+- Package scripts: @package.json
+- Environment files: !`find . -name &quot;.env*&quot; | head -3`
+- Recent workflow runs: !`gh run list --limit 5 2&gt;/dev/null || echo &quot;GitHub CLI not available&quot;`
+
+## Task
+
+Automate CI/CD pipeline management with comprehensive workflow orchestration.
+
+## Pipeline Operations
+
+### Setup New Pipeline
+Create complete CI/CD pipeline with:
+
+```yaml
+# .github/workflows/ci.yml
+name: CI Pipeline
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: &#039;npm&#039;
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run linter
+        run: npm run lint
+      
+      - name: Run tests
+        run: npm run test:coverage
+      
+      - name: Build application
+        run: npm run build
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+```
+
+### Multi-Environment Deployment
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  deploy-staging:
+    if: github.ref == &#039;refs/heads/main&#039;
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Staging
+        run: |
+          npm run build:staging
+          npm run deploy:staging
+        env:
+          STAGING_API_URL: ${{ secrets.STAGING_API_URL }}
+          STAGING_SECRET: ${{ secrets.STAGING_SECRET }}
+
+  deploy-production:
+    if: github.event_name == &#039;release&#039;
+    runs-on: ubuntu-latest
+    environment: production
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Production
+        run: |
+          npm run build:production
+          npm run deploy:production
+        env:
+          PROD_API_URL: ${{ secrets.PROD_API_URL }}
+          PROD_SECRET: ${{ secrets.PROD_SECRET }}
+```
+
+### Security &amp; Quality Gates
+```yaml
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run security audit
+        run: npm audit --audit-level=moderate
+      
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+      
+      - name: SAST Scan
+        uses: github/super-linter@v4
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### Performance Testing
+```yaml
+  performance:
+    runs-on: ubuntu-latest
+    if: github.event_name == &#039;pull_request&#039;
+    steps:
+      - uses: actions/checkout@v4
+      - name: Performance Test
+        run: |
+          npm run build
+          npm run start:test &amp;
+          sleep 10
+          npx lighthouse http://localhost:3000 --output=json --output-path=./lighthouse.json
+      
+      - name: Comment PR
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require(&#039;fs&#039;);
+            const lighthouse = JSON.parse(fs.readFileSync(&#039;./lighthouse.json&#039;));
+            const score = lighthouse.lhr.categories.performance.score * 100;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `⚡ Performance Score: ${score}/100`
+            });
+```
+
+## Advanced Features
+
+### 1. **Matrix Strategy Testing**
+```yaml
+strategy:
+  matrix:
+    os: [ubuntu-latest, windows-latest, macos-latest]
+    node-version: [16, 18, 20]
+    include:
+      - os: ubuntu-latest
+        node-version: 20
+        coverage: true
+```
+
+### 2. **Conditional Workflows**
+```yaml
+- name: Skip CI
+  if: contains(github.event.head_commit.message, &#039;[skip ci]&#039;)
+  run: echo &quot;Skipping CI as requested&quot;
+
+- name: Deploy only on version tags
+  if: startsWith(github.ref, &#039;refs/tags/v&#039;)
+  run: npm run deploy
+```
+
+### 3. **Workflow Dependencies**
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    
+  deploy:
+    needs: [test, build]
+    if: github.ref == &#039;refs/heads/main&#039;
+    runs-on: ubuntu-latest
+```
+
+### 4. **Cache Optimization**
+```yaml
+- name: Cache node modules
+  uses: actions/cache@v3
+  with:
+    path: ~/.npm
+    key: ${{ runner.os }}-node-${{ hashFiles(&#039;**/package-lock.json&#039;) }}
+    restore-keys: |
+      ${{ runner.os }}-node-
+
+- name: Cache build output
+  uses: actions/cache@v3
+  with:
+    path: dist
+    key: build-${{ github.sha }}
+```
+
+### 5. **Artifact Management**
+```yaml
+- name: Upload build artifacts
+  uses: actions/upload-artifact@v3
+  with:
+    name: dist-files
+    path: dist/
+    retention-days: 7
+
+- name: Download artifacts
+  uses: actions/download-artifact@v3
+  with:
+    name: dist-files
+    path: dist/
+```
+
+### 6. **Environment Management**
+```yaml
+environments:
+  staging:
+    url: https://staging.example.com
+    
+  production:
+    url: https://example.com
+    protection_rules:
+      - type: required_reviewers
+        required_reviewers:
+          - devops-team
+      - type: wait_timer
+        wait_timer: 5
+```
+
+## Pipeline Monitoring
+
+### Status Checks
+```bash
+# Check workflow status
+gh run list --workflow=ci.yml --limit=10
+
+# View specific run
+gh run view [run-id] --log
+
+# Monitor failure rate
+gh api repos/:owner/:repo/actions/runs \
+  --jq &#039;.workflow_runs[0:20] | map(select(.conclusion==&quot;failure&quot;)) | length&#039;
+```
+
+### Performance Metrics
+```bash
+# Average build time
+gh api repos/:owner/:repo/actions/runs \
+  --jq &#039;.workflow_runs[0:50] | map(.run_duration_ms) | add / length&#039;
+
+# Success rate calculation
+gh api repos/:owner/:repo/actions/runs \
+  --jq &#039;.workflow_runs[0:100] | [group_by(.conclusion)[] | {conclusion: .[0].conclusion, count: length}]&#039;
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. **Workflow Permission Issues**
+```yaml
+permissions:
+  contents: read
+  actions: write
+  security-events: write
+  pull-requests: write
+```
+
+#### 2. **Secret Management**
+```bash
+# Add repository secret
+gh secret set STAGING_API_URL --body &quot;https://staging-api.example.com&quot;
+
+# List secrets
+gh secret list
+```
+
+#### 3. **Timeout Configuration**
+```yaml
+jobs:
+  long-running-job:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Long task
+        timeout-minutes: 30
+        run: npm run long-task
+```
+
+#### 4. **Debugging Workflows**
+```yaml
+- name: Debug information
+  run: |
+    echo &quot;Event name: ${{ github.event_name }}&quot;
+    echo &quot;Ref: ${{ github.ref }}&quot;
+    echo &quot;SHA: ${{ github.sha }}&quot;
+    echo &quot;Actor: ${{ github.actor }}&quot;
+```
+
+## Best Practices
+
+### 1. **Fail Fast Strategy**
+- Run fastest jobs first
+- Use `fail-fast: true` in matrix
+- Implement early validation steps
+
+### 2. **Security First**
+- Never store secrets in code
+- Use least privilege permissions
+- Scan for vulnerabilities early
+
+### 3. **Efficiency Optimization**
+- Use appropriate cache strategies
+- Minimize workflow duration
+- Parallel job execution
+
+### 4. **Monitoring &amp; Alerting**
+- Track build success rates
+- Monitor deployment frequency
+- Alert on critical failures
+
+## Integration Examples
+
+### Docker Integration
+```yaml
+- name: Build Docker image
+  run: |
+    docker build -t myapp:${{ github.sha }} .
+    docker tag myapp:${{ github.sha }} myapp:latest
+
+- name: Push to registry
+  run: |
+    echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+    docker push myapp:${{ github.sha }}
+    docker push myapp:latest
+```
+
+### Cloud Deployment
+```yaml
+- name: Deploy to AWS
+  uses: aws-actions/configure-aws-credentials@v2
+  with:
+    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    aws-region: us-east-1
+
+- name: Deploy to S3
+  run: |
+    aws s3 sync dist/ s3://my-bucket --delete
+    aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_ID }} --paths &quot;/*&quot;
+```
+
+This pipeline manager provides comprehensive automation for modern CI/CD workflows with security, performance, and monitoring built-in.</code>
       </div>
     </div>
 

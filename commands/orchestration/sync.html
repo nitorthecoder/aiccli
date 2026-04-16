@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,310 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/sync</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/sync</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># Orchestration Sync Command
+
+Synchronize task status with git commits, ensuring consistency between version control and task tracking.
+
+## Usage
+
+```
+/orchestration/sync [options]
+```
+
+## Description
+
+Analyzes git history and task status to identify discrepancies, automatically updating task tracking based on commit evidence and maintaining bidirectional consistency.
+
+## Basic Commands
+
+### Full Sync
+```
+/orchestration/sync
+```
+Performs complete synchronization between git and task status.
+
+### Check Sync Status
+```
+/orchestration/sync --check
+```
+Reports inconsistencies without making changes.
+
+### Sync Specific Orchestration
+```
+/orchestration/sync --date 03_15_2024 --project auth_system
+```
+
+## Sync Operations
+
+### Git → Task Status
+Updates task status based on commit messages:
+```
+Found commits:
+- feat(auth): implement JWT validation (TASK-003) ✓
+  Status: in_progress → qa (based on commit)
+  
+- test(auth): add JWT validation tests (TASK-003) ✓
+  Status: qa → completed (tests indicate completion)
+  
+- fix(auth): resolve token expiration (TASK-007) ✓
+  Status: todos → in_progress (work started)
+```
+
+### Task Status → Git
+Identifies tasks marked complete without commits:
+```
+Status Discrepancies:
+- TASK-005: Marked &#039;completed&#039; but no commits found
+- TASK-008: In &#039;qa&#039; but no implementation commits
+- TASK-010: Multiple commits but still in &#039;todos&#039;
+```
+
+## Detection Patterns
+
+### Commit Pattern Matching
+```
+Patterns detected:
+- &quot;feat(auth): implement&quot; → Implementation complete
+- &quot;test(auth): add&quot; → Testing phase
+- &quot;fix(auth): resolve&quot; → Bug fix complete
+- &quot;docs(auth): update&quot; → Documentation done
+- &quot;refactor(auth):&quot; → Code improvement
+```
+
+### Task Reference Extraction
+```
+Scanning commits for task references:
+- Explicit: &quot;Task: TASK-003&quot; ✓
+- In body: &quot;Implements TASK-003&quot; ✓
+- Branch name: &quot;feature/TASK-003-jwt&quot; ✓
+- PR title: &quot;TASK-003: JWT implementation&quot; ✓
+```
+
+## Sync Rules
+
+### Automatic Status Updates
+```yaml
+sync_rules:
+  commit_patterns:
+    - pattern: &quot;feat.*TASK-(\d+)&quot;
+      action: &quot;move to qa if in_progress&quot;
+    - pattern: &quot;test.*TASK-(\d+).*pass&quot;
+      action: &quot;move to completed if in qa&quot;
+    - pattern: &quot;fix.*TASK-(\d+)&quot;
+      action: &quot;move to qa if in_progress&quot;
+    - pattern: &quot;WIP.*TASK-(\d+)&quot;
+      action: &quot;keep in in_progress&quot;
+```
+
+### Conflict Resolution
+```
+Conflict detected for TASK-003:
+- Git evidence: 3 commits, tests passing
+- Task status: in_progress
+- Recommended: Move to completed
+
+Resolution options:
+[1] Trust git (move to completed)
+[2] Trust tracker (keep in_progress)
+[3] Manual review
+[4] Skip
+```
+
+## Analysis Reports
+
+### Sync Summary
+```
+Synchronization Report
+======================
+
+Analyzed: 45 commits across 3 branches
+Tasks referenced: 12
+Status updates needed: 4
+
+Updates to apply:
+- TASK-003: in_progress → completed (3 commits)
+- TASK-007: todos → in_progress (1 commit)
+- TASK-009: qa → completed (tests added)
+- TASK-011: on_hold → in_progress (blocker resolved)
+
+Warnings:
+- TASK-005: Completed without commits
+- TASK-013: Commits without task reference
+```
+
+### Detailed Analysis
+```
+Task: TASK-003 - JWT Implementation
+Current Status: in_progress
+Git Evidence:
+  - feat(auth): implement JWT validation (2 days ago)
+  - test(auth): add validation tests (1 day ago)
+  - fix(auth): handle edge cases (1 day ago)
+  
+Recommendation: Move to completed
+Confidence: High (95%)
+```
+
+## Options
+
+### Dry Run
+```
+/orchestration/sync --dry-run
+```
+Shows what would change without applying updates.
+
+### Force Sync
+```
+/orchestration/sync --force
+```
+Applies all recommendations without prompting.
+
+### Time Range
+```
+/orchestration/sync --since &quot;1 week ago&quot;
+```
+Only analyzes recent commits.
+
+### Branch Specific
+```
+/orchestration/sync --branch feature/auth
+```
+Syncs only tasks related to specific branch.
+
+## Integration Features
+
+### Update Tracking Files
+```
+/orchestration/sync --update-trackers
+```
+Updates TASK-STATUS-TRACKER.yaml with:
+```yaml
+git_tracking:
+  TASK-003:
+    status_from_git: completed
+    confidence: 0.95
+    evidence:
+      - commit: abc123
+        message: &quot;feat(auth): implement JWT&quot;
+        date: &quot;2024-03-13&quot;
+      - commit: def456
+        message: &quot;test(auth): add tests&quot;
+        date: &quot;2024-03-14&quot;
+```
+
+### Generate Commit Report
+```
+/orchestration/sync --commit-report
+```
+Creates report of all task-related commits.
+
+### Fix Orphaned Commits
+```
+/orchestration/sync --link-orphans
+```
+Associates commits without task references.
+
+## Sync Strategies
+
+### Conservative
+```
+/orchestration/sync --conservative
+```
+Only updates with high confidence matches.
+
+### Aggressive
+```
+/orchestration/sync --aggressive
+```
+Updates based on any evidence.
+
+### Interactive
+```
+/orchestration/sync --interactive
+```
+Prompts for each potential update.
+
+## Examples
+
+### Example 1: Daily Sync
+```
+/orchestration/sync --since yesterday
+
+Quick sync results:
+- 5 commits analyzed
+- 2 tasks updated
+- All changes applied successfully
+```
+
+### Example 2: Branch Merge Sync
+```
+/orchestration/sync --after-merge feature/auth
+
+Post-merge sync:
+- 15 commits from feature/auth
+- 5 tasks moved to completed
+- 2 tasks have test failures (kept in qa)
+```
+
+### Example 3: Audit Mode
+```
+/orchestration/sync --audit --report
+
+Audit Report:
+- Tasks with commits: 85%
+- Commits with task refs: 92%
+- Average commits per task: 2.3
+- Orphaned commits: 3
+```
+
+## Webhook Integration
+
+### Auto-sync on Push
+```yaml
+git_hooks:
+  post-commit: /orchestration/sync --last-commit
+  post-merge: /orchestration/sync --branch HEAD
+```
+
+## Best Practices
+
+1. **Regular Syncs**: Run daily or after major commits
+2. **Review Before Force**: Check dry-run output first
+3. **Maintain References**: Include task IDs in commits
+4. **Handle Conflicts**: Don&#039;t ignore sync warnings
+5. **Document Decisions**: Note why status differs from git
+
+## Configuration
+
+### Sync Preferences
+```yaml
+sync_config:
+  auto_sync: true
+  confidence_threshold: 0.8
+  require_tests: true
+  trust_git_over_tracker: true
+  patterns:
+    - implementation: &quot;feat|feature&quot;
+    - testing: &quot;test|spec&quot;
+    - completion: &quot;done|complete|finish&quot;
+```
+
+## Notes
+
+- Requires git access to all relevant branches
+- Preserves manual status overrides with flags
+- Supports custom commit message patterns
+- Integrates with CI/CD for automated syncing</code>
       </div>
     </div>
 

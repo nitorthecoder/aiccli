@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,252 @@
     <p class="desc">Create a new Next.js application with best practices and optimal configuration</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/nextjs-scaffold</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/nextjs-scaffold</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Read, Write, Edit, Bash
+argument-hint: [project-name] [--typescript] [--tailwind] [--app-router]
+description: Create a new Next.js application with best practices and optimal configuration
+---
+
+## Next.js Application Scaffolding
+
+**Project Name**: $ARGUMENTS
+
+## Environment Analysis
+
+- Current directory: !`pwd`
+- Node.js version: !`node --version`
+- npm version: !`npm --version`
+- Existing package.json: @package.json (if exists)
+
+## Scaffolding Requirements
+
+### 1. Project Initialization
+Based on provided arguments, determine setup options:
+- **TypeScript**: Check for `--typescript` flag or detect existing TS config
+- **Tailwind CSS**: Check for `--tailwind` flag or detect existing config
+- **App Router**: Check for `--app-router` flag (default for new projects)
+- **ESLint/Prettier**: Always include for code quality
+
+### 2. Next.js Configuration
+Create optimized `next.config.js` with:
+```javascript
+/** @type {import(&#039;next&#039;).NextConfig} */
+const nextConfig = {
+  experimental: {
+    optimizePackageImports: [&#039;lucide-react&#039;, &#039;@heroicons/react&#039;],
+  },
+  images: {
+    formats: [&#039;image/webp&#039;, &#039;image/avif&#039;],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+  },
+  async headers() {
+    return [
+      {
+        source: &#039;/(.*)&#039;,
+        headers: [
+          {
+            key: &#039;X-Frame-Options&#039;,
+            value: &#039;DENY&#039;,
+          },
+          {
+            key: &#039;X-Content-Type-Options&#039;,
+            value: &#039;nosniff&#039;,
+          },
+        ],
+      },
+    ];
+  },
+};
+```
+
+### 3. Essential Dependencies
+Install core dependencies:
+- **Production**: `next`, `react`, `react-dom`
+- **Development**: `eslint`, `eslint-config-next`, `typescript` (if TS), `@types/*` (if TS)
+- **Optional**: `tailwindcss`, `prettier`, `husky`, `lint-staged`
+
+### 4. Project Structure
+Create optimal directory structure:
+```
+project-name/
+├── app/                    # App Router (Next.js 13+)
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── api/
+├── components/             # Reusable components
+│   └── ui/                # UI primitives
+├── lib/                   # Utilities and configurations
+├── public/                # Static assets
+├── types/                 # TypeScript type definitions
+├── .env.local             # Environment variables
+├── .env.example           # Environment template
+├── .gitignore
+├── next.config.js
+├── package.json
+├── README.md
+└── tsconfig.json          # If TypeScript
+```
+
+### 5. Configuration Files
+
+#### ESLint Configuration
+```json
+{
+  &quot;extends&quot;: [&quot;next/core-web-vitals&quot;],
+  &quot;rules&quot;: {
+    &quot;@next/next/no-img-element&quot;: &quot;error&quot;,
+    &quot;@next/next/no-html-link-for-pages&quot;: &quot;error&quot;
+  }
+}
+```
+
+#### TypeScript Configuration (if applicable)
+```json
+{
+  &quot;compilerOptions&quot;: {
+    &quot;target&quot;: &quot;es5&quot;,
+    &quot;lib&quot;: [&quot;dom&quot;, &quot;dom.iterable&quot;, &quot;es6&quot;],
+    &quot;allowJs&quot;: true,
+    &quot;skipLibCheck&quot;: true,
+    &quot;strict&quot;: true,
+    &quot;noEmit&quot;: true,
+    &quot;esModuleInterop&quot;: true,
+    &quot;module&quot;: &quot;esnext&quot;,
+    &quot;moduleResolution&quot;: &quot;bundler&quot;,
+    &quot;resolveJsonModule&quot;: true,
+    &quot;isolatedModules&quot;: true,
+    &quot;jsx&quot;: &quot;preserve&quot;,
+    &quot;incremental&quot;: true,
+    &quot;plugins&quot;: [
+      {
+        &quot;name&quot;: &quot;next&quot;
+      }
+    ],
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@/*&quot;: [&quot;./*&quot;]
+    }
+  },
+  &quot;include&quot;: [&quot;next-env.d.ts&quot;, &quot;**/*.ts&quot;, &quot;**/*.tsx&quot;, &quot;.next/types/**/*.ts&quot;],
+  &quot;exclude&quot;: [&quot;node_modules&quot;]
+}
+```
+
+### 6. Starter Components
+
+#### Root Layout
+```typescript
+import type { Metadata } from &#039;next&#039;;
+import { Inter } from &#039;next/font/google&#039;;
+import &#039;./globals.css&#039;;
+
+const inter = Inter({ subsets: [&#039;latin&#039;] });
+
+export const metadata: Metadata = {
+  title: &#039;Project Name&#039;,
+  description: &#039;Generated with Claude Code Next.js scaffolding&#039;,
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    &lt;html lang=&quot;en&quot;&gt;
+      &lt;body className={inter.className}&gt;{children}&lt;/body&gt;
+    &lt;/html&gt;
+  );
+}
+```
+
+#### Home Page
+```typescript
+export default function Home() {
+  return (
+    &lt;main className=&quot;flex min-h-screen flex-col items-center justify-between p-24&quot;&gt;
+      &lt;div className=&quot;z-10 max-w-5xl w-full items-center justify-between font-mono text-sm&quot;&gt;
+        &lt;h1 className=&quot;text-4xl font-bold&quot;&gt;Welcome to Your Next.js App&lt;/h1&gt;
+        &lt;p className=&quot;mt-4 text-lg&quot;&gt;
+          Built with Claude Code scaffolding
+        &lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
+  );
+}
+```
+
+### 7. Development Scripts
+Update package.json with optimized scripts:
+```json
+{
+  &quot;scripts&quot;: {
+    &quot;dev&quot;: &quot;next dev&quot;,
+    &quot;build&quot;: &quot;next build&quot;,
+    &quot;start&quot;: &quot;next start&quot;,
+    &quot;lint&quot;: &quot;next lint&quot;,
+    &quot;type-check&quot;: &quot;tsc --noEmit&quot;,
+    &quot;format&quot;: &quot;prettier --write .&quot;,
+    &quot;format:check&quot;: &quot;prettier --check .&quot;
+  }
+}
+```
+
+### 8. Documentation
+Create comprehensive README.md with:
+- Project overview and features
+- Installation and setup instructions
+- Development workflow
+- Deployment guidelines
+- Contributing guidelines
+
+## Implementation Steps
+
+1. **Initialize Project**: Create project directory and basic structure
+2. **Install Dependencies**: Set up Next.js with chosen options
+3. **Configure TypeScript**: Set up TypeScript if requested
+4. **Setup Tailwind**: Configure Tailwind CSS if requested
+5. **Create Components**: Generate starter components and layouts
+6. **Setup Development Tools**: Configure ESLint, Prettier, and scripts
+7. **Environment Configuration**: Create .env files and examples
+8. **Generate Documentation**: Create README and setup guides
+
+## Quality Checklist
+
+- [ ] Next.js configured with App Router
+- [ ] TypeScript setup (if requested)
+- [ ] Tailwind CSS configured (if requested)
+- [ ] ESLint and Prettier configured
+- [ ] Security headers configured
+- [ ] Image optimization enabled
+- [ ] Development scripts working
+- [ ] Environment variables template created
+- [ ] README documentation complete
+- [ ] Project builds successfully
+
+## Post-Scaffolding Tasks
+
+After scaffolding, run these commands to verify setup:
+```bash
+cd [project-name]
+npm install
+npm run build
+npm run lint
+npm run type-check  # If TypeScript
+```
+
+Provide specific next steps based on the project requirements and any additional features needed.</code>
       </div>
     </div>
 

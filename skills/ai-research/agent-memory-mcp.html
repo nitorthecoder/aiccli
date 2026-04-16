@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,99 @@
     <p class="desc">A hybrid memory system that provides persistent, searchable knowledge management for AI agents (Architecture, Patterns, Decisions).</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/agent-memory-mcp</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/agent-memory-mcp</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: agent-memory-mcp
+author: Amit Rathiesh
+description: A hybrid memory system that provides persistent, searchable knowledge management for AI agents (Architecture, Patterns, Decisions).
+---
+
+# Agent Memory Skill
+
+This skill provides a persistent, searchable memory bank that automatically syncs with project documentation. It runs as an MCP server to allow reading/writing/searching of long-term memories.
+
+## Prerequisites
+
+- Node.js (v18+)
+
+## Setup
+
+1. **Clone the Repository**:
+   Clone the `agentMemory` project into your agent&#039;s workspace or a parallel directory:
+
+   ```bash
+   git clone https://github.com/webzler/agentMemory.git .agent/skills/agent-memory
+   ```
+
+2. **Install Dependencies**:
+
+   ```bash
+   cd .agent/skills/agent-memory
+   npm install
+   npm run compile
+   ```
+
+3. **Start the MCP Server**:
+   Use the helper script to activate the memory bank for your current project:
+
+   ```bash
+   npm run start-server &lt;project_id&gt; &lt;absolute_path_to_target_workspace&gt;
+   ```
+
+   _Example for current directory:_
+
+   ```bash
+   npm run start-server my-project $(pwd)
+   ```
+
+## Capabilities (MCP Tools)
+
+### `memory_search`
+
+Search for memories by query, type, or tags.
+
+- **Args**: `query` (string), `type?` (string), `tags?` (string[])
+- **Usage**: &quot;Find all authentication patterns&quot; -&gt; `memory_search({ query: &quot;authentication&quot;, type: &quot;pattern&quot; })`
+
+### `memory_write`
+
+Record new knowledge or decisions.
+
+- **Args**: `key` (string), `type` (string), `content` (string), `tags?` (string[])
+- **Usage**: &quot;Save this architecture decision&quot; -&gt; `memory_write({ key: &quot;auth-v1&quot;, type: &quot;decision&quot;, content: &quot;...&quot; })`
+
+### `memory_read`
+
+Retrieve specific memory content by key.
+
+- **Args**: `key` (string)
+- **Usage**: &quot;Get the auth design&quot; -&gt; `memory_read({ key: &quot;auth-v1&quot; })`
+
+### `memory_stats`
+
+View analytics on memory usage.
+
+- **Usage**: &quot;Show memory statistics&quot; -&gt; `memory_stats({})`
+
+## Dashboard
+
+This skill includes a standalone dashboard to visualize memory usage.
+
+```bash
+npm run start-dashboard &lt;absolute_path_to_target_workspace&gt;
+```
+
+Access at: `http://localhost:3333`
+</code>
       </div>
     </div>
 

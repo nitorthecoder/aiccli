@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,863 @@
     <p class="desc">"Automate GitHub workflows with AI assistance. Includes PR reviews, issue triage, CI/CD integration, and Git operations. Use when automating GitHub workflows, setting up PR review automation, creating GitHub Actions, or triaging issues."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/github-workflow-automation</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/github-workflow-automation</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: github-workflow-automation
+description: &quot;Automate GitHub workflows with AI assistance. Includes PR reviews, issue triage, CI/CD integration, and Git operations. Use when automating GitHub workflows, setting up PR review automation, creating GitHub Actions, or triaging issues.&quot;
+---
+
+# 🔧 GitHub Workflow Automation
+
+&gt; Patterns for automating GitHub workflows with AI assistance, inspired by [Gemini CLI](https://github.com/google-gemini/gemini-cli) and modern DevOps practices.
+
+## When to Use This Skill
+
+Use this skill when:
+
+- Automating PR reviews with AI
+- Setting up issue triage automation
+- Creating GitHub Actions workflows
+- Integrating AI into CI/CD pipelines
+- Automating Git operations (rebases, cherry-picks)
+
+---
+
+## 1. Automated PR Review
+
+### 1.1 PR Review Action
+
+```yaml
+# .github/workflows/ai-review.yml
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed
+        run: |
+          files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo &quot;files&lt;&lt;EOF&quot; &gt;&gt; $GITHUB_OUTPUT
+          echo &quot;$files&quot; &gt;&gt; $GITHUB_OUTPUT
+          echo &quot;EOF&quot; &gt;&gt; $GITHUB_OUTPUT
+
+      - name: Get diff
+        id: diff
+        run: |
+          diff=$(git diff origin/${{ github.base_ref }}...HEAD)
+          echo &quot;diff&lt;&lt;EOF&quot; &gt;&gt; $GITHUB_OUTPUT
+          echo &quot;$diff&quot; &gt;&gt; $GITHUB_OUTPUT
+          echo &quot;EOF&quot; &gt;&gt; $GITHUB_OUTPUT
+
+      - name: AI Review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { Anthropic } = require(&#039;@anthropic-ai/sdk&#039;);
+            const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+            const response = await client.messages.create({
+              model: &quot;claude-3-sonnet-20240229&quot;,
+              max_tokens: 4096,
+              messages: [{
+                role: &quot;user&quot;,
+                content: `Review this PR diff and provide feedback:
+                
+                Changed files: ${{ steps.changed.outputs.files }}
+                
+                Diff:
+                ${{ steps.diff.outputs.diff }}
+                
+                Provide:
+                1. Summary of changes
+                2. Potential issues or bugs
+                3. Suggestions for improvement
+                4. Security concerns if any
+                
+                Format as GitHub markdown.`
+              }]
+            });
+
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              body: response.content[0].text,
+              event: &#039;COMMENT&#039;
+            });
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+### 1.2 Review Comment Patterns
+
+````markdown
+# AI Review Structure
+
+## 📋 Summary
+
+Brief description of what this PR does.
+
+## ✅ What looks good
+
+- Well-structured code
+- Good test coverage
+- Clear naming conventions
+
+## ⚠️ Potential Issues
+
+1. **Line 42**: Possible null pointer exception
+   ```javascript
+   // Current
+   user.profile.name;
+   // Suggested
+   user?.profile?.name ?? &quot;Unknown&quot;;
+   ```
+````
+
+2. **Line 78**: Consider error handling
+   ```javascript
+   // Add try-catch or .catch()
+   ```
+
+## 💡 Suggestions
+
+- Consider extracting the validation logic into a separate function
+- Add JSDoc comments for public methods
+
+## 🔒 Security Notes
+
+- No sensitive data exposure detected
+- API key handling looks correct
+
+````
+
+### 1.3 Focused Reviews
+
+```yaml
+# Review only specific file types
+- name: Filter code files
+  run: |
+    files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | \
+            grep -E &#039;\.(ts|tsx|js|jsx|py|go)$&#039; || true)
+    echo &quot;code_files=$files&quot; &gt;&gt; $GITHUB_OUTPUT
+
+# Review with context
+- name: AI Review with context
+  run: |
+    # Include relevant context files
+    context=&quot;&quot;
+    for file in ${{ steps.changed.outputs.files }}; do
+      if [[ -f &quot;$file&quot; ]]; then
+        context+=&quot;=== $file ===\n$(cat $file)\n\n&quot;
+      fi
+    done
+
+    # Send to AI with full file context
+````
+
+---
+
+## 2. Issue Triage Automation
+
+### 2.1 Auto-label Issues
+
+```yaml
+# .github/workflows/issue-triage.yml
+name: Issue Triage
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Analyze issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+
+            // Call AI to analyze
+            const analysis = await analyzeIssue(issue.title, issue.body);
+
+            // Apply labels
+            const labels = [];
+
+            if (analysis.type === &#039;bug&#039;) {
+              labels.push(&#039;bug&#039;);
+              if (analysis.severity === &#039;high&#039;) labels.push(&#039;priority: high&#039;);
+            } else if (analysis.type === &#039;feature&#039;) {
+              labels.push(&#039;enhancement&#039;);
+            } else if (analysis.type === &#039;question&#039;) {
+              labels.push(&#039;question&#039;);
+            }
+
+            if (analysis.area) {
+              labels.push(`area: ${analysis.area}`);
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: labels
+            });
+
+            // Add initial response
+            if (analysis.type === &#039;bug&#039; &amp;&amp; !analysis.hasReproSteps) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `Thanks for reporting this issue!
+
+To help us investigate, could you please provide:
+- Steps to reproduce the issue
+- Expected behavior
+- Actual behavior
+- Environment (OS, version, etc.)
+
+This will help us resolve your issue faster. 🙏`
+              });
+            }
+```
+
+### 2.2 Issue Analysis Prompt
+
+```typescript
+const TRIAGE_PROMPT = `
+Analyze this GitHub issue and classify it:
+
+Title: {title}
+Body: {body}
+
+Return JSON with:
+{
+  &quot;type&quot;: &quot;bug&quot; | &quot;feature&quot; | &quot;question&quot; | &quot;docs&quot; | &quot;other&quot;,
+  &quot;severity&quot;: &quot;low&quot; | &quot;medium&quot; | &quot;high&quot; | &quot;critical&quot;,
+  &quot;area&quot;: &quot;frontend&quot; | &quot;backend&quot; | &quot;api&quot; | &quot;docs&quot; | &quot;ci&quot; | &quot;other&quot;,
+  &quot;summary&quot;: &quot;one-line summary&quot;,
+  &quot;hasReproSteps&quot;: boolean,
+  &quot;isFirstContribution&quot;: boolean,
+  &quot;suggestedLabels&quot;: [&quot;label1&quot;, &quot;label2&quot;],
+  &quot;suggestedAssignees&quot;: [&quot;username&quot;] // based on area expertise
+}
+`;
+```
+
+### 2.3 Stale Issue Management
+
+```yaml
+# .github/workflows/stale.yml
+name: Manage Stale Issues
+
+on:
+  schedule:
+    - cron: &quot;0 0 * * *&quot; # Daily
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has not had 
+            recent activity. It will be closed in 14 days if no further activity occurs.
+
+            If this issue is still relevant:
+            - Add a comment with an update
+            - Remove the `stale` label
+
+            Thank you for your contributions! 🙏
+
+          stale-pr-message: |
+            This PR has been automatically marked as stale. Please update it or it 
+            will be closed in 14 days.
+
+          days-before-stale: 60
+          days-before-close: 14
+          stale-issue-label: &quot;stale&quot;
+          stale-pr-label: &quot;stale&quot;
+          exempt-issue-labels: &quot;pinned,security,in-progress&quot;
+          exempt-pr-labels: &quot;pinned,security&quot;
+```
+
+---
+
+## 3. CI/CD Integration
+
+### 3.1 Smart Test Selection
+
+```yaml
+# .github/workflows/smart-tests.yml
+name: Smart Test Selection
+
+on:
+  pull_request:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    outputs:
+      test_suites: ${{ steps.analyze.outputs.suites }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Analyze changes
+        id: analyze
+        run: |
+          # Get changed files
+          changed=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+
+          # Determine which test suites to run
+          suites=&quot;[]&quot;
+
+          if echo &quot;$changed&quot; | grep -q &quot;^src/api/&quot;; then
+            suites=$(echo $suites | jq &#039;. + [&quot;api&quot;]&#039;)
+          fi
+
+          if echo &quot;$changed&quot; | grep -q &quot;^src/frontend/&quot;; then
+            suites=$(echo $suites | jq &#039;. + [&quot;frontend&quot;]&#039;)
+          fi
+
+          if echo &quot;$changed&quot; | grep -q &quot;^src/database/&quot;; then
+            suites=$(echo $suites | jq &#039;. + [&quot;database&quot;, &quot;api&quot;]&#039;)
+          fi
+
+          # If nothing specific, run all
+          if [ &quot;$suites&quot; = &quot;[]&quot; ]; then
+            suites=&#039;[&quot;all&quot;]&#039;
+          fi
+
+          echo &quot;suites=$suites&quot; &gt;&gt; $GITHUB_OUTPUT
+
+  test:
+    needs: analyze
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        suite: ${{ fromJson(needs.analyze.outputs.test_suites) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          if [ &quot;${{ matrix.suite }}&quot; = &quot;all&quot; ]; then
+            npm test
+          else
+            npm test -- --suite ${{ matrix.suite }}
+          fi
+```
+
+### 3.2 Deployment with AI Validation
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy with AI Validation
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get deployment changes
+        id: changes
+        run: |
+          # Get commits since last deployment
+          last_deploy=$(git describe --tags --abbrev=0 2&gt;/dev/null || echo &quot;&quot;)
+          if [ -n &quot;$last_deploy&quot; ]; then
+            changes=$(git log --oneline $last_deploy..HEAD)
+          else
+            changes=$(git log --oneline -10)
+          fi
+          echo &quot;changes&lt;&lt;EOF&quot; &gt;&gt; $GITHUB_OUTPUT
+          echo &quot;$changes&quot; &gt;&gt; $GITHUB_OUTPUT
+          echo &quot;EOF&quot; &gt;&gt; $GITHUB_OUTPUT
+
+      - name: AI Risk Assessment
+        id: assess
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Analyze changes for deployment risk
+            const prompt = `
+            Analyze these changes for deployment risk:
+
+            ${process.env.CHANGES}
+
+            Return JSON:
+            {
+              &quot;riskLevel&quot;: &quot;low&quot; | &quot;medium&quot; | &quot;high&quot;,
+              &quot;concerns&quot;: [&quot;concern1&quot;, &quot;concern2&quot;],
+              &quot;recommendations&quot;: [&quot;rec1&quot;, &quot;rec2&quot;],
+              &quot;requiresManualApproval&quot;: boolean
+            }
+            `;
+
+            // Call AI and parse response
+            const analysis = await callAI(prompt);
+
+            if (analysis.riskLevel === &#039;high&#039;) {
+              core.setFailed(&#039;High-risk deployment detected. Manual review required.&#039;);
+            }
+
+            return analysis;
+        env:
+          CHANGES: ${{ steps.changes.outputs.changes }}
+
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy
+        run: |
+          echo &quot;Deploying to production...&quot;
+          # Deployment commands here
+```
+
+### 3.3 Rollback Automation
+
+```yaml
+# .github/workflows/rollback.yml
+name: Automated Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: &quot;Reason for rollback&quot;
+        required: true
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find last stable version
+        id: stable
+        run: |
+          # Find last successful deployment
+          stable=$(git tag -l &#039;v*&#039; --sort=-version:refname | head -1)
+          echo &quot;version=$stable&quot; &gt;&gt; $GITHUB_OUTPUT
+
+      - name: Rollback
+        run: |
+          git checkout ${{ steps.stable.outputs.version }}
+          # Deploy stable version
+          npm run deploy
+
+      - name: Notify team
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              &quot;text&quot;: &quot;🔄 Production rolled back to ${{ steps.stable.outputs.version }}&quot;,
+              &quot;blocks&quot;: [
+                {
+                  &quot;type&quot;: &quot;section&quot;,
+                  &quot;text&quot;: {
+                    &quot;type&quot;: &quot;mrkdwn&quot;,
+                    &quot;text&quot;: &quot;*Rollback executed*\n• Version: `${{ steps.stable.outputs.version }}`\n• Reason: ${{ inputs.reason }}\n• Triggered by: ${{ github.actor }}&quot;
+                  }
+                }
+              ]
+            }
+```
+
+---
+
+## 4. Git Operations
+
+### 4.1 Automated Rebasing
+
+```yaml
+# .github/workflows/auto-rebase.yml
+name: Auto Rebase
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  rebase:
+    if: github.event.issue.pull_request &amp;&amp; contains(github.event.comment.body, &#039;/rebase&#039;)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config user.name &quot;github-actions[bot]&quot;
+          git config user.email &quot;github-actions[bot]@users.noreply.github.com&quot;
+
+      - name: Rebase PR
+        run: |
+          # Fetch PR branch
+          gh pr checkout ${{ github.event.issue.number }}
+
+          # Rebase onto main
+          git fetch origin main
+          git rebase origin/main
+
+          # Force push
+          git push --force-with-lease
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment result
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: &#039;✅ Successfully rebased onto main!&#039;
+            })
+```
+
+### 4.2 Smart Cherry-Pick
+
+```typescript
+// AI-assisted cherry-pick that handles conflicts
+async function smartCherryPick(commitHash: string, targetBranch: string) {
+  // Get commit info
+  const commitInfo = await exec(`git show ${commitHash} --stat`);
+
+  // Check for potential conflicts
+  const targetDiff = await exec(
+    `git diff ${targetBranch}...HEAD -- ${affectedFiles}`
+  );
+
+  // AI analysis
+  const analysis = await ai.analyze(`
+    I need to cherry-pick this commit to ${targetBranch}:
+    
+    ${commitInfo}
+    
+    Current state of affected files on ${targetBranch}:
+    ${targetDiff}
+    
+    Will there be conflicts? If so, suggest resolution strategy.
+  `);
+
+  if (analysis.willConflict) {
+    // Create branch for manual resolution
+    await exec(
+      `git checkout -b cherry-pick-${commitHash.slice(0, 7)} ${targetBranch}`
+    );
+    const result = await exec(`git cherry-pick ${commitHash}`, {
+      allowFail: true,
+    });
+
+    if (result.failed) {
+      // AI-assisted conflict resolution
+      const conflicts = await getConflicts();
+      for (const conflict of conflicts) {
+        const resolution = await ai.resolveConflict(conflict);
+        await applyResolution(conflict.file, resolution);
+      }
+    }
+  } else {
+    await exec(`git checkout ${targetBranch}`);
+    await exec(`git cherry-pick ${commitHash}`);
+  }
+}
+```
+
+### 4.3 Branch Cleanup
+
+```yaml
+# .github/workflows/branch-cleanup.yml
+name: Branch Cleanup
+
+on:
+  schedule:
+    - cron: &#039;0 0 * * 0&#039;  # Weekly
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find stale branches
+        id: stale
+        run: |
+          # Branches not updated in 30 days
+          stale=$(git for-each-ref --sort=-committerdate refs/remotes/origin \
+            --format=&#039;%(refname:short) %(committerdate:relative)&#039; | \
+            grep -E &#039;[3-9][0-9]+ days|[0-9]+ months|[0-9]+ years&#039; | \
+            grep -v &#039;origin/main\|origin/develop&#039; | \
+            cut -d&#039; &#039; -f1 | sed &#039;s|origin/||&#039;)
+
+          echo &quot;branches&lt;&lt;EOF&quot; &gt;&gt; $GITHUB_OUTPUT
+          echo &quot;$stale&quot; &gt;&gt; $GITHUB_OUTPUT
+          echo &quot;EOF&quot; &gt;&gt; $GITHUB_OUTPUT
+
+      - name: Create cleanup PR
+        if: steps.stale.outputs.branches != &#039;&#039;
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branches = `${{ steps.stale.outputs.branches }}`.split(&#039;\n&#039;).filter(Boolean);
+
+            const body = `## 🧹 Stale Branch Cleanup
+
+The following branches haven&#039;t been updated in over 30 days:
+
+${branches.map(b =&gt; `- \`${b}\``).join(&#039;\n&#039;)}
+
+### Actions:
+- [ ] Review each branch
+- [ ] Delete branches that are no longer needed
+- Comment \`/keep branch-name\` to preserve specific branches
+`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: &#039;Stale Branch Cleanup&#039;,
+              body: body,
+              labels: [&#039;housekeeping&#039;]
+            });
+```
+
+---
+
+## 5. On-Demand Assistance
+
+### 5.1 @mention Bot
+
+```yaml
+# .github/workflows/mention-bot.yml
+name: AI Mention Bot
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  respond:
+    if: contains(github.event.comment.body, &#039;@ai-helper&#039;)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract question
+        id: question
+        run: |
+          # Extract text after @ai-helper
+          question=$(echo &quot;${{ github.event.comment.body }}&quot; | sed &#039;s/.*@ai-helper//&#039;)
+          echo &quot;question=$question&quot; &gt;&gt; $GITHUB_OUTPUT
+
+      - name: Get context
+        id: context
+        run: |
+          if [ &quot;${{ github.event.issue.pull_request }}&quot; != &quot;&quot; ]; then
+            # It&#039;s a PR - get diff
+            gh pr diff ${{ github.event.issue.number }} &gt; context.txt
+          else
+            # It&#039;s an issue - get description
+            gh issue view ${{ github.event.issue.number }} --json body -q .body &gt; context.txt
+          fi
+          echo &quot;context=$(cat context.txt)&quot; &gt;&gt; $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: AI Response
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const response = await ai.chat(`
+              Context: ${process.env.CONTEXT}
+              
+              Question: ${process.env.QUESTION}
+              
+              Provide a helpful, specific answer. Include code examples if relevant.
+            `);
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: response
+            });
+        env:
+          CONTEXT: ${{ steps.context.outputs.context }}
+          QUESTION: ${{ steps.question.outputs.question }}
+```
+
+### 5.2 Command Patterns
+
+```markdown
+## Available Commands
+
+| Command              | Description                 |
+| :------------------- | :-------------------------- |
+| `@ai-helper explain` | Explain the code in this PR |
+| `@ai-helper review`  | Request AI code review      |
+| `@ai-helper fix`     | Suggest fixes for issues    |
+| `@ai-helper test`    | Generate test cases         |
+| `@ai-helper docs`    | Generate documentation      |
+| `/rebase`            | Rebase PR onto main         |
+| `/update`            | Update PR branch from main  |
+| `/approve`           | Mark as approved by bot     |
+| `/label bug`         | Add &#039;bug&#039; label             |
+| `/assign @user`      | Assign to user              |
+```
+
+---
+
+## 6. Repository Configuration
+
+### 6.1 CODEOWNERS
+
+```
+# .github/CODEOWNERS
+
+# Global owners
+* @org/core-team
+
+# Frontend
+/src/frontend/ @org/frontend-team
+*.tsx @org/frontend-team
+*.css @org/frontend-team
+
+# Backend
+/src/api/ @org/backend-team
+/src/database/ @org/backend-team
+
+# Infrastructure
+/.github/ @org/devops-team
+/terraform/ @org/devops-team
+Dockerfile @org/devops-team
+
+# Docs
+/docs/ @org/docs-team
+*.md @org/docs-team
+
+# Security-sensitive
+/src/auth/ @org/security-team
+/src/crypto/ @org/security-team
+```
+
+### 6.2 Branch Protection
+
+```yaml
+# Set up via GitHub API
+- name: Configure branch protection
+  uses: actions/github-script@v7
+  with:
+    script: |
+      await github.rest.repos.updateBranchProtection({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        branch: &#039;main&#039;,
+        required_status_checks: {
+          strict: true,
+          contexts: [&#039;test&#039;, &#039;lint&#039;, &#039;ai-review&#039;]
+        },
+        enforce_admins: true,
+        required_pull_request_reviews: {
+          required_approving_review_count: 1,
+          require_code_owner_reviews: true,
+          dismiss_stale_reviews: true
+        },
+        restrictions: null,
+        required_linear_history: true,
+        allow_force_pushes: false,
+        allow_deletions: false
+      });
+```
+
+---
+
+## Best Practices
+
+### Security
+
+- [ ] Store API keys in GitHub Secrets
+- [ ] Use minimal permissions in workflows
+- [ ] Validate all inputs
+- [ ] Don&#039;t expose sensitive data in logs
+
+### Performance
+
+- [ ] Cache dependencies
+- [ ] Use matrix builds for parallel testing
+- [ ] Skip unnecessary jobs with path filters
+- [ ] Use self-hosted runners for heavy workloads
+
+### Reliability
+
+- [ ] Add timeouts to jobs
+- [ ] Handle rate limits gracefully
+- [ ] Implement retry logic
+- [ ] Have rollback procedures
+
+---
+
+## Resources
+
+- [Gemini CLI GitHub Action](https://github.com/google-github-actions/run-gemini-cli)
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+- [GitHub REST API](https://docs.github.com/en/rest)
+- [CODEOWNERS Syntax](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
+</code>
       </div>
     </div>
 

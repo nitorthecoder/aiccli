@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,143 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/create-pull-request</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/create-pull-request</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># How to Create a Pull Request Using GitHub CLI
+
+This guide explains how to create pull requests using GitHub CLI in our project.
+
+## Prerequisites
+
+1. Install GitHub CLI if you haven&#039;t already:
+
+   ```bash
+   # macOS
+   brew install gh
+
+   # Windows
+   winget install --id GitHub.cli
+
+   # Linux
+   # Follow instructions at https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+   ```
+
+2. Authenticate with GitHub:
+   ```bash
+   gh auth login
+   ```
+
+## Creating a New Pull Request
+
+1. First, prepare your PR description following the template in `.github/pull_request_template.md`
+
+2. Use the `gh pr create` command to create a new pull request:
+
+   ```bash
+   # Basic command structure
+   gh pr create --title &quot;✨(scope): Your descriptive title&quot; --body &quot;Your PR description&quot; --base main --draft
+   ```
+
+   For more complex PR descriptions with proper formatting, use the `--body-file` option with the exact PR template structure:
+
+   ```bash
+   # Create PR with proper template structure
+   gh pr create --title &quot;✨(scope): Your descriptive title&quot; --body-file &lt;(echo -e &quot;## Issue\n\n- resolve:\n\n## Why is this change needed?\nYour description here.\n\n## What would you like reviewers to focus on?\n- Point 1\n- Point 2\n\n## Testing Verification\nHow you tested these changes.\n\n## What was done\npr_agent:summary\n\n## Detailed Changes\npr_agent:walkthrough\n\n## Additional Notes\nAny additional notes.&quot;) --base main --draft
+   ```
+
+## Best Practices
+
+1. **PR Title Format**: Use conventional commit format with emojis
+
+   - Always include an appropriate emoji at the beginning of the title
+   - Use the actual emoji character (not the code representation like `:sparkles:`)
+   - Examples:
+     - `✨(supabase): Add staging remote configuration`
+     - `🐛(auth): Fix login redirect issue`
+     - `📝(readme): Update installation instructions`
+
+2. **Description Template**: Always use our PR template structure from `.github/pull_request_template.md`:
+
+   - Issue reference
+   - Why the change is needed
+   - Review focus points
+   - Testing verification
+   - PR-Agent sections (keep `pr_agent:summary` and `pr_agent:walkthrough` tags intact)
+   - Additional notes
+
+3. **Template Accuracy**: Ensure your PR description precisely follows the template structure:
+
+   - Don&#039;t modify or rename the PR-Agent sections (`pr_agent:summary` and `pr_agent:walkthrough`)
+   - Keep all section headers exactly as they appear in the template
+   - Don&#039;t add custom sections that aren&#039;t in the template
+
+4. **Draft PRs**: Start as draft when the work is in progress
+   - Use `--draft` flag in the command
+   - Convert to ready for review when complete using `gh pr ready`
+
+### Common Mistakes to Avoid
+
+1. **Incorrect Section Headers**: Always use the exact section headers from the template
+2. **Modifying PR-Agent Sections**: Don&#039;t remove or modify the `pr_agent:summary` and `pr_agent:walkthrough` placeholders
+3. **Adding Custom Sections**: Stick to the sections defined in the template
+4. **Using Outdated Templates**: Always refer to the current `.github/pull_request_template.md` file
+
+### Missing Sections
+
+Always include all template sections, even if some are marked as &quot;N/A&quot; or &quot;None&quot;
+
+## Additional GitHub CLI PR Commands
+
+Here are some additional useful GitHub CLI commands for managing PRs:
+
+```bash
+# List your open pull requests
+gh pr list --author &quot;@me&quot;
+
+# Check PR status
+gh pr status
+
+# View a specific PR
+gh pr view &lt;PR-NUMBER&gt;
+
+# Check out a PR branch locally
+gh pr checkout &lt;PR-NUMBER&gt;
+
+# Convert a draft PR to ready for review
+gh pr ready &lt;PR-NUMBER&gt;
+
+# Add reviewers to a PR
+gh pr edit &lt;PR-NUMBER&gt; --add-reviewer username1,username2
+
+# Merge a PR
+gh pr merge &lt;PR-NUMBER&gt; --squash
+```
+
+## Using Templates for PR Creation
+
+To simplify PR creation with consistent descriptions, you can create a template file:
+
+1. Create a file named `pr-template.md` with your PR template
+2. Use it when creating PRs:
+
+```bash
+gh pr create --title &quot;feat(scope): Your title&quot; --body-file pr-template.md --base main --draft
+```
+
+## Related Documentation
+
+- [PR Template](.github/pull_request_template.md)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [GitHub CLI documentation](https://cli.github.com/manual/)
+</code>
       </div>
     </div>
 

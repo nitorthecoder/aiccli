@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,475 @@
     <p class="desc">Compress large language models using knowledge distillation from teacher to student models. Use when deploying smaller models with retained performance, transferring GPT-4 capabilities to open-source models, or reducing inference costs. Covers temperature scaling, soft targets, reverse KLD, logit distillation, and MiniLLM training strategies.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/emerging-techniques-knowledge-distillation</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/emerging-techniques-knowledge-distillation</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: knowledge-distillation
+description: Compress large language models using knowledge distillation from teacher to student models. Use when deploying smaller models with retained performance, transferring GPT-4 capabilities to open-source models, or reducing inference costs. Covers temperature scaling, soft targets, reverse KLD, logit distillation, and MiniLLM training strategies.
+version: 1.0.0
+author: Orchestra Research
+license: MIT
+tags: [Emerging Techniques, Knowledge Distillation, Model Compression, Teacher-Student, MiniLLM, Reverse KLD, Soft Targets, Temperature Scaling, Logit Distillation, Model Transfer]
+dependencies: [transformers, torch, datasets]
+---
+
+# Knowledge Distillation: Compressing LLMs
+
+## When to Use This Skill
+
+Use Knowledge Distillation when you need to:
+- **Compress models** from 70B → 7B while retaining 90%+ performance
+- **Transfer capabilities** from proprietary models (GPT-4) to open-source (LLaMA, Mistral)
+- **Reduce inference costs** by deploying smaller student models
+- **Create specialized models** by distilling domain-specific knowledge
+- **Improve small models** using synthetic data from large teachers
+
+**Key Techniques**: Temperature scaling, soft targets, reverse KLD (MiniLLM), logit distillation, response distillation
+
+**Papers**: Hinton et al. 2015 (arXiv 1503.02531), MiniLLM (arXiv 2306.08543), KD Survey (arXiv 2402.13116)
+
+## Installation
+
+```bash
+# Standard transformers
+pip install transformers datasets accelerate
+
+# For training
+pip install torch deepspeed wandb
+
+# Optional: MiniLLM implementation
+git clone https://github.com/microsoft/LMOps
+cd LMOps/minillm
+pip install -e .
+```
+
+## Quick Start
+
+### Basic Knowledge Distillation
+
+```python
+import torch
+import torch.nn.functional as F
+from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments
+
+# 1. Load teacher (large) and student (small) models
+teacher = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Llama-2-70b-hf&quot;,  # Large teacher
+    torch_dtype=torch.float16,
+    device_map=&quot;auto&quot;
+)
+
+student = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Llama-2-7b-hf&quot;,  # Small student
+    torch_dtype=torch.float16,
+    device_map=&quot;cuda:0&quot;
+)
+
+tokenizer = AutoTokenizer.from_pretrained(&quot;meta-llama/Llama-2-70b-hf&quot;)
+
+# 2. Define distillation loss
+def distillation_loss(student_logits, teacher_logits, labels, temperature=2.0, alpha=0.5):
+    &quot;&quot;&quot;
+    Combine hard loss (cross-entropy) with soft loss (KL divergence).
+
+    Args:
+        temperature: Softens probability distributions (higher = softer)
+        alpha: Weight for distillation loss (1-alpha for hard loss)
+    &quot;&quot;&quot;
+    # Hard loss: Standard cross-entropy with true labels
+    hard_loss = F.cross_entropy(student_logits.view(-1, student_logits.size(-1)), labels.view(-1))
+
+    # Soft loss: KL divergence between student and teacher
+    soft_targets = F.softmax(teacher_logits / temperature, dim=-1)
+    soft_student = F.log_softmax(student_logits / temperature, dim=-1)
+    soft_loss = F.kl_div(soft_student, soft_targets, reduction=&#039;batchmean&#039;) * (temperature ** 2)
+
+    # Combined loss
+    return alpha * soft_loss + (1 - alpha) * hard_loss
+
+# 3. Training loop
+for batch in dataloader:
+    # Teacher forward (no grad)
+    with torch.no_grad():
+        teacher_outputs = teacher(**batch)
+        teacher_logits = teacher_outputs.logits
+
+    # Student forward
+    student_outputs = student(**batch)
+    student_logits = student_outputs.logits
+
+    # Compute distillation loss
+    loss = distillation_loss(
+        student_logits,
+        teacher_logits,
+        batch[&#039;labels&#039;],
+        temperature=2.0,
+        alpha=0.7  # 70% soft, 30% hard
+    )
+
+    # Backward and optimize
+    loss.backward()
+    optimizer.step()
+    optimizer.zero_grad()
+```
+
+### MiniLLM (Reverse KLD)
+
+**Source**: arXiv 2306.08543 (2024)
+
+**Innovation**: Use reverse KLD instead of forward KLD for better generative model distillation.
+
+```python
+def reverse_kl_loss(student_logits, teacher_logits, temperature=1.0):
+    &quot;&quot;&quot;
+    Reverse KL divergence: KL(Teacher || Student)
+    Better for generative models than forward KL.
+    &quot;&quot;&quot;
+    # Teacher distribution (target)
+    p_teacher = F.softmax(teacher_logits / temperature, dim=-1)
+
+    # Student distribution (model)
+    log_p_student = F.log_softmax(student_logits / temperature, dim=-1)
+
+    # Reverse KL: Sum over teacher, student learns to cover teacher&#039;s modes
+    reverse_kl = -(p_teacher * log_p_student).sum(dim=-1).mean()
+
+    return reverse_kl * (temperature ** 2)
+
+# Training with MiniLLM
+for batch in dataloader:
+    with torch.no_grad():
+        teacher_logits = teacher(**batch).logits
+
+    student_logits = student(**batch).logits
+
+    # Reverse KLD (better for generation)
+    loss = reverse_kl_loss(student_logits, teacher_logits, temperature=1.0)
+
+    loss.backward()
+    optimizer.step()
+```
+
+**Why reverse KL?**
+- **Forward KL** (standard): Student learns to match teacher&#039;s *mean*
+- **Reverse KL** (MiniLLM): Student learns to *cover* all teacher&#039;s modes
+- Better for diverse text generation
+
+### Response Distillation
+
+```python
+# Generate synthetic data from teacher, train student to imitate
+
+# 1. Generate synthetic responses from teacher
+prompts = [&quot;Explain AI:&quot;, &quot;What is ML?&quot;, &quot;Define NLP:&quot;]
+
+teacher_responses = []
+for prompt in prompts:
+    inputs = tokenizer(prompt, return_tensors=&#039;pt&#039;).to(teacher.device)
+    outputs = teacher.generate(**inputs, max_new_tokens=256, do_sample=True, temperature=0.7)
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    teacher_responses.append(response)
+
+# 2. Train student on teacher&#039;s responses (standard fine-tuning)
+train_dataset = [
+    {&quot;text&quot;: f&quot;{prompt}\n{response}&quot;}
+    for prompt, response in zip(prompts, teacher_responses)
+]
+
+# 3. Fine-tune student
+trainer = Trainer(
+    model=student,
+    args=TrainingArguments(output_dir=&quot;./student&quot;, num_train_epochs=3, learning_rate=2e-5),
+    train_dataset=train_dataset,
+)
+trainer.train()
+```
+
+## Core Concepts
+
+### 1. Temperature Scaling
+
+**Purpose**: Soften probability distributions to expose teacher&#039;s uncertainty.
+
+```python
+# Low temperature (T=1): Sharp distribution
+logits = [3.0, 2.0, 1.0]
+probs_T1 = softmax(logits / 1.0)  # [0.67, 0.24, 0.09]
+
+# High temperature (T=4): Soft distribution
+probs_T4 = softmax(logits / 4.0)  # [0.42, 0.34, 0.24]
+
+# Higher T reveals more information about relative rankings
+```
+
+**Rule**: Use T=2-5 for distillation (2 is common default).
+
+### 2. Loss Function Components
+
+```python
+# Total loss = alpha * soft_loss + (1 - alpha) * hard_loss
+
+# Soft loss: Learn from teacher&#039;s knowledge
+soft_loss = KL(student || teacher)
+
+# Hard loss: Learn from ground truth labels
+hard_loss = CrossEntropy(student_output, true_labels)
+
+# Typical values:
+alpha = 0.5  # Balanced
+alpha = 0.7  # More emphasis on teacher
+alpha = 0.3  # More emphasis on labels
+```
+
+### 3. Forward vs Reverse KLD
+
+```python
+# Forward KL: KL(Student || Teacher)
+# - Student matches teacher&#039;s average behavior
+# - Mode-seeking: Student focuses on teacher&#039;s highest probability modes
+# - Good for classification
+
+# Reverse KL: KL(Teacher || Student)
+# - Student covers all of teacher&#039;s behaviors
+# - Mode-covering: Student learns diverse behaviors
+# - Good for generation (MiniLLM)
+```
+
+## Training Strategies
+
+### Strategy 1: Logit Distillation
+
+```python
+# Train student to match teacher&#039;s logits directly
+
+def logit_distillation_trainer(student, teacher, dataloader, temperature=2.0):
+    optimizer = torch.optim.AdamW(student.parameters(), lr=2e-5)
+
+    for epoch in range(3):
+        for batch in dataloader:
+            # Get logits
+            with torch.no_grad():
+                teacher_logits = teacher(**batch).logits
+
+            student_logits = student(**batch).logits
+
+            # MSE on logits (alternative to KLD)
+            loss = F.mse_loss(student_logits, teacher_logits)
+
+            # Or use KLD
+            # loss = F.kl_div(
+            #     F.log_softmax(student_logits/temperature, dim=-1),
+            #     F.softmax(teacher_logits/temperature, dim=-1),
+            #     reduction=&#039;batchmean&#039;
+            # ) * (temperature ** 2)
+
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+
+    return student
+```
+
+### Strategy 2: Two-Stage Distillation
+
+```python
+# Stage 1: Distill from teacher
+student = distill(teacher, student, epochs=5)
+
+# Stage 2: Fine-tune on task-specific data
+student = fine_tune(student, task_data, epochs=3)
+
+# Results in better task performance than single-stage
+```
+
+### Strategy 3: Multi-Teacher Distillation
+
+```python
+# Learn from multiple expert teachers
+
+def multi_teacher_distillation(student, teachers, batch):
+    &quot;&quot;&quot;Distill from ensemble of teachers.&quot;&quot;&quot;
+    teacher_logits_list = []
+
+    # Get logits from all teachers
+    with torch.no_grad():
+        for teacher in teachers:
+            logits = teacher(**batch).logits
+            teacher_logits_list.append(logits)
+
+    # Average teacher predictions
+    avg_teacher_logits = torch.stack(teacher_logits_list).mean(dim=0)
+
+    # Student learns from ensemble
+    student_logits = student(**batch).logits
+    loss = F.kl_div(
+        F.log_softmax(student_logits, dim=-1),
+        F.softmax(avg_teacher_logits, dim=-1),
+        reduction=&#039;batchmean&#039;
+    )
+
+    return loss
+```
+
+## Production Deployment
+
+### Complete Training Script
+
+```python
+from transformers import Trainer, TrainingArguments, DataCollatorForLanguageModeling
+
+def train_distilled_model(
+    teacher_name=&quot;meta-llama/Llama-2-70b-hf&quot;,
+    student_name=&quot;meta-llama/Llama-2-7b-hf&quot;,
+    output_dir=&quot;./distilled-llama-7b&quot;,
+    temperature=2.0,
+    alpha=0.7,
+):
+    # Load models
+    teacher = AutoModelForCausalLM.from_pretrained(teacher_name, torch_dtype=torch.float16, device_map=&quot;auto&quot;)
+    student = AutoModelForCausalLM.from_pretrained(student_name, torch_dtype=torch.float16)
+    tokenizer = AutoTokenizer.from_pretrained(teacher_name)
+
+    # Custom trainer with distillation
+    class DistillationTrainer(Trainer):
+        def compute_loss(self, model, inputs, return_outputs=False):
+            # Student forward
+            outputs_student = model(**inputs)
+            student_logits = outputs_student.logits
+
+            # Teacher forward (no grad)
+            with torch.no_grad():
+                outputs_teacher = teacher(**inputs)
+                teacher_logits = outputs_teacher.logits
+
+            # Distillation loss
+            soft_targets = F.softmax(teacher_logits / temperature, dim=-1)
+            soft_student = F.log_softmax(student_logits / temperature, dim=-1)
+            soft_loss = F.kl_div(soft_student, soft_targets, reduction=&#039;batchmean&#039;) * (temperature ** 2)
+
+            # Hard loss
+            hard_loss = outputs_student.loss
+
+            # Combined
+            loss = alpha * soft_loss + (1 - alpha) * hard_loss
+
+            return (loss, outputs_student) if return_outputs else loss
+
+    # Training arguments
+    training_args = TrainingArguments(
+        output_dir=output_dir,
+        num_train_epochs=3,
+        per_device_train_batch_size=4,
+        gradient_accumulation_steps=8,
+        learning_rate=2e-5,
+        warmup_steps=500,
+        logging_steps=100,
+        save_steps=1000,
+        bf16=True,
+        gradient_checkpointing=True,
+    )
+
+    # Train
+    trainer = DistillationTrainer(
+        model=student,
+        args=training_args,
+        train_dataset=train_dataset,
+        data_collator=DataCollatorForLanguageModeling(tokenizer, mlm=False),
+    )
+
+    trainer.train()
+    student.save_pretrained(output_dir)
+    tokenizer.save_pretrained(output_dir)
+
+# Usage
+train_distilled_model(
+    teacher_name=&quot;meta-llama/Llama-2-70b-hf&quot;,
+    student_name=&quot;meta-llama/Llama-2-7b-hf&quot;,
+    temperature=2.0,
+    alpha=0.7
+)
+```
+
+## Best Practices
+
+### 1. Hyperparameter Selection
+
+```python
+# Temperature
+T = 1.0  # Sharp (less knowledge transfer)
+T = 2.0  # Standard (good balance)
+T = 5.0  # Soft (more knowledge transfer)
+
+# Alpha (weight)
+alpha = 0.5  # Balanced
+alpha = 0.7  # Emphasize teacher knowledge
+alpha = 0.9  # Strong distillation
+
+# Rule: Higher T + higher alpha = stronger distillation
+```
+
+### 2. Model Size Ratio
+
+```python
+# Good ratios (teacher/student)
+70B / 7B = 10×    # Excellent
+13B / 1B = 13×    # Good
+7B / 1B = 7×      # Acceptable
+
+# Avoid too large gap
+70B / 1B = 70×    # Too large, ineffective
+```
+
+### 3. Data Quality
+
+```python
+# Best: Use teacher-generated data + real data
+train_data = {
+    &quot;teacher_generated&quot;: 70%,  # Diverse, high-quality
+    &quot;real_data&quot;: 30%            # Ground truth
+}
+
+# Avoid: Only real data (doesn&#039;t utilize teacher fully)
+```
+
+## Evaluation
+
+```python
+from transformers import pipeline
+
+# Compare student vs teacher
+teacher_pipe = pipeline(&quot;text-generation&quot;, model=teacher)
+student_pipe = pipeline(&quot;text-generation&quot;, model=student)
+
+prompts = [&quot;Explain quantum computing:&quot;, &quot;What is AI?&quot;]
+
+for prompt in prompts:
+    teacher_out = teacher_pipe(prompt, max_new_tokens=100)
+    student_out = student_pipe(prompt, max_new_tokens=100)
+
+    print(f&quot;Prompt: {prompt}&quot;)
+    print(f&quot;Teacher: {teacher_out[0][&#039;generated_text&#039;]}&quot;)
+    print(f&quot;Student: {student_out[0][&#039;generated_text&#039;]}&quot;)
+    print(f&quot;Match quality: {calculate_similarity(teacher_out, student_out):.2f}&quot;)
+```
+
+## Resources
+
+- **Hinton et al. 2015 (Foundational)**: https://arxiv.org/abs/1503.02531
+- **MiniLLM (Reverse KLD)**: https://arxiv.org/abs/2306.08543
+- **KD Survey for LLMs (2024)**: https://arxiv.org/abs/2402.13116
+- **MiniLLM GitHub**: https://github.com/microsoft/LMOps/tree/main/minillm
+
+
+</code>
       </div>
     </div>
 

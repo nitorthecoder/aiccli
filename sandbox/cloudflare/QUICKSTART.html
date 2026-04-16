@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,284 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install sandbox/QUICKSTART</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install sandbox/QUICKSTART</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># Cloudflare Sandbox Quick Start Guide
+
+Get your Cloudflare Claude Code Sandbox running in under 5 minutes.
+
+## Prerequisites Checklist
+
+- [ ] Cloudflare account (sign up at https://dash.cloudflare.com/sign-up)
+- [ ] Anthropic API key (get from https://console.anthropic.com/)
+- [ ] Node.js 16.17.0+ installed
+- [ ] Docker installed and running (for local development)
+
+## Option 1: Deploy to Production (Fastest)
+
+Perfect if you want to skip local testing and deploy directly.
+
+### Step 1: Install Dependencies
+```bash
+cd .claude/sandbox/cloudflare
+npm install
+```
+
+### Step 2: Set API Key
+```bash
+npx wrangler secret put ANTHROPIC_API_KEY
+# Paste your Anthropic API key when prompted
+```
+
+### Step 3: Deploy
+```bash
+npx wrangler deploy
+```
+
+### Step 4: Wait for Container Provisioning
+```bash
+# Wait 2-3 minutes, then check:
+npx wrangler containers list
+# You should see: ✓ Container ready
+```
+
+### Step 5: Test Your Deployment
+```bash
+# Get your worker URL from the deploy output, then:
+curl -X POST https://YOUR-WORKER.YOUR-SUBDOMAIN.workers.dev/execute \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{&quot;question&quot;: &quot;What is the 10th Fibonacci number?&quot;}&#039;
+```
+
+Expected response:
+```json
+{
+  &quot;success&quot;: true,
+  &quot;question&quot;: &quot;What is the 10th Fibonacci number?&quot;,
+  &quot;code&quot;: &quot;def fibonacci(n):\n    ...&quot;,
+  &quot;output&quot;: &quot;55\n&quot;,
+  &quot;error&quot;: &quot;&quot;,
+  &quot;executionTime&quot;: 1234
+}
+```
+
+**Done!** Your sandbox is live at the edge.
+
+---
+
+## Option 2: Local Development First
+
+Perfect if you want to test locally before deploying.
+
+### Step 1: Install Dependencies
+```bash
+cd .claude/sandbox/cloudflare
+npm install
+```
+
+### Step 2: Create Local Environment File
+```bash
+cp .dev.vars.example .dev.vars
+# Edit .dev.vars and add your Anthropic API key
+```
+
+### Step 3: Start Docker
+```bash
+# macOS: Open Docker Desktop
+# Linux: sudo systemctl start docker
+# Windows: Start Docker Desktop
+
+# Verify Docker is running:
+docker ps
+```
+
+### Step 4: Start Development Server
+```bash
+npm run dev
+```
+
+Wait for:
+```
+⛅️ wrangler 3.78.12
+-------------------
+⎔ Starting local server...
+[wrangler:inf] Ready on http://localhost:8787
+```
+
+### Step 5: Test Locally
+```bash
+# In a new terminal:
+curl -X POST http://localhost:8787/execute \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{&quot;question&quot;: &quot;Calculate factorial of 5&quot;}&#039;
+```
+
+### Step 6: Deploy When Ready
+```bash
+# Stop the dev server (Ctrl+C)
+npx wrangler secret put ANTHROPIC_API_KEY
+npx wrangler deploy
+```
+
+**Done!** You&#039;ve tested locally and deployed.
+
+---
+
+## Option 3: Using the CLI Tools
+
+Perfect if you prefer command-line interaction.
+
+### Step 1: Setup (same as above)
+```bash
+cd .claude/sandbox/cloudflare
+npm install
+npx wrangler secret put ANTHROPIC_API_KEY
+npx wrangler deploy
+```
+
+### Step 2: Use the Launcher
+```bash
+# Execute a prompt
+node launcher.ts &quot;What is 2 to the power of 10?&quot; \
+  &quot;&quot; \
+  your_anthropic_key \
+  https://your-worker.workers.dev
+```
+
+### Step 3: Use the Monitor (for debugging)
+```bash
+# Get detailed execution metrics
+node monitor.ts &quot;Calculate factorial of 5&quot; \
+  your_anthropic_key \
+  https://your-worker.workers.dev
+```
+
+**Done!** You&#039;re using the CLI tools.
+
+---
+
+## Common Issues &amp; Quick Fixes
+
+### &quot;Container not ready&quot;
+**Solution**: Wait 2-3 minutes after first deployment
+```bash
+npx wrangler containers list
+```
+
+### &quot;Docker daemon is not running&quot;
+**Solution**: Start Docker Desktop or Docker service
+```bash
+docker ps  # Should list containers
+```
+
+### &quot;ANTHROPIC_API_KEY not configured&quot;
+**Solution**: Set the secret
+```bash
+# Production:
+npx wrangler secret put ANTHROPIC_API_KEY
+
+# Local (.dev.vars):
+echo &quot;ANTHROPIC_API_KEY=sk-ant-your-key&quot; &gt; .dev.vars
+```
+
+### &quot;Worker not found&quot;
+**Solution**: Deploy the worker
+```bash
+npx wrangler deploy
+```
+
+### &quot;Execution timeout&quot;
+**Solution**: Increase timeout in request
+```json
+{
+  &quot;question&quot;: &quot;Your question&quot;,
+  &quot;timeout&quot;: 60000
+}
+```
+
+---
+
+## Next Steps
+
+### 1. Customize Your Worker
+Edit `src/index.ts` to add custom logic:
+- Add authentication
+- Implement rate limiting
+- Add custom error handling
+- Create specialized endpoints
+
+### 2. Add Monitoring
+```bash
+# Watch logs in real-time
+npx wrangler tail
+
+# Use the monitor tool
+node monitor.ts &quot;your prompt&quot; your_api_key
+```
+
+### 3. Test Different Languages
+```bash
+# Python (default)
+curl -X POST https://your-worker.workers.dev/execute \
+  -d &#039;{&quot;question&quot;: &quot;Fibonacci&quot;, &quot;language&quot;: &quot;python&quot;}&#039;
+
+# JavaScript
+curl -X POST https://your-worker.workers.dev/execute \
+  -d &#039;{&quot;question&quot;: &quot;Fibonacci&quot;, &quot;language&quot;: &quot;javascript&quot;}&#039;
+```
+
+### 4. Integrate with Your App
+```javascript
+// Frontend integration
+const response = await fetch(&#039;https://your-worker.workers.dev/execute&#039;, {
+  method: &#039;POST&#039;,
+  headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
+  body: JSON.stringify({ question: &#039;Calculate factorial of 5&#039; })
+});
+
+const result = await response.json();
+console.log(result.output);
+```
+
+### 5. Enable Advanced Features
+See the main [README.md](./README.md) for:
+- Streaming output
+- Code Interpreter API
+- Caching strategies
+- Performance optimization
+
+---
+
+## Resources
+
+- **Documentation**: [README.md](./README.md)
+- **Debugging**: [SANDBOX_DEBUGGING.md](./SANDBOX_DEBUGGING.md)
+- **Component Info**: [claude-code-sandbox.md](./claude-code-sandbox.md)
+- **Cloudflare Docs**: https://developers.cloudflare.com/sandbox/
+- **Anthropic Docs**: https://docs.anthropic.com/
+
+---
+
+## Getting Help
+
+1. **Check logs**: `npx wrangler tail`
+2. **Use monitor**: `node monitor.ts &quot;test&quot; your_key`
+3. **Read debugging guide**: [SANDBOX_DEBUGGING.md](./SANDBOX_DEBUGGING.md)
+4. **Check container status**: `npx wrangler containers list`
+5. **Test health**: `curl https://your-worker.workers.dev/health`
+
+---
+
+**You&#039;re all set! Start executing code with Claude AI on Cloudflare&#039;s edge network.**
+</code>
       </div>
     </div>
 

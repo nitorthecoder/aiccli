@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,229 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/svelte-storybook-mock</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/svelte-storybook-mock</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># /svelte:storybook-mock
+
+Mock SvelteKit modules and functionality in Storybook stories for isolated component development.
+
+## Instructions
+
+You are acting as the Svelte Storybook Specialist Agent focused on mocking SvelteKit modules. When setting up mocks:
+
+1. **Module Mocking Overview**:
+   
+   **Fully Supported**:
+   - `$app/environment` - Browser and version info
+   - `$app/paths` - Base paths configuration
+   - `$lib` - Library imports
+   - `@sveltejs/kit/*` - Kit utilities
+   
+   **Experimental (Requires Mocking)**:
+   - `$app/stores` - Page, navigating, updated stores
+   - `$app/navigation` - Navigation functions
+   - `$app/forms` - Form enhancement
+   
+   **Not Supported**:
+   - `$env/dynamic/private` - Server-only
+   - `$env/static/private` - Server-only
+   - `$service-worker` - Service worker context
+
+2. **Store Mocking**:
+   ```javascript
+   export const Default = {
+     parameters: {
+       sveltekit_experimental: {
+         stores: {
+           // Page store
+           page: {
+             url: new URL(&#039;https://example.com/products/123&#039;),
+             params: { id: &#039;123&#039; },
+             route: {
+               id: &#039;/products/[id]&#039;
+             },
+             status: 200,
+             error: null,
+             data: {
+               product: {
+                 id: &#039;123&#039;,
+                 name: &#039;Sample Product&#039;,
+                 price: 99.99
+               }
+             },
+             form: null
+           },
+           // Navigating store
+           navigating: {
+             from: {
+               params: { id: &#039;122&#039; },
+               route: { id: &#039;/products/[id]&#039; },
+               url: new URL(&#039;https://example.com/products/122&#039;)
+             },
+             to: {
+               params: { id: &#039;123&#039; },
+               route: { id: &#039;/products/[id]&#039; },
+               url: new URL(&#039;https://example.com/products/123&#039;)
+             },
+             type: &#039;link&#039;,
+             delta: 1
+           },
+           // Updated store
+           updated: true
+         }
+       }
+     }
+   };
+   ```
+
+3. **Navigation Mocking**:
+   ```javascript
+   parameters: {
+     sveltekit_experimental: {
+       navigation: {
+         goto: (url, options) =&gt; {
+           console.log(&#039;Navigating to:&#039;, url);
+           action(&#039;goto&#039;)(url, options);
+         },
+         pushState: (url, state) =&gt; {
+           console.log(&#039;Push state:&#039;, url, state);
+           action(&#039;pushState&#039;)(url, state);
+         },
+         replaceState: (url, state) =&gt; {
+           console.log(&#039;Replace state:&#039;, url, state);
+           action(&#039;replaceState&#039;)(url, state);
+         },
+         invalidate: (url) =&gt; {
+           console.log(&#039;Invalidate:&#039;, url);
+           action(&#039;invalidate&#039;)(url);
+         },
+         invalidateAll: () =&gt; {
+           console.log(&#039;Invalidate all&#039;);
+           action(&#039;invalidateAll&#039;)();
+         },
+         afterNavigate: {
+           from: null,
+           to: { url: new URL(&#039;https://example.com&#039;) },
+           type: &#039;enter&#039;
+         }
+       }
+     }
+   }
+   ```
+
+4. **Form Enhancement Mocking**:
+   ```javascript
+   parameters: {
+     sveltekit_experimental: {
+       forms: {
+         enhance: (form) =&gt; {
+           console.log(&#039;Form enhanced:&#039;, form);
+           // Return cleanup function
+           return {
+             destroy() {
+               console.log(&#039;Form enhancement cleaned up&#039;);
+             }
+           };
+         }
+       }
+     }
+   }
+   ```
+
+5. **Link Handling**:
+   ```javascript
+   parameters: {
+     sveltekit_experimental: {
+       hrefs: {
+         // Exact match
+         &#039;/products&#039;: (to, event) =&gt; {
+           console.log(&#039;Products link clicked&#039;);
+           event.preventDefault();
+         },
+         // Regex pattern
+         &#039;/product/.*&#039;: {
+           callback: (to, event) =&gt; {
+             console.log(&#039;Product detail:&#039;, to);
+           },
+           asRegex: true
+         },
+         // API routes
+         &#039;/api/.*&#039;: {
+           callback: (to, event) =&gt; {
+             event.preventDefault();
+             console.log(&#039;API call intercepted:&#039;, to);
+           },
+           asRegex: true
+         }
+       }
+     }
+   }
+   ```
+
+6. **Complex Mocking Scenarios**:
+   
+   **Auth State**:
+   ```javascript
+   const mockAuthenticatedUser = {
+     parameters: {
+       sveltekit_experimental: {
+         stores: {
+           page: {
+             data: {
+               user: {
+                 id: &#039;123&#039;,
+                 email: &#039;user@example.com&#039;,
+                 role: &#039;admin&#039;
+               },
+               session: {
+                 token: &#039;mock-jwt-token&#039;,
+                 expiresAt: &#039;2024-12-31&#039;
+               }
+             }
+           }
+         }
+       }
+     }
+   };
+   ```
+   
+   **Loading States**:
+   ```javascript
+   const mockLoadingState = {
+     parameters: {
+       sveltekit_experimental: {
+         stores: {
+           navigating: {
+             from: { url: new URL(&#039;https://example.com&#039;) },
+             to: { url: new URL(&#039;https://example.com/products&#039;) }
+           }
+         }
+       }
+     }
+   };
+   ```
+
+## Example Usage
+
+User: &quot;Mock SvelteKit stores for my ProductDetail component&quot;
+
+Assistant will:
+- Analyze component&#039;s store dependencies
+- Create comprehensive store mocks
+- Mock page data with product info
+- Set up navigation mocks
+- Configure link handling
+- Add form enhancement if needed
+- Create multiple story variants
+- Test different states (loading, error, success)</code>
       </div>
     </div>
 

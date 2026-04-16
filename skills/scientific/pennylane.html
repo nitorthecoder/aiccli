@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,237 @@
     <p class="desc">Cross-platform Python library for quantum computing, quantum machine learning, and quantum chemistry. Enables building and training quantum circuits with automatic differentiation, seamless integration with PyTorch/JAX/TensorFlow, and device-independent execution across simulators and quantum hardware (IBM, Amazon Braket, Google, Rigetti, IonQ, etc.). Use when working with quantum circuits, variational quantum algorithms (VQE, QAOA), quantum neural networks, hybrid quantum-classical models, molecular simulations, quantum chemistry calculations, or any quantum computing tasks requiring gradient-based optimization, hardware-agnostic programming, or quantum machine learning workflows.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pennylane</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/pennylane</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: pennylane
+description: Cross-platform Python library for quantum computing, quantum machine learning, and quantum chemistry. Enables building and training quantum circuits with automatic differentiation, seamless integration with PyTorch/JAX/TensorFlow, and device-independent execution across simulators and quantum hardware (IBM, Amazon Braket, Google, Rigetti, IonQ, etc.). Use when working with quantum circuits, variational quantum algorithms (VQE, QAOA), quantum neural networks, hybrid quantum-classical models, molecular simulations, quantum chemistry calculations, or any quantum computing tasks requiring gradient-based optimization, hardware-agnostic programming, or quantum machine learning workflows.
+---
+
+# PennyLane
+
+## Overview
+
+PennyLane is a quantum computing library that enables training quantum computers like neural networks. It provides automatic differentiation of quantum circuits, device-independent programming, and seamless integration with classical machine learning frameworks.
+
+## Installation
+
+Install using uv:
+
+```bash
+uv pip install pennylane
+```
+
+For quantum hardware access, install device plugins:
+
+```bash
+# IBM Quantum
+uv pip install pennylane-qiskit
+
+# Amazon Braket
+uv pip install amazon-braket-pennylane-plugin
+
+# Google Cirq
+uv pip install pennylane-cirq
+
+# Rigetti Forest
+uv pip install pennylane-rigetti
+
+# IonQ
+uv pip install pennylane-ionq
+```
+
+## Quick Start
+
+Build a quantum circuit and optimize its parameters:
+
+```python
+import pennylane as qml
+from pennylane import numpy as np
+
+# Create device
+dev = qml.device(&#039;default.qubit&#039;, wires=2)
+
+# Define quantum circuit
+@qml.qnode(dev)
+def circuit(params):
+    qml.RX(params[0], wires=0)
+    qml.RY(params[1], wires=1)
+    qml.CNOT(wires=[0, 1])
+    return qml.expval(qml.PauliZ(0))
+
+# Optimize parameters
+opt = qml.GradientDescentOptimizer(stepsize=0.1)
+params = np.array([0.1, 0.2], requires_grad=True)
+
+for i in range(100):
+    params = opt.step(circuit, params)
+```
+
+## Core Capabilities
+
+### 1. Quantum Circuit Construction
+
+Build circuits with gates, measurements, and state preparation. See `references/quantum_circuits.md` for:
+- Single and multi-qubit gates
+- Controlled operations and conditional logic
+- Mid-circuit measurements and adaptive circuits
+- Various measurement types (expectation, probability, samples)
+- Circuit inspection and debugging
+
+### 2. Quantum Machine Learning
+
+Create hybrid quantum-classical models. See `references/quantum_ml.md` for:
+- Integration with PyTorch, JAX, TensorFlow
+- Quantum neural networks and variational classifiers
+- Data encoding strategies (angle, amplitude, basis, IQP)
+- Training hybrid models with backpropagation
+- Transfer learning with quantum circuits
+
+### 3. Quantum Chemistry
+
+Simulate molecules and compute ground state energies. See `references/quantum_chemistry.md` for:
+- Molecular Hamiltonian generation
+- Variational Quantum Eigensolver (VQE)
+- UCCSD ansatz for chemistry
+- Geometry optimization and dissociation curves
+- Molecular property calculations
+
+### 4. Device Management
+
+Execute on simulators or quantum hardware. See `references/devices_backends.md` for:
+- Built-in simulators (default.qubit, lightning.qubit, default.mixed)
+- Hardware plugins (IBM, Amazon Braket, Google, Rigetti, IonQ)
+- Device selection and configuration
+- Performance optimization and caching
+- GPU acceleration and JIT compilation
+
+### 5. Optimization
+
+Train quantum circuits with various optimizers. See `references/optimization.md` for:
+- Built-in optimizers (Adam, gradient descent, momentum, RMSProp)
+- Gradient computation methods (backprop, parameter-shift, adjoint)
+- Variational algorithms (VQE, QAOA)
+- Training strategies (learning rate schedules, mini-batches)
+- Handling barren plateaus and local minima
+
+### 6. Advanced Features
+
+Leverage templates, transforms, and compilation. See `references/advanced_features.md` for:
+- Circuit templates and layers
+- Transforms and circuit optimization
+- Pulse-level programming
+- Catalyst JIT compilation
+- Noise models and error mitigation
+- Resource estimation
+
+## Common Workflows
+
+### Train a Variational Classifier
+
+```python
+# 1. Define ansatz
+@qml.qnode(dev)
+def classifier(x, weights):
+    # Encode data
+    qml.AngleEmbedding(x, wires=range(4))
+
+    # Variational layers
+    qml.StronglyEntanglingLayers(weights, wires=range(4))
+
+    return qml.expval(qml.PauliZ(0))
+
+# 2. Train
+opt = qml.AdamOptimizer(stepsize=0.01)
+weights = np.random.random((3, 4, 3))  # 3 layers, 4 wires
+
+for epoch in range(100):
+    for x, y in zip(X_train, y_train):
+        weights = opt.step(lambda w: (classifier(x, w) - y)**2, weights)
+```
+
+### Run VQE for Molecular Ground State
+
+```python
+from pennylane import qchem
+
+# 1. Build Hamiltonian
+symbols = [&#039;H&#039;, &#039;H&#039;]
+coords = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.74])
+H, n_qubits = qchem.molecular_hamiltonian(symbols, coords)
+
+# 2. Define ansatz
+@qml.qnode(dev)
+def vqe_circuit(params):
+    qml.BasisState(qchem.hf_state(2, n_qubits), wires=range(n_qubits))
+    qml.UCCSD(params, wires=range(n_qubits))
+    return qml.expval(H)
+
+# 3. Optimize
+opt = qml.AdamOptimizer(stepsize=0.1)
+params = np.zeros(10, requires_grad=True)
+
+for i in range(100):
+    params, energy = opt.step_and_cost(vqe_circuit, params)
+    print(f&quot;Step {i}: Energy = {energy:.6f} Ha&quot;)
+```
+
+### Switch Between Devices
+
+```python
+# Same circuit, different backends
+circuit_def = lambda dev: qml.qnode(dev)(circuit_function)
+
+# Test on simulator
+dev_sim = qml.device(&#039;default.qubit&#039;, wires=4)
+result_sim = circuit_def(dev_sim)(params)
+
+# Run on quantum hardware
+dev_hw = qml.device(&#039;qiskit.ibmq&#039;, wires=4, backend=&#039;ibmq_manila&#039;)
+result_hw = circuit_def(dev_hw)(params)
+```
+
+## Detailed Documentation
+
+For comprehensive coverage of specific topics, consult the reference files:
+
+- **Getting started**: `references/getting_started.md` - Installation, basic concepts, first steps
+- **Quantum circuits**: `references/quantum_circuits.md` - Gates, measurements, circuit patterns
+- **Quantum ML**: `references/quantum_ml.md` - Hybrid models, framework integration, QNNs
+- **Quantum chemistry**: `references/quantum_chemistry.md` - VQE, molecular Hamiltonians, chemistry workflows
+- **Devices**: `references/devices_backends.md` - Simulators, hardware plugins, device configuration
+- **Optimization**: `references/optimization.md` - Optimizers, gradients, variational algorithms
+- **Advanced**: `references/advanced_features.md` - Templates, transforms, JIT compilation, noise
+
+## Best Practices
+
+1. **Start with simulators** - Test on `default.qubit` before deploying to hardware
+2. **Use parameter-shift for hardware** - Backpropagation only works on simulators
+3. **Choose appropriate encodings** - Match data encoding to problem structure
+4. **Initialize carefully** - Use small random values to avoid barren plateaus
+5. **Monitor gradients** - Check for vanishing gradients in deep circuits
+6. **Cache devices** - Reuse device objects to reduce initialization overhead
+7. **Profile circuits** - Use `qml.specs()` to analyze circuit complexity
+8. **Test locally** - Validate on simulators before submitting to hardware
+9. **Use templates** - Leverage built-in templates for common circuit patterns
+10. **Compile when possible** - Use Catalyst JIT for performance-critical code
+
+## Resources
+
+- Official documentation: https://docs.pennylane.ai
+- Codebook (tutorials): https://pennylane.ai/codebook
+- QML demonstrations: https://pennylane.ai/qml/demonstrations
+- Community forum: https://discuss.pennylane.ai
+- GitHub: https://github.com/PennyLaneAI/pennylane
+</code>
       </div>
     </div>
 

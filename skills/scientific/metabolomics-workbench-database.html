@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,270 @@
     <p class="desc">"Access NIH Metabolomics Workbench via REST API (4,200+ studies). Query metabolites, RefMet nomenclature, MS/NMR data, m/z searches, study metadata, for metabolomics and biomarker discovery."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/metabolomics-workbench-database</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/metabolomics-workbench-database</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: metabolomics-workbench-database
+description: &quot;Access NIH Metabolomics Workbench via REST API (4,200+ studies). Query metabolites, RefMet nomenclature, MS/NMR data, m/z searches, study metadata, for metabolomics and biomarker discovery.&quot;
+---
+
+# Metabolomics Workbench Database
+
+## Overview
+
+The Metabolomics Workbench is a comprehensive NIH Common Fund-sponsored platform hosted at UCSD that serves as the primary repository for metabolomics research data. It provides programmatic access to over 4,200 processed studies (3,790+ publicly available), standardized metabolite nomenclature through RefMet, and powerful search capabilities across multiple analytical platforms (GC-MS, LC-MS, NMR).
+
+## When to Use This Skill
+
+This skill should be used when querying metabolite structures, accessing study data, standardizing nomenclature, performing mass spectrometry searches, or retrieving gene/protein-metabolite associations through the Metabolomics Workbench REST API.
+
+## Core Capabilities
+
+### 1. Querying Metabolite Structures and Data
+
+Access comprehensive metabolite information including structures, identifiers, and cross-references to external databases.
+
+**Key operations:**
+- Retrieve compound data by various identifiers (PubChem CID, InChI Key, KEGG ID, HMDB ID, etc.)
+- Download molecular structures as MOL files or PNG images
+- Access standardized compound classifications
+- Cross-reference between different metabolite databases
+
+**Example queries:**
+```python
+import requests
+
+# Get compound information by PubChem CID
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/compound/pubchem_cid/5281365/all/json&#039;)
+
+# Download molecular structure as PNG
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/compound/regno/11/png&#039;)
+
+# Get compound name by registry number
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/compound/regno/11/name/json&#039;)
+```
+
+### 2. Accessing Study Metadata and Experimental Results
+
+Query metabolomics studies by various criteria and retrieve complete experimental datasets.
+
+**Key operations:**
+- Search studies by metabolite, institute, investigator, or title
+- Access study summaries, experimental factors, and analysis details
+- Retrieve complete experimental data in various formats
+- Download mwTab format files for complete study information
+- Query untargeted metabolomics data
+
+**Example queries:**
+```python
+# List all available public studies
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/study/study_id/ST/available/json&#039;)
+
+# Get study summary
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/study/study_id/ST000001/summary/json&#039;)
+
+# Retrieve experimental data
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/study/study_id/ST000001/data/json&#039;)
+
+# Find studies containing a specific metabolite
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/study/refmet_name/Tyrosine/summary/json&#039;)
+```
+
+### 3. Standardizing Metabolite Nomenclature with RefMet
+
+Use the RefMet database to standardize metabolite names and access systematic classification across four structural resolution levels.
+
+**Key operations:**
+- Match common metabolite names to standardized RefMet names
+- Query by chemical formula, exact mass, or InChI Key
+- Access hierarchical classification (super class, main class, sub class)
+- Retrieve all RefMet entries or filter by classification
+
+**Example queries:**
+```python
+# Standardize a metabolite name
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/refmet/match/citrate/name/json&#039;)
+
+# Query by molecular formula
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/refmet/formula/C12H24O2/all/json&#039;)
+
+# Get all metabolites in a specific class
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/refmet/main_class/Fatty%20Acids/all/json&#039;)
+
+# Retrieve complete RefMet database
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/refmet/all/json&#039;)
+```
+
+### 4. Performing Mass Spectrometry Searches
+
+Search for compounds by mass-to-charge ratio (m/z) with specified ion adducts and tolerance levels.
+
+**Key operations:**
+- Search precursor ion masses across multiple databases (Metabolomics Workbench, LIPIDS, RefMet)
+- Specify ion adduct types (M+H, M-H, M+Na, M+NH4, M+2H, etc.)
+- Calculate exact masses for known metabolites with specific adducts
+- Set mass tolerance for flexible matching
+
+**Example queries:**
+```python
+# Search by m/z value with M+H adduct
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/moverz/MB/635.52/M+H/0.5/json&#039;)
+
+# Calculate exact mass for a metabolite with specific adduct
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/moverz/exactmass/PC(34:1)/M+H/json&#039;)
+
+# Search across RefMet database
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/moverz/REFMET/200.15/M-H/0.3/json&#039;)
+```
+
+### 5. Filtering Studies by Analytical and Biological Parameters
+
+Use the MetStat context to find studies matching specific experimental conditions.
+
+**Key operations:**
+- Filter by analytical method (LCMS, GCMS, NMR)
+- Specify ionization polarity (POSITIVE, NEGATIVE)
+- Filter by chromatography type (HILIC, RP, GC)
+- Target specific species, sample sources, or diseases
+- Combine multiple filters using semicolon-delimited format
+
+**Example queries:**
+```python
+# Find human blood studies on diabetes using LC-MS
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/metstat/LCMS;POSITIVE;HILIC;Human;Blood;Diabetes/json&#039;)
+
+# Find all human blood studies containing tyrosine
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/metstat/;;;Human;Blood;;;Tyrosine/json&#039;)
+
+# Filter by analytical method only
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/metstat/GCMS;;;;;;/json&#039;)
+```
+
+### 6. Accessing Gene and Protein Information
+
+Retrieve gene and protein data associated with metabolic pathways and metabolite metabolism.
+
+**Key operations:**
+- Query genes by symbol, name, or ID
+- Access protein sequences and annotations
+- Cross-reference between gene IDs, RefSeq IDs, and UniProt IDs
+- Retrieve gene-metabolite associations
+
+**Example queries:**
+```python
+# Get gene information by symbol
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/gene/gene_symbol/ACACA/all/json&#039;)
+
+# Retrieve protein data by UniProt ID
+response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/protein/uniprot_id/Q13085/all/json&#039;)
+```
+
+## Common Workflows
+
+### Workflow 1: Finding Studies for a Specific Metabolite
+
+To find all studies containing measurements of a specific metabolite:
+
+1. First standardize the metabolite name using RefMet:
+   ```python
+   response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/refmet/match/glucose/name/json&#039;)
+   ```
+
+2. Use the standardized name to search for studies:
+   ```python
+   response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/study/refmet_name/Glucose/summary/json&#039;)
+   ```
+
+3. Retrieve experimental data from specific studies:
+   ```python
+   response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/study/study_id/ST000001/data/json&#039;)
+   ```
+
+### Workflow 2: Identifying Compounds from MS Data
+
+To identify potential compounds from mass spectrometry m/z values:
+
+1. Perform m/z search with appropriate adduct and tolerance:
+   ```python
+   response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/moverz/MB/180.06/M+H/0.5/json&#039;)
+   ```
+
+2. Review candidate compounds from results
+
+3. Retrieve detailed information for candidate compounds:
+   ```python
+   response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/compound/regno/{regno}/all/json&#039;)
+   ```
+
+4. Download structures for confirmation:
+   ```python
+   response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/compound/regno/{regno}/png&#039;)
+   ```
+
+### Workflow 3: Exploring Disease-Specific Metabolomics
+
+To find metabolomics studies for a specific disease and analytical platform:
+
+1. Use MetStat to filter studies:
+   ```python
+   response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/metstat/LCMS;POSITIVE;;Human;;Cancer/json&#039;)
+   ```
+
+2. Review study IDs from results
+
+3. Access detailed study information:
+   ```python
+   response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/study/study_id/ST{ID}/summary/json&#039;)
+   ```
+
+4. Retrieve complete experimental data:
+   ```python
+   response = requests.get(&#039;https://www.metabolomicsworkbench.org/rest/study/study_id/ST{ID}/data/json&#039;)
+   ```
+
+## Output Formats
+
+The API supports two primary output formats:
+- **JSON** (default): Machine-readable format, ideal for programmatic access
+- **TXT**: Human-readable tab-delimited text format
+
+Specify format by appending `/json` or `/txt` to API URLs. When format is omitted, JSON is returned by default.
+
+## Best Practices
+
+1. **Use RefMet for standardization**: Always standardize metabolite names through RefMet before searching studies to ensure consistent nomenclature
+
+2. **Specify appropriate adducts**: When performing m/z searches, use the correct ion adduct type for your analytical method (e.g., M+H for positive mode ESI)
+
+3. **Set reasonable tolerances**: Use appropriate mass tolerance values (typically 0.5 Da for low-resolution, 0.01 Da for high-resolution MS)
+
+4. **Cache reference data**: Consider caching frequently used reference data (RefMet database, compound information) to minimize API calls
+
+5. **Handle pagination**: For large result sets, be prepared to handle multiple data structures in responses
+
+6. **Validate identifiers**: Cross-reference metabolite identifiers across multiple databases when possible to ensure correct compound identification
+
+## Resources
+
+### references/
+
+Detailed API reference documentation is available in `references/api_reference.md`, including:
+- Complete REST API endpoint specifications
+- All available contexts (compound, study, refmet, metstat, gene, protein, moverz)
+- Input/output parameter details
+- Ion adduct types for mass spectrometry
+- Additional query examples
+
+Load this reference file when detailed API specifications are needed or when working with less common endpoints.
+</code>
       </div>
     </div>
 

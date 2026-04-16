@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,238 @@
     <p class="desc">"Use when working with *.excalidraw or *.excalidraw.json files, user mentions diagrams/flowcharts, or requests architecture visualization - delegates all Excalidraw operations to subagents to prevent context exhaustion from verbose JSON (single files: 4k-22k tokens, can exceed read limits)"</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/excalidraw</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/excalidraw</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: excalidraw
+description: &quot;Use when working with *.excalidraw or *.excalidraw.json files, user mentions diagrams/flowcharts, or requests architecture visualization - delegates all Excalidraw operations to subagents to prevent context exhaustion from verbose JSON (single files: 4k-22k tokens, can exceed read limits)&quot;
+---
+
+# Excalidraw Subagent Delegation
+
+## Overview
+
+**Core principle:** Main agents NEVER read Excalidraw files directly. Always delegate to subagents to isolate context consumption.
+
+Excalidraw files are JSON with high token cost but low information density. Single files range from 4k-22k tokens (largest can exceed read tool limits). Reading multiple diagrams quickly exhausts context budget (7 files = 67k tokens = 33% of budget).
+
+## The Problem
+
+Excalidraw JSON structure:
+- Each shape has 20+ properties (x, y, width, height, strokeColor, seed, version, etc.)
+- Most properties are visual metadata (positioning, styling, roughness)
+- Actual content: text labels and element relationships (&lt;10% of file)
+- **Signal-to-noise ratio is extremely low**
+
+Example: 14-element diagram = 596 lines, 16K, ~4k tokens. 79-element diagram = 2,916 lines, 88K, ~22k tokens (exceeds read limit).
+
+## When to Use
+
+**Trigger on ANY of these:**
+- File path contains `.excalidraw` or `.excalidraw.json`
+- User requests: &quot;explain/update/create diagram&quot;, &quot;show architecture&quot;, &quot;visualize flow&quot;
+- User mentions: &quot;flowchart&quot;, &quot;architecture diagram&quot;, &quot;Excalidraw file&quot;
+- Architecture/design documentation tasks involving visual artifacts
+
+**Use delegation even for:**
+- &quot;Small&quot; files (smallest is 4k tokens - still significant)
+- &quot;Quick checks&quot; (checking component names still loads full JSON)
+- Single file operations (isolation prevents context pollution)
+- Modifications (don&#039;t need full format understanding in main context)
+
+## Delegation Pattern
+
+### Main Agent Responsibilities
+
+**NEVER:**
+- ❌ Use Read tool on *.excalidraw files
+- ❌ Parse Excalidraw JSON in main context
+- ❌ Load multiple diagrams for comparison
+- ❌ Inspect file to &quot;understand the format&quot;
+
+**ALWAYS:**
+- ✅ Delegate ALL Excalidraw operations to subagents
+- ✅ Provide clear task description to subagent
+- ✅ Request text-only summaries (not raw JSON)
+- ✅ Keep diagram analysis isolated from main work
+
+### Subagent Task Templates
+
+#### Read/Understand Operation
+```
+Task: Extract and explain the components in [file.excalidraw.json]
+
+Approach:
+1. Read the Excalidraw JSON
+2. Extract only text elements (ignore positioning/styling)
+3. Identify relationships between components
+4. Summarize architecture/flow
+
+Return:
+- List of components/services with descriptions
+- Connection/dependency relationships
+- Key insights about the architecture
+- DO NOT return raw JSON or verbose element details
+```
+
+#### Modify Operation
+```
+Task: Add [component] to [file.excalidraw.json], connected to [existing-component]
+
+Approach:
+1. Read file to identify existing elements
+2. Find [existing-component] and its position
+3. Create new element JSON for [component]
+4. Add arrow elements for connections
+5. Write updated file
+
+Return:
+- Confirmation of changes made
+- Position of new element
+- IDs of created elements
+```
+
+#### Create Operation
+```
+Task: Create new Excalidraw diagram showing [description]
+
+Approach:
+1. Design layout for [number] components
+2. Create rectangle elements with text labels
+3. Add arrows showing relationships
+4. Use consistent styling (colors, fonts)
+5. Write to [file.excalidraw.json]
+
+Return:
+- Confirmation of file created
+- Summary of components included
+- File location
+```
+
+#### Compare Operation
+```
+Task: Compare architecture approaches in [file1] vs [file2]
+
+Approach:
+1. Read both files
+2. Extract text labels from each
+3. Identify structural differences
+4. Compare component relationships
+
+Return:
+- Key differences in architecture
+- Components unique to each approach
+- Relationship/flow differences
+- DO NOT return full element details from both files
+```
+
+## Common Rationalizations (STOP and Delegate Instead)
+
+| Excuse | Reality | What to Do |
+|--------|---------|------------|
+| &quot;Direct reading is most efficient&quot; | Consumes 4k-22k tokens unnecessarily | Delegate to subagent |
+| &quot;It&#039;s token-efficient to read directly&quot; | Baseline tests showed 9-45% budget used | Always delegate |
+| &quot;This is optimal for one-time analysis&quot; | &quot;One-time&quot; still pollutes main context | Subagent isolation |
+| &quot;The JSON is straightforward&quot; | Simplicity ≠ token efficiency | Delegate anyway |
+| &quot;I need to understand the format&quot; | Format understanding not needed in main agent | Subagent handles format |
+| &quot;Within reasonable bounds&quot; (18k tokens) | &quot;Reasonable&quot; is subjective rationalization | Hard rule: delegate |
+| &quot;Just a quick check of components&quot; | &quot;Quick check&quot; still loads full JSON | Extract text via subagent |
+| &quot;File is small (16K)&quot; | 4k tokens is NOT small | Size threshold doesn&#039;t matter |
+
+## Red Flags - STOP and Delegate
+
+Catch yourself about to:
+- Use Read tool on .excalidraw file
+- &quot;Quickly check&quot; what components exist
+- &quot;Understand the structure&quot; before modifying
+- Load file to &quot;see what&#039;s there&quot;
+- Compare multiple diagrams side-by-side
+- Parse JSON to &quot;extract just the text&quot;
+
+**All of these mean: Use Task tool with subagent instead.**
+
+## Quick Reference
+
+| Operation | Main Agent Action | Subagent Returns |
+|-----------|-------------------|------------------|
+| **Understand diagram** | Delegate with &quot;Extract and explain&quot; template | Component list + relationships |
+| **Modify diagram** | Delegate with &quot;Add [X] connected to [Y]&quot; template | Confirmation + changes made |
+| **Create diagram** | Delegate with &quot;Create showing [description]&quot; template | File location + summary |
+| **Compare diagrams** | Delegate with &quot;Compare [A] vs [B]&quot; template | Key differences (not raw JSON) |
+
+## Token Analysis (Why This Matters)
+
+Real data from baseline testing:
+
+| Scenario | Without Delegation | With Delegation | Savings |
+|----------|-------------------|-----------------|---------|
+| Single large file | 22k tokens (45% budget) | ~500 tokens (subagent summary) | 98% |
+| Two-file comparison | 18k tokens (9% budget) | ~800 tokens (diff summary) | 96% |
+| Modification task | 14k tokens (7% budget) | ~300 tokens (confirmation) | 98% |
+
+**Context pollution impact:**
+- Reading all 7 project diagrams: 67k tokens (33% of 200k budget)
+- With delegation: ~2k tokens (isolated in subagents)
+- **Savings: 97% context budget preserved**
+
+## Implementation Example
+
+**❌ BAD (Direct Read):**
+```
+User: &quot;What architecture is shown in detailed-architecture.excalidraw.json?&quot;
+Agent: Let me read that file... [reads 22k tokens into main context]
+```
+
+**✅ GOOD (Subagent Delegation):**
+```
+User: &quot;What architecture is shown in detailed-architecture.excalidraw.json?&quot;
+Agent: I&#039;ll use a subagent to extract the architecture details.
+
+[Dispatches Task tool with general-purpose subagent]
+Task: Extract and explain components in .ryanquinn3/ticketing/detailed-architecture.excalidraw.json
+
+[Receives ~500 token summary with component list and relationships]
+[Responds to user with architecture explanation, main context preserved]
+```
+
+## Why &quot;Straightforward JSON&quot; Doesn&#039;t Matter
+
+Agents often rationalize: &quot;The format is simple, I can just read it.&quot;
+
+**The problem isn&#039;t complexity - it&#039;s verbosity:**
+- Simple structure with 20+ properties per element
+- Repetitive metadata (seed, version, nonce, roughness)
+- Positioning data (x, y, width, height) not semantically useful
+- Visual styling (strokeColor, opacity, fillStyle) irrelevant to content
+
+**Token cost comes from volume, not complexity.**
+
+Even &quot;straightforward&quot; JSON consumes 4k-22k tokens because:
+- 79 elements × ~280 tokens/element = 22k tokens
+- Most tokens are metadata noise
+- Only text labels and relationships matter (~10% of content)
+
+## The Iron Law
+
+**Main agents NEVER read Excalidraw files. No exceptions.**
+
+Not for:
+- &quot;Quick checks&quot;
+- &quot;Small files&quot;
+- &quot;Understanding format&quot;
+- &quot;One-time analysis&quot;
+- &quot;Optimal efficiency&quot;
+
+**Always delegate. Isolation is free via subagents.**
+</code>
       </div>
     </div>
 

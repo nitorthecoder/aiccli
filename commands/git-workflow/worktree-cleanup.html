@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,141 @@
     <p class="desc">Clean up merged worktrees and their branches</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/worktree-cleanup</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/worktree-cleanup</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Bash(git:*), Bash(rm:*), Bash(ls:*), Bash(pwd:*), Bash(grep:*)
+argument-hint: --all | --branch claude/name | --dry-run
+description: Clean up merged worktrees and their branches
+---
+
+# Worktree Cleanup
+
+Remove worktrees and branches that have been merged: $ARGUMENTS
+
+## Instructions
+
+You are in the **main repository** (not a worktree). Clean up finished worktrees.
+
+### Branch Patterns
+
+This project uses the following branch prefixes for worktrees:
+- `claude/*` — Claude Code auto-created worktrees
+- `claude-daniel/*` — User-created worktrees
+- `review/*` — Component review worktrees
+
+All three prefixes must be checked in every step below.
+
+### Step 1: Validate Environment
+
+1. Verify this is the main working tree (first entry in `git worktree list`)
+2. If inside a worktree, warn: &quot;Run `/worktree-cleanup` from the main repo, not from a worktree.&quot;
+3. Fetch latest from origin: `git fetch origin --prune`
+4. Get the main branch name (main or master)
+
+### Step 2: Parse Arguments
+
+Parse `$ARGUMENTS` for options:
+
+- `--all` — clean up ALL merged worktrees and branches
+- `--branch &lt;prefix&gt;/&lt;name&gt;` — clean up a specific worktree/branch
+- `--dry-run` — show what would be cleaned up without doing anything
+- `--force-all` — remove ALL worktrees regardless of merge status (asks confirmation per worktree)
+- No arguments — list worktrees and ask which to clean up
+
+### Step 3: Identify Worktrees
+
+1. List all worktrees: `git worktree list`
+2. List all matching branches:
+   ```bash
+   git branch --list &#039;claude/*&#039; &#039;claude-daniel/*&#039; &#039;review/*&#039;
+   ```
+3. For each matching branch, check if it&#039;s been merged into main:
+   ```bash
+   git branch --merged origin/&lt;main-branch&gt; | grep -E &#039;^\s+(claude/|claude-daniel/|review/)&#039;
+   ```
+4. Also check remote branches:
+   ```bash
+   git branch -r --merged origin/&lt;main-branch&gt; | grep -E &#039;origin/(claude/|claude-daniel/|review/)&#039;
+   ```
+5. For squash-merged branches (not detected by `--merged`), check if the branch diff is empty against main:
+   ```bash
+   # A branch is effectively merged if its changes already exist in main
+   git diff origin/main...&lt;branch&gt; --stat
+   ```
+   If the diff is empty or very small (only whitespace), consider it merged.
+
+### Step 4: Display Status
+
+Show a table of all worktrees/branches:
+
+```
+| # | Worktree | Branch | Merged? | Dirty? | Action |
+|---|---------|--------|---------|--------|--------|
+| 1 | eager-mendeleev | claude/eager-mendeleev | Yes | Clean | Will remove |
+| 2 | agent-a7e312d0 | review/code-reviewer-2026-04-01 | No | Clean | Skipped |
+```
+
+### Step 5: Confirm and Execute
+
+If `--dry-run` was specified, show the table and stop.
+
+Otherwise, use AskUserQuestion to confirm cleanup (unless `--all` was specified with only merged branches).
+
+For each worktree/branch to clean up:
+
+1. Remove the worktree:
+   ```bash
+   git worktree remove &lt;path&gt;
+   ```
+   If that fails (dirty worktree), warn and skip — **never force-remove**.
+
+2. Delete the local branch:
+   ```bash
+   git branch -d &lt;branch&gt;
+   ```
+   Use `-d` (not `-D`) for merged branches. For `--force-all` unmerged branches, use `-D` only after explicit user confirmation.
+
+3. Delete the remote branch (if it exists):
+   ```bash
+   git push origin --delete &lt;branch&gt;
+   ```
+   If the remote branch doesn&#039;t exist, ignore the error silently.
+
+### Step 6: Prune
+
+After all removals:
+
+```bash
+git worktree prune
+```
+
+### Step 7: Summary
+
+Show what was cleaned up:
+
+```
+Cleanup Complete
+──────────────────────────────────
+Removed:  &lt;N&gt; worktree(s)
+Deleted:  &lt;N&gt; local branch(es)
+Deleted:  &lt;N&gt; remote branch(es)
+Skipped:  &lt;N&gt; unmerged branch(es)
+──────────────────────────────────
+```
+
+If any unmerged branches were skipped, list them and suggest:
+- Merge the PR first, then run cleanup again
+- Or use `git worktree remove &lt;path&gt;` and `git branch -D &lt;branch&gt;` manually if the work is truly abandoned
+</code>
       </div>
     </div>
 

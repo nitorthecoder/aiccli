@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,508 @@
     <p class="desc">Smart dependency management for any language. Auto-detects project type, applies safe updates automatically, prompts for major versions, diagnoses and fixes dependency issues.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/dependency-updater</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/dependency-updater</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: dependency-updater
+description: Smart dependency management for any language. Auto-detects project type, applies safe updates automatically, prompts for major versions, diagnoses and fixes dependency issues.
+license: MIT
+metadata:
+  version: 1.0.0
+---
+
+# Dependency Updater
+
+Smart dependency management for any language with automatic detection and safe updates.
+
+---
+
+## Quick Start
+
+```
+update my dependencies
+```
+
+The skill auto-detects your project type and handles the rest.
+
+---
+
+## Triggers
+
+| Trigger | Example |
+|---------|---------|
+| Update dependencies | &quot;update dependencies&quot;, &quot;update deps&quot; |
+| Check outdated | &quot;check for outdated packages&quot; |
+| Fix dependency issues | &quot;fix my dependency problems&quot; |
+| Security audit | &quot;audit dependencies for vulnerabilities&quot; |
+| Diagnose deps | &quot;diagnose dependency issues&quot; |
+
+---
+
+## Supported Languages
+
+| Language | Package File | Update Tool | Audit Tool |
+|----------|--------------|-------------|------------|
+| **Node.js** | package.json | `taze` | `npm audit` |
+| **Python** | requirements.txt, pyproject.toml | `pip-review` | `safety`, `pip-audit` |
+| **Go** | go.mod | `go get -u` | `govulncheck` |
+| **Rust** | Cargo.toml | `cargo update` | `cargo audit` |
+| **Ruby** | Gemfile | `bundle update` | `bundle audit` |
+| **Java** | pom.xml, build.gradle | `mvn versions:*` | `mvn dependency:*` |
+| **.NET** | *.csproj | `dotnet outdated` | `dotnet list package --vulnerable` |
+
+---
+
+## Quick Reference
+
+| Update Type | Version Change | Action |
+|-------------|----------------|--------|
+| **Fixed** | No `^` or `~` | Skip (intentionally pinned) |
+| **PATCH** | `x.y.z` → `x.y.Z` | Auto-apply |
+| **MINOR** | `x.y.z` → `x.Y.0` | Auto-apply |
+| **MAJOR** | `x.y.z` → `X.0.0` | Prompt user individually |
+
+---
+
+## Workflow
+
+```
+User Request
+    │
+    ▼
+┌─────────────────────────────────────────────────────┐
+│ Step 1: DETECT PROJECT TYPE                         │
+│ • Scan for package files (package.json, go.mod...) │
+│ • Identify package manager                          │
+├─────────────────────────────────────────────────────┤
+│ Step 2: CHECK PREREQUISITES                         │
+│ • Verify required tools are installed               │
+│ • Suggest installation if missing                   │
+├─────────────────────────────────────────────────────┤
+│ Step 3: SCAN FOR UPDATES                            │
+│ • Run language-specific outdated check              │
+│ • Categorize: MAJOR / MINOR / PATCH / Fixed         │
+├─────────────────────────────────────────────────────┤
+│ Step 4: AUTO-APPLY SAFE UPDATES                     │
+│ • Apply MINOR and PATCH automatically               │
+│ • Report what was updated                           │
+├─────────────────────────────────────────────────────┤
+│ Step 5: PROMPT FOR MAJOR UPDATES                    │
+│ • AskUserQuestion for each MAJOR update             │
+│ • Show current → new version                        │
+├─────────────────────────────────────────────────────┤
+│ Step 6: APPLY APPROVED MAJORS                       │
+│ • Update only approved packages                     │
+├─────────────────────────────────────────────────────┤
+│ Step 7: FINALIZE                                    │
+│ • Run install command                               │
+│ • Run security audit                                │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## Commands by Language
+
+### Node.js (npm/yarn/pnpm)
+
+```bash
+# Check prerequisites
+scripts/check-tool.sh taze &quot;npm install -g taze&quot;
+
+# Scan for updates
+taze
+
+# Apply minor/patch
+taze minor --write
+
+# Apply specific majors
+taze major --write --include pkg1,pkg2
+
+# Monorepo support
+taze -r  # recursive
+
+# Security
+npm audit
+npm audit fix
+```
+
+### Python
+
+```bash
+# Check outdated
+pip list --outdated
+
+# Update all (careful!)
+pip-review --auto
+
+# Update specific
+pip install --upgrade package-name
+
+# Security
+pip-audit
+safety check
+```
+
+### Go
+
+```bash
+# Check outdated
+go list -m -u all
+
+# Update all
+go get -u ./...
+
+# Tidy up
+go mod tidy
+
+# Security
+govulncheck ./...
+```
+
+### Rust
+
+```bash
+# Check outdated
+cargo outdated
+
+# Update within semver
+cargo update
+
+# Security
+cargo audit
+```
+
+### Ruby
+
+```bash
+# Check outdated
+bundle outdated
+
+# Update all
+bundle update
+
+# Update specific
+bundle update --conservative gem-name
+
+# Security
+bundle audit
+```
+
+### Java (Maven)
+
+```bash
+# Check outdated
+mvn versions:display-dependency-updates
+
+# Update to latest
+mvn versions:use-latest-releases
+
+# Security
+mvn dependency:tree
+mvn dependency-check:check
+```
+
+### .NET
+
+```bash
+# Check outdated
+dotnet list package --outdated
+
+# Update specific
+dotnet add package PackageName
+
+# Security
+dotnet list package --vulnerable
+```
+
+---
+
+## Diagnosis Mode
+
+When dependencies are broken, run diagnosis:
+
+### Common Issues &amp; Fixes
+
+| Issue | Symptoms | Fix |
+|-------|----------|-----|
+| **Version Conflict** | &quot;Cannot resolve dependency tree&quot; | Clean install, use overrides/resolutions |
+| **Peer Dependency** | &quot;Peer dependency not satisfied&quot; | Install required peer version |
+| **Security Vuln** | `npm audit` shows issues | `npm audit fix` or manual update |
+| **Unused Deps** | Bloated bundle | Run `depcheck` (Node) or equivalent |
+| **Duplicate Deps** | Multiple versions installed | Run `npm dedupe` or equivalent |
+
+### Emergency Fixes
+
+```bash
+# Node.js - Nuclear reset
+rm -rf node_modules package-lock.json
+npm cache clean --force
+npm install
+
+# Python - Clean virtualenv
+rm -rf venv
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Go - Reset modules
+rm go.sum
+go mod tidy
+```
+
+---
+
+## Security Audit
+
+Run security checks for any project:
+
+```bash
+# Node.js
+npm audit
+npm audit --json | jq &#039;.metadata.vulnerabilities&#039;
+
+# Python
+pip-audit
+safety check
+
+# Go
+govulncheck ./...
+
+# Rust
+cargo audit
+
+# Ruby
+bundle audit
+
+# .NET
+dotnet list package --vulnerable
+```
+
+### Severity Response
+
+| Severity | Action |
+|----------|--------|
+| **Critical** | Fix immediately |
+| **High** | Fix within 24h |
+| **Moderate** | Fix within 1 week |
+| **Low** | Fix in next release |
+
+---
+
+## Anti-Patterns
+
+| Avoid | Why | Instead |
+|-------|-----|---------|
+| Update fixed versions | Intentionally pinned | Skip them |
+| Auto-apply MAJOR | Breaking changes | Prompt user |
+| Batch MAJOR prompts | Loses context | Prompt individually |
+| Skip lock file | Irreproducible builds | Always commit lock files |
+| Ignore security alerts | Vulnerabilities | Address by severity |
+
+---
+
+## Verification Checklist
+
+After updates:
+
+- [ ] Updates scanned without errors
+- [ ] MINOR/PATCH auto-applied
+- [ ] MAJOR updates prompted individually
+- [ ] Fixed versions untouched
+- [ ] Lock file updated
+- [ ] Install command ran
+- [ ] Security audit passed (or issues noted)
+
+---
+
+&lt;details&gt;
+&lt;summary&gt;&lt;strong&gt;Deep Dive: Project Detection&lt;/strong&gt;&lt;/summary&gt;
+
+The skill auto-detects project type by scanning for package files:
+
+| File Found | Language | Package Manager |
+|------------|----------|-----------------|
+| `package.json` | Node.js | npm/yarn/pnpm |
+| `requirements.txt` | Python | pip |
+| `pyproject.toml` | Python | pip/poetry |
+| `Pipfile` | Python | pipenv |
+| `go.mod` | Go | go modules |
+| `Cargo.toml` | Rust | cargo |
+| `Gemfile` | Ruby | bundler |
+| `pom.xml` | Java | Maven |
+| `build.gradle` | Java/Kotlin | Gradle |
+| `*.csproj` | .NET | dotnet |
+
+**Detection order matters for monorepos:**
+1. Check current directory first
+2. Then check for workspace/monorepo patterns
+3. Offer to run recursively if applicable
+
+&lt;/details&gt;
+
+&lt;details&gt;
+&lt;summary&gt;&lt;strong&gt;Deep Dive: Node.js with taze&lt;/strong&gt;&lt;/summary&gt;
+
+### Prerequisites
+
+```bash
+# Install taze globally (recommended)
+npm install -g taze
+
+# Or use npx
+npx taze
+```
+
+### Smart Update Flow
+
+```bash
+# 1. Scan all updates
+taze
+
+# 2. Apply safe updates (minor + patch)
+taze minor --write
+
+# 3. For each major, prompt user:
+#    &quot;Update @types/node from ^20.0.0 to ^22.0.0?&quot;
+#    If yes, add to approved list
+
+# 4. Apply approved majors
+taze major --write --include approved-pkg1,approved-pkg2
+
+# 5. Install
+npm install  # or pnpm install / yarn
+```
+
+### Auto-Approve List
+
+Some packages have frequent major bumps but are backward-compatible:
+
+| Package | Reason |
+|---------|--------|
+| `lucide-react` | Icon library, majors are additive |
+| `@types/*` | Type definitions, usually safe |
+
+&lt;/details&gt;
+
+&lt;details&gt;
+&lt;summary&gt;&lt;strong&gt;Deep Dive: Version Strategies&lt;/strong&gt;&lt;/summary&gt;
+
+### Semantic Versioning
+
+```
+MAJOR.MINOR.PATCH (e.g., 2.3.1)
+
+MAJOR: Breaking changes - requires code changes
+MINOR: New features - backward compatible
+PATCH: Bug fixes - backward compatible
+```
+
+### Range Specifiers
+
+| Specifier | Meaning | Example |
+|-----------|---------|---------|
+| `^1.2.3` | Minor + Patch OK | `&gt;=1.2.3 &lt;2.0.0` |
+| `~1.2.3` | Patch only | `&gt;=1.2.3 &lt;1.3.0` |
+| `1.2.3` | Exact (fixed) | Only `1.2.3` |
+| `&gt;=1.2.3` | At least | Any `&gt;=1.2.3` |
+| `*` | Any | Latest (dangerous) |
+
+### Recommended Strategy
+
+```json
+{
+  &quot;dependencies&quot;: {
+    &quot;critical-lib&quot;: &quot;1.2.3&quot;,      // Exact for critical
+    &quot;stable-lib&quot;: &quot;~1.2.3&quot;,       // Patch only for stable
+    &quot;modern-lib&quot;: &quot;^1.2.3&quot;        // Minor OK for active
+  }
+}
+```
+
+&lt;/details&gt;
+
+&lt;details&gt;
+&lt;summary&gt;&lt;strong&gt;Deep Dive: Conflict Resolution&lt;/strong&gt;&lt;/summary&gt;
+
+### Node.js Conflicts
+
+**Diagnosis:**
+```bash
+npm ls package-name      # See dependency tree
+npm explain package-name # Why installed
+yarn why package-name    # Yarn equivalent
+```
+
+**Resolution with overrides:**
+```json
+// package.json
+{
+  &quot;overrides&quot;: {
+    &quot;lodash&quot;: &quot;^4.18.0&quot;
+  }
+}
+```
+
+**Resolution with resolutions (Yarn):**
+```json
+{
+  &quot;resolutions&quot;: {
+    &quot;lodash&quot;: &quot;^4.18.0&quot;
+  }
+}
+```
+
+### Python Conflicts
+
+**Diagnosis:**
+```bash
+pip check
+pipdeptree -p package-name
+```
+
+**Resolution:**
+```bash
+# Use virtual environment
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Or use constraints
+pip install -c constraints.txt -r requirements.txt
+```
+
+&lt;/details&gt;
+
+---
+
+## Script Reference
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/check-tool.sh` | Verify tool is installed |
+| `scripts/run-taze.sh` | Run taze with proper flags |
+
+---
+
+## Related Tools
+
+| Tool | Language | Purpose |
+|------|----------|---------|
+| [taze](https://github.com/antfu-collective/taze) | Node.js | Smart dependency updates |
+| [npm-check-updates](https://github.com/raineorshine/npm-check-updates) | Node.js | Alternative to taze |
+| [pip-review](https://github.com/jgonggrijp/pip-review) | Python | Interactive pip updates |
+| [cargo-edit](https://github.com/killercup/cargo-edit) | Rust | Cargo dependency management |
+| [bundler-audit](https://github.com/rubysec/bundler-audit) | Ruby | Security auditing |
+</code>
       </div>
     </div>
 

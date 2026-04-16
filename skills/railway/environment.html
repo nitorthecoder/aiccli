@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,418 @@
     <p class="desc">Query, stage, and apply configuration changes for Railway environments. Use for ANY variable or env var operations, service configuration (source, build settings, deploy settings), lifecycle (delete service), and applying changes. Prefer over railway-status skill for any configuration or variable queries.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/environment</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/environment</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: railway-environment
+description: Query, stage, and apply configuration changes for Railway environments. Use for ANY variable or env var operations, service configuration (source, build settings, deploy settings), lifecycle (delete service), and applying changes. Prefer over railway-status skill for any configuration or variable queries.
+version: 1.0.0
+author: Railway
+license: MIT
+tags: [Railway, Environment, Configuration, Variables, Build, Deploy, Infrastructure, Settings]
+dependencies: [railway-cli]
+allowed-tools: Bash(railway:*)
+---
+
+# Environment Configuration
+
+Query, stage, and apply configuration changes for Railway environments.
+
+## Shell Escaping
+
+**CRITICAL:** When running GraphQL queries via bash, you MUST wrap in heredoc to prevent shell escaping issues:
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh &#039;query ...&#039; &#039;{&quot;var&quot;: &quot;value&quot;}&#039;
+SCRIPT
+```
+
+Without the heredoc wrapper, multi-line commands break and exclamation marks in GraphQL non-null types get escaped, causing query failures.
+
+## When to Use
+
+- User wants to create a new environment
+- User wants to duplicate an environment (e.g., &quot;copy production to staging&quot;)
+- User wants to switch to a different environment
+- User asks about current build/deploy settings, variables, replicas, health checks, domains
+- User asks to change service source (Docker image, branch, commit, root directory)
+- User wants to connect a service to a GitHub repo
+- User wants to deploy from a GitHub repo (create empty service first via railway-new skill, then use this)
+- User asks to change build or start command
+- User wants to add/update/delete environment variables
+- User wants to change replica count or configure health checks
+- User asks to delete a service, volume, or bucket
+- User says &quot;apply changes&quot;, &quot;commit changes&quot;, &quot;deploy changes&quot;
+- Auto-fixing build errors detected in logs
+
+## Create Environment
+
+Create a new environment in the linked project:
+
+```bash
+railway environment new &lt;name&gt;
+```
+
+Duplicate an existing environment:
+
+```bash
+railway environment new staging --duplicate production
+```
+
+With service-specific variables:
+
+```bash
+railway environment new staging --duplicate production --service-variable api PORT=3001
+```
+
+## Switch Environment
+
+Link a different environment to the current directory:
+
+```bash
+railway environment &lt;name&gt;
+```
+
+Or by ID:
+
+```bash
+railway environment &lt;environment-id&gt;
+```
+
+## Get Context
+
+```bash
+railway status --json
+```
+
+Extract:
+
+- `project.id` - for service lookup
+- `environment.id` - for the mutations
+- `service.id` - default service if user doesn&#039;t specify one
+
+### Resolve Service ID
+
+If user specifies a service by name, query project services:
+
+```graphql
+query projectServices($projectId: String!) {
+  project(id: $projectId) {
+    services {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+```
+
+Match the service name (case-insensitive) to get the service ID.
+
+## Query Configuration
+
+Fetch current environment configuration and staged changes.
+
+```graphql
+query environmentConfig($environmentId: String!) {
+  environment(id: $environmentId) {
+    id
+    config(decryptVariables: false)
+    serviceInstances {
+      edges {
+        node {
+          id
+          serviceId
+        }
+      }
+    }
+  }
+  environmentStagedChanges(environmentId: $environmentId) {
+    id
+    patch(decryptVariables: false)
+  }
+}
+```
+
+Example:
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;query envConfig($envId: String!) {
+    environment(id: $envId) { id config(decryptVariables: false) }
+    environmentStagedChanges(environmentId: $envId) { id patch(decryptVariables: false) }
+  }&#039; \
+  &#039;{&quot;envId&quot;: &quot;ENV_ID&quot;}&#039;
+SCRIPT
+```
+
+### Response Structure
+
+The `config` field contains current configuration:
+
+```json
+{
+  &quot;services&quot;: {
+    &quot;&lt;serviceId&gt;&quot;: {
+      &quot;source&quot;: { &quot;repo&quot;: &quot;...&quot;, &quot;branch&quot;: &quot;main&quot; },
+      &quot;build&quot;: { &quot;buildCommand&quot;: &quot;npm run build&quot;, &quot;builder&quot;: &quot;NIXPACKS&quot; },
+      &quot;deploy&quot;: {
+        &quot;startCommand&quot;: &quot;npm start&quot;,
+        &quot;multiRegionConfig&quot;: { &quot;us-west2&quot;: { &quot;numReplicas&quot;: 1 } }
+      },
+      &quot;variables&quot;: { &quot;NODE_ENV&quot;: { &quot;value&quot;: &quot;production&quot; } },
+      &quot;networking&quot;: { &quot;serviceDomains&quot;: {}, &quot;customDomains&quot;: {} }
+    }
+  },
+  &quot;sharedVariables&quot;: { &quot;DATABASE_URL&quot;: { &quot;value&quot;: &quot;...&quot; } }
+}
+```
+
+The `patch` field in `environmentStagedChanges` contains pending changes. The effective configuration is the base `config` merged with the staged `patch`.
+
+For complete field reference, see [reference/environment-config.md](../reference/environment-config.md).
+
+For variable syntax and service wiring patterns, see [reference/variables.md](../reference/variables.md).
+
+## Get Rendered Variables
+
+The GraphQL queries above return **unrendered** variables - template syntax like `${{shared.DOMAIN}}` is preserved. This is correct for management/editing.
+
+To see **rendered** (resolved) values as they appear at runtime:
+
+```bash
+# Current linked service
+railway variables --json
+
+# Specific service
+railway variables --service &lt;service-name&gt; --json
+```
+
+**When to use:**
+- Debugging connection issues (see actual URLs/ports)
+- Verifying variable resolution is correct
+- Viewing Railway-injected values (RAILWAY_*)
+
+## Stage Changes
+
+Stage configuration changes via the `environmentStageChanges` mutation. Use `merge: true` to automatically merge with existing staged changes.
+
+```graphql
+mutation stageEnvironmentChanges(
+  $environmentId: String!
+  $input: EnvironmentConfig!
+  $merge: Boolean
+) {
+  environmentStageChanges(
+    environmentId: $environmentId
+    input: $input
+    merge: $merge
+  ) {
+    id
+  }
+}
+```
+
+**Important:** Always use variables (not inline input) because service IDs are UUIDs which can&#039;t be used as unquoted GraphQL object keys.
+
+Example:
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;mutation stageChanges($environmentId: String!, $input: EnvironmentConfig!, $merge: Boolean) {
+    environmentStageChanges(environmentId: $environmentId, input: $input, merge: $merge) { id }
+  }&#039; \
+  &#039;{&quot;environmentId&quot;: &quot;ENV_ID&quot;, &quot;input&quot;: {&quot;services&quot;: {&quot;SERVICE_ID&quot;: {&quot;build&quot;: {&quot;buildCommand&quot;: &quot;npm run build&quot;}}}}, &quot;merge&quot;: true}&#039;
+SCRIPT
+```
+
+### Delete Service
+
+Use `isDeleted: true`:
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;mutation stageChanges($environmentId: String!, $input: EnvironmentConfig!, $merge: Boolean) {
+    environmentStageChanges(environmentId: $environmentId, input: $input, merge: $merge) { id }
+  }&#039; \
+  &#039;{&quot;environmentId&quot;: &quot;ENV_ID&quot;, &quot;input&quot;: {&quot;services&quot;: {&quot;SERVICE_ID&quot;: {&quot;isDeleted&quot;: true}}}, &quot;merge&quot;: true}&#039;
+SCRIPT
+```
+
+## Stage and Apply Immediately
+
+For single changes that should deploy right away, use `environmentPatchCommit` to stage and apply in one call.
+
+```graphql
+mutation environmentPatchCommit(
+  $environmentId: String!
+  $patch: EnvironmentConfig
+  $commitMessage: String
+) {
+  environmentPatchCommit(
+    environmentId: $environmentId
+    patch: $patch
+    commitMessage: $commitMessage
+  )
+}
+```
+
+Example:
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;mutation patchCommit($environmentId: String!, $patch: EnvironmentConfig, $commitMessage: String) {
+    environmentPatchCommit(environmentId: $environmentId, patch: $patch, commitMessage: $commitMessage)
+  }&#039; \
+  &#039;{&quot;environmentId&quot;: &quot;ENV_ID&quot;, &quot;patch&quot;: {&quot;services&quot;: {&quot;SERVICE_ID&quot;: {&quot;variables&quot;: {&quot;API_KEY&quot;: {&quot;value&quot;: &quot;secret&quot;}}}}}, &quot;commitMessage&quot;: &quot;add API_KEY&quot;}&#039;
+SCRIPT
+```
+
+**When to use:** Single change, no need to batch, user wants immediate deployment.
+
+**When NOT to use:** Multiple related changes to batch, or user says &quot;stage only&quot; / &quot;don&#039;t deploy yet&quot;.
+
+## Apply Staged Changes
+
+Commit staged changes and trigger deployments.
+
+**Note:** There is no `railway apply` CLI command. Use the mutation below or direct users to the web UI.
+
+### Apply Mutation
+
+**Mutation name: `environmentPatchCommitStaged`**
+
+```graphql
+mutation environmentPatchCommitStaged(
+  $environmentId: String!
+  $message: String
+  $skipDeploys: Boolean
+) {
+  environmentPatchCommitStaged(
+    environmentId: $environmentId
+    commitMessage: $message
+    skipDeploys: $skipDeploys
+  )
+}
+```
+
+Example:
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;mutation commitStaged($environmentId: String!, $message: String) {
+    environmentPatchCommitStaged(environmentId: $environmentId, commitMessage: $message)
+  }&#039; \
+  &#039;{&quot;environmentId&quot;: &quot;ENV_ID&quot;, &quot;message&quot;: &quot;add API_KEY variable&quot;}&#039;
+SCRIPT
+```
+
+### Parameters
+
+| Field           | Type    | Default | Description                                 |
+| --------------- | ------- | ------- | ------------------------------------------- |
+| `environmentId` | String! | -       | Environment ID from status                  |
+| `message`       | String  | null    | Short description of changes                |
+| `skipDeploys`   | Boolean | false   | Skip deploys (only if user explicitly asks) |
+
+### Commit Message
+
+Keep very short - one sentence max. Examples:
+
+- &quot;set build command to fix npm error&quot;
+- &quot;add API_KEY variable&quot;
+- &quot;increase replicas to 3&quot;
+
+Leave empty if no meaningful description.
+
+### Default Behavior
+
+**Always deploy** unless user explicitly asks to skip. Only set `skipDeploys: true` if user says &quot;apply without deploying&quot;, &quot;commit but don&#039;t deploy&quot;, or &quot;skip deploys&quot;.
+
+Returns a workflow ID (string) on success.
+
+## Auto-Apply Behavior
+
+By default, **apply changes immediately**.
+
+### Flow
+
+**Single change:** Use `environmentPatchCommit` to stage and apply in one call.
+
+**Multiple changes or batching:** Use `environmentStageChanges` with `merge: true` for each change, then `environmentPatchCommitStaged` to apply.
+
+### When NOT to Auto-Apply
+
+- User explicitly says &quot;stage only&quot;, &quot;don&#039;t deploy yet&quot;, or similar
+- User is making multiple related changes that should deploy together
+
+**When you don&#039;t auto-apply, tell the user:**
+
+&gt; Changes staged. Apply them at: https://railway.com/project/{projectId}
+&gt; Or ask me to apply them.
+
+Get `projectId` from `railway status --json` → `project.id`
+
+## Error Handling
+
+### Service Not Found
+
+```
+Service &quot;foo&quot; not found in project. Available services: api, web, worker
+```
+
+### No Staged Changes
+
+```
+No patch to apply
+```
+
+There are no staged changes to commit. Stage changes first.
+
+### Invalid Configuration
+
+Common issues:
+
+- `buildCommand` and `startCommand` cannot be identical
+- `buildCommand` only valid with NIXPACKS builder
+- `dockerfilePath` only valid with DOCKERFILE builder
+
+### No Permission
+
+```
+You don&#039;t have permission to modify this environment. Check your Railway role.
+```
+
+### No Linked Project
+
+```
+No project linked. Run `railway link` to link a project.
+```
+
+## Composability
+
+- **Create service**: Use railway-service skill
+- **View logs**: Use railway-deployment skill
+- **Add domains**: Use railway-domain skill
+- **Deploy local code**: Use railway-deploy skill
+</code>
       </div>
     </div>
 

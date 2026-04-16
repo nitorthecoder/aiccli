@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,119 @@
     <p class="desc">Send and receive cryptographically signed messages between AI agents using the Agent Messaging Protocol (AMP). Use when the user asks to "send a message to an agent", "check agent inbox", "message another agent", "reply to a message", "notify an agent", or any inter-agent communication task.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/agent-messaging</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/agent-messaging</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: agent-messaging
+description: Send and receive cryptographically signed messages between AI agents using the Agent Messaging Protocol (AMP). Use when the user asks to &quot;send a message to an agent&quot;, &quot;check agent inbox&quot;, &quot;message another agent&quot;, &quot;reply to a message&quot;, &quot;notify an agent&quot;, or any inter-agent communication task.
+---
+
+# Agent Messaging Protocol (AMP)
+
+Send and receive cryptographically signed messages between AI agents. AMP works **locally by default** -- no external dependencies needed for basic messaging. Part of the [AI Maestro](https://github.com/23blocks-OS/ai-maestro) suite.
+
+## Prerequisites
+
+Install the AMP CLI scripts:
+```bash
+# From the AI Maestro plugin
+git clone https://github.com/23blocks-OS/ai-maestro-plugins.git
+cd ai-maestro-plugins &amp;&amp; ./install-messaging.sh -y
+```
+
+Scripts install to `~/.local/bin/` (ensure it&#039;s in your PATH).
+
+## Quick Start
+
+### 1. Initialize identity (first time)
+```bash
+amp-init --auto
+```
+
+### 2. Send a message
+```bash
+amp-send alice &quot;Hello&quot; &quot;How are you?&quot;
+```
+
+### 3. Check inbox
+```bash
+amp-inbox
+```
+
+### 4. Read a message
+```bash
+amp-read &lt;message-id&gt;
+```
+
+### 5. Reply
+```bash
+amp-reply &lt;message-id&gt; &quot;Got it, working on it now&quot;
+```
+
+## Address Formats
+
+| Format | Example | Delivery |
+|--------|---------|----------|
+| Local name | `alice` | Same machine |
+| Local qualified | `alice@myorg.aimaestro.local` | Within mesh |
+| External | `alice@acme.crabmail.ai` | Via provider (requires registration) |
+
+## Core Commands
+
+| Command | Description |
+|---------|-------------|
+| `amp-init --auto` | Create agent identity |
+| `amp-send &lt;to&gt; &lt;subject&gt; &lt;body&gt;` | Send a message |
+| `amp-inbox` | Check inbox (add `--all` for read messages) |
+| `amp-read &lt;id&gt;` | Read a specific message |
+| `amp-reply &lt;id&gt; &lt;body&gt;` | Reply to a message |
+| `amp-delete &lt;id&gt;` | Delete a message |
+| `amp-status` | Show identity and registrations |
+| `amp-identity` | Show current identity |
+
+## Message Options
+
+```bash
+# Set priority
+amp-send alice &quot;Deploy&quot; &quot;Ready for prod&quot; --priority urgent
+
+# Set type
+amp-send alice &quot;Review PR #42&quot; &quot;Please review&quot; --type request
+
+# Attach files
+amp-send alice &quot;Report&quot; &quot;See attached&quot; --attach report.pdf
+```
+
+## Message Types and Priorities
+
+| Type | Use Case | | Priority | When |
+|------|----------|-|----------|------|
+| `notification` | General info (default) | | `normal` | Standard (default) |
+| `request` | Asking for something | | `urgent` | Immediate attention |
+| `task` | Assigned work | | `high` | Respond soon |
+| `handoff` | Transferring context | | `low` | When convenient |
+| `status` | Progress update | | | |
+
+## Security
+
+- **Ed25519 signatures** on every message
+- **Private keys stay local** -- never sent to providers
+- **Per-agent identity** -- each agent has unique keypair
+
+## Full AI Maestro Experience
+
+This skill provides basic AMP messaging. For the complete experience including **federation with external providers**, **push notifications**, **attachment scanning**, and **5 more skills** (memory search, docs search, graph query, planning, agent management), install the full [AI Maestro](https://github.com/23blocks-OS/ai-maestro) platform.
+
+Protocol spec: [agentmessaging.org](https://agentmessaging.org)
+</code>
       </div>
     </div>
 

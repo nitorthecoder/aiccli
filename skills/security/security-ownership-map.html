@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,224 @@
     <p class="desc">"Analyze git repositories to build a security ownership topology (people-to-file), compute bus factor and sensitive-code ownership, and export CSV/JSON for graph databases and visualization. Trigger only when the user explicitly wants a security-oriented ownership or bus-factor analysis grounded in git history (for example: orphaned sensitive code, security maintainers, CODEOWNERS reality checks for risk, sensitive hotspots, or ownership clusters). Do not trigger for general maintainer lists or non-security ownership questions."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/security-ownership-map</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/security-ownership-map</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: &quot;security-ownership-map&quot;
+description: &quot;Analyze git repositories to build a security ownership topology (people-to-file), compute bus factor and sensitive-code ownership, and export CSV/JSON for graph databases and visualization. Trigger only when the user explicitly wants a security-oriented ownership or bus-factor analysis grounded in git history (for example: orphaned sensitive code, security maintainers, CODEOWNERS reality checks for risk, sensitive hotspots, or ownership clusters). Do not trigger for general maintainer lists or non-security ownership questions.&quot;
+author: openai
+---
+
+# Security Ownership Map
+
+## Overview
+
+Build a bipartite graph of people and files from git history, then compute ownership risk and export graph artifacts for Neo4j/Gephi. Also build a file co-change graph (Jaccard similarity on shared commits) to cluster files by how they move together while ignoring large, noisy commits.
+
+## Requirements
+
+- Python 3
+- `networkx` (required; community detection is enabled by default)
+
+Install with:
+
+```bash
+pip install networkx
+```
+
+## Workflow
+
+1. Scope the repo and time window (optional `--since/--until`).
+2. Decide sensitivity rules (use defaults or provide a CSV config).
+3. Build the ownership map with `scripts/run_ownership_map.py` (co-change graph is on by default; use `--cochange-max-files` to ignore supernode commits).
+4. Communities are computed by default; graphml output is optional (`--graphml`).
+5. Query the outputs with `scripts/query_ownership.py` for bounded JSON slices.
+6. Persist and visualize (see `references/neo4j-import.md`).
+
+By default, the co-change graph ignores common “glue” files (lockfiles, `.github/*`, editor config) so clusters reflect actual code movement instead of shared infra edits. Override with `--cochange-exclude` or `--no-default-cochange-excludes`. Dependabot commits are excluded by default; override with `--no-default-author-excludes` or add patterns via `--author-exclude-regex`.
+
+If you want to exclude Linux build glue like `Kbuild` from co-change clustering, pass:
+
+```bash
+python skills/skills/security-ownership-map/scripts/run_ownership_map.py \
+  --repo /path/to/linux \
+  --out ownership-map-out \
+  --cochange-exclude &quot;**/Kbuild&quot;
+```
+
+## Quick start
+
+Run from the repo root:
+
+```bash
+python skills/skills/security-ownership-map/scripts/run_ownership_map.py \
+  --repo . \
+  --out ownership-map-out \
+  --since &quot;12 months ago&quot; \
+  --emit-commits
+```
+
+Defaults: author identity, author date, and merge commits excluded. Use `--identity committer`, `--date-field committer`, or `--include-merges` if needed.
+
+Example (override co-change excludes):
+
+```bash
+python skills/skills/security-ownership-map/scripts/run_ownership_map.py \
+  --repo . \
+  --out ownership-map-out \
+  --cochange-exclude &quot;**/Cargo.lock&quot; \
+  --cochange-exclude &quot;**/.github/**&quot; \
+  --no-default-cochange-excludes
+```
+
+Communities are computed by default. To disable:
+
+```bash
+python skills/skills/security-ownership-map/scripts/run_ownership_map.py \
+  --repo . \
+  --out ownership-map-out \
+  --no-communities
+```
+
+## Sensitivity rules
+
+By default, the script flags common auth/crypto/secret paths. Override by providing a CSV file:
+
+```
+# pattern,tag,weight
+**/auth/**,auth,1.0
+**/crypto/**,crypto,1.0
+**/*.pem,secrets,1.0
+```
+
+Use it with `--sensitive-config path/to/sensitive.csv`.
+
+## Output artifacts
+
+`ownership-map-out/` contains:
+
+- `people.csv` (nodes: people)
+- `files.csv` (nodes: files)
+- `edges.csv` (edges: touches)
+- `cochange_edges.csv` (file-to-file co-change edges with Jaccard weight; omitted with `--no-cochange`)
+- `summary.json` (security ownership findings)
+- `commits.jsonl` (optional, if `--emit-commits`)
+- `communities.json` (computed by default from co-change edges when available; includes `maintainers` per community; disable with `--no-communities`)
+- `cochange.graph.json` (NetworkX node-link JSON with `community_id` + `community_maintainers`; falls back to `ownership.graph.json` if no co-change edges)
+- `ownership.graphml` / `cochange.graphml` (optional, if `--graphml`)
+
+`people.csv` includes timezone detection based on author commit offsets: `primary_tz_offset`, `primary_tz_minutes`, and `timezone_offsets`.
+
+## LLM query helper
+
+Use `scripts/query_ownership.py` to return small, JSON-bounded slices without loading the full graph into context.
+
+Examples:
+
+```bash
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out people --limit 10
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out files --tag auth --bus-factor-max 1
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out person --person alice@corp --limit 10
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out file --file crypto/tls
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out cochange --file crypto/tls --limit 10
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out summary --section orphaned_sensitive_code
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out community --id 3
+```
+
+Use `--community-top-owners 5` (default) to control how many maintainers are stored per community.
+
+## Basic security queries
+
+Run these to answer common security ownership questions with bounded output:
+
+```bash
+# Orphaned sensitive code (stale + low bus factor)
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out summary --section orphaned_sensitive_code
+
+# Hidden owners for sensitive tags
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out summary --section hidden_owners
+
+# Sensitive hotspots with low bus factor
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out summary --section bus_factor_hotspots
+
+# Auth/crypto files with bus factor &lt;= 1
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out files --tag auth --bus-factor-max 1
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out files --tag crypto --bus-factor-max 1
+
+# Who is touching sensitive code the most
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out people --sort sensitive_touches --limit 10
+
+# Co-change neighbors (cluster hints for ownership drift)
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out cochange --file path/to/file --min-jaccard 0.05 --limit 20
+
+# Community maintainers (for a cluster)
+python skills/skills/security-ownership-map/scripts/query_ownership.py --data-dir ownership-map-out community --id 3
+
+# Monthly maintainers for the community containing a file
+python skills/skills/security-ownership-map/scripts/community_maintainers.py \
+  --data-dir ownership-map-out \
+  --file network/card.c \
+  --since 2025-01-01 \
+  --top 5
+
+# Quarterly buckets instead of monthly
+python skills/skills/security-ownership-map/scripts/community_maintainers.py \
+  --data-dir ownership-map-out \
+  --file network/card.c \
+  --since 2025-01-01 \
+  --bucket quarter \
+  --top 5
+```
+
+Notes:
+- Touches default to one authored commit (not per-file). Use `--touch-mode file` to count per-file touches.
+- Use `--window-days 90` or `--weight recency --half-life-days 180` to smooth churn.
+- Filter bots with `--ignore-author-regex &#039;(bot|dependabot)&#039;`.
+- Use `--min-share 0.1` to show stable maintainers only.
+- Use `--bucket quarter` for calendar quarter groupings.
+- Use `--identity committer` or `--date-field committer` to switch from author attribution.
+- Use `--include-merges` to include merge commits (excluded by default).
+
+### Summary format (default)
+
+Use this structure, add fields if needed:
+
+```json
+{
+  &quot;orphaned_sensitive_code&quot;: [
+    {
+      &quot;path&quot;: &quot;crypto/tls/handshake.rs&quot;,
+      &quot;last_security_touch&quot;: &quot;2023-03-12T18:10:04+00:00&quot;,
+      &quot;bus_factor&quot;: 1
+    }
+  ],
+  &quot;hidden_owners&quot;: [
+    {
+      &quot;person&quot;: &quot;alice@corp&quot;,
+      &quot;controls&quot;: &quot;63% of auth code&quot;
+    }
+  ]
+}
+```
+
+## Graph persistence
+
+Use `references/neo4j-import.md` when you need to load the CSVs into Neo4j. It includes constraints, import Cypher, and visualization tips.
+
+## Notes
+
+- `bus_factor_hotspots` in `summary.json` lists sensitive files with low bus factor; `orphaned_sensitive_code` is the stale subset.
+- If `git log` is too large, narrow with `--since` or `--until`.
+- Compare `summary.json` against CODEOWNERS to highlight ownership drift.
+</code>
       </div>
     </div>
 

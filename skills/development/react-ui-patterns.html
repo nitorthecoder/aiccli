@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,306 @@
     <p class="desc">Modern React UI patterns for loading states, error handling, and data fetching. Use when building UI components, handling async data, or managing UI states.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/react-ui-patterns</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/react-ui-patterns</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: react-ui-patterns
+description: Modern React UI patterns for loading states, error handling, and data fetching. Use when building UI components, handling async data, or managing UI states.
+---
+
+# React UI Patterns
+
+## Core Principles
+
+1. **Never show stale UI** - Loading spinners only when actually loading
+2. **Always surface errors** - Users must know when something fails
+3. **Optimistic updates** - Make the UI feel instant
+4. **Progressive disclosure** - Show content as it becomes available
+5. **Graceful degradation** - Partial data is better than no data
+
+## Loading State Patterns
+
+### The Golden Rule
+
+**Show loading indicator ONLY when there&#039;s no data to display.**
+
+```typescript
+// CORRECT - Only show loading when no data exists
+const { data, loading, error } = useGetItemsQuery();
+
+if (error) return &lt;ErrorState error={error} onRetry={refetch} /&gt;;
+if (loading &amp;&amp; !data) return &lt;LoadingState /&gt;;
+if (!data?.items.length) return &lt;EmptyState /&gt;;
+
+return &lt;ItemList items={data.items} /&gt;;
+```
+
+```typescript
+// WRONG - Shows spinner even when we have cached data
+if (loading) return &lt;LoadingState /&gt;; // Flashes on refetch!
+```
+
+### Loading State Decision Tree
+
+```
+Is there an error?
+  → Yes: Show error state with retry option
+  → No: Continue
+
+Is it loading AND we have no data?
+  → Yes: Show loading indicator (spinner/skeleton)
+  → No: Continue
+
+Do we have data?
+  → Yes, with items: Show the data
+  → Yes, but empty: Show empty state
+  → No: Show loading (fallback)
+```
+
+### Skeleton vs Spinner
+
+| Use Skeleton When | Use Spinner When |
+|-------------------|------------------|
+| Known content shape | Unknown content shape |
+| List/card layouts | Modal actions |
+| Initial page load | Button submissions |
+| Content placeholders | Inline operations |
+
+## Error Handling Patterns
+
+### The Error Handling Hierarchy
+
+```
+1. Inline error (field-level) → Form validation errors
+2. Toast notification → Recoverable errors, user can retry
+3. Error banner → Page-level errors, data still partially usable
+4. Full error screen → Unrecoverable, needs user action
+```
+
+### Always Show Errors
+
+**CRITICAL: Never swallow errors silently.**
+
+```typescript
+// CORRECT - Error always surfaced to user
+const [createItem, { loading }] = useCreateItemMutation({
+  onCompleted: () =&gt; {
+    toast.success({ title: &#039;Item created&#039; });
+  },
+  onError: (error) =&gt; {
+    console.error(&#039;createItem failed:&#039;, error);
+    toast.error({ title: &#039;Failed to create item&#039; });
+  },
+});
+
+// WRONG - Error silently caught, user has no idea
+const [createItem] = useCreateItemMutation({
+  onError: (error) =&gt; {
+    console.error(error); // User sees nothing!
+  },
+});
+```
+
+### Error State Component Pattern
+
+```typescript
+interface ErrorStateProps {
+  error: Error;
+  onRetry?: () =&gt; void;
+  title?: string;
+}
+
+const ErrorState = ({ error, onRetry, title }: ErrorStateProps) =&gt; (
+  &lt;div className=&quot;error-state&quot;&gt;
+    &lt;Icon name=&quot;exclamation-circle&quot; /&gt;
+    &lt;h3&gt;{title ?? &#039;Something went wrong&#039;}&lt;/h3&gt;
+    &lt;p&gt;{error.message}&lt;/p&gt;
+    {onRetry &amp;&amp; (
+      &lt;Button onClick={onRetry}&gt;Try Again&lt;/Button&gt;
+    )}
+  &lt;/div&gt;
+);
+```
+
+## Button State Patterns
+
+### Button Loading State
+
+```tsx
+&lt;Button
+  onClick={handleSubmit}
+  isLoading={isSubmitting}
+  disabled={!isValid || isSubmitting}
+&gt;
+  Submit
+&lt;/Button&gt;
+```
+
+### Disable During Operations
+
+**CRITICAL: Always disable triggers during async operations.**
+
+```tsx
+// CORRECT - Button disabled while loading
+&lt;Button
+  disabled={isSubmitting}
+  isLoading={isSubmitting}
+  onClick={handleSubmit}
+&gt;
+  Submit
+&lt;/Button&gt;
+
+// WRONG - User can tap multiple times
+&lt;Button onClick={handleSubmit}&gt;
+  {isSubmitting ? &#039;Submitting...&#039; : &#039;Submit&#039;}
+&lt;/Button&gt;
+```
+
+## Empty States
+
+### Empty State Requirements
+
+Every list/collection MUST have an empty state:
+
+```tsx
+// WRONG - No empty state
+return &lt;FlatList data={items} /&gt;;
+
+// CORRECT - Explicit empty state
+return (
+  &lt;FlatList
+    data={items}
+    ListEmptyComponent={&lt;EmptyState /&gt;}
+  /&gt;
+);
+```
+
+### Contextual Empty States
+
+```tsx
+// Search with no results
+&lt;EmptyState
+  icon=&quot;search&quot;
+  title=&quot;No results found&quot;
+  description=&quot;Try different search terms&quot;
+/&gt;
+
+// List with no items yet
+&lt;EmptyState
+  icon=&quot;plus-circle&quot;
+  title=&quot;No items yet&quot;
+  description=&quot;Create your first item&quot;
+  action={{ label: &#039;Create Item&#039;, onClick: handleCreate }}
+/&gt;
+```
+
+## Form Submission Pattern
+
+```tsx
+const MyForm = () =&gt; {
+  const [submit, { loading }] = useSubmitMutation({
+    onCompleted: handleSuccess,
+    onError: handleError,
+  });
+
+  const handleSubmit = async () =&gt; {
+    if (!isValid) {
+      toast.error({ title: &#039;Please fix errors&#039; });
+      return;
+    }
+    await submit({ variables: { input: values } });
+  };
+
+  return (
+    &lt;form&gt;
+      &lt;Input
+        value={values.name}
+        onChange={handleChange(&#039;name&#039;)}
+        error={touched.name ? errors.name : undefined}
+      /&gt;
+      &lt;Button
+        type=&quot;submit&quot;
+        onClick={handleSubmit}
+        disabled={!isValid || loading}
+        isLoading={loading}
+      &gt;
+        Submit
+      &lt;/Button&gt;
+    &lt;/form&gt;
+  );
+};
+```
+
+## Anti-Patterns
+
+### Loading States
+
+```typescript
+// WRONG - Spinner when data exists (causes flash)
+if (loading) return &lt;Spinner /&gt;;
+
+// CORRECT - Only show loading without data
+if (loading &amp;&amp; !data) return &lt;Spinner /&gt;;
+```
+
+### Error Handling
+
+```typescript
+// WRONG - Error swallowed
+try {
+  await mutation();
+} catch (e) {
+  console.log(e); // User has no idea!
+}
+
+// CORRECT - Error surfaced
+onError: (error) =&gt; {
+  console.error(&#039;operation failed:&#039;, error);
+  toast.error({ title: &#039;Operation failed&#039; });
+}
+```
+
+### Button States
+
+```typescript
+// WRONG - Button not disabled during submission
+&lt;Button onClick={submit}&gt;Submit&lt;/Button&gt;
+
+// CORRECT - Disabled and shows loading
+&lt;Button onClick={submit} disabled={loading} isLoading={loading}&gt;
+  Submit
+&lt;/Button&gt;
+```
+
+## Checklist
+
+Before completing any UI component:
+
+**UI States:**
+- [ ] Error state handled and shown to user
+- [ ] Loading state shown only when no data exists
+- [ ] Empty state provided for collections
+- [ ] Buttons disabled during async operations
+- [ ] Buttons show loading indicator when appropriate
+
+**Data &amp; Mutations:**
+- [ ] Mutations have onError handler
+- [ ] All user actions have feedback (toast/visual)
+
+## Integration with Other Skills
+
+- **graphql-schema**: Use mutation patterns with proper error handling
+- **testing-patterns**: Test all UI states (loading, error, empty, success)
+- **formik-patterns**: Apply form submission patterns
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,149 @@
     <p class="desc">Create, update, and manage GitHub issues using MCP tools. Use this skill when users want to create bug reports, feature requests, or task issues, update existing issues, add labels/assignees/milestones, or manage issue workflows. Triggers on requests like "create an issue", "file a bug", "request a feature", "update issue X", or any GitHub issue management task.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/github-issues</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/github-issues</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Bash, Read
+description: Create, update, and manage GitHub issues using MCP tools. Use this skill when users want to create bug reports, feature requests, or task issues, update existing issues, add labels/assignees/milestones, or manage issue workflows. Triggers on requests like &quot;create an issue&quot;, &quot;file a bug&quot;, &quot;request a feature&quot;, &quot;update issue X&quot;, or any GitHub issue management task.
+---
+
+# GitHub Issues
+
+Manage GitHub issues using the `@modelcontextprotocol/server-github` MCP server.
+
+## Available MCP Tools
+
+| Tool | Purpose |
+|------|---------|
+| `mcp__github__create_issue` | Create new issues |
+| `mcp__github__update_issue` | Update existing issues |
+| `mcp__github__get_issue` | Fetch issue details |
+| `mcp__github__search_issues` | Search issues |
+| `mcp__github__add_issue_comment` | Add comments |
+| `mcp__github__list_issues` | List repository issues |
+
+## Workflow
+
+1. **Determine action**: Create, update, or query?
+2. **Gather context**: Get repo info, existing labels, milestones if needed
+3. **Structure content**: Use appropriate template from [references/templates.md](references/templates.md)
+4. **Execute**: Call the appropriate MCP tool
+5. **Confirm**: Report the issue URL to user
+
+## Creating Issues
+
+### Required Parameters
+
+```
+owner: repository owner (org or user)
+repo: repository name  
+title: clear, actionable title
+body: structured markdown content
+```
+
+### Optional Parameters
+
+```
+labels: [&quot;bug&quot;, &quot;enhancement&quot;, &quot;documentation&quot;, ...]
+assignees: [&quot;username1&quot;, &quot;username2&quot;]
+milestone: milestone number (integer)
+```
+
+### Title Guidelines
+
+- Start with type prefix when useful: `[Bug]`, `[Feature]`, `[Docs]`
+- Be specific and actionable
+- Keep under 72 characters
+- Examples:
+  - `[Bug] Login fails with SSO enabled`
+  - `[Feature] Add dark mode support`
+  - `Add unit tests for auth module`
+
+### Body Structure
+
+Always use the templates in [references/templates.md](references/templates.md). Choose based on issue type:
+
+| User Request | Template |
+|--------------|----------|
+| Bug, error, broken, not working | Bug Report |
+| Feature, enhancement, add, new | Feature Request |
+| Task, chore, refactor, update | Task |
+
+## Updating Issues
+
+Use `mcp__github__update_issue` with:
+
+```
+owner, repo, issue_number (required)
+title, body, state, labels, assignees, milestone (optional - only changed fields)
+```
+
+State values: `open`, `closed`
+
+## Examples
+
+### Example 1: Bug Report
+
+**User**: &quot;Create a bug issue - the login page crashes when using SSO&quot;
+
+**Action**: Call `mcp__github__create_issue` with:
+```json
+{
+  &quot;owner&quot;: &quot;github&quot;,
+  &quot;repo&quot;: &quot;awesome-copilot&quot;,
+  &quot;title&quot;: &quot;[Bug] Login page crashes when using SSO&quot;,
+  &quot;body&quot;: &quot;## Description\nThe login page crashes when users attempt to authenticate using SSO.\n\n## Steps to Reproduce\n1. Navigate to login page\n2. Click &#039;Sign in with SSO&#039;\n3. Page crashes\n\n## Expected Behavior\nSSO authentication should complete and redirect to dashboard.\n\n## Actual Behavior\nPage becomes unresponsive and displays error.\n\n## Environment\n- Browser: [To be filled]\n- OS: [To be filled]\n\n## Additional Context\nReported by user.&quot;,
+  &quot;labels&quot;: [&quot;bug&quot;]
+}
+```
+
+### Example 2: Feature Request
+
+**User**: &quot;Create a feature request for dark mode with high priority&quot;
+
+**Action**: Call `mcp__github__create_issue` with:
+```json
+{
+  &quot;owner&quot;: &quot;github&quot;,
+  &quot;repo&quot;: &quot;awesome-copilot&quot;,
+  &quot;title&quot;: &quot;[Feature] Add dark mode support&quot;,
+  &quot;body&quot;: &quot;## Summary\nAdd dark mode theme option for improved user experience and accessibility.\n\n## Motivation\n- Reduces eye strain in low-light environments\n- Increasingly expected by users\n- Improves accessibility\n\n## Proposed Solution\nImplement theme toggle with system preference detection.\n\n## Acceptance Criteria\n- [ ] Toggle switch in settings\n- [ ] Persists user preference\n- [ ] Respects system preference by default\n- [ ] All UI components support both themes\n\n## Alternatives Considered\nNone specified.\n\n## Additional Context\nHigh priority request.&quot;,
+  &quot;labels&quot;: [&quot;enhancement&quot;, &quot;high-priority&quot;]
+}
+```
+
+## Common Labels
+
+Use these standard labels when applicable:
+
+| Label | Use For |
+|-------|---------|
+| `bug` | Something isn&#039;t working |
+| `enhancement` | New feature or improvement |
+| `documentation` | Documentation updates |
+| `good first issue` | Good for newcomers |
+| `help wanted` | Extra attention needed |
+| `question` | Further information requested |
+| `wontfix` | Will not be addressed |
+| `duplicate` | Already exists |
+| `high-priority` | Urgent issues |
+
+## Tips
+
+- Always confirm the repository context before creating issues
+- Ask for missing critical information rather than guessing
+- Link related issues when known: `Related to #123`
+- For updates, fetch current issue first to preserve unchanged fields
+</code>
       </div>
     </div>
 

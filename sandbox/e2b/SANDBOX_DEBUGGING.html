@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,219 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install sandbox/SANDBOX_DEBUGGING</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install sandbox/SANDBOX_DEBUGGING</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># E2B Sandbox Debugging Guide
+
+## 🔍 Herramientas de Monitoreo Disponibles
+
+### 1. Launcher Principal con Logging Mejorado
+**Archivo**: `e2b-launcher.py`
+- Logging detallado de cada paso
+- Verificación de instalación de Claude Code
+- Monitoreo de permisos y ambiente
+- Timeouts extendidos para operaciones largas
+- Descarga automática de archivos generados
+
+### 2. Monitor de Sandbox en Tiempo Real
+**Archivo**: `e2b-monitor.py`  
+- Monitoreo de recursos del sistema
+- Tracking de file system en tiempo real
+- Análisis de performance y memory usage
+- Logging con timestamps detallados
+
+### 3. Simulador Demo
+Para testing sin API keys válidos, crea un archivo demo que simule el flujo completo.
+
+## 🚨 Troubleshooting Común
+
+### Problema: &quot;Sandbox timeout&quot;
+**Síntomas**:
+```
+❌ Error: The sandbox was not found: This error is likely due to sandbox timeout
+```
+
+**Soluciones**:
+1. **Aumentar timeout del sandbox**:
+   ```python
+   sbx = Sandbox.create(timeout=600)  # 10 minutos
+   sbx.set_timeout(900)  # Extender a 15 minutos
+   ```
+
+2. **Usar el monitor para ver qué consume tiempo**:
+   ```bash
+   python e2b-monitor.py &quot;Your prompt here&quot; &quot;&quot; your_e2b_key your_anthropic_key
+   ```
+
+### Problema: &quot;Claude not found&quot;
+**Síntomas**:
+```
+❌ Claude not found, checking PATH...
+```
+
+**Debugging Steps**:
+1. **Verificar template correcto**:
+   ```python
+   template=&quot;anthropic-claude-code&quot;  # Debe ser exactamente este
+   ```
+
+2. **Verificar instalación en sandbox**:
+   ```bash
+   # El launcher ejecuta automáticamente:
+   which claude
+   claude --version
+   echo $PATH
+   ```
+
+### Problema: &quot;Permission denied&quot;
+**Síntomas**:
+```
+❌ Write permission issue
+```
+
+**Soluciones**:
+1. **Verificar directorio de trabajo**:
+   ```bash
+   pwd
+   whoami
+   ls -la
+   ```
+
+2. **Cambiar a directorio con permisos**:
+   ```python
+   sbx.commands.run(&quot;cd /home/user &amp;&amp; mkdir workspace &amp;&amp; cd workspace&quot;)
+   ```
+
+### Problema: API Key Issues
+**Síntomas**:
+```
+❌ Error: 401: Invalid API key
+```
+
+**Debugging**:
+1. **Verificar formato de API key**:
+   - E2B keys: formato específico de E2B
+   - Anthropic keys: empiezan con &quot;sk-ant-&quot;
+
+2. **Verificar permisos**:
+   - Verificar que la key tenga permisos de sandbox
+   - Verificar quota/límites de la cuenta
+
+## 📊 Usando el Monitor para Debugging
+
+### Comando Básico:
+```bash
+python e2b-monitor.py &quot;Create a React app&quot; &quot;&quot; your_e2b_key your_anthropic_key
+```
+
+### Output del Monitor:
+```
+[14:32:15] INFO: 🚀 Starting enhanced E2B sandbox with monitoring
+[14:32:16] INFO: ✅ Sandbox created: abc123xyz
+[14:32:17] INFO: 🔍 System resources check
+[14:32:17] INFO: Memory usage:
+[14:32:17] INFO:                total        used        free
+[14:32:17] INFO:   Mem:           2.0Gi       512Mi       1.5Gi
+[14:32:18] INFO: 📁 Initial file system state
+[14:32:18] INFO: Current directory: /home/user
+[14:32:19] INFO: 🤖 Executing Claude Code with monitoring
+[14:32:19] INFO: Starting monitored execution: echo &#039;Create a React app&#039;...
+[14:32:22] INFO: Command completed in 3.45 seconds
+[14:32:22] INFO: Exit code: 0
+[14:32:22] INFO: STDOUT length: 2847 characters
+```
+
+## 🎯 Casos de Uso Específicos
+
+### 1. **Debugging Timeouts**
+```bash
+# Usar el monitor para ver exactamente dónde se cuelga
+python e2b-monitor.py &quot;Complex prompt that times out&quot;
+```
+
+### 2. **Verificar Generación de Archivos**
+El launcher automáticamente descarga archivos generados:
+```
+💾 DOWNLOADING FILES TO LOCAL MACHINE:
+✅ Downloaded: ./index.html → ./e2b-output/index.html
+✅ Downloaded: ./styles.css → ./e2b-output/styles.css
+
+📁 All files downloaded to: /path/to/project/e2b-output
+```
+
+### 3. **Monitoreo de Performance**
+```
+[14:33:20] INFO: Top processes:
+[14:33:20] INFO:   USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+[14:33:20] INFO:   user      1234  5.2  2.1  98765 43210 pts/0    S+   14:32   0:01 claude
+```
+
+## 🛠 Configuración Avanzada
+
+### Variables de Ambiente Útiles:
+```bash
+export E2B_DEBUG=1                    # Debug mode
+export ANTHROPIC_API_KEY=your_key     # Claude API key  
+export E2B_API_KEY=your_key          # E2B API key
+```
+
+### Configuración de Timeout Personalizada:
+```python
+# Para operaciones muy largas (ej: compilación completa)
+sbx = Sandbox.create(timeout=1800)  # 30 minutos
+sbx.set_timeout(3600)               # 1 hora máximo
+```
+
+## 📋 Checklist de Debugging
+
+### Antes de Reportar un Issue:
+- [ ] API keys válidos y con permisos correctos
+- [ ] Template correcto: &quot;anthropic-claude-code&quot;
+- [ ] Timeout suficiente para la operación
+- [ ] Ejecutar con el monitor para logs detallados
+- [ ] Verificar que Claude Code esté instalado en sandbox
+- [ ] Revisar permisos de escritura en directorio
+- [ ] Comprobar memoria/recursos disponibles
+
+### Información a Incluir en Reports:
+- Output completo del launcher o monitor
+- Sandbox ID si está disponible
+- Prompt exacto que causa el problema
+- Componentes instalados (si aplica)
+- Tiempo de ejecución antes del fallo
+
+## 🚀 Funcionalidades del Sistema
+
+### Descarga Automática de Archivos
+El launcher descarga automáticamente todos los archivos generados:
+- HTML, CSS, JS, TS, TSX, Python, JSON, Markdown
+- Se guardan en directorio local `./e2b-output/`
+- Excluye archivos internos de Claude Code
+- Preserva nombres de archivo originales
+
+### Logging Detallado
+- Verificación de instalación de Claude Code
+- Monitoreo de permisos y ambiente del sandbox
+- Tracking de exit codes y output length
+- Timestamps para análisis de performance
+
+### Timeouts Inteligentes
+- 10 minutos timeout inicial para creación
+- 15 minutos total extendido automáticamente
+- 5 minutos timeout para ejecución de Claude Code
+- Timeouts cortos para verificaciones (5-10 segundos)
+
+---
+
+**Con estas herramientas puedes monitorear exactamente qué está pasando dentro del sandbox E2B y debuggear cualquier problema que surja.**</code>
       </div>
     </div>
 

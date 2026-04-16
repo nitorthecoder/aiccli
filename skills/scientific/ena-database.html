@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,215 @@
     <p class="desc">"Access European Nucleotide Archive via API/FTP. Retrieve DNA/RNA sequences, raw reads (FASTQ), genome assemblies by accession, for genomics and bioinformatics pipelines. Supports multiple formats."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/ena-database</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/ena-database</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: ena-database
+description: &quot;Access European Nucleotide Archive via API/FTP. Retrieve DNA/RNA sequences, raw reads (FASTQ), genome assemblies by accession, for genomics and bioinformatics pipelines. Supports multiple formats.&quot;
+---
+
+# ENA Database
+
+## Overview
+
+The European Nucleotide Archive (ENA) is a comprehensive public repository for nucleotide sequence data and associated metadata. Access and query DNA/RNA sequences, raw reads, genome assemblies, and functional annotations through REST APIs and FTP for genomics and bioinformatics pipelines.
+
+## When to Use This Skill
+
+This skill should be used when:
+
+- Retrieving nucleotide sequences or raw sequencing reads by accession
+- Searching for samples, studies, or assemblies by metadata criteria
+- Downloading FASTQ files or genome assemblies for analysis
+- Querying taxonomic information for organisms
+- Accessing sequence annotations and functional data
+- Integrating ENA data into bioinformatics pipelines
+- Performing cross-reference searches to related databases
+- Bulk downloading datasets via FTP or Aspera
+
+## Core Capabilities
+
+### 1. Data Types and Structure
+
+ENA organizes data into hierarchical object types:
+
+**Studies/Projects** - Group related data and control release dates. Studies are the primary unit for citing archived data.
+
+**Samples** - Represent units of biomaterial from which sequencing libraries were produced. Samples must be registered before submitting most data types.
+
+**Raw Reads** - Consist of:
+- **Experiments**: Metadata about sequencing methods, library preparation, and instrument details
+- **Runs**: References to data files containing raw sequencing reads from a single sequencing run
+
+**Assemblies** - Genome, transcriptome, metagenome, or metatranscriptome assemblies at various completion levels.
+
+**Sequences** - Assembled and annotated sequences stored in the EMBL Nucleotide Sequence Database, including coding/non-coding regions and functional annotations.
+
+**Analyses** - Results from computational analyses of sequence data.
+
+**Taxonomy Records** - Taxonomic information including lineage and rank.
+
+### 2. Programmatic Access
+
+ENA provides multiple REST APIs for data access. Consult `references/api_reference.md` for detailed endpoint documentation.
+
+**Key APIs:**
+
+**ENA Portal API** - Advanced search functionality across all ENA data types
+- Documentation: https://www.ebi.ac.uk/ena/portal/api/doc
+- Use for complex queries and metadata searches
+
+**ENA Browser API** - Direct retrieval of records and metadata
+- Documentation: https://www.ebi.ac.uk/ena/browser/api/doc
+- Use for downloading specific records by accession
+- Returns data in XML format
+
+**ENA Taxonomy REST API** - Query taxonomic information
+- Access lineage, rank, and related taxonomic data
+
+**ENA Cross Reference Service** - Access related records from external databases
+- Endpoint: https://www.ebi.ac.uk/ena/xref/rest/
+
+**CRAM Reference Registry** - Retrieve reference sequences
+- Endpoint: https://www.ebi.ac.uk/ena/cram/
+- Query by MD5 or SHA1 checksums
+
+**Rate Limiting**: All APIs have a rate limit of 50 requests per second. Exceeding this returns HTTP 429 (Too Many Requests).
+
+### 3. Searching and Retrieving Data
+
+**Browser-Based Search:**
+- Free text search across all fields
+- Sequence similarity search (BLAST integration)
+- Cross-reference search to find related records
+- Advanced search with Rulespace query builder
+
+**Programmatic Queries:**
+- Use Portal API for advanced searches at scale
+- Filter by data type, date range, taxonomy, or metadata fields
+- Download results as tabulated metadata summaries or XML records
+
+**Example API Query Pattern:**
+```python
+import requests
+
+# Search for samples from a specific study
+base_url = &quot;https://www.ebi.ac.uk/ena/portal/api/search&quot;
+params = {
+    &quot;result&quot;: &quot;sample&quot;,
+    &quot;query&quot;: &quot;study_accession=PRJEB1234&quot;,
+    &quot;format&quot;: &quot;json&quot;,
+    &quot;limit&quot;: 100
+}
+
+response = requests.get(base_url, params=params)
+samples = response.json()
+```
+
+### 4. Data Retrieval Formats
+
+**Metadata Formats:**
+- XML (native ENA format)
+- JSON (via Portal API)
+- TSV/CSV (tabulated summaries)
+
+**Sequence Data:**
+- FASTQ (raw reads)
+- BAM/CRAM (aligned reads)
+- FASTA (assembled sequences)
+- EMBL flat file format (annotated sequences)
+
+**Download Methods:**
+- Direct API download (small files)
+- FTP for bulk data transfer
+- Aspera for high-speed transfer of large datasets
+- enaBrowserTools command-line utility for bulk downloads
+
+### 5. Common Use Cases
+
+**Retrieve raw sequencing reads by accession:**
+```python
+# Download run files using Browser API
+accession = &quot;ERR123456&quot;
+url = f&quot;https://www.ebi.ac.uk/ena/browser/api/xml/{accession}&quot;
+```
+
+**Search for all samples in a study:**
+```python
+# Use Portal API to list samples
+study_id = &quot;PRJNA123456&quot;
+url = f&quot;https://www.ebi.ac.uk/ena/portal/api/search?result=sample&amp;query=study_accession={study_id}&amp;format=tsv&quot;
+```
+
+**Find assemblies for a specific organism:**
+```python
+# Search assemblies by taxonomy
+organism = &quot;Escherichia coli&quot;
+url = f&quot;https://www.ebi.ac.uk/ena/portal/api/search?result=assembly&amp;query=tax_tree({organism})&amp;format=json&quot;
+```
+
+**Get taxonomic lineage:**
+```python
+# Query taxonomy API
+taxon_id = &quot;562&quot;  # E. coli
+url = f&quot;https://www.ebi.ac.uk/ena/taxonomy/rest/tax-id/{taxon_id}&quot;
+```
+
+### 6. Integration with Analysis Pipelines
+
+**Bulk Download Pattern:**
+1. Search for accessions matching criteria using Portal API
+2. Extract file URLs from search results
+3. Download files via FTP or using enaBrowserTools
+4. Process downloaded data in pipeline
+
+**BLAST Integration:**
+Integrate with EBI&#039;s NCBI BLAST service (REST/SOAP API) for sequence similarity searches against ENA sequences.
+
+### 7. Best Practices
+
+**Rate Limiting:**
+- Implement exponential backoff when receiving HTTP 429 responses
+- Batch requests when possible to stay within 50 req/sec limit
+- Use bulk download tools for large datasets instead of iterating API calls
+
+**Data Citation:**
+- Always cite using Study/Project accessions when publishing
+- Include accession numbers for specific samples, runs, or assemblies used
+
+**API Response Handling:**
+- Check HTTP status codes before processing responses
+- Parse XML responses using proper XML libraries (not regex)
+- Handle pagination for large result sets
+
+**Performance:**
+- Use FTP/Aspera for downloading large files (&gt;100MB)
+- Prefer TSV/JSON formats over XML when only metadata is needed
+- Cache taxonomy lookups locally when processing many records
+
+## Resources
+
+This skill includes detailed reference documentation for working with ENA:
+
+### references/
+
+**api_reference.md** - Comprehensive API endpoint documentation including:
+- Detailed parameters for Portal API and Browser API
+- Response format specifications
+- Advanced query syntax and operators
+- Field names for filtering and searching
+- Common API patterns and examples
+
+Load this reference when constructing complex API queries, debugging API responses, or needing specific parameter details.
+</code>
       </div>
     </div>
 

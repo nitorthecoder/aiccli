@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,104 @@
     <p class="desc">Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/using-superpowers</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/using-superpowers</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: using-superpowers
+description: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions
+---
+
+&lt;EXTREMELY-IMPORTANT&gt;
+If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
+
+IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
+
+This is not negotiable. This is not optional. You cannot rationalize your way out of this.
+&lt;/EXTREMELY-IMPORTANT&gt;
+
+## How to Access Skills
+
+**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.
+
+**In other environments:** Check your platform&#039;s documentation for how skills are loaded.
+
+# Using Skills
+
+## The Rule
+
+**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don&#039;t need to use it.
+
+```dot
+digraph skill_flow {
+    &quot;User message received&quot; [shape=doublecircle];
+    &quot;Might any skill apply?&quot; [shape=diamond];
+    &quot;Invoke Skill tool&quot; [shape=box];
+    &quot;Announce: &#039;Using [skill] to [purpose]&#039;&quot; [shape=box];
+    &quot;Has checklist?&quot; [shape=diamond];
+    &quot;Create TodoWrite todo per item&quot; [shape=box];
+    &quot;Follow skill exactly&quot; [shape=box];
+    &quot;Respond (including clarifications)&quot; [shape=doublecircle];
+
+    &quot;User message received&quot; -&gt; &quot;Might any skill apply?&quot;;
+    &quot;Might any skill apply?&quot; -&gt; &quot;Invoke Skill tool&quot; [label=&quot;yes, even 1%&quot;];
+    &quot;Might any skill apply?&quot; -&gt; &quot;Respond (including clarifications)&quot; [label=&quot;definitely not&quot;];
+    &quot;Invoke Skill tool&quot; -&gt; &quot;Announce: &#039;Using [skill] to [purpose]&#039;&quot;;
+    &quot;Announce: &#039;Using [skill] to [purpose]&#039;&quot; -&gt; &quot;Has checklist?&quot;;
+    &quot;Has checklist?&quot; -&gt; &quot;Create TodoWrite todo per item&quot; [label=&quot;yes&quot;];
+    &quot;Has checklist?&quot; -&gt; &quot;Follow skill exactly&quot; [label=&quot;no&quot;];
+    &quot;Create TodoWrite todo per item&quot; -&gt; &quot;Follow skill exactly&quot;;
+}
+```
+
+## Red Flags
+
+These thoughts mean STOP—you&#039;re rationalizing:
+
+| Thought | Reality |
+|---------|---------|
+| &quot;This is just a simple question&quot; | Questions are tasks. Check for skills. |
+| &quot;I need more context first&quot; | Skill check comes BEFORE clarifying questions. |
+| &quot;Let me explore the codebase first&quot; | Skills tell you HOW to explore. Check first. |
+| &quot;I can check git/files quickly&quot; | Files lack conversation context. Check for skills. |
+| &quot;Let me gather information first&quot; | Skills tell you HOW to gather information. |
+| &quot;This doesn&#039;t need a formal skill&quot; | If a skill exists, use it. |
+| &quot;I remember this skill&quot; | Skills evolve. Read current version. |
+| &quot;This doesn&#039;t count as a task&quot; | Action = task. Check for skills. |
+| &quot;The skill is overkill&quot; | Simple things become complex. Use it. |
+| &quot;I&#039;ll just do this one thing first&quot; | Check BEFORE doing anything. |
+| &quot;This feels productive&quot; | Undisciplined action wastes time. Skills prevent this. |
+| &quot;I know what that means&quot; | Knowing the concept ≠ using the skill. Invoke it. |
+
+## Skill Priority
+
+When multiple skills could apply, use this order:
+
+1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task
+2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution
+
+&quot;Let&#039;s build X&quot; → brainstorming first, then implementation skills.
+&quot;Fix this bug&quot; → debugging first, then domain-specific skills.
+
+## Skill Types
+
+**Rigid** (TDD, debugging): Follow exactly. Don&#039;t adapt away discipline.
+
+**Flexible** (patterns): Adapt principles to context.
+
+The skill itself tells you which.
+
+## User Instructions
+
+Instructions say WHAT, not HOW. &quot;Add X&quot; or &quot;Fix Y&quot; doesn&#039;t mean skip workflows.
+</code>
       </div>
     </div>
 

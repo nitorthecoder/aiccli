@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,144 @@
     <p class="desc">Commit, push, and create PR from the current worktree</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/worktree-deliver</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/worktree-deliver</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Bash(git:*), Bash(gh:*), Bash(rm:*), Bash(cat:*), Bash(pwd:*), Bash(ls:*)
+description: Commit, push, and create PR from the current worktree
+---
+
+# Worktree Deliver
+
+Commit all work, push, and create a pull request from the current worktree.
+
+## Instructions
+
+You are inside a worktree. Package up the work and deliver it as a PR.
+
+### Step 1: Validate Environment
+
+1. Verify this is a worktree (not the main working tree) using `git worktree list`
+2. Get current branch: `git branch --show-current`
+3. Verify branch follows `claude/*`, `claude-daniel/*`, or `review/*` pattern. If not, warn the user and ask if they want to continue.
+4. Read `.worktree-task.md` if it exists to get the original task description
+
+### Step 2: Review Changes
+
+1. Run `git diff --stat` and `git diff --cached --stat` to show all changes
+2. Run `git status --short` to show the full picture
+3. If there are no changes at all (clean working tree, no commits ahead of main), inform the user there&#039;s nothing to deliver and stop.
+
+### Step 3: Clean Up Task File
+
+Before staging anything, remove the worktree task file so it doesn&#039;t end up in the commit:
+
+```bash
+rm -f .worktree-task.md
+```
+
+### Step 4: Confirm Files to Commit
+
+Use AskUserQuestion to show the user what will be committed and ask for confirmation. List all modified, added, and untracked files.
+
+Options:
+- &quot;Stage all changes&quot; — stage everything
+- &quot;Let me choose&quot; — user will specify which files to include
+
+If the user wants to choose, ask them which files to stage.
+
+### Step 5: Stage and Commit
+
+1. Stage the confirmed files with `git add`
+2. Generate a commit message following conventional commits format
+
+**Commit Message Strategy:**
+
+   1. **Analyze the diff** to determine the conventional commit type:
+      - `feat:` — New functionality, new files, new exports, new API endpoints
+      - `fix:` — Bug fixes, error corrections, fixing broken behavior
+      - `refactor:` — Code restructuring without changing behavior
+      - `docs:` — Documentation only changes
+      - `test:` — Adding or modifying tests
+      - `chore:` — Build scripts, configs, maintenance tasks
+
+   2. **Generate a commit message** based on:
+      - The task description from `.worktree-task.md` (if it was found)
+      - A brief summary of what the diff actually changed
+      - Format: `&lt;type&gt;: &lt;subject&gt;` (max 72 characters)
+
+   3. **Show the proposed message** to the user with AskUserQuestion:
+      - Display the generated message clearly
+      - Options: &quot;Use this message&quot; / &quot;Let me write my own&quot;
+
+   4. **If user chooses to write their own:**
+      - Ask them to provide their commit message
+      - Validate it follows conventional commits format (warn if not, but allow)
+
+   5. **Always include body and co-author:**
+      - Add a brief body summarizing what changed (2-3 bullet points if multiple changes)
+      - Include the standard co-author line
+
+3. Create the commit with the message using a HEREDOC:
+   ```bash
+   git commit -m &quot;$(cat &lt;&lt;&#039;EOF&#039;
+   &lt;commit message here&gt;
+   EOF
+   )&quot;
+   ```
+
+### Step 6: Push
+
+Push the branch to origin:
+
+```bash
+git push -u origin HEAD
+```
+
+If push fails due to no upstream, the `-u` flag should handle it. If it fails for another reason, show the error and suggest fixes.
+
+### Step 7: Create Pull Request
+
+1. Determine the base branch (main or master) using the same detection as worktree-init
+2. Create the PR using `gh pr create`:
+
+```bash
+gh pr create --base &lt;main-branch&gt; --title &quot;&lt;PR title&gt;&quot; --body &quot;$(cat &lt;&lt;&#039;EOF&#039;
+## Summary
+
+&lt;bullet points describing the changes based on task description and diff&gt;
+
+## Original Task
+
+&lt;task description from .worktree-task.md&gt;
+
+## Changes
+
+&lt;git diff --stat summary&gt;
+
+---
+Created from worktree `claude/&lt;name&gt;` using `/worktree-deliver`
+EOF
+)&quot;
+```
+
+3. Display the PR URL prominently
+
+### Step 8: Next Steps
+
+Tell the user:
+- PR is ready for review at `&lt;URL&gt;`
+- After merging, run `/worktree-cleanup` from the main repo to clean up
+- They can close this terminal panel
+</code>
       </div>
     </div>
 

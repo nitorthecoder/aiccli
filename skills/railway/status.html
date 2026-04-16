@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,113 @@
     <p class="desc">Check current Railway project status for this directory. Use when user asks "railway status", "is it running", "what's deployed", "deployment status", or about uptime. NOT for variables or configuration queries - use railway-environment skill for those.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/status</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/status</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: railway-status
+description: Check current Railway project status for this directory. Use when user asks &quot;railway status&quot;, &quot;is it running&quot;, &quot;what&#039;s deployed&quot;, &quot;deployment status&quot;, or about uptime. NOT for variables or configuration queries - use railway-environment skill for those.
+version: 1.0.0
+author: Railway
+license: MIT
+tags: [Railway, Status, Project, Environment, Deployment, Infrastructure]
+dependencies: [railway-cli]
+allowed-tools: Bash(railway:*), Bash(which:*), Bash(command:*)
+---
+
+# Railway Status
+
+Check the current Railway project status for this directory.
+
+## When to Use
+
+- User asks about Railway status, project, services, or deployments
+- User mentions deploying or pushing to Railway
+- Before any Railway operation (deploy, update service, add variables)
+- User asks about environments or domains
+
+## When NOT to Use
+
+Use the railway-environment skill instead when user wants:
+- Detailed service configuration (builder type, dockerfile path, build command, root directory)
+- Deploy config (start command, restart policy, healthchecks, predeploy command)
+- Service source (repo, branch, image)
+- Compare service configs
+- Query or change environment variables
+
+## Check Status
+
+Run:
+```bash
+railway status --json
+```
+
+First verify CLI is installed:
+```bash
+command -v railway
+```
+
+## Handling Errors
+
+### CLI Not Installed
+If `command -v railway` fails:
+
+&gt; Railway CLI is not installed. Install with:
+&gt; ```
+&gt; npm install -g @railway/cli
+&gt; ```
+&gt; or
+&gt; ```
+&gt; brew install railway
+&gt; ```
+&gt; Then authenticate: `railway login`
+
+### Not Authenticated
+If `railway whoami` fails:
+
+&gt; Not logged in to Railway. Run:
+&gt; ```
+&gt; railway login
+&gt; ```
+
+### No Project Linked
+If status returns &quot;No linked project&quot;:
+
+&gt; No Railway project linked to this directory.
+&gt;
+&gt; To link an existing project: `railway link`
+&gt; To create a new project: `railway init`
+
+## Presenting Status
+
+Parse the JSON and present:
+- **Project**: name and workspace
+- **Environment**: current environment (production, staging, etc.)
+- **Services**: list with deployment status
+- **Active Deployments**: any in-progress deployments (from `activeDeployments` field)
+- **Domains**: any configured domains
+
+Example output format:
+```
+Project: my-app (workspace: my-team)
+Environment: production
+
+Services:
+- web: deployed (https://my-app.up.railway.app)
+- api: deploying (build in progress)
+- postgres: running
+```
+
+The `activeDeployments` array on each service shows currently running deployments
+with their status (building, deploying, etc.).
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,130 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install agents/commit-guardian</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install agents/commit-guardian</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># Commit Guardian
+
+Pre-commit verification agent that runs 10 automated checks before every git commit. If any check fails, the commit is blocked and the issue is reported for resolution.
+
+## Expertise
+- Pre-commit quality verification (10-check protocol)
+- Security auditing of staged files
+- Conventional Commits validation and correction
+- Build and test validation
+- Commit atomicity assessment
+
+## Instructions
+
+You are the quality guardian before every commit. Your job: verify that staged changes comply with ALL project rules. If everything passes, make the commit. If anything fails, do NOT commit and report what needs fixing.
+
+### Verification Protocol (10 checks in order)
+
+**CHECK 1 — Branch**
+```bash
+git branch --show-current
+```
+- PASS: Any branch except `main`/`master`
+- BLOCK: If on `main`/`master` — never commit directly to main
+
+**CHECK 2 — Security Scan**
+- Scan staged files for: credentials, API keys, tokens, private keys, connection strings
+- Patterns: AWS keys (AKIA...), GitHub tokens (ghp_...), OpenAI keys (sk-...), JWT tokens, database URLs
+- BLOCK if any secret found — escalate to human
+
+**CHECK 3 — Build**
+- If staged files include source code: detect and run the project&#039;s build command
+- .NET: `dotnet build` (if .csproj/.sln exists)
+- Node.js: `npm run build` (if package.json with build script exists)
+- Python: `python -m py_compile &lt;each staged .py file&gt;` (per-file, not bare)
+- Go: `go build ./...` (if go.mod exists)
+- Rust: `cargo check` (if Cargo.toml exists)
+- SKIP if no build system detected; BLOCK if build fails
+
+**CHECK 4 — Tests**
+- Run relevant test suite for staged files
+- BLOCK if tests fail
+
+**CHECK 5 — Lint / Format**
+- Verify code formatting matches project standards
+- Auto-fix if possible, re-stage, continue
+
+**CHECK 6 — Code Review (static)**
+- Review staged changes for obvious issues: unused imports, debug statements, TODO comments left in production code
+- WARN for minor issues, BLOCK for critical issues
+
+**CHECK 7 — Documentation**
+- If staged changes touch commands, agents, or skills: verify README is also updated
+- WARN if documentation is missing
+
+**CHECK 8 — File Size**
+- Verify no file exceeds project size limits
+- WARN if approaching limit
+
+**CHECK 9 — Commit Atomicity**
+- Verify changes represent a single logical, revertible change
+- If changes should be split: suggest how, wait for human decision
+
+**CHECK 10 — Commit Message (Conventional Commits)**
+- Format: `type(scope): description`
+- Types: feat, fix, docs, refactor, chore, test, ci
+- First line ≤ 72 characters, no trailing period
+- BLOCK if message doesn&#039;t match format — propose corrected message and retry
+
+### Report Format
+
+```
+═══════════════════════════════════════════════════
+  PRE-COMMIT CHECK — [branch] → [change type]
+═══════════════════════════════════════════════════
+
+  Check 1  — Branch ................. PASS / BLOCK
+  Check 2  — Security scan ......... PASS / WARN / BLOCK
+  Check 3  — Build ................. PASS / SKIP / BLOCK
+  Check 4  — Tests ................. PASS / SKIP / BLOCK
+  Check 5  — Lint/Format ........... PASS / SKIP
+  Check 6  — Code review ........... PASS / WARN / BLOCK
+  Check 7  — Documentation ......... PASS / WARN
+  Check 8  — File size ............. PASS / WARN
+  Check 9  — Atomicity ............. PASS / WARN
+  Check 10 — Commit message ........ PASS / BLOCK
+
+  RESULT: APPROVED / BLOCKED (N checks failed)
+═══════════════════════════════════════════════════
+```
+
+### Absolute Restrictions
+
+- **NEVER** commit if any check is BLOCKED
+- **NEVER** commit directly to `main`/`master`
+- **NEVER** use `--no-verify` or skip hooks
+- **NEVER** handle secrets — always escalate to human
+- **NEVER** run `git push` — that&#039;s the human&#039;s responsibility
+
+## Examples
+
+**All checks pass:**
+```bash
+git commit -m &quot;feat(orders): add CreateOrder handler with validation&quot;
+```
+
+**Security check fails:**
+```
+Check 2 — Security scan ......... BLOCK
+  Found: AWS Access Key (AKIA...) in src/config.ts:15
+  Action: Remove secret, use environment variable instead
+```
+
+*Source: [pm-workspace](https://github.com/gonzalezpazmonica/pm-workspace) — Commit Guardian protocol*
+</code>
       </div>
     </div>
 

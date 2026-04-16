@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,259 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/clean-branches</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/clean-branches</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># Clean Branches Command
+
+Clean up merged and stale git branches
+
+## Instructions
+
+Follow this systematic approach to clean up git branches: **$ARGUMENTS**
+
+1. **Repository State Analysis**
+   - Check current branch and uncommitted changes
+   - List all local and remote branches
+   - Identify the main/master branch name
+   - Review recent branch activity and merge history
+
+   ```bash
+   # Check current status
+   git status
+   git branch -a
+   git remote -v
+   
+   # Check main branch name
+   git symbolic-ref refs/remotes/origin/HEAD | sed &#039;s@^refs/remotes/origin/@@&#039;
+   ```
+
+2. **Safety Precautions**
+   - Ensure working directory is clean
+   - Switch to main/master branch
+   - Pull latest changes from remote
+   - Create backup of current branch state if needed
+
+   ```bash
+   # Ensure clean state
+   git stash push -m &quot;Backup before branch cleanup&quot;
+   git checkout main  # or master
+   git pull origin main
+   ```
+
+3. **Identify Merged Branches**
+   - List branches that have been merged into main
+   - Exclude protected branches (main, master, develop)
+   - Check both local and remote merged branches
+   - Verify merge status to avoid accidental deletion
+
+   ```bash
+   # List merged local branches
+   git branch --merged main | grep -v &quot;main\\|master\\|develop\\|\\*&quot;
+   
+   # List merged remote branches
+   git branch -r --merged main | grep -v &quot;main\\|master\\|develop\\|HEAD&quot;
+   ```
+
+4. **Identify Stale Branches**
+   - Find branches with no recent activity
+   - Check last commit date for each branch
+   - Identify branches older than specified timeframe (e.g., 30 days)
+   - Consider branch naming patterns for feature/hotfix branches
+
+   ```bash
+   # List branches by last commit date
+   git for-each-ref --format=&#039;%(committerdate) %(authorname) %(refname)&#039; --sort=committerdate refs/heads
+   
+   # Find branches older than 30 days
+   git for-each-ref --format=&#039;%(refname:short) %(committerdate)&#039; refs/heads | awk &#039;$2 &lt; &quot;&#039;$(date -d &#039;30 days ago&#039; &#039;+%Y-%m-%d&#039;)&#039;&quot;&#039;
+   ```
+
+5. **Interactive Branch Review**
+   - Review each branch before deletion
+   - Check if branch has unmerged changes
+   - Verify branch purpose and status
+   - Ask for confirmation before deletion
+
+   ```bash
+   # Check for unmerged changes
+   git log main..branch-name --oneline
+   
+   # Show branch information
+   git show-branch branch-name main
+   ```
+
+6. **Protected Branch Configuration**
+   - Identify branches that should never be deleted
+   - Configure protection rules for important branches
+   - Document branch protection policies
+   - Set up automated protection for new repositories
+
+   ```bash
+   # Example protected branches
+   PROTECTED_BRANCHES=(&quot;main&quot; &quot;master&quot; &quot;develop&quot; &quot;staging&quot; &quot;production&quot;)
+   ```
+
+7. **Local Branch Cleanup**
+   - Delete merged local branches safely
+   - Remove stale feature branches
+   - Clean up tracking branches for deleted remotes
+   - Update local branch references
+
+   ```bash
+   # Delete merged branches (interactive)
+   git branch --merged main | grep -v &quot;main\\|master\\|develop\\|\\*&quot; | xargs -n 1 -p git branch -d
+   
+   # Force delete if needed (use with caution)
+   git branch -D branch-name
+   ```
+
+8. **Remote Branch Cleanup**
+   - Remove merged remote branches
+   - Clean up remote tracking references
+   - Delete obsolete remote branches
+   - Update remote branch information
+
+   ```bash
+   # Prune remote tracking branches
+   git remote prune origin
+   
+   # Delete remote branch
+   git push origin --delete branch-name
+   
+   # Remove local tracking of deleted remote branches
+   git branch -dr origin/branch-name
+   ```
+
+9. **Automated Cleanup Script**
+   
+   ```bash
+   #!/bin/bash
+   
+   # Git branch cleanup script
+   set -e
+   
+   # Configuration
+   MAIN_BRANCH=&quot;main&quot;
+   PROTECTED_BRANCHES=(&quot;main&quot; &quot;master&quot; &quot;develop&quot; &quot;staging&quot; &quot;production&quot;)
+   STALE_DAYS=30
+   
+   # Functions
+   is_protected() {
+       local branch=$1
+       for protected in &quot;${PROTECTED_BRANCHES[@]}&quot;; do
+           if [[ &quot;$branch&quot; == &quot;$protected&quot; ]]; then
+               return 0
+           fi
+       done
+       return 1
+   }
+   
+   # Switch to main branch
+   git checkout $MAIN_BRANCH
+   git pull origin $MAIN_BRANCH
+   
+   # Clean up merged branches
+   echo &quot;Cleaning up merged branches...&quot;
+   merged_branches=$(git branch --merged $MAIN_BRANCH | grep -v &quot;\\*\\|$MAIN_BRANCH&quot;)
+   
+   for branch in $merged_branches; do
+       if ! is_protected &quot;$branch&quot;; then
+           echo &quot;Deleting merged branch: $branch&quot;
+           git branch -d &quot;$branch&quot;
+       fi
+   done
+   
+   # Prune remote tracking branches
+   echo &quot;Pruning remote tracking branches...&quot;
+   git remote prune origin
+   
+   echo &quot;Branch cleanup completed!&quot;
+   ```
+
+10. **Team Coordination**
+    - Notify team before cleaning shared branches
+    - Check if branches are being used by others
+    - Coordinate branch cleanup schedules
+    - Document branch cleanup procedures
+
+11. **Branch Naming Convention Cleanup**
+    - Identify branches with non-standard naming
+    - Clean up temporary or experimental branches
+    - Remove old hotfix and feature branches
+    - Enforce consistent naming conventions
+
+12. **Verification and Validation**
+    - Verify important branches are still present
+    - Check that no active work was deleted
+    - Validate remote branch synchronization
+    - Confirm team members have no issues
+
+    ```bash
+    # Verify cleanup results
+    git branch -a
+    git remote show origin
+    ```
+
+13. **Documentation and Reporting**
+    - Document what branches were cleaned up
+    - Report any issues or conflicts found
+    - Update team documentation about branch lifecycle
+    - Create branch cleanup schedule and policies
+
+14. **Rollback Procedures**
+    - Document how to recover deleted branches
+    - Use reflog to find deleted branch commits
+    - Create emergency recovery procedures
+    - Set up branch restoration scripts
+
+    ```bash
+    # Recover deleted branch using reflog
+    git reflog --no-merges --since=&quot;2 weeks ago&quot;
+    git checkout -b recovered-branch commit-hash
+    ```
+
+15. **Automation Setup**
+    - Set up automated branch cleanup scripts
+    - Configure CI/CD pipeline for branch cleanup
+    - Create scheduled cleanup jobs
+    - Implement branch lifecycle policies
+
+16. **Best Practices Implementation**
+    - Establish branch lifecycle guidelines
+    - Set up automated merge detection
+    - Configure branch protection rules
+    - Implement code review requirements
+
+**Advanced Cleanup Options:**
+
+```bash
+# Clean up all merged branches except protected ones
+git branch --merged main | grep -E &quot;^  (feature|hotfix|bugfix)/&quot; | xargs -n 1 git branch -d
+
+# Interactive cleanup with confirmation
+git branch --merged main | grep -v &quot;main\|master\|develop&quot; | xargs -n 1 -p git branch -d
+
+# Batch delete remote branches
+git branch -r --merged main | grep origin | grep -v &quot;main\|master\|develop\|HEAD&quot; | cut -d/ -f2- | xargs -n 1 git push origin --delete
+
+# Clean up branches older than specific date
+git for-each-ref --format=&#039;%(refname:short) %(committerdate:short)&#039; refs/heads | awk &#039;$2 &lt; &quot;2023-01-01&quot;&#039; | cut -d&#039; &#039; -f1 | xargs -n 1 git branch -D
+```
+
+Remember to:
+- Always backup important branches before cleanup
+- Coordinate with team members before deleting shared branches
+- Test cleanup scripts in a safe environment first
+- Document all cleanup procedures and policies
+- Set up regular cleanup schedules to prevent accumulation</code>
       </div>
     </div>
 

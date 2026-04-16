@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,152 @@
     <p class="desc">Diagnose slow React components and suggest targeted performance fixes.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/react-component-performance</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/react-component-performance</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: react-component-performance
+description: Diagnose slow React components and suggest targeted performance fixes.
+risk: safe
+source: &quot;Dimillian/Skills (MIT)&quot;
+date_added: &quot;2026-03-25&quot;
+---
+
+# React Component Performance
+
+## Overview
+
+Identify render hotspots, isolate expensive updates, and apply targeted optimizations without changing UI behavior.
+
+## When to Use
+
+- When the user asks to profile or improve a slow React component.
+- When you need to reduce re-renders, list lag, or expensive render work in React UI.
+
+## Workflow
+
+1. Reproduce or describe the slowdown.
+2. Identify what triggers re-renders (state updates, props churn, effects).
+3. Isolate fast-changing state from heavy subtrees.
+4. Stabilize props and handlers; memoize where it pays off.
+5. Reduce expensive work (computation, DOM size, list length).
+6. **Validate**: open React DevTools Profiler → record the interaction → inspect the Flamegraph for components rendering longer than ~16 ms → compare against a pre-optimization baseline recording.
+
+## Checklist
+
+- Measure: use React DevTools Profiler or log renders; capture baseline.
+- Find churn: identify state updated on a timer, scroll, input, or animation.
+- Split: move ticking state into a child; keep heavy lists static.
+- Memoize: wrap leaf rows with `memo` only when props are stable.
+- Stabilize props: use `useCallback`/`useMemo` for handlers and derived values.
+- Avoid derived work in render: precompute, or compute inside memoized helpers.
+- Control list size: window/virtualize long lists; avoid rendering hidden items.
+- Keys: ensure stable keys; avoid index when order can change.
+- Effects: verify dependency arrays; avoid effects that re-run on every render.
+- Style/layout: watch for expensive layout thrash or large Markdown/diff renders.
+
+## Optimization Patterns
+
+### Isolate ticking state
+
+Move a timer or animation counter into a child so the parent list never re-renders on each tick.
+
+```tsx
+// ❌ Before – entire parent (and list) re-renders every second
+function Dashboard({ items }: { items: Item[] }) {
+  const [tick, setTick] = useState(0);
+  useEffect(() =&gt; {
+    const id = setInterval(() =&gt; setTick(t =&gt; t + 1), 1000);
+    return () =&gt; clearInterval(id);
+  }, []);
+  return (
+    &lt;&gt;
+      &lt;Clock tick={tick} /&gt;
+      &lt;ExpensiveList items={items} /&gt; {/* re-renders every second */}
+    &lt;/&gt;
+  );
+}
+
+// ✅ After – only &lt;Clock&gt; re-renders; list is untouched
+function Clock() {
+  const [tick, setTick] = useState(0);
+  useEffect(() =&gt; {
+    const id = setInterval(() =&gt; setTick(t =&gt; t + 1), 1000);
+    return () =&gt; clearInterval(id);
+  }, []);
+  return &lt;span&gt;{tick}s&lt;/span&gt;;
+}
+
+function Dashboard({ items }: { items: Item[] }) {
+  return (
+    &lt;&gt;
+      &lt;Clock /&gt;
+      &lt;ExpensiveList items={items} /&gt;
+    &lt;/&gt;
+  );
+}
+```
+
+### Stabilize callbacks with `useCallback` + `memo`
+
+```tsx
+// ❌ Before – new handler reference on every render busts Row memo
+function List({ items }: { items: Item[] }) {
+  const handleClick = (id: string) =&gt; console.log(id); // new ref each render
+  return items.map(item =&gt; &lt;Row key={item.id} item={item} onClick={handleClick} /&gt;);
+}
+
+// ✅ After – stable handler; Row only re-renders when its own item changes
+const Row = memo(({ item, onClick }: RowProps) =&gt; (
+  &lt;li onClick={() =&gt; onClick(item.id)}&gt;{item.name}&lt;/li&gt;
+));
+
+function List({ items }: { items: Item[] }) {
+  const handleClick = useCallback((id: string) =&gt; console.log(id), []);
+  return items.map(item =&gt; &lt;Row key={item.id} item={item} onClick={handleClick} /&gt;);
+}
+```
+
+### Prefer derived data outside render
+
+```tsx
+// ❌ Before – recomputes on every render
+function Summary({ orders }: { orders: Order[] }) {
+  const total = orders.reduce((sum, o) =&gt; sum + o.amount, 0); // runs every render
+  return &lt;p&gt;Total: {total}&lt;/p&gt;;
+}
+
+// ✅ After – recomputes only when orders changes
+function Summary({ orders }: { orders: Order[] }) {
+  const total = useMemo(() =&gt; orders.reduce((sum, o) =&gt; sum + o.amount, 0), [orders]);
+  return &lt;p&gt;Total: {total}&lt;/p&gt;;
+}
+```
+
+### Additional patterns
+
+- **Split rows**: extract list rows into memoized components with narrow props.
+- **Defer heavy rendering**: lazy-render or collapse expensive content until expanded.
+
+## Profiling Validation Steps
+
+1. Open **React DevTools → Profiler** tab.
+2. Click **Record**, perform the slow interaction, then **Stop**.
+3. Switch to **Flamegraph** view; any bar labeled with a component and time &gt; ~16 ms is a candidate.
+4. Use **Ranked chart** to sort by self render time and target the top offenders.
+5. Apply one optimization at a time, re-record, and compare render counts and durations against the baseline.
+
+## Example Reference
+
+Load `references/examples.md` when the user wants a concrete refactor example.
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,306 @@
     <p class="desc">Add official Railway database services (Postgres, Redis, MySQL, MongoDB). Use when user wants to add a database, says "add postgres", "add redis", "add database", "connect to database", or "wire up the database". For other templates (Ghost, Strapi, n8n), use the railway-templates skill.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/database</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/database</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: railway-database
+description: Add official Railway database services (Postgres, Redis, MySQL, MongoDB). Use when user wants to add a database, says &quot;add postgres&quot;, &quot;add redis&quot;, &quot;add database&quot;, &quot;connect to database&quot;, or &quot;wire up the database&quot;. For other templates (Ghost, Strapi, n8n), use the railway-templates skill.
+version: 1.0.0
+author: Railway
+license: MIT
+tags: [Railway, Database, Postgres, Redis, MySQL, MongoDB, Infrastructure, Deployment, Template]
+dependencies: [railway-cli]
+allowed-tools: Bash(railway:*)
+---
+
+# Railway Database
+
+Add official Railway database services. These are maintained templates with pre-configured volumes, networking, and connection variables.
+
+For non-database templates, see the `railway-templates` skill.
+
+## When to Use
+
+- User asks to &quot;add a database&quot;, &quot;add Postgres&quot;, &quot;add Redis&quot;, etc.
+- User needs a database for their application
+- User asks about connecting to a database
+- User says &quot;add postgres and connect to my server&quot;
+- User says &quot;wire up the database&quot;
+
+## Decision Flow
+
+**ALWAYS check for existing databases FIRST before creating.**
+
+```
+User mentions database
+        │
+  Check existing DBs first
+  (query env config for source.image)
+        │
+   ┌────┴────┐
+ Exists    Doesn&#039;t exist
+    │           │
+    │      Create database
+    │      (CLI or API)
+    │           │
+    │      Wait for deployment
+    │           │
+    └─────┬─────┘
+          │
+    User wants to
+    connect service?
+          │
+    ┌─────┴─────┐
+   Yes         No
+    │           │
+Wire vars    Done +
+via env     suggest wiring
+skill
+```
+
+## Check for Existing Databases
+
+Before creating a database, check if one already exists.
+
+For full environment config structure, see [environment-config.md](../reference/environment-config.md).
+
+```bash
+railway status --json
+```
+
+Then query environment config and check `source.image` for each service:
+
+```graphql
+query environmentConfig($environmentId: String!) {
+  environment(id: $environmentId) {
+    config(decryptVariables: false)
+  }
+}
+```
+
+The `config.services` object contains each service&#039;s configuration. Check `source.image` for:
+
+- `ghcr.io/railway/postgres*` or `postgres:*` → Postgres
+- `ghcr.io/railway/redis*` or `redis:*` → Redis
+- `ghcr.io/railway/mysql*` or `mysql:*` → MySQL
+- `ghcr.io/railway/mongo*` or `mongo:*` → MongoDB
+
+## Available Databases
+
+| Database | Template Code |
+|----------|---------------|
+| PostgreSQL | `postgres` |
+| Redis | `redis` |
+| MySQL | `mysql` |
+| MongoDB | `mongodb` |
+
+## Prerequisites
+
+Get project context:
+```bash
+railway status --json
+```
+
+Extract:
+- `id` - project ID
+- `environments.edges[0].node.id` - environment ID
+
+Get workspace ID (not in status output):
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;query getWorkspace($projectId: String!) {
+    project(id: $projectId) { workspaceId }
+  }&#039; \
+  &#039;{&quot;projectId&quot;: &quot;PROJECT_ID&quot;}&#039;
+SCRIPT
+```
+
+## Adding a Database
+
+### Step 1: Fetch Template
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;query template($code: String!) {
+    template(code: $code) {
+      id
+      name
+      serializedConfig
+    }
+  }&#039; \
+  &#039;{&quot;code&quot;: &quot;postgres&quot;}&#039;
+SCRIPT
+```
+
+This returns the template&#039;s `id` and `serializedConfig` needed for deployment.
+
+### Step 2: Deploy Template
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;mutation deployTemplate($input: TemplateDeployV2Input!) {
+    templateDeployV2(input: $input) {
+      projectId
+      workflowId
+    }
+  }&#039; \
+  &#039;{
+    &quot;input&quot;: {
+      &quot;templateId&quot;: &quot;TEMPLATE_ID&quot;,
+      &quot;serializedConfig&quot;: SERIALIZED_CONFIG,
+      &quot;projectId&quot;: &quot;PROJECT_ID&quot;,
+      &quot;environmentId&quot;: &quot;ENVIRONMENT_ID&quot;,
+      &quot;workspaceId&quot;: &quot;WORKSPACE_ID&quot;
+    }
+  }&#039;
+SCRIPT
+```
+
+**Important:** `serializedConfig` is the exact object from the template query, not a string.
+
+## Connecting to the Database
+
+After deployment, other services connect using reference variables.
+
+For complete variable reference syntax and wiring patterns, see [variables.md](../reference/variables.md).
+
+### Backend Services (Server-side)
+
+Use the private/internal URL for server-to-server communication:
+
+| Database | Variable Reference |
+|----------|-------------------|
+| PostgreSQL | `${{Postgres.DATABASE_URL}}` |
+| Redis | `${{Redis.REDIS_URL}}` |
+| MySQL | `${{MySQL.MYSQL_URL}}` |
+| MongoDB | `${{MongoDB.MONGO_URL}}` |
+
+### Frontend Applications
+
+**Important:** Frontends run in the user&#039;s browser and cannot access Railway&#039;s private network. They must use public URLs or go through a backend API.
+
+For direct database access from frontend (not recommended):
+- Use the public URL variables (e.g., `${{MongoDB.MONGO_PUBLIC_URL}}`)
+- Requires TCP proxy to be enabled
+
+Better pattern: Frontend → Backend API → Database
+
+## Example: Add PostgreSQL
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+# 1. Get context
+railway status --json
+# Extract project.id and environment.id
+
+# 2. Get workspace ID
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;query { project(id: &quot;proj-id&quot;) { workspaceId } }&#039; &#039;{}&#039;
+
+# 3. Fetch Postgres template
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;query { template(code: &quot;postgres&quot;) { id serializedConfig } }&#039; &#039;{}&#039;
+
+# 4. Deploy template
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;mutation deploy($input: TemplateDeployV2Input!) {
+    templateDeployV2(input: $input) { projectId workflowId }
+  }&#039; \
+  &#039;{&quot;input&quot;: {&quot;templateId&quot;: &quot;...&quot;, &quot;serializedConfig&quot;: {...}, &quot;projectId&quot;: &quot;...&quot;, &quot;environmentId&quot;: &quot;...&quot;, &quot;workspaceId&quot;: &quot;...&quot;}}&#039;
+SCRIPT
+```
+
+### Then Connect From Another Service
+
+Use `railway-environment` skill to add the variable reference:
+
+```json
+{
+  &quot;services&quot;: {
+    &quot;&lt;backend-service-id&gt;&quot;: {
+      &quot;variables&quot;: {
+        &quot;DATABASE_URL&quot;: { &quot;value&quot;: &quot;${{Postgres.DATABASE_URL}}&quot; }
+      }
+    }
+  }
+}
+```
+
+## Response
+
+Successful deployment returns:
+```json
+{
+  &quot;data&quot;: {
+    &quot;templateDeployV2&quot;: {
+      &quot;projectId&quot;: &quot;e63baedb-e308-49e9-8c06-c25336f861c7&quot;,
+      &quot;workflowId&quot;: &quot;deployTemplate/project/e63baedb-e308-49e9-8c06-c25336f861c7/xxx&quot;
+    }
+  }
+}
+```
+
+## What Gets Created
+
+Each database template creates:
+- A service with the database image
+- A volume for data persistence
+- Environment variables for connection strings
+- TCP proxy for external access (where applicable)
+
+## Error Handling
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| Template not found | Invalid template code | Use: `postgres`, `redis`, `mysql`, `mongodb` |
+| Permission denied | User lacks access | Need DEVELOPER role or higher |
+| Project not found | Invalid project ID | Run `railway status --json` for correct ID |
+
+## Example Workflows
+
+### &quot;add postgres and connect to the server&quot;
+
+1. Check existing DBs via env config query
+2. If postgres exists: Skip to step 5
+3. If not exists: Deploy postgres template (fetch template → deploy)
+4. Wait for deployment to complete
+5. Identify target service (ask if multiple, or use linked service)
+6. Use `railway-environment` skill to stage: `DATABASE_URL: { &quot;value&quot;: &quot;${{Postgres.DATABASE_URL}}&quot; }`
+7. Apply changes
+
+### &quot;add postgres&quot;
+
+1. Check existing DBs via env config query
+2. If exists: &quot;Postgres already exists in this project&quot;
+3. If not exists: Deploy postgres template
+4. Inform user: &quot;Postgres created. Connect a service with: `DATABASE_URL=${{Postgres.DATABASE_URL}}`&quot;
+
+### &quot;connect the server to redis&quot;
+
+1. Check existing DBs via env config query
+2. If redis exists: Wire up REDIS_URL via environment skill → apply
+3. If no redis: Ask &quot;No Redis found. Create one?&quot;
+   - Deploy redis template
+   - Wire REDIS_URL → apply
+
+## Composability
+
+- **Connect services**: Use `railway-environment` skill to add variable references
+- **View database service**: Use `railway-service` skill
+- **Check logs**: Use `railway-deployment` skill
+</code>
       </div>
     </div>
 

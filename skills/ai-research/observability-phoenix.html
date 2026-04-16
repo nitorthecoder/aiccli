@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,492 @@
     <p class="desc">Open-source AI observability platform for LLM tracing, evaluation, and monitoring. Use when debugging LLM applications with detailed traces, running evaluations on datasets, or monitoring production AI systems with real-time insights.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/observability-phoenix</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/observability-phoenix</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: phoenix-observability
+description: Open-source AI observability platform for LLM tracing, evaluation, and monitoring. Use when debugging LLM applications with detailed traces, running evaluations on datasets, or monitoring production AI systems with real-time insights.
+version: 1.0.0
+author: Orchestra Research
+license: MIT
+tags: [Observability, Phoenix, Arize, Tracing, Evaluation, Monitoring, LLM Ops, OpenTelemetry]
+dependencies: [arize-phoenix&gt;=12.0.0]
+---
+
+# Phoenix - AI Observability Platform
+
+Open-source AI observability and evaluation platform for LLM applications with tracing, evaluation, datasets, experiments, and real-time monitoring.
+
+## When to use Phoenix
+
+**Use Phoenix when:**
+- Debugging LLM application issues with detailed traces
+- Running systematic evaluations on datasets
+- Monitoring production LLM systems in real-time
+- Building experiment pipelines for prompt/model comparison
+- Self-hosted observability without vendor lock-in
+
+**Key features:**
+- **Tracing**: OpenTelemetry-based trace collection for any LLM framework
+- **Evaluation**: LLM-as-judge evaluators for quality assessment
+- **Datasets**: Versioned test sets for regression testing
+- **Experiments**: Compare prompts, models, and configurations
+- **Playground**: Interactive prompt testing with multiple models
+- **Open-source**: Self-hosted with PostgreSQL or SQLite
+
+**Use alternatives instead:**
+- **LangSmith**: Managed platform with LangChain-first integration
+- **Weights &amp; Biases**: Deep learning experiment tracking focus
+- **Arize Cloud**: Managed Phoenix with enterprise features
+- **MLflow**: General ML lifecycle, model registry focus
+
+## Quick start
+
+### Installation
+
+```bash
+pip install arize-phoenix
+
+# With specific backends
+pip install arize-phoenix[embeddings]  # Embedding analysis
+pip install arize-phoenix-otel         # OpenTelemetry config
+pip install arize-phoenix-evals        # Evaluation framework
+pip install arize-phoenix-client       # Lightweight REST client
+```
+
+### Launch Phoenix server
+
+```python
+import phoenix as px
+
+# Launch in notebook (ThreadServer mode)
+session = px.launch_app()
+
+# View UI
+session.view()  # Embedded iframe
+print(session.url)  # http://localhost:6006
+```
+
+### Command-line server (production)
+
+```bash
+# Start Phoenix server
+phoenix serve
+
+# With PostgreSQL
+export PHOENIX_SQL_DATABASE_URL=&quot;postgresql://user:pass@host/db&quot;
+phoenix serve --port 6006
+```
+
+### Basic tracing
+
+```python
+from phoenix.otel import register
+from openinference.instrumentation.openai import OpenAIInstrumentor
+
+# Configure OpenTelemetry with Phoenix
+tracer_provider = register(
+    project_name=&quot;my-llm-app&quot;,
+    endpoint=&quot;http://localhost:6006/v1/traces&quot;
+)
+
+# Instrument OpenAI SDK
+OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+
+# All OpenAI calls are now traced
+from openai import OpenAI
+client = OpenAI()
+response = client.chat.completions.create(
+    model=&quot;gpt-4o&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}]
+)
+```
+
+## Core concepts
+
+### Traces and spans
+
+A **trace** represents a complete execution flow, while **spans** are individual operations within that trace.
+
+```python
+from phoenix.otel import register
+from opentelemetry import trace
+
+# Setup tracing
+tracer_provider = register(project_name=&quot;my-app&quot;)
+tracer = trace.get_tracer(__name__)
+
+# Create custom spans
+with tracer.start_as_current_span(&quot;process_query&quot;) as span:
+    span.set_attribute(&quot;input.value&quot;, query)
+
+    # Child spans are automatically nested
+    with tracer.start_as_current_span(&quot;retrieve_context&quot;):
+        context = retriever.search(query)
+
+    with tracer.start_as_current_span(&quot;generate_response&quot;):
+        response = llm.generate(query, context)
+
+    span.set_attribute(&quot;output.value&quot;, response)
+```
+
+### Projects
+
+Projects organize related traces:
+
+```python
+import os
+os.environ[&quot;PHOENIX_PROJECT_NAME&quot;] = &quot;production-chatbot&quot;
+
+# Or per-trace
+from phoenix.otel import register
+tracer_provider = register(project_name=&quot;experiment-v2&quot;)
+```
+
+## Framework instrumentation
+
+### OpenAI
+
+```python
+from phoenix.otel import register
+from openinference.instrumentation.openai import OpenAIInstrumentor
+
+tracer_provider = register()
+OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)
+```
+
+### LangChain
+
+```python
+from phoenix.otel import register
+from openinference.instrumentation.langchain import LangChainInstrumentor
+
+tracer_provider = register()
+LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+
+# All LangChain operations traced
+from langchain_openai import ChatOpenAI
+llm = ChatOpenAI(model=&quot;gpt-4o&quot;)
+response = llm.invoke(&quot;Hello!&quot;)
+```
+
+### LlamaIndex
+
+```python
+from phoenix.otel import register
+from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
+
+tracer_provider = register()
+LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)
+```
+
+### Anthropic
+
+```python
+from phoenix.otel import register
+from openinference.instrumentation.anthropic import AnthropicInstrumentor
+
+tracer_provider = register()
+AnthropicInstrumentor().instrument(tracer_provider=tracer_provider)
+```
+
+## Evaluation framework
+
+### Built-in evaluators
+
+```python
+from phoenix.evals import (
+    OpenAIModel,
+    HallucinationEvaluator,
+    RelevanceEvaluator,
+    ToxicityEvaluator,
+    llm_classify
+)
+
+# Setup model for evaluation
+eval_model = OpenAIModel(model=&quot;gpt-4o&quot;)
+
+# Evaluate hallucination
+hallucination_eval = HallucinationEvaluator(eval_model)
+results = hallucination_eval.evaluate(
+    input=&quot;What is the capital of France?&quot;,
+    output=&quot;The capital of France is Paris.&quot;,
+    reference=&quot;Paris is the capital of France.&quot;
+)
+```
+
+### Custom evaluators
+
+```python
+from phoenix.evals import llm_classify
+
+# Define custom evaluation
+def evaluate_helpfulness(input_text, output_text):
+    template = &quot;&quot;&quot;
+    Evaluate if the response is helpful for the given question.
+
+    Question: {input}
+    Response: {output}
+
+    Is this response helpful? Answer &#039;helpful&#039; or &#039;not_helpful&#039;.
+    &quot;&quot;&quot;
+
+    result = llm_classify(
+        model=eval_model,
+        template=template,
+        input=input_text,
+        output=output_text,
+        rails=[&quot;helpful&quot;, &quot;not_helpful&quot;]
+    )
+    return result
+```
+
+### Run evaluations on dataset
+
+```python
+from phoenix import Client
+from phoenix.evals import run_evals
+
+client = Client()
+
+# Get spans to evaluate
+spans_df = client.get_spans_dataframe(
+    project_name=&quot;my-app&quot;,
+    filter_condition=&quot;span_kind == &#039;LLM&#039;&quot;
+)
+
+# Run evaluations
+eval_results = run_evals(
+    dataframe=spans_df,
+    evaluators=[
+        HallucinationEvaluator(eval_model),
+        RelevanceEvaluator(eval_model)
+    ],
+    provide_explanation=True
+)
+
+# Log results back to Phoenix
+client.log_evaluations(eval_results)
+```
+
+## Datasets and experiments
+
+### Create dataset
+
+```python
+from phoenix import Client
+
+client = Client()
+
+# Create dataset
+dataset = client.create_dataset(
+    name=&quot;qa-test-set&quot;,
+    description=&quot;QA evaluation dataset&quot;
+)
+
+# Add examples
+client.add_examples_to_dataset(
+    dataset_name=&quot;qa-test-set&quot;,
+    examples=[
+        {
+            &quot;input&quot;: {&quot;question&quot;: &quot;What is Python?&quot;},
+            &quot;output&quot;: {&quot;answer&quot;: &quot;A programming language&quot;}
+        },
+        {
+            &quot;input&quot;: {&quot;question&quot;: &quot;What is ML?&quot;},
+            &quot;output&quot;: {&quot;answer&quot;: &quot;Machine learning&quot;}
+        }
+    ]
+)
+```
+
+### Run experiment
+
+```python
+from phoenix import Client
+from phoenix.experiments import run_experiment
+
+client = Client()
+
+def my_model(input_data):
+    &quot;&quot;&quot;Your model function.&quot;&quot;&quot;
+    question = input_data[&quot;question&quot;]
+    return {&quot;answer&quot;: generate_answer(question)}
+
+def accuracy_evaluator(input_data, output, expected):
+    &quot;&quot;&quot;Custom evaluator.&quot;&quot;&quot;
+    return {
+        &quot;score&quot;: 1.0 if expected[&quot;answer&quot;].lower() in output[&quot;answer&quot;].lower() else 0.0,
+        &quot;label&quot;: &quot;correct&quot; if expected[&quot;answer&quot;].lower() in output[&quot;answer&quot;].lower() else &quot;incorrect&quot;
+    }
+
+# Run experiment
+results = run_experiment(
+    dataset_name=&quot;qa-test-set&quot;,
+    task=my_model,
+    evaluators=[accuracy_evaluator],
+    experiment_name=&quot;baseline-v1&quot;
+)
+
+print(f&quot;Average accuracy: {results.aggregate_metrics[&#039;accuracy&#039;]}&quot;)
+```
+
+## Client API
+
+### Query traces and spans
+
+```python
+from phoenix import Client
+
+client = Client(endpoint=&quot;http://localhost:6006&quot;)
+
+# Get spans as DataFrame
+spans_df = client.get_spans_dataframe(
+    project_name=&quot;my-app&quot;,
+    filter_condition=&quot;span_kind == &#039;LLM&#039;&quot;,
+    limit=1000
+)
+
+# Get specific span
+span = client.get_span(span_id=&quot;abc123&quot;)
+
+# Get trace
+trace = client.get_trace(trace_id=&quot;xyz789&quot;)
+```
+
+### Log feedback
+
+```python
+from phoenix import Client
+
+client = Client()
+
+# Log user feedback
+client.log_annotation(
+    span_id=&quot;abc123&quot;,
+    name=&quot;user_rating&quot;,
+    annotator_kind=&quot;HUMAN&quot;,
+    score=0.8,
+    label=&quot;helpful&quot;,
+    metadata={&quot;comment&quot;: &quot;Good response&quot;}
+)
+```
+
+### Export data
+
+```python
+# Export to pandas
+df = client.get_spans_dataframe(project_name=&quot;my-app&quot;)
+
+# Export traces
+traces = client.list_traces(project_name=&quot;my-app&quot;)
+```
+
+## Production deployment
+
+### Docker
+
+```bash
+docker run -p 6006:6006 arizephoenix/phoenix:latest
+```
+
+### With PostgreSQL
+
+```bash
+# Set database URL
+export PHOENIX_SQL_DATABASE_URL=&quot;postgresql://user:pass@host:5432/phoenix&quot;
+
+# Start server
+phoenix serve --host 0.0.0.0 --port 6006
+```
+
+### Environment variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PHOENIX_PORT` | HTTP server port | `6006` |
+| `PHOENIX_HOST` | Server bind address | `127.0.0.1` |
+| `PHOENIX_GRPC_PORT` | gRPC/OTLP port | `4317` |
+| `PHOENIX_SQL_DATABASE_URL` | Database connection | SQLite temp |
+| `PHOENIX_WORKING_DIR` | Data storage directory | OS temp |
+| `PHOENIX_ENABLE_AUTH` | Enable authentication | `false` |
+| `PHOENIX_SECRET` | JWT signing secret | Required if auth enabled |
+
+### With authentication
+
+```bash
+export PHOENIX_ENABLE_AUTH=true
+export PHOENIX_SECRET=&quot;your-secret-key-min-32-chars&quot;
+export PHOENIX_ADMIN_SECRET=&quot;admin-bootstrap-token&quot;
+
+phoenix serve
+```
+
+## Best practices
+
+1. **Use projects**: Separate traces by environment (dev/staging/prod)
+2. **Add metadata**: Include user IDs, session IDs for debugging
+3. **Evaluate regularly**: Run automated evaluations in CI/CD
+4. **Version datasets**: Track test set changes over time
+5. **Monitor costs**: Track token usage via Phoenix dashboards
+6. **Self-host**: Use PostgreSQL for production deployments
+
+## Common issues
+
+**Traces not appearing:**
+```python
+from phoenix.otel import register
+
+# Verify endpoint
+tracer_provider = register(
+    project_name=&quot;my-app&quot;,
+    endpoint=&quot;http://localhost:6006/v1/traces&quot;  # Correct endpoint
+)
+
+# Force flush
+from opentelemetry import trace
+trace.get_tracer_provider().force_flush()
+```
+
+**High memory in notebook:**
+```python
+# Close session when done
+session = px.launch_app()
+# ... do work ...
+session.close()
+px.close_app()
+```
+
+**Database connection issues:**
+```bash
+# Verify PostgreSQL connection
+psql $PHOENIX_SQL_DATABASE_URL -c &quot;SELECT 1&quot;
+
+# Check Phoenix logs
+phoenix serve --log-level debug
+```
+
+## References
+
+- **[Advanced Usage](references/advanced-usage.md)** - Custom evaluators, experiments, production setup
+- **[Troubleshooting](references/troubleshooting.md)** - Common issues, debugging, performance
+
+## Resources
+
+- **Documentation**: https://docs.arize.com/phoenix
+- **Repository**: https://github.com/Arize-ai/phoenix
+- **Docker Hub**: https://hub.docker.com/r/arizephoenix/phoenix
+- **Version**: 12.0.0+
+- **License**: Apache 2.0
+</code>
       </div>
     </div>
 

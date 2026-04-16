@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,309 @@
     <p class="desc">Use when user needs capabilities Claude lacks (image generation, real-time X/Twitter data) or explicitly requests external models ("blockrun", "use grok", "use gpt", "dall-e", "deepseek")</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/blockrun</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/blockrun</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: blockrun
+description: Use when user needs capabilities Claude lacks (image generation, real-time X/Twitter data) or explicitly requests external models (&quot;blockrun&quot;, &quot;use grok&quot;, &quot;use gpt&quot;, &quot;dall-e&quot;, &quot;deepseek&quot;)
+allowed-tools: Read, Bash(python:*), Bash(python3:*), Bash(pip:*), Bash(source:*)
+---
+
+# BlockRun
+
+**BlockRun works with Claude Code and Google Antigravity.**
+
+You can&#039;t generate images. You have no real-time X/Twitter access. BlockRun gives you these capabilities.
+
+## Philosophy
+
+You have a wallet. When you need a capability you lack, you pay for it autonomously.
+
+| You Need | You Call | Pricing |
+|----------|----------|---------|
+| Image generation | DALL-E | $0.04/image |
+| Real-time X data | Grok + Live Search | $0.025/source |
+| Second opinion | GPT-5.2 | $1.75/M input, $14/M output |
+| Cheaper processing | DeepSeek | $0.14/M input, $0.28/M output |
+
+**How it works:** BlockRun uses x402 micropayments to route your requests to OpenAI, xAI, Google, and other providers. No API keys needed - your wallet pays per token.
+
+## Budget Control (Optional)
+
+If the user specifies a budget (e.g., &quot;use at most $1&quot;), track spending and stop when budget is reached:
+
+```python
+from blockrun_llm import setup_agent_wallet
+
+client = setup_agent_wallet()
+budget = 1.0  # User&#039;s budget
+
+# Before each call, check if within budget
+spending = client.get_spending()
+if spending[&#039;total_usd&#039;] &gt;= budget:
+    print(f&quot;Budget reached: ${spending[&#039;total_usd&#039;]:.4f} spent&quot;)
+    # Stop making calls
+else:
+    response = client.chat(&quot;openai/gpt-5.2&quot;, &quot;Hello!&quot;)
+
+# At the end, report spending
+spending = client.get_spending()
+print(f&quot;💰 Total spent: ${spending[&#039;total_usd&#039;]:.4f} across {spending[&#039;calls&#039;]} calls&quot;)
+```
+
+## When to Use
+
+| Trigger | Your Action |
+|---------|-------------|
+| User explicitly requests (&quot;blockrun second opinion with GPT on...&quot;, &quot;use grok to check...&quot;, &quot;generate image with dall-e&quot;) | Execute via BlockRun |
+| User needs something you can&#039;t do (images, live X data) | Suggest BlockRun, wait for confirmation |
+| You can handle the task fine | Do it yourself, don&#039;t mention BlockRun |
+
+## Example User Prompts
+
+Users will say things like:
+
+| User Says | What You Do |
+|-----------|-------------|
+| &quot;blockrun generate an image of a sunset&quot; | Call DALL-E via ImageClient |
+| &quot;use grok to check what&#039;s trending on X&quot; | Call Grok with `search=True` |
+| &quot;blockrun GPT review this code&quot; | Call GPT-5.2 via LLMClient |
+| &quot;what&#039;s the latest news about AI agents?&quot; | Suggest Grok (you lack real-time data) |
+| &quot;generate a logo for my startup&quot; | Suggest DALL-E (you can&#039;t generate images) |
+| &quot;blockrun check my balance&quot; | Show wallet balance via `get_balance()` |
+| &quot;blockrun deepseek summarize this file&quot; | Call DeepSeek for cost savings |
+
+## Wallet &amp; Balance
+
+Use `setup_agent_wallet()` to auto-create a wallet and get a client. This shows the QR code and welcome message on first use.
+
+**Initialize client (always start with this):**
+```python
+from blockrun_llm import setup_agent_wallet
+
+client = setup_agent_wallet()  # Auto-creates wallet, shows QR if new
+```
+
+**Check balance (when user asks &quot;show balance&quot;, &quot;check wallet&quot;, etc.):**
+```python
+balance = client.get_balance()  # On-chain USDC balance
+print(f&quot;Balance: ${balance:.2f} USDC&quot;)
+print(f&quot;Wallet: {client.get_wallet_address()}&quot;)
+```
+
+**Show QR code for funding:**
+```python
+from blockrun_llm import generate_wallet_qr_ascii, get_wallet_address
+
+# ASCII QR for terminal display
+print(generate_wallet_qr_ascii(get_wallet_address()))
+```
+
+## SDK Usage
+
+**Prerequisite:** Install the SDK with `pip install blockrun-llm`
+
+### Basic Chat
+```python
+from blockrun_llm import setup_agent_wallet
+
+client = setup_agent_wallet()  # Auto-creates wallet if needed
+response = client.chat(&quot;openai/gpt-5.2&quot;, &quot;What is 2+2?&quot;)
+print(response)
+
+# Check spending
+spending = client.get_spending()
+print(f&quot;Spent ${spending[&#039;total_usd&#039;]:.4f}&quot;)
+```
+
+### Real-time X/Twitter Search (xAI Live Search)
+
+**IMPORTANT:** For real-time X/Twitter data, you MUST enable Live Search with `search=True` or `search_parameters`.
+
+```python
+from blockrun_llm import setup_agent_wallet
+
+client = setup_agent_wallet()
+
+# Simple: Enable live search with search=True
+response = client.chat(
+    &quot;xai/grok-3&quot;,
+    &quot;What are the latest posts from @blockrunai on X?&quot;,
+    search=True  # Enables real-time X/Twitter search
+)
+print(response)
+```
+
+### Advanced X Search with Filters
+
+```python
+from blockrun_llm import setup_agent_wallet
+
+client = setup_agent_wallet()
+
+response = client.chat(
+    &quot;xai/grok-3&quot;,
+    &quot;Analyze @blockrunai&#039;s recent content and engagement&quot;,
+    search_parameters={
+        &quot;mode&quot;: &quot;on&quot;,
+        &quot;sources&quot;: [
+            {
+                &quot;type&quot;: &quot;x&quot;,
+                &quot;included_x_handles&quot;: [&quot;blockrunai&quot;],
+                &quot;post_favorite_count&quot;: 5
+            }
+        ],
+        &quot;max_search_results&quot;: 20,
+        &quot;return_citations&quot;: True
+    }
+)
+print(response)
+```
+
+### Image Generation
+```python
+from blockrun_llm import ImageClient
+
+client = ImageClient()
+result = client.generate(&quot;A cute cat wearing a space helmet&quot;)
+print(result.data[0].url)
+```
+
+## xAI Live Search Reference
+
+Live Search is xAI&#039;s real-time data API. Cost: **$0.025 per source** (default 10 sources = ~$0.26).
+
+To reduce costs, set `max_search_results` to a lower value:
+```python
+# Only use 5 sources (~$0.13)
+response = client.chat(&quot;xai/grok-3&quot;, &quot;What&#039;s trending?&quot;,
+    search_parameters={&quot;mode&quot;: &quot;on&quot;, &quot;max_search_results&quot;: 5})
+```
+
+### Search Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `mode` | string | &quot;auto&quot; | &quot;off&quot;, &quot;auto&quot;, or &quot;on&quot; |
+| `sources` | array | web,news,x | Data sources to query |
+| `return_citations` | bool | true | Include source URLs |
+| `from_date` | string | - | Start date (YYYY-MM-DD) |
+| `to_date` | string | - | End date (YYYY-MM-DD) |
+| `max_search_results` | int | 10 | Max sources to return (customize to control cost) |
+
+### Source Types
+
+**X/Twitter Source:**
+```python
+{
+    &quot;type&quot;: &quot;x&quot;,
+    &quot;included_x_handles&quot;: [&quot;handle1&quot;, &quot;handle2&quot;],  # Max 10
+    &quot;excluded_x_handles&quot;: [&quot;spam_account&quot;],        # Max 10
+    &quot;post_favorite_count&quot;: 100,  # Min likes threshold
+    &quot;post_view_count&quot;: 1000      # Min views threshold
+}
+```
+
+**Web Source:**
+```python
+{
+    &quot;type&quot;: &quot;web&quot;,
+    &quot;country&quot;: &quot;US&quot;,  # ISO alpha-2 code
+    &quot;allowed_websites&quot;: [&quot;example.com&quot;],  # Max 5
+    &quot;safe_search&quot;: True
+}
+```
+
+**News Source:**
+```python
+{
+    &quot;type&quot;: &quot;news&quot;,
+    &quot;country&quot;: &quot;US&quot;,
+    &quot;excluded_websites&quot;: [&quot;tabloid.com&quot;]  # Max 5
+}
+```
+
+## Available Models
+
+| Model | Best For | Pricing |
+|-------|----------|---------|
+| `openai/gpt-5.2` | Second opinions, code review, general | $1.75/M in, $14/M out |
+| `openai/gpt-5-mini` | Cost-optimized reasoning | $0.30/M in, $1.20/M out |
+| `openai/o4-mini` | Latest efficient reasoning | $1.10/M in, $4.40/M out |
+| `openai/o3` | Advanced reasoning, complex problems | $10/M in, $40/M out |
+| `xai/grok-3` | Real-time X/Twitter data | $3/M + $0.025/source |
+| `deepseek/deepseek-chat` | Simple tasks, bulk processing | $0.14/M in, $0.28/M out |
+| `google/gemini-2.5-flash` | Very long documents, fast | $0.15/M in, $0.60/M out |
+| `openai/dall-e-3` | Photorealistic images | $0.04/image |
+| `google/nano-banana` | Fast, artistic images | $0.01/image |
+
+*M = million tokens. Actual cost depends on your prompt and response length.*
+
+## Cost Reference
+
+All LLM costs are per million tokens (M = 1,000,000 tokens).
+
+| Model | Input | Output |
+|-------|-------|--------|
+| GPT-5.2 | $1.75/M | $14.00/M |
+| GPT-5-mini | $0.30/M | $1.20/M |
+| Grok-3 (no search) | $3.00/M | $15.00/M |
+| DeepSeek | $0.14/M | $0.28/M |
+
+| Fixed Cost Actions | |
+|-------|--------|
+| Grok Live Search | $0.025/source (default 10 = $0.25) |
+| DALL-E image | $0.04/image |
+| Nano Banana image | $0.01/image |
+
+**Typical costs:** A 500-word prompt (~750 tokens) to GPT-5.2 costs ~$0.001 input. A 1000-word response (~1500 tokens) costs ~$0.02 output.
+
+## Setup &amp; Funding
+
+**Wallet location:** `$HOME/.blockrun/.session` (e.g., `/Users/username/.blockrun/.session`)
+
+**First-time setup:**
+1. Wallet auto-creates when `setup_agent_wallet()` is called
+2. Check wallet and balance:
+```python
+from blockrun_llm import setup_agent_wallet
+client = setup_agent_wallet()
+print(f&quot;Wallet: {client.get_wallet_address()}&quot;)
+print(f&quot;Balance: ${client.get_balance():.2f} USDC&quot;)
+```
+3. Fund wallet with $1-5 USDC on Base network
+
+**Show QR code for funding (ASCII for terminal):**
+```python
+from blockrun_llm import generate_wallet_qr_ascii, get_wallet_address
+print(generate_wallet_qr_ascii(get_wallet_address()))
+```
+
+## Troubleshooting
+
+**&quot;Grok says it has no real-time access&quot;**
+→ You forgot to enable Live Search. Add `search=True`:
+```python
+response = client.chat(&quot;xai/grok-3&quot;, &quot;What&#039;s trending?&quot;, search=True)
+```
+
+**Module not found**
+→ Install the SDK: `pip install blockrun-llm`
+
+## Updates
+
+```bash
+pip install --upgrade blockrun-llm
+```
+</code>
       </div>
     </div>
 

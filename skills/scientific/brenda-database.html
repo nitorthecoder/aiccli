@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,730 @@
     <p class="desc">"Access BRENDA enzyme database via SOAP API. Retrieve kinetic parameters (Km, kcat), reaction equations, organism data, and substrate-specific enzyme information for biochemical research and metabolic pathway analysis."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/brenda-database</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/brenda-database</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: brenda-database
+description: &quot;Access BRENDA enzyme database via SOAP API. Retrieve kinetic parameters (Km, kcat), reaction equations, organism data, and substrate-specific enzyme information for biochemical research and metabolic pathway analysis.&quot;
+---
+
+# BRENDA Database
+
+## Overview
+
+BRENDA (BRaunschweig ENzyme DAtabase) is the world&#039;s most comprehensive enzyme information system, containing detailed enzyme data from scientific literature. Query kinetic parameters (Km, kcat), reaction equations, substrate specificities, organism information, and optimal conditions for enzymes using the official SOAP API. Access over 45,000 enzymes with millions of kinetic data points for biochemical research, metabolic engineering, and enzyme discovery.
+
+## When to Use This Skill
+
+This skill should be used when:
+- Searching for enzyme kinetic parameters (Km, kcat, Vmax)
+- Retrieving reaction equations and stoichiometry
+- Finding enzymes for specific substrates or reactions
+- Comparing enzyme properties across different organisms
+- Investigating optimal pH, temperature, and conditions
+- Accessing enzyme inhibition and activation data
+- Supporting metabolic pathway reconstruction and retrosynthesis
+- Performing enzyme engineering and optimization studies
+- Analyzing substrate specificity and cofactor requirements
+
+## Core Capabilities
+
+### 1. Kinetic Parameter Retrieval
+
+Access comprehensive kinetic data for enzymes:
+
+**Get Km Values by EC Number**:
+```python
+from brenda_client import get_km_values
+
+# Get Km values for all organisms
+km_data = get_km_values(&quot;1.1.1.1&quot;)  # Alcohol dehydrogenase
+
+# Get Km values for specific organism
+km_data = get_km_values(&quot;1.1.1.1&quot;, organism=&quot;Saccharomyces cerevisiae&quot;)
+
+# Get Km values for specific substrate
+km_data = get_km_values(&quot;1.1.1.1&quot;, substrate=&quot;ethanol&quot;)
+```
+
+**Parse Km Results**:
+```python
+for entry in km_data:
+    print(f&quot;Km: {entry}&quot;)
+    # Example output: &quot;organism*Homo sapiens#substrate*ethanol#kmValue*1.2#commentary*&quot;
+```
+
+**Extract Specific Information**:
+```python
+from scripts.brenda_queries import parse_km_entry, extract_organism_data
+
+for entry in km_data:
+    parsed = parse_km_entry(entry)
+    organism = extract_organism_data(entry)
+    print(f&quot;Organism: {parsed[&#039;organism&#039;]}&quot;)
+    print(f&quot;Substrate: {parsed[&#039;substrate&#039;]}&quot;)
+    print(f&quot;Km value: {parsed[&#039;km_value&#039;]}&quot;)
+    print(f&quot;pH: {parsed.get(&#039;ph&#039;, &#039;N/A&#039;)}&quot;)
+    print(f&quot;Temperature: {parsed.get(&#039;temperature&#039;, &#039;N/A&#039;)}&quot;)
+```
+
+### 2. Reaction Information
+
+Retrieve reaction equations and details:
+
+**Get Reactions by EC Number**:
+```python
+from brenda_client import get_reactions
+
+# Get all reactions for EC number
+reactions = get_reactions(&quot;1.1.1.1&quot;)
+
+# Filter by organism
+reactions = get_reactions(&quot;1.1.1.1&quot;, organism=&quot;Escherichia coli&quot;)
+
+# Search specific reaction
+reactions = get_reactions(&quot;1.1.1.1&quot;, reaction=&quot;ethanol + NAD+&quot;)
+```
+
+**Process Reaction Data**:
+```python
+from scripts.brenda_queries import parse_reaction_entry, extract_substrate_products
+
+for reaction in reactions:
+    parsed = parse_reaction_entry(reaction)
+    substrates, products = extract_substrate_products(reaction)
+
+    print(f&quot;Reaction: {parsed[&#039;reaction&#039;]}&quot;)
+    print(f&quot;Organism: {parsed[&#039;organism&#039;]}&quot;)
+    print(f&quot;Substrates: {substrates}&quot;)
+    print(f&quot;Products: {products}&quot;)
+```
+
+### 3. Enzyme Discovery
+
+Find enzymes for specific biochemical transformations:
+
+**Find Enzymes by Substrate**:
+```python
+from scripts.brenda_queries import search_enzymes_by_substrate
+
+# Find enzymes that act on glucose
+enzymes = search_enzymes_by_substrate(&quot;glucose&quot;, limit=20)
+
+for enzyme in enzymes:
+    print(f&quot;EC: {enzyme[&#039;ec_number&#039;]}&quot;)
+    print(f&quot;Name: {enzyme[&#039;enzyme_name&#039;]}&quot;)
+    print(f&quot;Reaction: {enzyme[&#039;reaction&#039;]}&quot;)
+```
+
+**Find Enzymes by Product**:
+```python
+from scripts.brenda_queries import search_enzymes_by_product
+
+# Find enzymes that produce lactate
+enzymes = search_enzymes_by_product(&quot;lactate&quot;, limit=10)
+```
+
+**Search by Reaction Pattern**:
+```python
+from scripts.brenda_queries import search_by_pattern
+
+# Find oxidation reactions
+enzymes = search_by_pattern(&quot;oxidation&quot;, limit=15)
+```
+
+### 4. Organism-Specific Enzyme Data
+
+Compare enzyme properties across organisms:
+
+**Get Enzyme Data for Multiple Organisms**:
+```python
+from scripts.brenda_queries import compare_across_organisms
+
+organisms = [&quot;Escherichia coli&quot;, &quot;Saccharomyces cerevisiae&quot;, &quot;Homo sapiens&quot;]
+comparison = compare_across_organisms(&quot;1.1.1.1&quot;, organisms)
+
+for org_data in comparison:
+    print(f&quot;Organism: {org_data[&#039;organism&#039;]}&quot;)
+    print(f&quot;Avg Km: {org_data[&#039;average_km&#039;]}&quot;)
+    print(f&quot;Optimal pH: {org_data[&#039;optimal_ph&#039;]}&quot;)
+    print(f&quot;Temperature range: {org_data[&#039;temperature_range&#039;]}&quot;)
+```
+
+**Find Organisms with Specific Enzyme**:
+```python
+from scripts.brenda_queries import get_organisms_for_enzyme
+
+organisms = get_organisms_for_enzyme(&quot;6.3.5.5&quot;)  # Glutamine synthetase
+print(f&quot;Found {len(organisms)} organisms with this enzyme&quot;)
+```
+
+### 5. Environmental Parameters
+
+Access optimal conditions and environmental parameters:
+
+**Get pH and Temperature Data**:
+```python
+from scripts.brenda_queries import get_environmental_parameters
+
+params = get_environmental_parameters(&quot;1.1.1.1&quot;)
+
+print(f&quot;Optimal pH range: {params[&#039;ph_range&#039;]}&quot;)
+print(f&quot;Optimal temperature: {params[&#039;optimal_temperature&#039;]}&quot;)
+print(f&quot;Stability pH: {params[&#039;stability_ph&#039;]}&quot;)
+print(f&quot;Temperature stability: {params[&#039;temperature_stability&#039;]}&quot;)
+```
+
+**Cofactor Requirements**:
+```python
+from scripts.brenda_queries import get_cofactor_requirements
+
+cofactors = get_cofactor_requirements(&quot;1.1.1.1&quot;)
+for cofactor in cofactors:
+    print(f&quot;Cofactor: {cofactor[&#039;name&#039;]}&quot;)
+    print(f&quot;Type: {cofactor[&#039;type&#039;]}&quot;)
+    print(f&quot;Concentration: {cofactor[&#039;concentration&#039;]}&quot;)
+```
+
+### 6. Substrate Specificity
+
+Analyze enzyme substrate preferences:
+
+**Get Substrate Specificity Data**:
+```python
+from scripts.brenda_queries import get_substrate_specificity
+
+specificity = get_substrate_specificity(&quot;1.1.1.1&quot;)
+
+for substrate in specificity:
+    print(f&quot;Substrate: {substrate[&#039;name&#039;]}&quot;)
+    print(f&quot;Km: {substrate[&#039;km&#039;]}&quot;)
+    print(f&quot;Vmax: {substrate[&#039;vmax&#039;]}&quot;)
+    print(f&quot;kcat: {substrate[&#039;kcat&#039;]}&quot;)
+    print(f&quot;Specificity constant: {substrate[&#039;kcat_km_ratio&#039;]}&quot;)
+```
+
+**Compare Substrate Preferences**:
+```python
+from scripts.brenda_queries import compare_substrate_affinity
+
+comparison = compare_substrate_affinity(&quot;1.1.1.1&quot;)
+sorted_by_km = sorted(comparison, key=lambda x: x[&#039;km&#039;])
+
+for substrate in sorted_by_km[:5]:  # Top 5 lowest Km
+    print(f&quot;{substrate[&#039;name&#039;]}: Km = {substrate[&#039;km&#039;]}&quot;)
+```
+
+### 7. Inhibition and Activation
+
+Access enzyme regulation data:
+
+**Get Inhibitor Information**:
+```python
+from scripts.brenda_queries import get_inhibitors
+
+inhibitors = get_inhibitors(&quot;1.1.1.1&quot;)
+
+for inhibitor in inhibitors:
+    print(f&quot;Inhibitor: {inhibitor[&#039;name&#039;]}&quot;)
+    print(f&quot;Type: {inhibitor[&#039;type&#039;]}&quot;)
+    print(f&quot;Ki: {inhibitor[&#039;ki&#039;]}&quot;)
+    print(f&quot;IC50: {inhibitor[&#039;ic50&#039;]}&quot;)
+```
+
+**Get Activator Information**:
+```python
+from scripts.brenda_queries import get_activators
+
+activators = get_activators(&quot;1.1.1.1&quot;)
+
+for activator in activators:
+    print(f&quot;Activator: {activator[&#039;name&#039;]}&quot;)
+    print(f&quot;Effect: {activator[&#039;effect&#039;]}&quot;)
+    print(f&quot;Mechanism: {activator[&#039;mechanism&#039;]}&quot;)
+```
+
+### 8. Enzyme Engineering Support
+
+Find engineering targets and alternatives:
+
+**Find Thermophilic Homologs**:
+```python
+from scripts.brenda_queries import find_thermophilic_homologs
+
+thermophilic = find_thermophilic_homologs(&quot;1.1.1.1&quot;, min_temp=50)
+
+for enzyme in thermophilic:
+    print(f&quot;Organism: {enzyme[&#039;organism&#039;]}&quot;)
+    print(f&quot;Optimal temp: {enzyme[&#039;optimal_temperature&#039;]}&quot;)
+    print(f&quot;Km: {enzyme[&#039;km&#039;]}&quot;)
+```
+
+**Find Alkaline/ Acid Stable Variants**:
+```python
+from scripts.brenda_queries import find_ph_stable_variants
+
+alkaline = find_ph_stable_variants(&quot;1.1.1.1&quot;, min_ph=8.0)
+acidic = find_ph_stable_variants(&quot;1.1.1.1&quot;, max_ph=6.0)
+```
+
+### 9. Kinetic Modeling
+
+Prepare data for kinetic modeling:
+
+**Get Kinetic Parameters for Modeling**:
+```python
+from scripts.brenda_queries import get_modeling_parameters
+
+model_data = get_modeling_parameters(&quot;1.1.1.1&quot;, substrate=&quot;ethanol&quot;)
+
+print(f&quot;Km: {model_data[&#039;km&#039;]}&quot;)
+print(f&quot;Vmax: {model_data[&#039;vmax&#039;]}&quot;)
+print(f&quot;kcat: {model_data[&#039;kcat&#039;]}&quot;)
+print(f&quot;Enzyme concentration: {model_data[&#039;enzyme_conc&#039;]}&quot;)
+print(f&quot;Temperature: {model_data[&#039;temperature&#039;]}&quot;)
+print(f&quot;pH: {model_data[&#039;ph&#039;]}&quot;)
+```
+
+**Generate Michaelis-Menten Plots**:
+```python
+from scripts.brenda_visualization import plot_michaelis_menten
+
+# Generate kinetic plots
+plot_michaelis_menten(&quot;1.1.1.1&quot;, substrate=&quot;ethanol&quot;)
+```
+
+## Installation Requirements
+
+```bash
+uv pip install zeep requests pandas matplotlib seaborn
+```
+
+## Authentication Setup
+
+BRENDA requires authentication credentials:
+
+1. **Create .env file**:
+```
+BRENDA_EMAIL=your.email@example.com
+BRENDA_PASSWORD=your_brenda_password
+```
+
+2. **Or set environment variables**:
+```bash
+export BRENDA_EMAIL=&quot;your.email@example.com&quot;
+export BRENDA_PASSWORD=&quot;your_brenda_password&quot;
+```
+
+3. **Register for BRENDA access**:
+   - Visit https://www.brenda-enzymes.org/
+   - Create an account
+   - Check your email for credentials
+   - Note: There&#039;s also `BRENDA_EMIAL` (note the typo) for legacy support
+
+## Helper Scripts
+
+This skill includes comprehensive Python scripts for BRENDA database queries:
+
+### scripts/brenda_queries.py
+
+Provides high-level functions for enzyme data analysis:
+
+**Key Functions**:
+- `parse_km_entry(entry)`: Parse BRENDA Km data entries
+- `parse_reaction_entry(entry)`: Parse reaction data entries
+- `extract_organism_data(entry)`: Extract organism-specific information
+- `search_enzymes_by_substrate(substrate, limit)`: Find enzymes for substrates
+- `search_enzymes_by_product(product, limit)`: Find enzymes producing products
+- `compare_across_organisms(ec_number, organisms)`: Compare enzyme properties
+- `get_environmental_parameters(ec_number)`: Get pH and temperature data
+- `get_cofactor_requirements(ec_number)`: Get cofactor information
+- `get_substrate_specificity(ec_number)`: Analyze substrate preferences
+- `get_inhibitors(ec_number)`: Get enzyme inhibition data
+- `get_activators(ec_number)`: Get enzyme activation data
+- `find_thermophilic_homologs(ec_number, min_temp)`: Find heat-stable variants
+- `get_modeling_parameters(ec_number, substrate)`: Get parameters for kinetic modeling
+- `export_kinetic_data(ec_number, format, filename)`: Export data to file
+
+**Usage**:
+```python
+from scripts.brenda_queries import search_enzymes_by_substrate, compare_across_organisms
+
+# Search for enzymes
+enzymes = search_enzymes_by_substrate(&quot;glucose&quot;, limit=20)
+
+# Compare across organisms
+comparison = compare_across_organisms(&quot;1.1.1.1&quot;, [&quot;E. coli&quot;, &quot;S. cerevisiae&quot;])
+```
+
+### scripts/brenda_visualization.py
+
+Provides visualization functions for enzyme data:
+
+**Key Functions**:
+- `plot_kinetic_parameters(ec_number)`: Plot Km and kcat distributions
+- `plot_organism_comparison(ec_number, organisms)`: Compare organisms
+- `plot_pH_profiles(ec_number)`: Plot pH activity profiles
+- `plot_temperature_profiles(ec_number)`: Plot temperature activity profiles
+- `plot_substrate_specificity(ec_number)`: Visualize substrate preferences
+- `plot_michaelis_menten(ec_number, substrate)`: Generate kinetic curves
+- `create_heatmap_data(enzymes, parameters)`: Create data for heatmaps
+- `generate_summary_plots(ec_number)`: Create comprehensive enzyme overview
+
+**Usage**:
+```python
+from scripts.brenda_visualization import plot_kinetic_parameters, plot_michaelis_menten
+
+# Plot kinetic parameters
+plot_kinetic_parameters(&quot;1.1.1.1&quot;)
+
+# Generate Michaelis-Menten curve
+plot_michaelis_menten(&quot;1.1.1.1&quot;, substrate=&quot;ethanol&quot;)
+```
+
+### scripts/enzyme_pathway_builder.py
+
+Build enzymatic pathways and retrosynthetic routes:
+
+**Key Functions**:
+- `find_pathway_for_product(product, max_steps)`: Find enzymatic pathways
+- `build_retrosynthetic_tree(target, depth)`: Build retrosynthetic tree
+- `suggest_enzyme_substitutions(ec_number, criteria)`: Suggest enzyme alternatives
+- `calculate_pathway_feasibility(pathway)`: Evaluate pathway viability
+- `optimize_pathway_conditions(pathway)`: Suggest optimal conditions
+- `generate_pathway_report(pathway, filename)`: Create detailed pathway report
+
+**Usage**:
+```python
+from scripts.enzyme_pathway_builder import find_pathway_for_product, build_retrosynthetic_tree
+
+# Find pathway to product
+pathway = find_pathway_for_product(&quot;lactate&quot;, max_steps=3)
+
+# Build retrosynthetic tree
+tree = build_retrosynthetic_tree(&quot;lactate&quot;, depth=2)
+```
+
+## API Rate Limits and Best Practices
+
+**Rate Limits**:
+- BRENDA API has moderate rate limiting
+- Recommended: 1 request per second for sustained usage
+- Maximum: 5 requests per 10 seconds
+
+**Best Practices**:
+1. **Cache results**: Store frequently accessed enzyme data locally
+2. **Batch queries**: Combine related requests when possible
+3. **Use specific searches**: Narrow down by organism, substrate when possible
+4. **Handle missing data**: Not all enzymes have complete data
+5. **Validate EC numbers**: Ensure EC numbers are in correct format
+6. **Implement delays**: Add delays between consecutive requests
+7. **Use wildcards wisely**: Use &#039;*&#039; for broader searches when appropriate
+8. **Monitor quota**: Track your API usage
+
+**Error Handling**:
+```python
+from brenda_client import get_km_values, get_reactions
+from zeep.exceptions import Fault, TransportError
+
+try:
+    km_data = get_km_values(&quot;1.1.1.1&quot;)
+except RuntimeError as e:
+    print(f&quot;Authentication error: {e}&quot;)
+except Fault as e:
+    print(f&quot;BRENDA API error: {e}&quot;)
+except TransportError as e:
+    print(f&quot;Network error: {e}&quot;)
+except Exception as e:
+    print(f&quot;Unexpected error: {e}&quot;)
+```
+
+## Common Workflows
+
+### Workflow 1: Enzyme Discovery for New Substrate
+
+Find suitable enzymes for a specific substrate:
+
+```python
+from brenda_client import get_km_values
+from scripts.brenda_queries import search_enzymes_by_substrate, compare_substrate_affinity
+
+# Search for enzymes that act on substrate
+substrate = &quot;2-phenylethanol&quot;
+enzymes = search_enzymes_by_substrate(substrate, limit=15)
+
+print(f&quot;Found {len(enzymes)} enzymes for {substrate}&quot;)
+for enzyme in enzymes:
+    print(f&quot;EC {enzyme[&#039;ec_number&#039;]}: {enzyme[&#039;enzyme_name&#039;]}&quot;)
+
+# Get kinetic data for best candidates
+if enzymes:
+    best_ec = enzymes[0][&#039;ec_number&#039;]
+    km_data = get_km_values(best_ec, substrate=substrate)
+
+    if km_data:
+        print(f&quot;Kinetic data for {best_ec}:&quot;)
+        for entry in km_data[:3]:  # First 3 entries
+            print(f&quot;  {entry}&quot;)
+```
+
+### Workflow 2: Cross-Organism Enzyme Comparison
+
+Compare enzyme properties across different organisms:
+
+```python
+from scripts.brenda_queries import compare_across_organisms, get_environmental_parameters
+
+# Define organisms for comparison
+organisms = [
+    &quot;Escherichia coli&quot;,
+    &quot;Saccharomyces cerevisiae&quot;,
+    &quot;Bacillus subtilis&quot;,
+    &quot;Thermus thermophilus&quot;
+]
+
+# Compare alcohol dehydrogenase
+comparison = compare_across_organisms(&quot;1.1.1.1&quot;, organisms)
+
+print(&quot;Cross-organism comparison:&quot;)
+for org_data in comparison:
+    print(f&quot;\n{org_data[&#039;organism&#039;]}:&quot;)
+    print(f&quot;  Average Km: {org_data[&#039;average_km&#039;]}&quot;)
+    print(f&quot;  Optimal pH: {org_data[&#039;optimal_ph&#039;]}&quot;)
+    print(f&quot;  Temperature: {org_data[&#039;optimal_temperature&#039;]}°C&quot;)
+
+# Get detailed environmental parameters
+env_params = get_environmental_parameters(&quot;1.1.1.1&quot;)
+print(f&quot;\nOverall optimal pH range: {env_params[&#039;ph_range&#039;]}&quot;)
+```
+
+### Workflow 3: Enzyme Engineering Target Identification
+
+Find engineering opportunities for enzyme improvement:
+
+```python
+from scripts.brenda_queries import (
+    find_thermophilic_homologs,
+    find_ph_stable_variants,
+    compare_substrate_affinity
+)
+
+# Find thermophilic variants for heat stability
+thermophilic = find_thermophilic_homologs(&quot;1.1.1.1&quot;, min_temp=50)
+print(f&quot;Found {len(thermophilic)} thermophilic variants&quot;)
+
+# Find alkaline-stable variants
+alkaline = find_ph_stable_variants(&quot;1.1.1.1&quot;, min_ph=8.0)
+print(f&quot;Found {len(alkaline)} alkaline-stable variants&quot;)
+
+# Compare substrate specificities for engineering targets
+specificity = compare_substrate_affinity(&quot;1.1.1.1&quot;)
+print(&quot;Substrate affinity ranking:&quot;)
+for i, sub in enumerate(specificity[:5]):
+    print(f&quot;  {i+1}. {sub[&#039;name&#039;]}: Km = {sub[&#039;km&#039;]}&quot;)
+```
+
+### Workflow 4: Enzymatic Pathway Construction
+
+Build enzymatic synthesis pathways:
+
+```python
+from scripts.enzyme_pathway_builder import (
+    find_pathway_for_product,
+    build_retrosynthetic_tree,
+    calculate_pathway_feasibility
+)
+
+# Find pathway to target product
+target = &quot;lactate&quot;
+pathway = find_pathway_for_product(target, max_steps=3)
+
+if pathway:
+    print(f&quot;Found pathway to {target}:&quot;)
+    for i, step in enumerate(pathway[&#039;steps&#039;]):
+        print(f&quot;  Step {i+1}: {step[&#039;reaction&#039;]}&quot;)
+        print(f&quot;    Enzyme: EC {step[&#039;ec_number&#039;]}&quot;)
+        print(f&quot;    Organism: {step[&#039;organism&#039;]}&quot;)
+
+# Evaluate pathway feasibility
+feasibility = calculate_pathway_feasibility(pathway)
+print(f&quot;\nPathway feasibility score: {feasibility[&#039;score&#039;]}/10&quot;)
+print(f&quot;Potential issues: {feasibility[&#039;warnings&#039;]}&quot;)
+```
+
+### Workflow 5: Kinetic Parameter Analysis
+
+Comprehensive kinetic analysis for enzyme selection:
+
+```python
+from brenda_client import get_km_values
+from scripts.brenda_queries import parse_km_entry, get_modeling_parameters
+from scripts.brenda_visualization import plot_kinetic_parameters
+
+# Get comprehensive kinetic data
+ec_number = &quot;1.1.1.1&quot;
+km_data = get_km_values(ec_number)
+
+# Analyze kinetic parameters
+all_entries = []
+for entry in km_data:
+    parsed = parse_km_entry(entry)
+    if parsed[&#039;km_value&#039;]:
+        all_entries.append(parsed)
+
+print(f&quot;Analyzed {len(all_entries)} kinetic entries&quot;)
+
+# Find best kinetic performer
+best_km = min(all_entries, key=lambda x: x[&#039;km_value&#039;])
+print(f&quot;\nBest kinetic performer:&quot;)
+print(f&quot;  Organism: {best_km[&#039;organism&#039;]}&quot;)
+print(f&quot;  Substrate: {best_km[&#039;substrate&#039;]}&quot;)
+print(f&quot;  Km: {best_km[&#039;km_value&#039;]}&quot;)
+
+# Get modeling parameters
+model_data = get_modeling_parameters(ec_number, substrate=best_km[&#039;substrate&#039;])
+print(f&quot;\nModeling parameters:&quot;)
+print(f&quot;  Km: {model_data[&#039;km&#039;]}&quot;)
+print(f&quot;  kcat: {model_data[&#039;kcat&#039;]}&quot;)
+print(f&quot;  Vmax: {model_data[&#039;vmax&#039;]}&quot;)
+
+# Generate visualization
+plot_kinetic_parameters(ec_number)
+```
+
+### Workflow 6: Industrial Enzyme Selection
+
+Select enzymes for industrial applications:
+
+```python
+from scripts.brenda_queries import (
+    find_thermophilic_homologs,
+    get_environmental_parameters,
+    get_inhibitors
+)
+
+# Industrial criteria: high temperature tolerance, organic solvent resistance
+target_enzyme = &quot;1.1.1.1&quot;
+
+# Find thermophilic variants
+thermophilic = find_thermophilic_homologs(target_enzyme, min_temp=60)
+print(f&quot;Thermophilic candidates: {len(thermophilic)}&quot;)
+
+# Check solvent tolerance (inhibitor data)
+inhibitors = get_inhibitors(target_enzyme)
+solvent_tolerant = [
+    inv for inv in inhibitors
+    if &#039;ethanol&#039; not in inv[&#039;name&#039;].lower() and
+       &#039;methanol&#039; not in inv[&#039;name&#039;].lower()
+]
+
+print(f&quot;Solvent tolerant candidates: {len(solvent_tolerant)}&quot;)
+
+# Evaluate top candidates
+for candidate in thermophilic[:3]:
+    print(f&quot;\nCandidate: {candidate[&#039;organism&#039;]}&quot;)
+    print(f&quot;  Optimal temp: {candidate[&#039;optimal_temperature&#039;]}°C&quot;)
+    print(f&quot;  Km: {candidate[&#039;km&#039;]}&quot;)
+    print(f&quot;  pH range: {candidate.get(&#039;ph_range&#039;, &#039;N/A&#039;)}&quot;)
+```
+
+## Data Formats and Parsing
+
+### BRENDA Response Format
+
+BRENDA returns data in specific formats that need parsing:
+
+**Km Value Format**:
+```
+organism*Escherichia coli#substrate*ethanol#kmValue*1.2#kmValueMaximum*#commentary*pH 7.4, 25°C#ligandStructureId*#literature*
+```
+
+**Reaction Format**:
+```
+ecNumber*1.1.1.1#organism*Saccharomyces cerevisiae#reaction*ethanol + NAD+ &lt;=&gt; acetaldehyde + NADH + H+#commentary*#literature*
+```
+
+### Data Extraction Patterns
+
+```python
+import re
+
+def parse_brenda_field(data, field_name):
+    &quot;&quot;&quot;Extract specific field from BRENDA data entry&quot;&quot;&quot;
+    pattern = f&quot;{field_name}\\*([^#]*)&quot;
+    match = re.search(pattern, data)
+    return match.group(1) if match else None
+
+def extract_multiple_values(data, field_name):
+    &quot;&quot;&quot;Extract multiple values for a field&quot;&quot;&quot;
+    pattern = f&quot;{field_name}\\*([^#]*)&quot;
+    matches = re.findall(pattern, data)
+    return [match for match in matches if match.strip()]
+```
+
+## Reference Documentation
+
+For detailed BRENDA documentation, see `references/api_reference.md`. This includes:
+- Complete SOAP API method documentation
+- Full parameter lists and formats
+- EC number structure and validation
+- Response format specifications
+- Error codes and handling
+- Data field definitions
+- Literature citation formats
+
+## Troubleshooting
+
+**Authentication Errors**:
+- Verify BRENDA_EMAIL and BRENDA_PASSWORD in .env file
+- Check for correct spelling (note BRENDA_EMIAL legacy support)
+- Ensure BRENDA account is active and has API access
+
+**No Results Returned**:
+- Try broader searches with wildcards (*)
+- Check EC number format (e.g., &quot;1.1.1.1&quot; not &quot;1.1.1&quot;)
+- Verify substrate spelling and naming
+- Some enzymes may have limited data in BRENDA
+
+**Rate Limiting**:
+- Add delays between requests (0.5-1 second)
+- Cache results locally
+- Use more specific queries to reduce data volume
+- Consider batch operations for multiple queries
+
+**Network Errors**:
+- Check internet connection
+- BRENDA server may be temporarily unavailable
+- Try again after a few minutes
+- Consider using VPN if geo-restricted
+
+**Data Format Issues**:
+- Use the provided parsing functions in scripts
+- BRENDA data can be inconsistent in formatting
+- Handle missing fields gracefully
+- Validate parsed data before use
+
+**Performance Issues**:
+- Large queries can be slow; limit search scope
+- Use specific organism or substrate filters
+- Consider asynchronous processing for batch operations
+- Monitor memory usage with large datasets
+
+## Additional Resources
+
+- BRENDA Home: https://www.brenda-enzymes.org/
+- BRENDA SOAP API Documentation: https://www.brenda-enzymes.org/soap.php
+- Enzyme Commission (EC) Numbers: https://www.qmul.ac.uk/sbcs/iubmb/enzyme/
+- Zeep SOAP Client: https://python-zeep.readthedocs.io/
+- Enzyme Nomenclature: https://www.iubmb.org/enzyme/</code>
       </div>
     </div>
 

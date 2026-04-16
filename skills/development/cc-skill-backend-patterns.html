@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,600 @@
     <p class="desc">Backend architecture patterns, API design, database optimization, and server-side best practices for Node.js, Express, and Next.js API routes.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/cc-skill-backend-patterns</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/cc-skill-backend-patterns</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: backend-patterns
+description: Backend architecture patterns, API design, database optimization, and server-side best practices for Node.js, Express, and Next.js API routes.
+author: affaan-m
+version: &quot;1.0&quot;
+---
+
+# Backend Development Patterns
+
+Backend architecture patterns and best practices for scalable server-side applications.
+
+## API Design Patterns
+
+### RESTful API Structure
+
+```typescript
+// ✅ Resource-based URLs
+GET    /api/markets                 # List resources
+GET    /api/markets/:id             # Get single resource
+POST   /api/markets                 # Create resource
+PUT    /api/markets/:id             # Replace resource
+PATCH  /api/markets/:id             # Update resource
+DELETE /api/markets/:id             # Delete resource
+
+// ✅ Query parameters for filtering, sorting, pagination
+GET /api/markets?status=active&amp;sort=volume&amp;limit=20&amp;offset=0
+```
+
+### Repository Pattern
+
+```typescript
+// Abstract data access logic
+interface MarketRepository {
+  findAll(filters?: MarketFilters): Promise&lt;Market[]&gt;
+  findById(id: string): Promise&lt;Market | null&gt;
+  create(data: CreateMarketDto): Promise&lt;Market&gt;
+  update(id: string, data: UpdateMarketDto): Promise&lt;Market&gt;
+  delete(id: string): Promise&lt;void&gt;
+}
+
+class SupabaseMarketRepository implements MarketRepository {
+  async findAll(filters?: MarketFilters): Promise&lt;Market[]&gt; {
+    let query = supabase.from(&#039;markets&#039;).select(&#039;*&#039;)
+
+    if (filters?.status) {
+      query = query.eq(&#039;status&#039;, filters.status)
+    }
+
+    if (filters?.limit) {
+      query = query.limit(filters.limit)
+    }
+
+    const { data, error } = await query
+
+    if (error) throw new Error(error.message)
+    return data
+  }
+
+  // Other methods...
+}
+```
+
+### Service Layer Pattern
+
+```typescript
+// Business logic separated from data access
+class MarketService {
+  constructor(private marketRepo: MarketRepository) {}
+
+  async searchMarkets(query: string, limit: number = 10): Promise&lt;Market[]&gt; {
+    // Business logic
+    const embedding = await generateEmbedding(query)
+    const results = await this.vectorSearch(embedding, limit)
+
+    // Fetch full data
+    const markets = await this.marketRepo.findByIds(results.map(r =&gt; r.id))
+
+    // Sort by similarity
+    return markets.sort((a, b) =&gt; {
+      const scoreA = results.find(r =&gt; r.id === a.id)?.score || 0
+      const scoreB = results.find(r =&gt; r.id === b.id)?.score || 0
+      return scoreA - scoreB
+    })
+  }
+
+  private async vectorSearch(embedding: number[], limit: number) {
+    // Vector search implementation
+  }
+}
+```
+
+### Middleware Pattern
+
+```typescript
+// Request/response processing pipeline
+export function withAuth(handler: NextApiHandler): NextApiHandler {
+  return async (req, res) =&gt; {
+    const token = req.headers.authorization?.replace(&#039;Bearer &#039;, &#039;&#039;)
+
+    if (!token) {
+      return res.status(401).json({ error: &#039;Unauthorized&#039; })
+    }
+
+    try {
+      const user = await verifyToken(token)
+      req.user = user
+      return handler(req, res)
+    } catch (error) {
+      return res.status(401).json({ error: &#039;Invalid token&#039; })
+    }
+  }
+}
+
+// Usage
+export default withAuth(async (req, res) =&gt; {
+  // Handler has access to req.user
+})
+```
+
+## Database Patterns
+
+### Query Optimization
+
+```typescript
+// ✅ GOOD: Select only needed columns
+const { data } = await supabase
+  .from(&#039;markets&#039;)
+  .select(&#039;id, name, status, volume&#039;)
+  .eq(&#039;status&#039;, &#039;active&#039;)
+  .order(&#039;volume&#039;, { ascending: false })
+  .limit(10)
+
+// ❌ BAD: Select everything
+const { data } = await supabase
+  .from(&#039;markets&#039;)
+  .select(&#039;*&#039;)
+```
+
+### N+1 Query Prevention
+
+```typescript
+// ❌ BAD: N+1 query problem
+const markets = await getMarkets()
+for (const market of markets) {
+  market.creator = await getUser(market.creator_id)  // N queries
+}
+
+// ✅ GOOD: Batch fetch
+const markets = await getMarkets()
+const creatorIds = markets.map(m =&gt; m.creator_id)
+const creators = await getUsers(creatorIds)  // 1 query
+const creatorMap = new Map(creators.map(c =&gt; [c.id, c]))
+
+markets.forEach(market =&gt; {
+  market.creator = creatorMap.get(market.creator_id)
+})
+```
+
+### Transaction Pattern
+
+```typescript
+async function createMarketWithPosition(
+  marketData: CreateMarketDto,
+  positionData: CreatePositionDto
+) {
+  // Use Supabase transaction
+  const { data, error } = await supabase.rpc(&#039;create_market_with_position&#039;, {
+    market_data: marketData,
+    position_data: positionData
+  })
+
+  if (error) throw new Error(&#039;Transaction failed&#039;)
+  return data
+}
+
+// SQL function in Supabase
+CREATE OR REPLACE FUNCTION create_market_with_position(
+  market_data jsonb,
+  position_data jsonb
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  -- Start transaction automatically
+  INSERT INTO markets VALUES (market_data);
+  INSERT INTO positions VALUES (position_data);
+  RETURN jsonb_build_object(&#039;success&#039;, true);
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Rollback happens automatically
+    RETURN jsonb_build_object(&#039;success&#039;, false, &#039;error&#039;, SQLERRM);
+END;
+$$;
+```
+
+## Caching Strategies
+
+### Redis Caching Layer
+
+```typescript
+class CachedMarketRepository implements MarketRepository {
+  constructor(
+    private baseRepo: MarketRepository,
+    private redis: RedisClient
+  ) {}
+
+  async findById(id: string): Promise&lt;Market | null&gt; {
+    // Check cache first
+    const cached = await this.redis.get(`market:${id}`)
+
+    if (cached) {
+      return JSON.parse(cached)
+    }
+
+    // Cache miss - fetch from database
+    const market = await this.baseRepo.findById(id)
+
+    if (market) {
+      // Cache for 5 minutes
+      await this.redis.setex(`market:${id}`, 300, JSON.stringify(market))
+    }
+
+    return market
+  }
+
+  async invalidateCache(id: string): Promise&lt;void&gt; {
+    await this.redis.del(`market:${id}`)
+  }
+}
+```
+
+### Cache-Aside Pattern
+
+```typescript
+async function getMarketWithCache(id: string): Promise&lt;Market&gt; {
+  const cacheKey = `market:${id}`
+
+  // Try cache
+  const cached = await redis.get(cacheKey)
+  if (cached) return JSON.parse(cached)
+
+  // Cache miss - fetch from DB
+  const market = await db.markets.findUnique({ where: { id } })
+
+  if (!market) throw new Error(&#039;Market not found&#039;)
+
+  // Update cache
+  await redis.setex(cacheKey, 300, JSON.stringify(market))
+
+  return market
+}
+```
+
+## Error Handling Patterns
+
+### Centralized Error Handler
+
+```typescript
+class ApiError extends Error {
+  constructor(
+    public statusCode: number,
+    public message: string,
+    public isOperational = true
+  ) {
+    super(message)
+    Object.setPrototypeOf(this, ApiError.prototype)
+  }
+}
+
+export function errorHandler(error: unknown, req: Request): Response {
+  if (error instanceof ApiError) {
+    return NextResponse.json({
+      success: false,
+      error: error.message
+    }, { status: error.statusCode })
+  }
+
+  if (error instanceof z.ZodError) {
+    return NextResponse.json({
+      success: false,
+      error: &#039;Validation failed&#039;,
+      details: error.errors
+    }, { status: 400 })
+  }
+
+  // Log unexpected errors
+  console.error(&#039;Unexpected error:&#039;, error)
+
+  return NextResponse.json({
+    success: false,
+    error: &#039;Internal server error&#039;
+  }, { status: 500 })
+}
+
+// Usage
+export async function GET(request: Request) {
+  try {
+    const data = await fetchData()
+    return NextResponse.json({ success: true, data })
+  } catch (error) {
+    return errorHandler(error, request)
+  }
+}
+```
+
+### Retry with Exponential Backoff
+
+```typescript
+async function fetchWithRetry&lt;T&gt;(
+  fn: () =&gt; Promise&lt;T&gt;,
+  maxRetries = 3
+): Promise&lt;T&gt; {
+  let lastError: Error
+
+  for (let i = 0; i &lt; maxRetries; i++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error as Error
+
+      if (i &lt; maxRetries - 1) {
+        // Exponential backoff: 1s, 2s, 4s
+        const delay = Math.pow(2, i) * 1000
+        await new Promise(resolve =&gt; setTimeout(resolve, delay))
+      }
+    }
+  }
+
+  throw lastError!
+}
+
+// Usage
+const data = await fetchWithRetry(() =&gt; fetchFromAPI())
+```
+
+## Authentication &amp; Authorization
+
+### JWT Token Validation
+
+```typescript
+import jwt from &#039;jsonwebtoken&#039;
+
+interface JWTPayload {
+  userId: string
+  email: string
+  role: &#039;admin&#039; | &#039;user&#039;
+}
+
+export function verifyToken(token: string): JWTPayload {
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload
+    return payload
+  } catch (error) {
+    throw new ApiError(401, &#039;Invalid token&#039;)
+  }
+}
+
+export async function requireAuth(request: Request) {
+  const token = request.headers.get(&#039;authorization&#039;)?.replace(&#039;Bearer &#039;, &#039;&#039;)
+
+  if (!token) {
+    throw new ApiError(401, &#039;Missing authorization token&#039;)
+  }
+
+  return verifyToken(token)
+}
+
+// Usage in API route
+export async function GET(request: Request) {
+  const user = await requireAuth(request)
+
+  const data = await getDataForUser(user.userId)
+
+  return NextResponse.json({ success: true, data })
+}
+```
+
+### Role-Based Access Control
+
+```typescript
+type Permission = &#039;read&#039; | &#039;write&#039; | &#039;delete&#039; | &#039;admin&#039;
+
+interface User {
+  id: string
+  role: &#039;admin&#039; | &#039;moderator&#039; | &#039;user&#039;
+}
+
+const rolePermissions: Record&lt;User[&#039;role&#039;], Permission[]&gt; = {
+  admin: [&#039;read&#039;, &#039;write&#039;, &#039;delete&#039;, &#039;admin&#039;],
+  moderator: [&#039;read&#039;, &#039;write&#039;, &#039;delete&#039;],
+  user: [&#039;read&#039;, &#039;write&#039;]
+}
+
+export function hasPermission(user: User, permission: Permission): boolean {
+  return rolePermissions[user.role].includes(permission)
+}
+
+export function requirePermission(permission: Permission) {
+  return async (request: Request) =&gt; {
+    const user = await requireAuth(request)
+
+    if (!hasPermission(user, permission)) {
+      throw new ApiError(403, &#039;Insufficient permissions&#039;)
+    }
+
+    return user
+  }
+}
+
+// Usage
+export const DELETE = requirePermission(&#039;delete&#039;)(async (request: Request) =&gt; {
+  // Handler with permission check
+})
+```
+
+## Rate Limiting
+
+### Simple In-Memory Rate Limiter
+
+```typescript
+class RateLimiter {
+  private requests = new Map&lt;string, number[]&gt;()
+
+  async checkLimit(
+    identifier: string,
+    maxRequests: number,
+    windowMs: number
+  ): Promise&lt;boolean&gt; {
+    const now = Date.now()
+    const requests = this.requests.get(identifier) || []
+
+    // Remove old requests outside window
+    const recentRequests = requests.filter(time =&gt; now - time &lt; windowMs)
+
+    if (recentRequests.length &gt;= maxRequests) {
+      return false  // Rate limit exceeded
+    }
+
+    // Add current request
+    recentRequests.push(now)
+    this.requests.set(identifier, recentRequests)
+
+    return true
+  }
+}
+
+const limiter = new RateLimiter()
+
+export async function GET(request: Request) {
+  const ip = request.headers.get(&#039;x-forwarded-for&#039;) || &#039;unknown&#039;
+
+  const allowed = await limiter.checkLimit(ip, 100, 60000)  // 100 req/min
+
+  if (!allowed) {
+    return NextResponse.json({
+      error: &#039;Rate limit exceeded&#039;
+    }, { status: 429 })
+  }
+
+  // Continue with request
+}
+```
+
+## Background Jobs &amp; Queues
+
+### Simple Queue Pattern
+
+```typescript
+class JobQueue&lt;T&gt; {
+  private queue: T[] = []
+  private processing = false
+
+  async add(job: T): Promise&lt;void&gt; {
+    this.queue.push(job)
+
+    if (!this.processing) {
+      this.process()
+    }
+  }
+
+  private async process(): Promise&lt;void&gt; {
+    this.processing = true
+
+    while (this.queue.length &gt; 0) {
+      const job = this.queue.shift()!
+
+      try {
+        await this.execute(job)
+      } catch (error) {
+        console.error(&#039;Job failed:&#039;, error)
+      }
+    }
+
+    this.processing = false
+  }
+
+  private async execute(job: T): Promise&lt;void&gt; {
+    // Job execution logic
+  }
+}
+
+// Usage for indexing markets
+interface IndexJob {
+  marketId: string
+}
+
+const indexQueue = new JobQueue&lt;IndexJob&gt;()
+
+export async function POST(request: Request) {
+  const { marketId } = await request.json()
+
+  // Add to queue instead of blocking
+  await indexQueue.add({ marketId })
+
+  return NextResponse.json({ success: true, message: &#039;Job queued&#039; })
+}
+```
+
+## Logging &amp; Monitoring
+
+### Structured Logging
+
+```typescript
+interface LogContext {
+  userId?: string
+  requestId?: string
+  method?: string
+  path?: string
+  [key: string]: unknown
+}
+
+class Logger {
+  log(level: &#039;info&#039; | &#039;warn&#039; | &#039;error&#039;, message: string, context?: LogContext) {
+    const entry = {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      ...context
+    }
+
+    console.log(JSON.stringify(entry))
+  }
+
+  info(message: string, context?: LogContext) {
+    this.log(&#039;info&#039;, message, context)
+  }
+
+  warn(message: string, context?: LogContext) {
+    this.log(&#039;warn&#039;, message, context)
+  }
+
+  error(message: string, error: Error, context?: LogContext) {
+    this.log(&#039;error&#039;, message, {
+      ...context,
+      error: error.message,
+      stack: error.stack
+    })
+  }
+}
+
+const logger = new Logger()
+
+// Usage
+export async function GET(request: Request) {
+  const requestId = crypto.randomUUID()
+
+  logger.info(&#039;Fetching markets&#039;, {
+    requestId,
+    method: &#039;GET&#039;,
+    path: &#039;/api/markets&#039;
+  })
+
+  try {
+    const markets = await fetchMarkets()
+    return NextResponse.json({ success: true, data: markets })
+  } catch (error) {
+    logger.error(&#039;Failed to fetch markets&#039;, error as Error, { requestId })
+    return NextResponse.json({ error: &#039;Internal error&#039; }, { status: 500 })
+  }
+}
+```
+
+**Remember**: Backend patterns enable scalable, maintainable server-side applications. Choose patterns that fit your complexity level.</code>
       </div>
     </div>
 

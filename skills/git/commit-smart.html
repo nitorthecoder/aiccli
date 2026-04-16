@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,127 @@
     <p class="desc">Analyze staged/unstaged changes and create semantic conventional commits with context about WHY, not just WHAT. Auto-detects commit type and scope from the diff. Supports optional type/scope arguments. Usage - /commit-smart, /commit-smart fix, /commit-smart refactor api</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/commit-smart</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/commit-smart</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: commit-smart
+description: Analyze staged/unstaged changes and create semantic conventional commits with context about WHY, not just WHAT. Auto-detects commit type and scope from the diff. Supports optional type/scope arguments. Usage - /commit-smart, /commit-smart fix, /commit-smart refactor api
+---
+
+# Smart Commit
+
+Create meaningful conventional commits by analyzing your actual changes.
+
+## Workflow
+
+### Step 1: Assess the working tree
+
+Run these commands to understand the current state:
+
+```bash
+git status
+git diff --stat
+git diff --cached --stat
+```
+
+### Step 2: Handle unstaged changes
+
+If nothing is staged (`git diff --cached` is empty):
+
+1. Show the user what files have changed
+2. Suggest what to stage based on logical grouping (e.g., &quot;these 3 files are all related to the auth refactor&quot;)
+3. Ask if they want to stage all, or select specific files
+4. Stage the approved files with `git add &lt;files&gt;`
+
+If changes are already staged, proceed to analysis.
+
+### Step 3: Analyze the diff
+
+Read the full staged diff:
+
+```bash
+git diff --cached
+```
+
+Determine the commit type from the changes:
+
+| Signal | Type |
+|--------|------|
+| New files with new functionality | `feat` |
+| New test files or test additions | `test` |
+| Changes to existing logic fixing incorrect behavior | `fix` |
+| Structural changes without behavior change | `refactor` |
+| package.json, tsconfig, CI config changes | `chore` |
+| Build/bundler config changes | `build` |
+| README, docs, comments only | `docs` |
+| Formatting, whitespace, semicolons only | `style` |
+| Performance improvements | `perf` |
+
+Determine the scope from the primary directory or module affected:
+- `src/api/` -&gt; `api`
+- `src/components/auth/` -&gt; `auth`
+- `tests/` -&gt; `tests`
+- Root config files -&gt; omit scope
+- Multiple unrelated areas -&gt; omit scope
+
+### Step 4: Check for user overrides
+
+If the user provided arguments via `$ARGUMENTS`:
+- Single word (e.g., `fix`) -&gt; use as commit type
+- Two words (e.g., `refactor api`) -&gt; use as type and scope
+- Otherwise -&gt; use auto-detected values
+
+### Step 5: Compose the commit message
+
+Format: `type(scope): imperative short description`
+
+Rules:
+- Subject line max 72 characters
+- Use imperative mood (&quot;add&quot;, &quot;fix&quot;, &quot;refactor&quot;, not &quot;added&quot;, &quot;fixes&quot;)
+- Don&#039;t end with a period
+- Body explains **WHY** this change was made, not what changed (the diff shows what)
+- If changes are trivial (typo fix, formatting), skip the body
+
+Example:
+```
+feat(auth): add JWT refresh token rotation
+
+Tokens were expiring mid-session for users with slow connections.
+Rotating refresh tokens extends the session without compromising
+security, since each refresh token can only be used once.
+```
+
+### Step 6: Confirm and commit
+
+Show the user the proposed commit message and ask for confirmation.
+
+If confirmed, run:
+```bash
+git commit -m &quot;&lt;message&gt;&quot;
+```
+
+Then verify with:
+```bash
+git log --oneline -1
+```
+
+Show the committed hash and message.
+
+## Tips
+
+- Run after completing a logical unit of work, not after every file change
+- If the diff is too large for one commit, suggest splitting into multiple commits
+- For breaking changes, add `!` after the scope: `feat(api)!: change response format`
+- The body should answer &quot;if someone reads this commit in 6 months, will they understand WHY?&quot;
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,462 @@
     <p class="desc">Half-Quadratic Quantization for LLMs without calibration data. Use when quantizing models to 4/3/2-bit precision without needing calibration datasets, for fast quantization workflows, or when deploying with vLLM or HuggingFace Transformers.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/optimization-hqq</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/optimization-hqq</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: hqq-quantization
+description: Half-Quadratic Quantization for LLMs without calibration data. Use when quantizing models to 4/3/2-bit precision without needing calibration datasets, for fast quantization workflows, or when deploying with vLLM or HuggingFace Transformers.
+version: 1.0.0
+author: Orchestra Research
+license: MIT
+tags: [Quantization, HQQ, Optimization, Memory Efficiency, Inference, Model Compression]
+dependencies: [hqq&gt;=0.2.0, torch&gt;=2.0.0]
+---
+
+# HQQ - Half-Quadratic Quantization
+
+Fast, calibration-free weight quantization supporting 8/4/3/2/1-bit precision with multiple optimized backends.
+
+## When to use HQQ
+
+**Use HQQ when:**
+- Quantizing models without calibration data (no dataset needed)
+- Need fast quantization (minutes vs hours for GPTQ/AWQ)
+- Deploying with vLLM or HuggingFace Transformers
+- Fine-tuning quantized models with LoRA/PEFT
+- Experimenting with extreme quantization (2-bit, 1-bit)
+
+**Key advantages:**
+- **No calibration**: Quantize any model instantly without sample data
+- **Multiple backends**: PyTorch, ATEN, TorchAO, Marlin, BitBlas for optimized inference
+- **Flexible precision**: 8/4/3/2/1-bit with configurable group sizes
+- **Framework integration**: Native HuggingFace and vLLM support
+- **PEFT compatible**: Fine-tune quantized models with LoRA
+
+**Use alternatives instead:**
+- **AWQ**: Need calibration-based accuracy, production serving
+- **GPTQ**: Maximum accuracy with calibration data available
+- **bitsandbytes**: Simple 8-bit/4-bit without custom backends
+- **llama.cpp/GGUF**: CPU inference, Apple Silicon deployment
+
+## Quick start
+
+### Installation
+
+```bash
+pip install hqq
+
+# With specific backend
+pip install hqq[torch]      # PyTorch backend
+pip install hqq[torchao]    # TorchAO int4 backend
+pip install hqq[bitblas]    # BitBlas backend
+pip install hqq[marlin]     # Marlin backend
+```
+
+### Basic quantization
+
+```python
+from hqq.core.quantize import BaseQuantizeConfig, HQQLinear
+import torch.nn as nn
+
+# Configure quantization
+config = BaseQuantizeConfig(
+    nbits=4,           # 4-bit quantization
+    group_size=64,     # Group size for quantization
+    axis=1             # Quantize along output dimension
+)
+
+# Quantize a linear layer
+linear = nn.Linear(4096, 4096)
+hqq_linear = HQQLinear(linear, config)
+
+# Use normally
+output = hqq_linear(input_tensor)
+```
+
+### Quantize full model with HuggingFace
+
+```python
+from transformers import AutoModelForCausalLM, HqqConfig
+
+# Configure HQQ
+quantization_config = HqqConfig(
+    nbits=4,
+    group_size=64,
+    axis=1
+)
+
+# Load and quantize
+model = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Llama-3.1-8B&quot;,
+    quantization_config=quantization_config,
+    device_map=&quot;auto&quot;
+)
+
+# Model is quantized and ready to use
+```
+
+## Core concepts
+
+### Quantization configuration
+
+HQQ uses `BaseQuantizeConfig` to define quantization parameters:
+
+```python
+from hqq.core.quantize import BaseQuantizeConfig
+
+# Standard 4-bit config
+config_4bit = BaseQuantizeConfig(
+    nbits=4,           # Bits per weight (1-8)
+    group_size=64,     # Weights per quantization group
+    axis=1             # 0=input dim, 1=output dim
+)
+
+# Aggressive 2-bit config
+config_2bit = BaseQuantizeConfig(
+    nbits=2,
+    group_size=16,     # Smaller groups for low-bit
+    axis=1
+)
+
+# Mixed precision per layer type
+layer_configs = {
+    &quot;self_attn.q_proj&quot;: BaseQuantizeConfig(nbits=4, group_size=64),
+    &quot;self_attn.k_proj&quot;: BaseQuantizeConfig(nbits=4, group_size=64),
+    &quot;self_attn.v_proj&quot;: BaseQuantizeConfig(nbits=4, group_size=64),
+    &quot;mlp.gate_proj&quot;: BaseQuantizeConfig(nbits=2, group_size=32),
+    &quot;mlp.up_proj&quot;: BaseQuantizeConfig(nbits=2, group_size=32),
+    &quot;mlp.down_proj&quot;: BaseQuantizeConfig(nbits=4, group_size=64),
+}
+```
+
+### HQQLinear layer
+
+The core quantized layer that replaces `nn.Linear`:
+
+```python
+from hqq.core.quantize import HQQLinear
+import torch
+
+# Create quantized layer
+linear = torch.nn.Linear(4096, 4096)
+hqq_layer = HQQLinear(linear, config)
+
+# Access quantized weights
+W_q = hqq_layer.W_q           # Quantized weights
+scale = hqq_layer.scale       # Scale factors
+zero = hqq_layer.zero         # Zero points
+
+# Dequantize for inspection
+W_dequant = hqq_layer.dequantize()
+```
+
+### Backends
+
+HQQ supports multiple inference backends for different hardware:
+
+```python
+from hqq.core.quantize import HQQLinear
+
+# Available backends
+backends = [
+    &quot;pytorch&quot;,          # Pure PyTorch (default)
+    &quot;pytorch_compile&quot;,  # torch.compile optimized
+    &quot;aten&quot;,            # Custom CUDA kernels
+    &quot;torchao_int4&quot;,    # TorchAO int4 matmul
+    &quot;gemlite&quot;,         # GemLite CUDA kernels
+    &quot;bitblas&quot;,         # BitBlas optimized
+    &quot;marlin&quot;,          # Marlin 4-bit kernels
+]
+
+# Set backend globally
+HQQLinear.set_backend(&quot;torchao_int4&quot;)
+
+# Or per layer
+hqq_layer.set_backend(&quot;marlin&quot;)
+```
+
+**Backend selection guide:**
+| Backend | Best For | Requirements |
+|---------|----------|--------------|
+| pytorch | Compatibility | Any GPU |
+| pytorch_compile | Moderate speedup | torch&gt;=2.0 |
+| aten | Good balance | CUDA GPU |
+| torchao_int4 | 4-bit inference | torchao installed |
+| marlin | Maximum 4-bit speed | Ampere+ GPU |
+| bitblas | Flexible bit-widths | bitblas installed |
+
+## HuggingFace integration
+
+### Load pre-quantized models
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+# Load HQQ-quantized model from Hub
+model = AutoModelForCausalLM.from_pretrained(
+    &quot;mobiuslabsgmbh/Llama-3.1-8B-HQQ-4bit&quot;,
+    device_map=&quot;auto&quot;
+)
+tokenizer = AutoTokenizer.from_pretrained(&quot;meta-llama/Llama-3.1-8B&quot;)
+
+# Use normally
+inputs = tokenizer(&quot;Hello, world!&quot;, return_tensors=&quot;pt&quot;).to(model.device)
+outputs = model.generate(**inputs, max_new_tokens=50)
+```
+
+### Quantize and save
+
+```python
+from transformers import AutoModelForCausalLM, HqqConfig
+
+# Quantize
+config = HqqConfig(nbits=4, group_size=64)
+model = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Llama-3.1-8B&quot;,
+    quantization_config=config,
+    device_map=&quot;auto&quot;
+)
+
+# Save quantized model
+model.save_pretrained(&quot;./llama-8b-hqq-4bit&quot;)
+
+# Push to Hub
+model.push_to_hub(&quot;my-org/Llama-3.1-8B-HQQ-4bit&quot;)
+```
+
+### Mixed precision quantization
+
+```python
+from transformers import AutoModelForCausalLM, HqqConfig
+
+# Different precision per layer type
+config = HqqConfig(
+    nbits=4,
+    group_size=64,
+    # Attention layers: higher precision
+    # MLP layers: lower precision for memory savings
+    dynamic_config={
+        &quot;attn&quot;: {&quot;nbits&quot;: 4, &quot;group_size&quot;: 64},
+        &quot;mlp&quot;: {&quot;nbits&quot;: 2, &quot;group_size&quot;: 32}
+    }
+)
+```
+
+## vLLM integration
+
+### Serve HQQ models with vLLM
+
+```python
+from vllm import LLM, SamplingParams
+
+# Load HQQ-quantized model
+llm = LLM(
+    model=&quot;mobiuslabsgmbh/Llama-3.1-8B-HQQ-4bit&quot;,
+    quantization=&quot;hqq&quot;,
+    dtype=&quot;float16&quot;
+)
+
+# Generate
+sampling_params = SamplingParams(temperature=0.7, max_tokens=100)
+outputs = llm.generate([&quot;What is machine learning?&quot;], sampling_params)
+```
+
+### vLLM with custom HQQ config
+
+```python
+from vllm import LLM
+
+llm = LLM(
+    model=&quot;meta-llama/Llama-3.1-8B&quot;,
+    quantization=&quot;hqq&quot;,
+    quantization_config={
+        &quot;nbits&quot;: 4,
+        &quot;group_size&quot;: 64
+    }
+)
+```
+
+## PEFT/LoRA fine-tuning
+
+### Fine-tune quantized models
+
+```python
+from transformers import AutoModelForCausalLM, HqqConfig
+from peft import LoraConfig, get_peft_model
+
+# Load quantized model
+quant_config = HqqConfig(nbits=4, group_size=64)
+model = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Llama-3.1-8B&quot;,
+    quantization_config=quant_config,
+    device_map=&quot;auto&quot;
+)
+
+# Apply LoRA
+lora_config = LoraConfig(
+    r=16,
+    lora_alpha=32,
+    target_modules=[&quot;q_proj&quot;, &quot;k_proj&quot;, &quot;v_proj&quot;, &quot;o_proj&quot;],
+    lora_dropout=0.05,
+    bias=&quot;none&quot;,
+    task_type=&quot;CAUSAL_LM&quot;
+)
+
+model = get_peft_model(model, lora_config)
+
+# Train normally with Trainer or custom loop
+```
+
+### QLoRA-style training
+
+```python
+from transformers import TrainingArguments, Trainer
+
+training_args = TrainingArguments(
+    output_dir=&quot;./hqq-lora-output&quot;,
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=4,
+    learning_rate=2e-4,
+    num_train_epochs=3,
+    fp16=True,
+    logging_steps=10,
+    save_strategy=&quot;epoch&quot;
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    data_collator=data_collator
+)
+
+trainer.train()
+```
+
+## Quantization workflows
+
+### Workflow 1: Quick model compression
+
+```python
+from transformers import AutoModelForCausalLM, AutoTokenizer, HqqConfig
+
+# 1. Configure quantization
+config = HqqConfig(nbits=4, group_size=64)
+
+# 2. Load and quantize (no calibration needed!)
+model = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Llama-3.1-8B&quot;,
+    quantization_config=config,
+    device_map=&quot;auto&quot;
+)
+tokenizer = AutoTokenizer.from_pretrained(&quot;meta-llama/Llama-3.1-8B&quot;)
+
+# 3. Verify quality
+prompt = &quot;The capital of France is&quot;
+inputs = tokenizer(prompt, return_tensors=&quot;pt&quot;).to(model.device)
+outputs = model.generate(**inputs, max_new_tokens=20)
+print(tokenizer.decode(outputs[0]))
+
+# 4. Save
+model.save_pretrained(&quot;./llama-8b-hqq&quot;)
+tokenizer.save_pretrained(&quot;./llama-8b-hqq&quot;)
+```
+
+### Workflow 2: Optimize for inference speed
+
+```python
+from hqq.core.quantize import HQQLinear
+from transformers import AutoModelForCausalLM, HqqConfig
+
+# 1. Quantize with optimal backend
+config = HqqConfig(nbits=4, group_size=64)
+model = AutoModelForCausalLM.from_pretrained(
+    &quot;meta-llama/Llama-3.1-8B&quot;,
+    quantization_config=config,
+    device_map=&quot;auto&quot;
+)
+
+# 2. Set fast backend
+HQQLinear.set_backend(&quot;marlin&quot;)  # or &quot;torchao_int4&quot;
+
+# 3. Compile for additional speedup
+import torch
+model = torch.compile(model)
+
+# 4. Benchmark
+import time
+inputs = tokenizer(&quot;Hello&quot;, return_tensors=&quot;pt&quot;).to(model.device)
+start = time.time()
+for _ in range(10):
+    model.generate(**inputs, max_new_tokens=100)
+print(f&quot;Avg time: {(time.time() - start) / 10:.2f}s&quot;)
+```
+
+## Best practices
+
+1. **Start with 4-bit**: Best quality/size tradeoff for most models
+2. **Use group_size=64**: Good balance; smaller for extreme quantization
+3. **Choose backend wisely**: Marlin for 4-bit Ampere+, TorchAO for flexibility
+4. **Verify quality**: Always test generation quality after quantization
+5. **Mixed precision**: Keep attention at higher precision, compress MLP more
+6. **PEFT training**: Use LoRA r=16-32 for good fine-tuning results
+
+## Common issues
+
+**Out of memory during quantization:**
+```python
+# Quantize layer-by-layer
+from hqq.models.hf.base import AutoHQQHFModel
+
+model = AutoHQQHFModel.from_pretrained(
+    &quot;meta-llama/Llama-3.1-8B&quot;,
+    quantization_config=config,
+    device_map=&quot;sequential&quot;  # Load layers sequentially
+)
+```
+
+**Slow inference:**
+```python
+# Switch to optimized backend
+from hqq.core.quantize import HQQLinear
+HQQLinear.set_backend(&quot;marlin&quot;)  # Requires Ampere+ GPU
+
+# Or compile
+model = torch.compile(model, mode=&quot;reduce-overhead&quot;)
+```
+
+**Poor quality at 2-bit:**
+```python
+# Use smaller group size
+config = BaseQuantizeConfig(
+    nbits=2,
+    group_size=16,  # Smaller groups help at low bits
+    axis=1
+)
+```
+
+## References
+
+- **[Advanced Usage](references/advanced-usage.md)** - Custom backends, mixed precision, optimization
+- **[Troubleshooting](references/troubleshooting.md)** - Common issues, debugging, benchmarks
+
+## Resources
+
+- **Repository**: https://github.com/mobiusml/hqq
+- **Paper**: Half-Quadratic Quantization
+- **HuggingFace Models**: https://huggingface.co/mobiuslabsgmbh
+- **Version**: 0.2.0+
+- **License**: Apache 2.0
+</code>
       </div>
     </div>
 

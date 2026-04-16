@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,209 @@
     <p class="desc">Complete guide for building MCP servers with FastMCP 3.0 - tools, resources, authentication, providers, middleware, and deployment. Use when creating Python MCP servers or integrating AI models with external tools and data.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/fastmcp-server</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/fastmcp-server</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: fastmcp-server
+description: Complete guide for building MCP servers with FastMCP 3.0 - tools, resources, authentication, providers, middleware, and deployment. Use when creating Python MCP servers or integrating AI models with external tools and data.
+version: 1.0.0
+author: FastMCP Community
+license: MIT
+tags: [FastMCP, MCP, Python, AI, Tools, Server, Authentication, Providers]
+dependencies: []
+---
+
+# FastMCP 3.0 Server Development
+
+Complete reference for building production-ready MCP (Model Context Protocol) servers with FastMCP 3.0 - the fast, Pythonic framework for connecting LLMs to tools and data.
+
+## When to use this skill
+
+**Use FastMCP Server when:**
+- Creating a new MCP server in Python
+- Adding tools, resources, or prompts to an MCP server
+- Implementing authentication (OAuth, OIDC, token verification)
+- Setting up middleware for logging, rate limiting, or authorization
+- Configuring providers (local, filesystem, skills, custom)
+- Building production MCP servers with telemetry and storage
+- Upgrading from FastMCP 2.x to 3.0
+
+**Key areas covered:**
+- **Tools &amp; Resources** (CORE): Decorators, validation, return types, templates
+- **Context &amp; DI** (CORE): MCP context, dependency injection, background tasks
+- **Authentication** (SECURITY): OAuth, OIDC, token verification, proxy patterns
+- **Authorization** (SECURITY): Scope-based and role-based access control
+- **Middleware** (ADVANCED): Request/response pipeline, built-in middleware
+- **Providers** (ADVANCED): Local, filesystem, skills, and custom providers
+- **Features** (ADVANCED): Pagination, sampling, storage, OpenTelemetry, versioning
+
+## Quick reference
+
+### Core patterns
+
+**Create a server with tools:**
+```python
+from fastmcp import FastMCP
+
+mcp = FastMCP(&quot;MyServer&quot;)
+
+@mcp.tool
+def add(a: int, b: int) -&gt; int:
+    &quot;&quot;&quot;Add two numbers&quot;&quot;&quot;
+    return a + b
+```
+
+**Create a resource:**
+```python
+@mcp.resource(&quot;data://config&quot;)
+def get_config() -&gt; dict:
+    &quot;&quot;&quot;Return server configuration&quot;&quot;&quot;
+    return {&quot;version&quot;: &quot;1.0&quot;, &quot;debug&quot;: False}
+```
+
+**Create a resource template:**
+```python
+@mcp.resource(&quot;users://{user_id}/profile&quot;)
+def get_user_profile(user_id: str) -&gt; dict:
+    &quot;&quot;&quot;Get a user&#039;s profile by ID&quot;&quot;&quot;
+    return fetch_user(user_id)
+```
+
+**Create a prompt:**
+```python
+@mcp.prompt
+def review_code(code: str, language: str = &quot;python&quot;) -&gt; str:
+    &quot;&quot;&quot;Review code for best practices&quot;&quot;&quot;
+    return f&quot;Review this {language} code:\n\n{code}&quot;
+```
+
+**Run the server:**
+```python
+if __name__ == &quot;__main__&quot;:
+    mcp.run()
+
+# Or with transport options:
+# mcp.run(transport=&quot;sse&quot;, host=&quot;0.0.0.0&quot;, port=8000)
+```
+
+### Using context in tools
+
+```python
+from fastmcp import FastMCP, Context
+
+mcp = FastMCP(&quot;MyServer&quot;)
+
+@mcp.tool
+def process_data(uri: str, ctx: Context) -&gt; str:
+    &quot;&quot;&quot;Process data with logging and progress&quot;&quot;&quot;
+    ctx.info(f&quot;Processing {uri}&quot;)
+    ctx.report_progress(0, 100)
+    data = ctx.read_resource(uri)
+    ctx.report_progress(100, 100)
+    return f&quot;Processed: {data}&quot;
+```
+
+### Authentication setup
+
+```python
+from fastmcp import FastMCP
+from fastmcp.server.auth import BearerAuthProvider
+
+auth = BearerAuthProvider(
+    jwks_uri=&quot;https://your-provider/.well-known/jwks.json&quot;,
+    audience=&quot;your-api&quot;,
+    issuer=&quot;https://your-provider/&quot;
+)
+
+mcp = FastMCP(&quot;SecureServer&quot;, auth=auth)
+```
+
+## Key concepts
+
+### Tools
+Functions exposed as executable capabilities for LLMs. Decorated with `@mcp.tool`. Support Pydantic validation, async, custom return types, and annotations (readOnlyHint, destructiveHint).
+
+### Resources &amp; Templates
+Static or dynamic data sources identified by URIs. Resources use fixed URIs (`data://config`), templates use parameterized URIs (`users://{id}/profile`). Support MIME types, annotations, and wildcard parameters.
+
+### Context
+The `Context` object provides access to MCP features within tools/resources: logging, progress reporting, resource access, LLM sampling, user elicitation, and session state.
+
+### Dependency Injection
+Inject values into tool/resource functions using `Depends()`. Supports HTTP requests, access tokens, custom dependencies, and generator-based cleanup patterns.
+
+### Providers
+Control where components come from. `LocalProvider` (default, decorator-based), `FileSystemProvider` (load from Python files on disk), `SkillsProvider` (packaged bundles), or custom providers.
+
+### Authentication &amp; Authorization
+Multiple auth patterns: token verification (JWT, JWKS), OAuth proxy, OIDC proxy, remote OAuth, and full OAuth server. Authorization via scopes on components and middleware.
+
+### Middleware
+Intercept and modify requests/responses. Built-in middleware for rate limiting, error handling, logging, and response size limits. Custom middleware via `@mcp.middleware`.
+
+## Using the references
+
+Detailed documentation is organized in the `references/` folder:
+
+### Getting Started
+- **getting-started/installation.md** - Install FastMCP, optional dependencies, verify setup
+- **getting-started/upgrade-guide.md** - Migrate from FastMCP 2.x to 3.0
+- **getting-started/quickstart.md** - First server, tools, resources, prompts, running
+
+### Server
+- **server/server-class.md** - FastMCP server configuration, transport options, tag filtering
+- **server/tools.md** - Tool decorator, parameters, validation, return types, annotations
+- **server/resources-and-templates.md** - Resources, templates, URIs, wildcards, MIME types
+
+### Context
+- **context/mcp-context.md** - Context object, logging, progress, resource access, sampling
+- **context/background-tasks.md** - Long-running operations with task support
+- **context/dependency-injection.md** - Depends(), custom deps, HTTP request, access tokens
+- **context/user-elicitation.md** - Request structured input from users during execution
+
+### Features
+- **features/icons.md** - Custom icons for tools, resources, prompts, and servers
+- **features/lifespans.md** - Server lifecycle management and startup/shutdown hooks
+- **features/client-logging.md** - Send log messages to MCP clients
+- **features/middleware.md** - Request/response pipeline, built-in and custom middleware
+- **features/pagination.md** - Paginate large component lists
+- **features/progress-reporting.md** - Report progress for long-running operations
+- **features/sampling.md** - Request LLM completions from the client
+- **features/storage-backends.md** - Memory, file, and Redis storage for caching and tokens
+- **features/opentelemetry.md** - Distributed tracing and observability
+- **features/versioning.md** - Version components and filter by version ranges
+
+### Authentication
+- **authentication/token-verification.md** - JWT, JWKS, introspection, static keys, custom
+- **authentication/remote-oauth.md** - Delegate auth to upstream OAuth provider
+- **authentication/oauth-proxy.md** - Full OAuth proxy with PKCE, client management
+- **authentication/oidc-proxy.md** - OpenID Connect proxy with auto-discovery
+- **authentication/full-oauth-server.md** - Complete built-in OAuth server
+
+### Authorization
+- **authorization.md** - Scope-based access control, middleware authorization, patterns
+
+### Providers
+- **providers/local.md** - Default provider, decorator-based component registration
+- **providers/filesystem.md** - Load components from Python files on disk
+- **providers/skills.md** - Package and distribute component bundles
+- **providers/custom.md** - Build custom providers for any component source
+
+## Version history
+
+**v1.0.0** (February 2026)
+- Initial release covering FastMCP 3.0 (release candidate)
+- 30 reference files across 7 categories
+- Complete coverage of tools, resources, context, auth, providers, and features
+</code>
       </div>
     </div>
 

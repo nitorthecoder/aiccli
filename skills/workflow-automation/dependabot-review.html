@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,125 @@
     <p class="desc">Review and manage Dependabot PRs. Categorizes by risk, checks CI status, auto-merges safe updates, and reports issues. Use when the user says "review dependabot", "merge dependabot", "dependabot PRs", or "update dependencies".</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/dependabot-review</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/dependabot-review</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: dependabot-review
+description: Review and manage Dependabot PRs. Categorizes by risk, checks CI status, auto-merges safe updates, and reports issues. Use when the user says &quot;review dependabot&quot;, &quot;merge dependabot&quot;, &quot;dependabot PRs&quot;, or &quot;update dependencies&quot;.
+license: MIT
+metadata:
+  author: claude-code-templates
+  version: &quot;1.0.0&quot;
+---
+
+# Dependabot PR Review
+
+You are a dependency management specialist. Your job is to review all open Dependabot PRs, assess risk, and take action.
+
+## Workflow
+
+### Step 1: Discovery
+
+List all open Dependabot PRs:
+
+```bash
+gh pr list --author &quot;dependabot[bot]&quot; --state open --json number,title,labels,createdAt,headRefName --limit 50
+```
+
+If no PRs are found, inform the user and stop.
+
+### Step 2: Classification
+
+For each PR, classify it into a risk tier based on the branch name and title:
+
+| Tier | Criteria | Action |
+|------|----------|--------|
+| **Safe** | GitHub Actions updates (`dependabot/github_actions/`), patch bumps (`1.2.3` -&gt; `1.2.4`) | Auto-merge |
+| **Low Risk** | Minor bumps (`1.2.0` -&gt; `1.3.0`) for well-known libraries | Auto-merge after CI check |
+| **Review Required** | Major bumps (`1.x` -&gt; `2.x`), unknown libraries, security-tagged PRs | Report to user |
+
+To determine bump type, parse the PR title. Dependabot titles follow patterns like:
+- `Bump X from 1.2.3 to 1.2.4` (patch)
+- `Bump X from 1.2.0 to 1.3.0` (minor)
+- `Bump X from 1.0.0 to 2.0.0` (major)
+
+### Step 3: CI Check
+
+For each PR you plan to merge, check CI status:
+
+```bash
+gh pr checks &lt;number&gt; --json name,state,bucket
+```
+
+- If all checks **pass**: proceed with merge
+- If checks are **pending**: wait up to 2 minutes (poll every 30s). If still pending, skip and report as &quot;CI pending&quot;
+- If any check **fails**: skip and report to user
+
+### Step 4: Merge Safe PRs
+
+For PRs classified as Safe or Low Risk with passing CI:
+
+```bash
+gh pr merge &lt;number&gt; --merge --delete-branch
+```
+
+**Important rules:**
+- Never force-merge
+- Never merge PRs with failing CI
+- Never merge major version bumps without user confirmation
+- Merge one at a time to avoid conflicts
+
+### Step 5: Report
+
+After processing, present a summary table to the user:
+
+```
+## Dependabot Review Summary
+
+### Merged (X PRs)
+| PR | Update | Type |
+|----|--------|------|
+| #123 | actions/checkout v4 -&gt; v6 | GitHub Actions |
+
+### Needs Review (X PRs)
+| PR | Update | Risk | Reason |
+|----|--------|------|--------|
+| #456 | jest 29 -&gt; 30 | Major | Breaking changes possible |
+
+### Skipped (X PRs)
+| PR | Update | Reason |
+|----|--------|--------|
+| #789 | chalk 5.5 -&gt; 5.6 | CI failing |
+```
+
+## Guardrails
+
+- **Always check CI before merging** — never merge red PRs
+- **Major bumps need user approval** — present the changelog and ask
+- **Rate limit merges** — if there are more than 10 PRs, process in batches of 5 and ask the user before continuing
+- **Conflict handling** — if a merge fails due to conflicts, skip it and report. Do not attempt to resolve conflicts
+- **Security PRs** — if a PR has a `security` label or mentions a CVE, always flag it to the user even if it&#039;s a patch, so they are aware
+- **Rebase cascades** — after merging several PRs, remaining ones may need rebase. Run `gh pr list --author &quot;dependabot[bot]&quot;` again after each batch to see updated status
+
+## Common Patterns
+
+**Quick safe merge (GitHub Actions only):**
+The user says &quot;merge the actions PRs&quot; — filter to `dependabot/github_actions/` branches only.
+
+**Full review:**
+The user says &quot;review dependabot&quot; — run the complete workflow above.
+
+**Dry run:**
+The user says &quot;check dependabot&quot; or &quot;show dependabot PRs&quot; — run Steps 1-2 only, report classification without merging.
+</code>
       </div>
     </div>
 

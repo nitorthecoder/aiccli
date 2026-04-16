@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,88 @@
     <p class="desc">Inspect GitHub PR checks with gh, pull failing GitHub Actions logs, summarize failure context, then create a fix plan and implement after user approval. Use when a user asks to debug or fix failing PR CI/CD checks on GitHub Actions and wants a plan + code changes; for external checks (e.g., Buildkite), only report the details URL and mark them out of scope.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/gh-fix-ci</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/gh-fix-ci</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: gh-fix-ci
+description: Inspect GitHub PR checks with gh, pull failing GitHub Actions logs, summarize failure context, then create a fix plan and implement after user approval. Use when a user asks to debug or fix failing PR CI/CD checks on GitHub Actions and wants a plan + code changes; for external checks (e.g., Buildkite), only report the details URL and mark them out of scope.
+metadata:
+  short-description: Fix failing Github CI actions
+---
+
+# Gh Pr Checks Plan Fix
+
+## Overview
+
+Use gh to locate failing PR checks, fetch GitHub Actions logs for actionable failures, summarize the failure snippet, then propose a fix plan and implement after explicit approval.
+- Depends on the `plan` skill for drafting and approving the fix plan.
+
+Prereq: ensure `gh` is authenticated (for example, run `gh auth login` once), then run `gh auth status` with escalated permissions (include workflow/repo scopes) so `gh` commands succeed. If sandboxing blocks `gh auth status`, rerun it with `sandbox_permissions=require_escalated`.
+
+## Inputs
+
+- `repo`: path inside the repo (default `.`)
+- `pr`: PR number or URL (optional; defaults to current branch PR)
+- `gh` authentication for the repo host
+
+## Quick start
+
+- `python &quot;&lt;path-to-skill&gt;/scripts/inspect_pr_checks.py&quot; --repo &quot;.&quot; --pr &quot;&lt;number-or-url&gt;&quot;`
+- Add `--json` if you want machine-friendly output for summarization.
+
+## Workflow
+
+1. Verify gh authentication.
+   - Run `gh auth status` in the repo with escalated scopes (workflow/repo) after running `gh auth login`.
+   - If sandboxed auth status fails, rerun the command with `sandbox_permissions=require_escalated` to allow network/keyring access.
+   - If unauthenticated, ask the user to log in before proceeding.
+2. Resolve the PR.
+   - Prefer the current branch PR: `gh pr view --json number,url`.
+   - If the user provides a PR number or URL, use that directly.
+3. Inspect failing checks (GitHub Actions only).
+   - Preferred: run the bundled script (handles gh field drift and job-log fallbacks):
+     - `python &quot;&lt;path-to-skill&gt;/scripts/inspect_pr_checks.py&quot; --repo &quot;.&quot; --pr &quot;&lt;number-or-url&gt;&quot;`
+     - Add `--json` for machine-friendly output.
+   - Manual fallback:
+     - `gh pr checks &lt;pr&gt; --json name,state,bucket,link,startedAt,completedAt,workflow`
+       - If a field is rejected, rerun with the available fields reported by `gh`.
+     - For each failing check, extract the run id from `detailsUrl` and run:
+       - `gh run view &lt;run_id&gt; --json name,workflowName,conclusion,status,url,event,headBranch,headSha`
+       - `gh run view &lt;run_id&gt; --log`
+     - If the run log says it is still in progress, fetch job logs directly:
+       - `gh api &quot;/repos/&lt;owner&gt;/&lt;repo&gt;/actions/jobs/&lt;job_id&gt;/logs&quot; &gt; &quot;&lt;path&gt;&quot;`
+4. Scope non-GitHub Actions checks.
+   - If `detailsUrl` is not a GitHub Actions run, label it as external and only report the URL.
+   - Do not attempt Buildkite or other providers; keep the workflow lean.
+5. Summarize failures for the user.
+   - Provide the failing check name, run URL (if any), and a concise log snippet.
+   - Call out missing logs explicitly.
+6. Create a plan.
+   - Use the `plan` skill to draft a concise plan and request approval.
+7. Implement after approval.
+   - Apply the approved plan, summarize diffs/tests, and ask about opening a PR.
+8. Recheck status.
+   - After changes, suggest re-running the relevant tests and `gh pr checks` to confirm.
+
+## Bundled Resources
+
+### scripts/inspect_pr_checks.py
+
+Fetch failing PR checks, pull GitHub Actions logs, and extract a failure snippet. Exits non-zero when failures remain so it can be used in automation.
+
+Usage examples:
+- `python &quot;&lt;path-to-skill&gt;/scripts/inspect_pr_checks.py&quot; --repo &quot;.&quot; --pr &quot;123&quot;`
+- `python &quot;&lt;path-to-skill&gt;/scripts/inspect_pr_checks.py&quot; --repo &quot;.&quot; --pr &quot;https://github.com/org/repo/pull/123&quot; --json`
+- `python &quot;&lt;path-to-skill&gt;/scripts/inspect_pr_checks.py&quot; --repo &quot;.&quot; --max-lines 200 --context 40`
+</code>
       </div>
     </div>
 

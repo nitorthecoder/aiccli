@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,260 @@
     <p class="desc">"Expert in CrewAI - the leading role-based multi-agent framework used by 60% of Fortune 500 companies. Covers agent design with roles and goals, task definition, crew orchestration, process types (sequential, hierarchical, parallel), memory systems, and flows for complex workflows. Essential for building collaborative AI agent teams. Use when: crewai, multi-agent team, agent roles, crew of agents, role-based agents."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/crewai</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/crewai</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: crewai
+description: &quot;Expert in CrewAI - the leading role-based multi-agent framework used by 60% of Fortune 500 companies. Covers agent design with roles and goals, task definition, crew orchestration, process types (sequential, hierarchical, parallel), memory systems, and flows for complex workflows. Essential for building collaborative AI agent teams. Use when: crewai, multi-agent team, agent roles, crew of agents, role-based agents.&quot;
+source: vibeship-spawner-skills (Apache 2.0)
+---
+
+# CrewAI
+
+**Role**: CrewAI Multi-Agent Architect
+
+You are an expert in designing collaborative AI agent teams with CrewAI. You think
+in terms of roles, responsibilities, and delegation. You design clear agent personas
+with specific expertise, create well-defined tasks with expected outputs, and
+orchestrate crews for optimal collaboration. You know when to use sequential vs
+hierarchical processes.
+
+## Capabilities
+
+- Agent definitions (role, goal, backstory)
+- Task design and dependencies
+- Crew orchestration
+- Process types (sequential, hierarchical)
+- Memory configuration
+- Tool integration
+- Flows for complex workflows
+
+## Requirements
+
+- Python 3.10+
+- crewai package
+- LLM API access
+
+## Patterns
+
+### Basic Crew with YAML Config
+
+Define agents and tasks in YAML (recommended)
+
+**When to use**: Any CrewAI project
+
+```python
+# config/agents.yaml
+researcher:
+  role: &quot;Senior Research Analyst&quot;
+  goal: &quot;Find comprehensive, accurate information on {topic}&quot;
+  backstory: |
+    You are an expert researcher with years of experience
+    in gathering and analyzing information. You&#039;re known
+    for your thorough and accurate research.
+  tools:
+    - SerperDevTool
+    - WebsiteSearchTool
+  verbose: true
+
+writer:
+  role: &quot;Content Writer&quot;
+  goal: &quot;Create engaging, well-structured content&quot;
+  backstory: |
+    You are a skilled writer who transforms research
+    into compelling narratives. You focus on clarity
+    and engagement.
+  verbose: true
+
+# config/tasks.yaml
+research_task:
+  description: |
+    Research the topic: {topic}
+
+    Focus on:
+    1. Key facts and statistics
+    2. Recent developments
+    3. Expert opinions
+    4. Contrarian viewpoints
+
+    Be thorough and cite sources.
+  agent: researcher
+  expected_output: |
+    A comprehensive research report with:
+    - Executive summary
+    - Key findings (bulleted)
+    - Sources cited
+
+writing_task:
+  description: |
+    Using the research provided, write an article about {topic}.
+
+    Requirements:
+    - 800-1000 words
+    - Engaging introduction
+    - Clear structure with headers
+    - Actionable conclusion
+  agent: writer
+  expected_output: &quot;A polished article ready for publication&quot;
+  context:
+    - research_task  # Uses output from research
+
+# crew.py
+from crewai import Agent, Task, Crew, Process
+from crewai.project import CrewBase, agent, task, crew
+
+@CrewBase
+class ContentCrew:
+    agents_config = &#039;config/agents.yaml&#039;
+    tasks_config = &#039;config/tasks.yaml&#039;
+
+    @agent
+    def researcher(self) -&gt; Agent:
+        return Agent(config=self.agents_config[&#039;researcher&#039;])
+
+    @agent
+    def writer(self) -&gt; Agent:
+        return Agent(config=self.agents_config[&#039;writer&#039;])
+
+    @task
+    def research_task(self) -&gt; Task:
+        return Task(config=self.tasks_config[&#039;research_task&#039;])
+
+    @task
+    def writing_task(self) -&gt; Task:
+        return Task(config
+```
+
+### Hierarchical Process
+
+Manager agent delegates to workers
+
+**When to use**: Complex tasks needing coordination
+
+```python
+from crewai import Crew, Process
+
+# Define specialized agents
+researcher = Agent(
+    role=&quot;Research Specialist&quot;,
+    goal=&quot;Find accurate information&quot;,
+    backstory=&quot;Expert researcher...&quot;
+)
+
+analyst = Agent(
+    role=&quot;Data Analyst&quot;,
+    goal=&quot;Analyze and interpret data&quot;,
+    backstory=&quot;Expert analyst...&quot;
+)
+
+writer = Agent(
+    role=&quot;Content Writer&quot;,
+    goal=&quot;Create engaging content&quot;,
+    backstory=&quot;Expert writer...&quot;
+)
+
+# Hierarchical crew - manager coordinates
+crew = Crew(
+    agents=[researcher, analyst, writer],
+    tasks=[research_task, analysis_task, writing_task],
+    process=Process.hierarchical,
+    manager_llm=ChatOpenAI(model=&quot;gpt-4o&quot;),  # Manager model
+    verbose=True
+)
+
+# Manager decides:
+# - Which agent handles which task
+# - When to delegate
+# - How to combine results
+
+result = crew.kickoff()
+```
+
+### Planning Feature
+
+Generate execution plan before running
+
+**When to use**: Complex workflows needing structure
+
+```python
+from crewai import Crew, Process
+
+# Enable planning
+crew = Crew(
+    agents=[researcher, writer, reviewer],
+    tasks=[research, write, review],
+    process=Process.sequential,
+    planning=True,  # Enable planning
+    planning_llm=ChatOpenAI(model=&quot;gpt-4o&quot;)  # Planner model
+)
+
+# With planning enabled:
+# 1. CrewAI generates step-by-step plan
+# 2. Plan is injected into each task
+# 3. Agents see overall structure
+# 4. More consistent results
+
+result = crew.kickoff()
+
+# Access the plan
+print(crew.plan)
+```
+
+## Anti-Patterns
+
+### ❌ Vague Agent Roles
+
+**Why bad**: Agent doesn&#039;t know its specialty.
+Overlapping responsibilities.
+Poor task delegation.
+
+**Instead**: Be specific:
+- &quot;Senior React Developer&quot; not &quot;Developer&quot;
+- &quot;Financial Analyst specializing in crypto&quot; not &quot;Analyst&quot;
+Include specific skills in backstory.
+
+### ❌ Missing Expected Outputs
+
+**Why bad**: Agent doesn&#039;t know done criteria.
+Inconsistent outputs.
+Hard to chain tasks.
+
+**Instead**: Always specify expected_output:
+expected_output: |
+  A JSON object with:
+  - summary: string (100 words max)
+  - key_points: list of strings
+  - confidence: float 0-1
+
+### ❌ Too Many Agents
+
+**Why bad**: Coordination overhead.
+Inconsistent communication.
+Slower execution.
+
+**Instead**: 3-5 agents with clear roles.
+One agent can handle multiple related tasks.
+Use tools instead of agents for simple actions.
+
+## Limitations
+
+- Python-only
+- Best for structured workflows
+- Can be verbose for simple cases
+- Flows are newer feature
+
+## Related Skills
+
+Works well with: `langgraph`, `autonomous-agents`, `langfuse`, `structured-output`
+</code>
       </div>
     </div>
 

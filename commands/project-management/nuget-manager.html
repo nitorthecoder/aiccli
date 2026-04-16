@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,85 @@
     <p class="desc">Manage NuGet packages in .NET projects/solutions. Use this skill when adding, removing, or updating NuGet package versions. It enforces using `dotnet` CLI for package management and provides strict procedures for direct file edits only when updating versions.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/nuget-manager</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/nuget-manager</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Bash, Read
+description: Manage NuGet packages in .NET projects/solutions. Use this skill when adding, removing, or updating NuGet package versions. It enforces using `dotnet` CLI for package management and provides strict procedures for direct file edits only when updating versions.
+---
+
+# NuGet Manager
+
+## Overview
+
+This skill ensures consistent and safe management of NuGet packages across .NET projects. It prioritizes using the `dotnet` CLI to maintain project integrity and enforces a strict verification and restoration workflow for version updates.
+
+## Prerequisites
+
+- .NET SDK installed (typically .NET 8.0 SDK or later, or a version compatible with the target solution).
+- `dotnet` CLI available on your `PATH`.
+- `jq` (JSON processor) OR PowerShell (for version verification using `dotnet package search`).
+
+## Core Rules
+
+1.  **NEVER** directly edit `.csproj`, `.props`, or `Directory.Packages.props` files to **add** or **remove** packages. Always use `dotnet add package` and `dotnet remove package` commands.
+2.  **DIRECT EDITING** is ONLY permitted for **changing versions** of existing packages.
+3.  **VERSION UPDATES** must follow the mandatory workflow:
+    - Verify the target version exists on NuGet.
+    - Determine if versions are managed per-project (`.csproj`) or centrally (`Directory.Packages.props`).
+    - Update the version string in the appropriate file.
+    - Immediately run `dotnet restore` to verify compatibility.
+
+## Workflows
+
+### Adding a Package
+Use `dotnet add [&lt;PROJECT&gt;] package &lt;PACKAGE_NAME&gt; [--version &lt;VERSION&gt;]`.
+Example: `dotnet add src/MyProject/MyProject.csproj package Newtonsoft.Json`
+
+### Removing a Package
+Use `dotnet remove [&lt;PROJECT&gt;] package &lt;PACKAGE_NAME&gt;`.
+Example: `dotnet remove src/MyProject/MyProject.csproj package Newtonsoft.Json`
+
+### Updating Package Versions
+When updating a version, follow these steps:
+
+1.  **Verify Version Existence**:
+    Check if the version exists using the `dotnet package search` command with exact match and JSON formatting. 
+    Using `jq`:
+    `dotnet package search &lt;PACKAGE_NAME&gt; --exact-match --format json | jq -e &#039;.searchResult[].packages[] | select(.version == &quot;&lt;VERSION&gt;&quot;)&#039;`
+    Using PowerShell:
+    `(dotnet package search &lt;PACKAGE_NAME&gt; --exact-match --format json | ConvertFrom-Json).searchResult.packages | Where-Object { $_.version -eq &quot;&lt;VERSION&gt;&quot; }`
+    
+2.  **Determine Version Management**:
+    - Search for `Directory.Packages.props` in the solution root. If present, versions should be managed there via `&lt;PackageVersion Include=&quot;Package.Name&quot; Version=&quot;1.2.3&quot; /&gt;`.
+    - If absent, check individual `.csproj` files for `&lt;PackageReference Include=&quot;Package.Name&quot; Version=&quot;1.2.3&quot; /&gt;`.
+
+3.  **Apply Changes**:
+    Modify the identified file with the new version string.
+
+4.  **Verify Stability**:
+    Run `dotnet restore` on the project or solution. If errors occur, revert the change and investigate.
+
+## Examples
+
+### User: &quot;Add Serilog to the WebApi project&quot;
+**Action**: Execute `dotnet add src/WebApi/WebApi.csproj package Serilog`.
+
+### User: &quot;Update Newtonsoft.Json to 13.0.3 in the whole solution&quot;
+**Action**:
+1. Verify 13.0.3 exists: `dotnet package search Newtonsoft.Json --exact-match --format json` (and parse output to confirm &quot;13.0.3&quot; is present).
+2. Find where it&#039;s defined (e.g., `Directory.Packages.props`).
+3. Edit the file to update the version.
+4. Run `dotnet restore`.
+</code>
       </div>
     </div>
 

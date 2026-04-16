@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,220 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/svelte-storybook-migrate</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/svelte-storybook-migrate</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># /svelte:storybook-migrate
+
+Migrate Storybook configurations and stories to newer versions, including Svelte CSF v5 and @storybook/sveltekit framework.
+
+## Instructions
+
+You are acting as the Svelte Storybook Specialist Agent focused on migration. When migrating Storybook:
+
+1. **Version Migrations**:
+   
+   **Storybook 6.x to 7.x**:
+   ```bash
+   # Automated upgrade
+   npx storybook@latest upgrade
+   
+   # Manual steps:
+   # 1. Update dependencies
+   # 2. Migrate to @storybook/sveltekit
+   # 3. Remove obsolete packages
+   # 4. Update configuration
+   ```
+   
+   **Configuration Changes**:
+   ```javascript
+   // Old (.storybook/main.js)
+   module.exports = {
+     framework: &#039;@storybook/svelte&#039;,
+     svelteOptions: { ... } // Remove this
+   };
+   
+   // New (.storybook/main.js)
+   export default {
+     framework: {
+       name: &#039;@storybook/sveltekit&#039;,
+       options: {}
+     }
+   };
+   ```
+
+2. **Svelte CSF Migration (v4 to v5)**:
+   
+   **Meta Component → defineMeta**:
+   ```svelte
+   &lt;!-- Old --&gt;
+   &lt;script context=&quot;module&quot;&gt;
+     import { Meta, Story } from &#039;@storybook/addon-svelte-csf&#039;;
+   &lt;/script&gt;
+   
+   &lt;Meta title=&quot;Button&quot; component={Button} /&gt;
+   
+   &lt;!-- New --&gt;
+   &lt;script&gt;
+     import { defineMeta } from &#039;@storybook/addon-svelte-csf&#039;;
+     import Button from &#039;./Button.svelte&#039;;
+     
+     const { Story } = defineMeta({
+       title: &#039;Button&#039;,
+       component: Button
+     });
+   &lt;/script&gt;
+   ```
+   
+   **Template → Children/Snippets**:
+   ```svelte
+   &lt;!-- Old --&gt;
+   &lt;Story name=&quot;Default&quot;&gt;
+     &lt;Template let:args&gt;
+       &lt;Button {...args} /&gt;
+     &lt;/Template&gt;
+   &lt;/Story&gt;
+   
+   &lt;!-- New --&gt;
+   &lt;Story name=&quot;Default&quot; args={{ label: &#039;Click&#039; }}&gt;
+     {#snippet template(args)}
+       &lt;Button {...args} /&gt;
+     {/snippet}
+   &lt;/Story&gt;
+   ```
+
+3. **Package Migration**:
+   
+   **Remove Obsolete Packages**:
+   ```bash
+   npm uninstall @storybook/svelte-vite
+   npm uninstall storybook-builder-vite
+   npm uninstall @storybook/builder-vite
+   npm uninstall @storybook/svelte
+   ```
+   
+   **Install New Packages**:
+   ```bash
+   npm install -D @storybook/sveltekit
+   npm install -D @storybook/addon-svelte-csf@latest
+   ```
+
+4. **Story Format Migration**:
+   
+   **CSF 2 to CSF 3**:
+   ```javascript
+   // Old (CSF 2)
+   export default {
+     title: &#039;Button&#039;,
+     component: Button
+   };
+   
+   export const Primary = (args) =&gt; ({
+     Component: Button,
+     props: args
+   });
+   Primary.args = { variant: &#039;primary&#039; };
+   
+   // New (CSF 3)
+   export default {
+     title: &#039;Button&#039;,
+     component: Button
+   };
+   
+   export const Primary = {
+     args: { variant: &#039;primary&#039; }
+   };
+   ```
+
+5. **Addon Updates**:
+   
+   **Actions → Tags**:
+   ```javascript
+   // Old
+   export default {
+     component: Button,
+     parameters: {
+       docs: { autodocs: true }
+     }
+   };
+   
+   // New
+   export default {
+     component: Button,
+     tags: [&#039;autodocs&#039;]
+   };
+   ```
+
+6. **Module Mocking Updates**:
+   
+   **New Parameter Structure**:
+   ```javascript
+   // Old approach (custom mocks)
+   import { page } from &#039;./__mocks__/stores&#039;;
+   
+   // New approach (parameters)
+   export const Default = {
+     parameters: {
+       sveltekit_experimental: {
+         stores: { page: { ... } }
+       }
+     }
+   };
+   ```
+
+7. **Migration Script**:
+   ```javascript
+   // migration-helper.js
+   import { readdir, readFile, writeFile } from &#039;fs/promises&#039;;
+   import { parse, walk } from &#039;svelte/compiler&#039;;
+   
+   async function migrateStories() {
+     // Find all .stories.svelte files
+     // Parse and transform AST
+     // Update syntax to v5
+     // Write updated files
+   }
+   ```
+
+8. **Testing After Migration**:
+   - Run `npm run storybook`
+   - Check all stories render
+   - Verify interactions work
+   - Test addons functionality
+   - Validate build process
+
+## Migration Checklist
+
+1. [ ] Backup current setup
+2. [ ] Update Storybook to v7+
+3. [ ] Migrate to @storybook/sveltekit
+4. [ ] Update Svelte CSF addon
+5. [ ] Convert story syntax
+6. [ ] Update module mocks
+7. [ ] Test all stories
+8. [ ] Update CI/CD config
+
+## Example Usage
+
+User: &quot;Migrate my Storybook from v6 with Svelte to v7 with SvelteKit&quot;
+
+Assistant will:
+- Analyze current setup
+- Create migration plan
+- Run upgrade command
+- Update framework config
+- Convert story formats
+- Migrate CSF syntax
+- Update module mocking
+- Test and validate
+- Document breaking changes</code>
       </div>
     </div>
 

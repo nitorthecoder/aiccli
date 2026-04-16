@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,23 @@
     <p class="desc">Resource-focused Neon monitor showing storage usage, compute consumption, and cost tracking. Perfect for monitoring resource usage and billing. Setup: Add variables to your project's .env file or export them: NEON_ENDPOINT, NEON_DATABASE, NEON_API_KEY, and NEON_PROJECT_ID. Shows storage usage, compute hours, estimated costs, activity metrics, and resource consumption tracking.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install settings/neon-database-resources</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install settings/neon-database-resources</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">{
+  &quot;description&quot;: &quot;Resource-focused Neon monitor showing storage usage, compute consumption, and cost tracking. Perfect for monitoring resource usage and billing. Setup: Add variables to your project&#039;s .env file or export them: NEON_ENDPOINT, NEON_DATABASE, NEON_API_KEY, and NEON_PROJECT_ID. Shows storage usage, compute hours, estimated costs, activity metrics, and resource consumption tracking.&quot;,
+  &quot;statusLine&quot;: {
+    &quot;type&quot;: &quot;command&quot;,
+    &quot;command&quot;: &quot;bash -c &#039;input=$(cat); DIR=$(echo \&quot;$input\&quot; | jq -r \&quot;.workspace.current_dir\&quot; 2&gt;/dev/null || echo \&quot;unknown\&quot;); DIR_NAME=$(basename \&quot;$DIR\&quot; 2&gt;/dev/null || echo \&quot;project\&quot;); if [ -f \&quot;$DIR/.env\&quot; ]; then while IFS= read -r line; do case \&quot;$line\&quot; in NEON_ENDPOINT=*) export NEON_ENDPOINT=\&quot;${line#*=}\&quot;;; NEON_DATABASE=*) export NEON_DATABASE=\&quot;${line#*=}\&quot;;; NEON_API_KEY=*) export NEON_API_KEY=\&quot;${line#*=}\&quot;;; NEON_PROJECT_ID=*) export NEON_PROJECT_ID=\&quot;${line#*=}\&quot;;; esac; done &lt; \&quot;$DIR/.env\&quot;; fi; if [ -n \&quot;$NEON_ENDPOINT\&quot; ] &amp;&amp; [ -n \&quot;$NEON_DATABASE\&quot; ] &amp;&amp; [ -n \&quot;$NEON_API_KEY\&quot; ] &amp;&amp; [ -n \&quot;$NEON_PROJECT_ID\&quot; ]; then REGION=$(echo \&quot;$NEON_ENDPOINT\&quot; | grep -o \&quot;us-[a-z0-9-]*\&quot; | head -1 || echo \&quot;unknown\&quot;); DB_NAME=$(echo \&quot;$NEON_DATABASE\&quot; | cut -c1-6); CONNECTION_TEST=$(timeout 3 nc -z \&quot;$NEON_ENDPOINT\&quot; 5432 &gt;/dev/null 2&gt;&amp;1 &amp;&amp; echo \&quot;connected\&quot; || echo \&quot;sleeping\&quot;); if [ \&quot;$CONNECTION_TEST\&quot; = \&quot;connected\&quot; ]; then CONN_ICON=\&quot;🟢\&quot;; STATUS=\&quot;active\&quot;; else CONN_ICON=\&quot;🟡\&quot;; STATUS=\&quot;sleep\&quot;; fi; CONSUMPTION_DATA=$(curl -s -m 5 -H \&quot;Authorization: Bearer $NEON_API_KEY\&quot; \&quot;https://console.neon.tech/api/v2/consumption_history/projects/$NEON_PROJECT_ID?limit=1\&quot; 2&gt;/dev/null); if [ -n \&quot;$CONSUMPTION_DATA\&quot; ] &amp;&amp; echo \&quot;$CONSUMPTION_DATA\&quot; | jq -e \&quot;.periods[0]\&quot; &gt;/dev/null 2&gt;&amp;1; then PERIOD_DATA=$(echo \&quot;$CONSUMPTION_DATA\&quot; | jq \&quot;.periods[0]\&quot; 2&gt;/dev/null); ACTIVE_TIME=$(echo \&quot;$PERIOD_DATA\&quot; | jq -r \&quot;.active_time_seconds // 0\&quot;); COMPUTE_TIME=$(echo \&quot;$PERIOD_DATA\&quot; | jq -r \&quot;.compute_time_seconds // 0\&quot;); STORAGE_BYTES=$(echo \&quot;$PERIOD_DATA\&quot; | jq -r \&quot;.synthetic_storage_size_bytes // 0\&quot;); WRITTEN_BYTES=$(echo \&quot;$PERIOD_DATA\&quot; | jq -r \&quot;.written_data_bytes // 0\&quot;); ACTIVE_HOURS=$(( ACTIVE_TIME / 3600 )); COMPUTE_HOURS=$(( COMPUTE_TIME / 3600 )); if [ \&quot;$STORAGE_BYTES\&quot; -gt 0 ]; then STORAGE_MB=$(( STORAGE_BYTES / 1048576 )); if [ \&quot;$STORAGE_MB\&quot; -lt 1024 ]; then STORAGE_DISPLAY=\&quot;${STORAGE_MB}MB\&quot;; else STORAGE_GB=$(( STORAGE_MB / 1024 )); STORAGE_DISPLAY=\&quot;${STORAGE_GB}GB\&quot;; fi; else STORAGE_DISPLAY=\&quot;&lt;1MB\&quot;; fi; if [ \&quot;$WRITTEN_BYTES\&quot; -gt 0 ]; then WRITTEN_MB=$(( WRITTEN_BYTES / 1048576 )); ACTIVITY_DISPLAY=\&quot;${WRITTEN_MB}MB↑\&quot;; else ACTIVITY_DISPLAY=\&quot;idle\&quot;; fi; ESTIMATED_COST=$(echo \&quot;scale=2; ($ACTIVE_HOURS * 0.25) + ($STORAGE_MB * 0.0001)\&quot; | bc 2&gt;/dev/null || echo \&quot;0.00\&quot;); COST_DISPLAY=\&quot;\\$${ESTIMATED_COST}\&quot;; if [ \&quot;$ACTIVE_HOURS\&quot; -gt 100 ]; then USAGE_ICON=\&quot;🔴\&quot;; elif [ \&quot;$ACTIVE_HOURS\&quot; -gt 50 ]; then USAGE_ICON=\&quot;🟡\&quot;; else USAGE_ICON=\&quot;🟢\&quot;; fi; else ACTIVE_HOURS=0; STORAGE_DISPLAY=\&quot;n/a\&quot;; ACTIVITY_DISPLAY=\&quot;n/a\&quot;; COST_DISPLAY=\&quot;n/a\&quot;; USAGE_ICON=\&quot;❓\&quot;; fi; CURRENT_TIME=$(date \&quot;+%H:%M\&quot;); PLAN_TYPE=\&quot;free\&quot;; if [ \&quot;$ACTIVE_HOURS\&quot; -gt 100 ]; then PLAN_TYPE=\&quot;paid\&quot;; fi; echo \&quot;🐘 Neon $CONN_ICON $STATUS | 💾 $STORAGE_DISPLAY | $USAGE_ICON ${ACTIVE_HOURS}h compute | 💰 $COST_DISPLAY/$PLAN_TYPE | 📈 $ACTIVITY_DISPLAY | ⏰ $CURRENT_TIME | 📁 $DIR_NAME\&quot;; else echo \&quot;🐘 Neon 🔧 config-needed | ⚠️ set NEON_ENDPOINT, NEON_DATABASE, NEON_API_KEY &amp; NEON_PROJECT_ID | 📁 $DIR_NAME\&quot;; fi&#039;&quot;
+  }
+}</code>
       </div>
     </div>
 

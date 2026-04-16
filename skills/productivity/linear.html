@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,104 @@
     <p class="desc">Manage issues, projects & team workflows in Linear. Use when the user wants to read, create or updates tickets in Linear.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/linear</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/linear</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: linear
+description: Manage issues, projects &amp; team workflows in Linear. Use when the user wants to read, create or updates tickets in Linear.
+metadata:
+  short-description: Manage Linear issues in Codex
+---
+
+# Linear
+
+## Overview
+
+This skill provides a structured workflow for managing issues, projects &amp; team workflows in Linear. It ensures consistent integration with the Linear MCP server, which offers natural-language project management for issues, projects, documentation, and team collaboration.
+
+## Prerequisites
+- Linear MCP server must be connected and accessible via OAuth
+- Confirm access to the relevant Linear workspace, teams, and projects
+
+## Required Workflow
+
+**Follow these steps in order. Do not skip steps.**
+
+### Step 0: Set up Linear MCP (if not already configured)
+
+If any MCP call fails because Linear MCP is not connected, pause and set it up:
+
+1. Add the Linear MCP:
+   - `codex mcp add linear --url https://mcp.linear.app/mcp`
+2. Enable remote MCP client:
+   - Set `[features] rmcp_client = true` in `config.toml` **or** run `codex --enable rmcp_client`
+3. Log in with OAuth:
+   - `codex mcp login linear`
+
+After successful login, the user will have to restart codex. You should finish your answer and tell them so when they try again they can continue with Step 1.
+
+**Windows/WSL note:** If you see connection errors on Windows, try configuring the Linear MCP to run via WSL:
+```json
+{&quot;mcpServers&quot;: {&quot;linear&quot;: {&quot;command&quot;: &quot;wsl&quot;, &quot;args&quot;: [&quot;npx&quot;, &quot;-y&quot;, &quot;mcp-remote&quot;, &quot;https://mcp.linear.app/sse&quot;, &quot;--transport&quot;, &quot;sse-only&quot;]}}}
+```
+
+### Step 1
+Clarify the user&#039;s goal and scope (e.g., issue triage, sprint planning, documentation audit, workload balance). Confirm team/project, priority, labels, cycle, and due dates as needed.
+
+### Step 2
+Select the appropriate workflow (see Practical Workflows below) and identify the Linear MCP tools you will need. Confirm required identifiers (issue ID, project ID, team key) before calling tools.
+
+### Step 3
+Execute Linear MCP tool calls in logical batches:
+- Read first (list/get/search) to build context.
+- Create or update next (issues, projects, labels, comments) with all required fields.
+- For bulk operations, explain the grouping logic before applying changes.
+
+### Step 4
+Summarize results, call out remaining gaps or blockers, and propose next actions (additional issues, label changes, assignments, or follow-up comments).
+
+## Available Tools
+
+Issue Management: `list_issues`, `get_issue`, `create_issue`, `update_issue`, `list_my_issues`, `list_issue_statuses`, `list_issue_labels`, `create_issue_label`
+
+Project &amp; Team: `list_projects`, `get_project`, `create_project`, `update_project`, `list_teams`, `get_team`, `list_users`
+
+Documentation &amp; Collaboration: `list_documents`, `get_document`, `search_documentation`, `list_comments`, `create_comment`, `list_cycles`
+
+## Practical Workflows
+
+- Sprint Planning: Review open issues for a target team, pick top items by priority, and create a new cycle (e.g., &quot;Q1 Performance Sprint&quot;) with assignments.
+- Bug Triage: List critical/high-priority bugs, rank by user impact, and move the top items to &quot;In Progress.&quot;
+- Documentation Audit: Search documentation (e.g., API auth), then open labeled &quot;documentation&quot; issues for gaps or outdated sections with detailed fixes.
+- Team Workload Balance: Group active issues by assignee, flag anyone with high load, and suggest or apply redistributions.
+- Release Planning: Create a project (e.g., &quot;v2.0 Release&quot;) with milestones (feature freeze, beta, docs, launch) and generate issues with estimates.
+- Cross-Project Dependencies: Find all &quot;blocked&quot; issues, identify blockers, and create linked issues if missing.
+- Automated Status Updates: Find your issues with stale updates and add status comments based on current state/blockers.
+- Smart Labeling: Analyze unlabeled issues, suggest/apply labels, and create missing label categories.
+- Sprint Retrospectives: Generate a report for the last completed cycle, note completed vs. pushed work, and open discussion issues for patterns.
+
+## Tips for Maximum Productivity
+
+- Batch operations for related changes; consider smart templates for recurring issue structures.
+- Use natural queries when possible (&quot;Show me what John is working on this week&quot;).
+- Leverage context: reference prior issues in new requests.
+- Break large updates into smaller batches to avoid rate limits; cache or reuse filters when listing frequently.
+
+## Troubleshooting
+
+- Authentication: Clear browser cookies, re-run OAuth, verify workspace permissions, ensure API access is enabled.
+- Tool Calling Errors: Confirm the model supports multiple tool calls, provide all required fields, and split complex requests.
+- Missing Data: Refresh token, verify workspace access, check for archived projects, and confirm correct team selection.
+- Performance: Remember Linear API rate limits; batch bulk operations, use specific filters, or cache frequent queries.
+</code>
       </div>
     </div>
 

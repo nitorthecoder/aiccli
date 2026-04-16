@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,444 @@
     <p class="desc">GGUF format and llama.cpp quantization for efficient CPU/GPU inference. Use when deploying models on consumer hardware, Apple Silicon, or when needing flexible quantization from 2-8 bit without GPU requirements.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/optimization-gguf</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/optimization-gguf</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: gguf-quantization
+description: GGUF format and llama.cpp quantization for efficient CPU/GPU inference. Use when deploying models on consumer hardware, Apple Silicon, or when needing flexible quantization from 2-8 bit without GPU requirements.
+version: 1.0.0
+author: Orchestra Research
+license: MIT
+tags: [GGUF, Quantization, llama.cpp, CPU Inference, Apple Silicon, Model Compression, Optimization]
+dependencies: [llama-cpp-python&gt;=0.2.0]
+---
+
+# GGUF - Quantization Format for llama.cpp
+
+The GGUF (GPT-Generated Unified Format) is the standard file format for llama.cpp, enabling efficient inference on CPUs, Apple Silicon, and GPUs with flexible quantization options.
+
+## When to use GGUF
+
+**Use GGUF when:**
+- Deploying on consumer hardware (laptops, desktops)
+- Running on Apple Silicon (M1/M2/M3) with Metal acceleration
+- Need CPU inference without GPU requirements
+- Want flexible quantization (Q2_K to Q8_0)
+- Using local AI tools (LM Studio, Ollama, text-generation-webui)
+
+**Key advantages:**
+- **Universal hardware**: CPU, Apple Silicon, NVIDIA, AMD support
+- **No Python runtime**: Pure C/C++ inference
+- **Flexible quantization**: 2-8 bit with various methods (K-quants)
+- **Ecosystem support**: LM Studio, Ollama, koboldcpp, and more
+- **imatrix**: Importance matrix for better low-bit quality
+
+**Use alternatives instead:**
+- **AWQ/GPTQ**: Maximum accuracy with calibration on NVIDIA GPUs
+- **HQQ**: Fast calibration-free quantization for HuggingFace
+- **bitsandbytes**: Simple integration with transformers library
+- **TensorRT-LLM**: Production NVIDIA deployment with maximum speed
+
+## Quick start
+
+### Installation
+
+```bash
+# Clone llama.cpp
+git clone https://github.com/ggml-org/llama.cpp
+cd llama.cpp
+
+# Build (CPU)
+make
+
+# Build with CUDA (NVIDIA)
+make GGML_CUDA=1
+
+# Build with Metal (Apple Silicon)
+make GGML_METAL=1
+
+# Install Python bindings (optional)
+pip install llama-cpp-python
+```
+
+### Convert model to GGUF
+
+```bash
+# Install requirements
+pip install -r requirements.txt
+
+# Convert HuggingFace model to GGUF (FP16)
+python convert_hf_to_gguf.py ./path/to/model --outfile model-f16.gguf
+
+# Or specify output type
+python convert_hf_to_gguf.py ./path/to/model \
+    --outfile model-f16.gguf \
+    --outtype f16
+```
+
+### Quantize model
+
+```bash
+# Basic quantization to Q4_K_M
+./llama-quantize model-f16.gguf model-q4_k_m.gguf Q4_K_M
+
+# Quantize with importance matrix (better quality)
+./llama-imatrix -m model-f16.gguf -f calibration.txt -o model.imatrix
+./llama-quantize --imatrix model.imatrix model-f16.gguf model-q4_k_m.gguf Q4_K_M
+```
+
+### Run inference
+
+```bash
+# CLI inference
+./llama-cli -m model-q4_k_m.gguf -p &quot;Hello, how are you?&quot;
+
+# Interactive mode
+./llama-cli -m model-q4_k_m.gguf --interactive
+
+# With GPU offload
+./llama-cli -m model-q4_k_m.gguf -ngl 35 -p &quot;Hello!&quot;
+```
+
+## Quantization types
+
+### K-quant methods (recommended)
+
+| Type | Bits | Size (7B) | Quality | Use Case |
+|------|------|-----------|---------|----------|
+| Q2_K | 2.5 | ~2.8 GB | Low | Extreme compression |
+| Q3_K_S | 3.0 | ~3.0 GB | Low-Med | Memory constrained |
+| Q3_K_M | 3.3 | ~3.3 GB | Medium | Balance |
+| Q4_K_S | 4.0 | ~3.8 GB | Med-High | Good balance |
+| Q4_K_M | 4.5 | ~4.1 GB | High | **Recommended default** |
+| Q5_K_S | 5.0 | ~4.6 GB | High | Quality focused |
+| Q5_K_M | 5.5 | ~4.8 GB | Very High | High quality |
+| Q6_K | 6.0 | ~5.5 GB | Excellent | Near-original |
+| Q8_0 | 8.0 | ~7.2 GB | Best | Maximum quality |
+
+### Legacy methods
+
+| Type | Description |
+|------|-------------|
+| Q4_0 | 4-bit, basic |
+| Q4_1 | 4-bit with delta |
+| Q5_0 | 5-bit, basic |
+| Q5_1 | 5-bit with delta |
+
+**Recommendation**: Use K-quant methods (Q4_K_M, Q5_K_M) for best quality/size ratio.
+
+## Conversion workflows
+
+### Workflow 1: HuggingFace to GGUF
+
+```bash
+# 1. Download model
+huggingface-cli download meta-llama/Llama-3.1-8B --local-dir ./llama-3.1-8b
+
+# 2. Convert to GGUF (FP16)
+python convert_hf_to_gguf.py ./llama-3.1-8b \
+    --outfile llama-3.1-8b-f16.gguf \
+    --outtype f16
+
+# 3. Quantize
+./llama-quantize llama-3.1-8b-f16.gguf llama-3.1-8b-q4_k_m.gguf Q4_K_M
+
+# 4. Test
+./llama-cli -m llama-3.1-8b-q4_k_m.gguf -p &quot;Hello!&quot; -n 50
+```
+
+### Workflow 2: With importance matrix (better quality)
+
+```bash
+# 1. Convert to GGUF
+python convert_hf_to_gguf.py ./model --outfile model-f16.gguf
+
+# 2. Create calibration text (diverse samples)
+cat &gt; calibration.txt &lt;&lt; &#039;EOF&#039;
+The quick brown fox jumps over the lazy dog.
+Machine learning is a subset of artificial intelligence.
+Python is a popular programming language.
+# Add more diverse text samples...
+EOF
+
+# 3. Generate importance matrix
+./llama-imatrix -m model-f16.gguf \
+    -f calibration.txt \
+    --chunk 512 \
+    -o model.imatrix \
+    -ngl 35  # GPU layers if available
+
+# 4. Quantize with imatrix
+./llama-quantize --imatrix model.imatrix \
+    model-f16.gguf \
+    model-q4_k_m.gguf \
+    Q4_K_M
+```
+
+### Workflow 3: Multiple quantizations
+
+```bash
+#!/bin/bash
+MODEL=&quot;llama-3.1-8b-f16.gguf&quot;
+IMATRIX=&quot;llama-3.1-8b.imatrix&quot;
+
+# Generate imatrix once
+./llama-imatrix -m $MODEL -f wiki.txt -o $IMATRIX -ngl 35
+
+# Create multiple quantizations
+for QUANT in Q4_K_M Q5_K_M Q6_K Q8_0; do
+    OUTPUT=&quot;llama-3.1-8b-${QUANT,,}.gguf&quot;
+    ./llama-quantize --imatrix $IMATRIX $MODEL $OUTPUT $QUANT
+    echo &quot;Created: $OUTPUT ($(du -h $OUTPUT | cut -f1))&quot;
+done
+```
+
+## Python usage
+
+### llama-cpp-python
+
+```python
+from llama_cpp import Llama
+
+# Load model
+llm = Llama(
+    model_path=&quot;./model-q4_k_m.gguf&quot;,
+    n_ctx=4096,          # Context window
+    n_gpu_layers=35,     # GPU offload (0 for CPU only)
+    n_threads=8          # CPU threads
+)
+
+# Generate
+output = llm(
+    &quot;What is machine learning?&quot;,
+    max_tokens=256,
+    temperature=0.7,
+    stop=[&quot;&lt;/s&gt;&quot;, &quot;\n\n&quot;]
+)
+print(output[&quot;choices&quot;][0][&quot;text&quot;])
+```
+
+### Chat completion
+
+```python
+from llama_cpp import Llama
+
+llm = Llama(
+    model_path=&quot;./model-q4_k_m.gguf&quot;,
+    n_ctx=4096,
+    n_gpu_layers=35,
+    chat_format=&quot;llama-3&quot;  # Or &quot;chatml&quot;, &quot;mistral&quot;, etc.
+)
+
+messages = [
+    {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a helpful assistant.&quot;},
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;What is Python?&quot;}
+]
+
+response = llm.create_chat_completion(
+    messages=messages,
+    max_tokens=256,
+    temperature=0.7
+)
+print(response[&quot;choices&quot;][0][&quot;message&quot;][&quot;content&quot;])
+```
+
+### Streaming
+
+```python
+from llama_cpp import Llama
+
+llm = Llama(model_path=&quot;./model-q4_k_m.gguf&quot;, n_gpu_layers=35)
+
+# Stream tokens
+for chunk in llm(
+    &quot;Explain quantum computing:&quot;,
+    max_tokens=256,
+    stream=True
+):
+    print(chunk[&quot;choices&quot;][0][&quot;text&quot;], end=&quot;&quot;, flush=True)
+```
+
+## Server mode
+
+### Start OpenAI-compatible server
+
+```bash
+# Start server
+./llama-server -m model-q4_k_m.gguf \
+    --host 0.0.0.0 \
+    --port 8080 \
+    -ngl 35 \
+    -c 4096
+
+# Or with Python bindings
+python -m llama_cpp.server \
+    --model model-q4_k_m.gguf \
+    --n_gpu_layers 35 \
+    --host 0.0.0.0 \
+    --port 8080
+```
+
+### Use with OpenAI client
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url=&quot;http://localhost:8080/v1&quot;,
+    api_key=&quot;not-needed&quot;
+)
+
+response = client.chat.completions.create(
+    model=&quot;local-model&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}],
+    max_tokens=256
+)
+print(response.choices[0].message.content)
+```
+
+## Hardware optimization
+
+### Apple Silicon (Metal)
+
+```bash
+# Build with Metal
+make clean &amp;&amp; make GGML_METAL=1
+
+# Run with Metal acceleration
+./llama-cli -m model.gguf -ngl 99 -p &quot;Hello&quot;
+
+# Python with Metal
+llm = Llama(
+    model_path=&quot;model.gguf&quot;,
+    n_gpu_layers=99,     # Offload all layers
+    n_threads=1          # Metal handles parallelism
+)
+```
+
+### NVIDIA CUDA
+
+```bash
+# Build with CUDA
+make clean &amp;&amp; make GGML_CUDA=1
+
+# Run with CUDA
+./llama-cli -m model.gguf -ngl 35 -p &quot;Hello&quot;
+
+# Specify GPU
+CUDA_VISIBLE_DEVICES=0 ./llama-cli -m model.gguf -ngl 35
+```
+
+### CPU optimization
+
+```bash
+# Build with AVX2/AVX512
+make clean &amp;&amp; make
+
+# Run with optimal threads
+./llama-cli -m model.gguf -t 8 -p &quot;Hello&quot;
+
+# Python CPU config
+llm = Llama(
+    model_path=&quot;model.gguf&quot;,
+    n_gpu_layers=0,      # CPU only
+    n_threads=8,         # Match physical cores
+    n_batch=512          # Batch size for prompt processing
+)
+```
+
+## Integration with tools
+
+### Ollama
+
+```bash
+# Create Modelfile
+cat &gt; Modelfile &lt;&lt; &#039;EOF&#039;
+FROM ./model-q4_k_m.gguf
+TEMPLATE &quot;&quot;&quot;{{ .System }}
+{{ .Prompt }}&quot;&quot;&quot;
+PARAMETER temperature 0.7
+PARAMETER num_ctx 4096
+EOF
+
+# Create Ollama model
+ollama create mymodel -f Modelfile
+
+# Run
+ollama run mymodel &quot;Hello!&quot;
+```
+
+### LM Studio
+
+1. Place GGUF file in `~/.cache/lm-studio/models/`
+2. Open LM Studio and select the model
+3. Configure context length and GPU offload
+4. Start inference
+
+### text-generation-webui
+
+```bash
+# Place in models folder
+cp model-q4_k_m.gguf text-generation-webui/models/
+
+# Start with llama.cpp loader
+python server.py --model model-q4_k_m.gguf --loader llama.cpp --n-gpu-layers 35
+```
+
+## Best practices
+
+1. **Use K-quants**: Q4_K_M offers best quality/size balance
+2. **Use imatrix**: Always use importance matrix for Q4 and below
+3. **GPU offload**: Offload as many layers as VRAM allows
+4. **Context length**: Start with 4096, increase if needed
+5. **Thread count**: Match physical CPU cores, not logical
+6. **Batch size**: Increase n_batch for faster prompt processing
+
+## Common issues
+
+**Model loads slowly:**
+```bash
+# Use mmap for faster loading
+./llama-cli -m model.gguf --mmap
+```
+
+**Out of memory:**
+```bash
+# Reduce GPU layers
+./llama-cli -m model.gguf -ngl 20  # Reduce from 35
+
+# Or use smaller quantization
+./llama-quantize model-f16.gguf model-q3_k_m.gguf Q3_K_M
+```
+
+**Poor quality at low bits:**
+```bash
+# Always use imatrix for Q4 and below
+./llama-imatrix -m model-f16.gguf -f calibration.txt -o model.imatrix
+./llama-quantize --imatrix model.imatrix model-f16.gguf model-q4_k_m.gguf Q4_K_M
+```
+
+## References
+
+- **[Advanced Usage](references/advanced-usage.md)** - Batching, speculative decoding, custom builds
+- **[Troubleshooting](references/troubleshooting.md)** - Common issues, debugging, benchmarks
+
+## Resources
+
+- **Repository**: https://github.com/ggml-org/llama.cpp
+- **Python Bindings**: https://github.com/abetlen/llama-cpp-python
+- **Pre-quantized Models**: https://huggingface.co/TheBloke
+- **GGUF Converter**: https://huggingface.co/spaces/ggml-org/gguf-my-repo
+- **License**: MIT
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,300 @@
     <p class="desc">"Crawl entire websites using Cloudflare Browser Rendering /crawl API. Initiates async crawl jobs, polls for completion, and saves results as markdown files. Useful for ingesting documentation sites, knowledge bases, or any web content into your project context. Requires CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN environment variables."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/cf-crawl</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/cf-crawl</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: cf-crawl
+description: &quot;Crawl entire websites using Cloudflare Browser Rendering /crawl API. Initiates async crawl jobs, polls for completion, and saves results as markdown files. Useful for ingesting documentation sites, knowledge bases, or any web content into your project context. Requires CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN environment variables.&quot;
+---
+
+# Cloudflare Website Crawler
+
+You are a web crawling assistant that uses Cloudflare&#039;s Browser Rendering /crawl REST API to crawl websites and save their content as markdown files for local use.
+
+## Prerequisites
+
+The user must have:
+1. A Cloudflare account with Browser Rendering enabled
+2. `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` available (see below)
+
+## Workflow
+
+When the user asks to crawl a website, follow this exact workflow:
+
+### Step 1: Load Credentials
+
+Look for `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` in this order:
+
+1. **Current environment variables** - Check if already exported in the shell
+2. **Project `.env` file** - Read `.env` in the current working directory and extract the values
+3. **Project `.env.local` file** - Read `.env.local` in the current working directory
+4. **Home directory `.env`** - Read `~/.env` as a last resort
+
+To load from a `.env` file, parse it line by line looking for `CLOUDFLARE_ACCOUNT_ID=` and `CLOUDFLARE_API_TOKEN=` entries. Use this bash approach:
+
+```bash
+# Load from .env if vars are not already set
+if [ -z &quot;$CLOUDFLARE_ACCOUNT_ID&quot; ] || [ -z &quot;$CLOUDFLARE_API_TOKEN&quot; ]; then
+  for envfile in .env .env.local &quot;$HOME/.env&quot;; do
+    if [ -f &quot;$envfile&quot; ]; then
+      eval &quot;$(grep -E &#039;^CLOUDFLARE_(ACCOUNT_ID|API_TOKEN)=&#039; &quot;$envfile&quot; | sed &#039;s/^/export /&#039;)&quot;
+    fi
+  done
+fi
+```
+
+If credentials are still missing after checking all sources, tell the user to add them to their project `.env` file:
+```
+CLOUDFLARE_ACCOUNT_ID=your-account-id
+CLOUDFLARE_API_TOKEN=your-api-token
+```
+
+The API token needs &quot;Browser Rendering - Edit&quot; permission. Create one at [Cloudflare Dashboard &gt; API Tokens](https://dash.cloudflare.com/profile/api-tokens).
+
+### Step 2: Validate Credentials
+
+Verify both variables are set and non-empty before proceeding.
+
+### Step 3: Initiate Crawl
+
+Send a POST request to start the crawl job. Choose parameters based on user needs:
+
+```bash
+curl -s -X POST &quot;https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/browser-rendering/crawl&quot; \
+  -H &quot;Authorization: Bearer ${CLOUDFLARE_API_TOKEN}&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{
+    &quot;url&quot;: &quot;&lt;TARGET_URL&gt;&quot;,
+    &quot;limit&quot;: &lt;NUMBER_OF_PAGES&gt;,
+    &quot;formats&quot;: [&quot;markdown&quot;],
+    &quot;options&quot;: {
+      &quot;excludePatterns&quot;: [&quot;**/changelog/**&quot;, &quot;**/api-reference/**&quot;]
+    }
+  }&#039;
+```
+
+For incremental crawls, add the `modifiedSince` parameter (Unix timestamp in seconds):
+
+```bash
+curl -s -X POST &quot;https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/browser-rendering/crawl&quot; \
+  -H &quot;Authorization: Bearer ${CLOUDFLARE_API_TOKEN}&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{
+    &quot;url&quot;: &quot;&lt;TARGET_URL&gt;&quot;,
+    &quot;limit&quot;: &lt;NUMBER_OF_PAGES&gt;,
+    &quot;formats&quot;: [&quot;markdown&quot;],
+    &quot;modifiedSince&quot;: &lt;UNIX_TIMESTAMP&gt;
+  }&#039;
+```
+
+When `--since` is provided, convert to Unix timestamp: `date -d &quot;2026-03-10&quot; +%s` (Linux) or `date -j -f &quot;%Y-%m-%d&quot; &quot;2026-03-10&quot; +%s` (macOS).
+
+The response returns a job ID:
+```json
+{&quot;success&quot;: true, &quot;result&quot;: &quot;job-uuid-here&quot;}
+```
+
+### Step 4: Poll for Completion
+
+Poll the job status every 5 seconds until it completes:
+
+```bash
+curl -s -X GET &quot;https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/browser-rendering/crawl/&lt;JOB_ID&gt;?limit=1&quot; \
+  -H &quot;Authorization: Bearer ${CLOUDFLARE_API_TOKEN}&quot; | python3 -c &quot;import sys,json; d=json.load(sys.stdin); print(f&#039;Status: {d[\&quot;result\&quot;][\&quot;status\&quot;]} | Finished: {d[\&quot;result\&quot;][\&quot;finished\&quot;]}/{d[\&quot;result\&quot;][\&quot;total\&quot;]}&#039;)&quot;
+```
+
+Possible job statuses:
+- `running` - Still in progress, keep polling
+- `completed` - All pages processed
+- `cancelled_due_to_timeout` - Exceeded 7-day limit
+- `cancelled_due_to_limits` - Hit account limits
+- `errored` - Something went wrong
+
+### Step 5: Retrieve Results
+
+When using `modifiedSince`, check for skipped pages to see what was unchanged:
+
+```bash
+# See which pages were skipped (not modified since the given timestamp)
+curl -s -X GET &quot;https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/browser-rendering/crawl/&lt;JOB_ID&gt;?status=skipped&amp;limit=50&quot; \
+  -H &quot;Authorization: Bearer ${CLOUDFLARE_API_TOKEN}&quot;
+```
+
+Fetch all completed records using pagination (cursor-based):
+
+```bash
+curl -s -X GET &quot;https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/browser-rendering/crawl/&lt;JOB_ID&gt;?status=completed&amp;limit=50&quot; \
+  -H &quot;Authorization: Bearer ${CLOUDFLARE_API_TOKEN}&quot;
+```
+
+If there are more records, use the `cursor` value from the response:
+```bash
+curl -s -X GET &quot;https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/browser-rendering/crawl/&lt;JOB_ID&gt;?status=completed&amp;limit=50&amp;cursor=&lt;CURSOR&gt;&quot; \
+  -H &quot;Authorization: Bearer ${CLOUDFLARE_API_TOKEN}&quot;
+```
+
+### Step 6: Save Results
+
+Save each page&#039;s markdown content to a local directory. Use a script like:
+
+```bash
+# Create output directory
+mkdir -p .crawl-output
+
+# Fetch and save all pages
+python3 -c &quot;
+import json, os, re, sys, urllib.request
+
+account_id = os.environ[&#039;CLOUDFLARE_ACCOUNT_ID&#039;]
+api_token = os.environ[&#039;CLOUDFLARE_API_TOKEN&#039;]
+job_id = &#039;&lt;JOB_ID&gt;&#039;
+base = f&#039;https://api.cloudflare.com/client/v4/accounts/{account_id}/browser-rendering/crawl/{job_id}&#039;
+outdir = &#039;.crawl-output&#039;
+os.makedirs(outdir, exist_ok=True)
+
+cursor = None
+total_saved = 0
+
+while True:
+    url = f&#039;{base}?status=completed&amp;limit=50&#039;
+    if cursor:
+        url += f&#039;&amp;cursor={cursor}&#039;
+
+    req = urllib.request.Request(url, headers={
+        &#039;Authorization&#039;: f&#039;Bearer {api_token}&#039;
+    })
+    with urllib.request.urlopen(req) as resp:
+        data = json.load(resp)
+
+    records = data.get(&#039;result&#039;, {}).get(&#039;records&#039;, [])
+    if not records:
+        break
+
+    for rec in records:
+        page_url = rec.get(&#039;url&#039;, &#039;&#039;)
+        md = rec.get(&#039;markdown&#039;, &#039;&#039;)
+        if not md:
+            continue
+        # Convert URL to filename
+        name = re.sub(r&#039;https?://&#039;, &#039;&#039;, page_url)
+        name = re.sub(r&#039;[^a-zA-Z0-9]&#039;, &#039;_&#039;, name).strip(&#039;_&#039;)[:120]
+        filepath = os.path.join(outdir, f&#039;{name}.md&#039;)
+        with open(filepath, &#039;w&#039;) as f:
+            f.write(f&#039;&lt;!-- Source: {page_url} --&gt;\n\n&#039;)
+            f.write(md)
+        total_saved += 1
+
+    cursor = data.get(&#039;result&#039;, {}).get(&#039;cursor&#039;)
+    if cursor is None:
+        break
+
+print(f&#039;Saved {total_saved} pages to {outdir}/&#039;)
+&quot;
+```
+
+## Parameter Reference
+
+### Core Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `url` | string | (required) | Starting URL to crawl |
+| `limit` | number | 10 | Max pages to crawl (up to 100,000) |
+| `depth` | number | 100,000 | Max link depth from starting URL |
+| `formats` | array | [&quot;html&quot;] | Output formats: `html`, `markdown`, `json` |
+| `render` | boolean | true | `true` = headless browser, `false` = fast HTML fetch |
+| `source` | string | &quot;all&quot; | Page discovery: `all`, `sitemaps`, `links` |
+| `maxAge` | number | 86400 | Cache validity in seconds (max 604800) |
+| `modifiedSince` | number | - | Unix timestamp; only crawl pages modified after this time |
+
+### Options Object
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `includePatterns` | array | [] | Wildcard patterns to include (`*` and `**`) |
+| `excludePatterns` | array | [] | Wildcard patterns to exclude (higher priority) |
+| `includeSubdomains` | boolean | false | Follow links to subdomains |
+| `includeExternalLinks` | boolean | false | Follow external links |
+
+### Advanced Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `jsonOptions` | object | AI-powered structured extraction (prompt, response_format) |
+| `authenticate` | object | HTTP basic auth (username, password) |
+| `setExtraHTTPHeaders` | object | Custom headers for requests |
+| `rejectResourceTypes` | array | Skip: image, media, font, stylesheet |
+| `userAgent` | string | Custom user agent string |
+| `cookies` | array | Custom cookies for requests |
+
+## Usage Examples
+
+### Crawl documentation site (most common)
+```
+/cf-crawl https://docs.example.com --limit 50
+```
+Crawls up to 50 pages, saves as markdown.
+
+### Crawl with filters
+```
+/cf-crawl https://docs.example.com --limit 100 --include &quot;/guides/**,/api/**&quot; --exclude &quot;/changelog/**&quot;
+```
+
+### Incremental crawl (diff detection)
+```
+/cf-crawl https://docs.example.com --limit 50 --since 2026-03-10
+```
+Only crawls pages modified since the given date. Skipped pages appear with `status=skipped` in results. This is ideal for daily doc-syncing: do one full crawl, then incremental updates to see only what changed.
+
+### Fast crawl without JavaScript rendering
+```
+/cf-crawl https://docs.example.com --no-render --limit 200
+```
+Uses static HTML fetch - faster and cheaper but won&#039;t capture JS-rendered content.
+
+### Crawl and merge into single file
+```
+/cf-crawl https://docs.example.com --limit 50 --merge
+```
+Merges all pages into a single markdown file for easy context loading.
+
+## Argument Parsing
+
+When invoked as `/cf-crawl`, parse the arguments as follows:
+
+- First positional argument: the URL to crawl
+- `--limit N` or `-l N`: max pages (default: 20)
+- `--depth N` or `-d N`: max depth (default: 100000)
+- `--include &quot;pattern1,pattern2&quot;`: include URL patterns
+- `--exclude &quot;pattern1,pattern2&quot;`: exclude URL patterns
+- `--no-render`: disable JavaScript rendering (faster)
+- `--merge`: combine all output into a single file
+- `--output DIR` or `-o DIR`: output directory (default: `.crawl-output`)
+- `--source sitemaps|links|all`: page discovery method (default: all)
+- `--since DATE`: only crawl pages modified since DATE (ISO date like `2026-03-10` or Unix timestamp). Converts to Unix timestamp for the `modifiedSince` API parameter
+
+If no URL is provided, ask the user for the target URL.
+
+## Important Notes
+
+- The /crawl endpoint respects robots.txt directives including crawl-delay
+- Blocked URLs appear with `&quot;status&quot;: &quot;disallowed&quot;` in results
+- Free plan: 10 minutes of browser time per day
+- Job results are available for 14 days after completion
+- Max job runtime: 7 days
+- Response page size limit: 10 MB per page
+- Use `render: false` for static sites to save browser time
+- Pattern wildcards: `*` matches any character except `/`, `**` matches including `/`
+</code>
       </div>
     </div>
 

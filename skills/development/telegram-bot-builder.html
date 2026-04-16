@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,235 @@
     <p class="desc">This skill should be used when the user asks to "create a Telegram bot", "build a Telegram chatbot", "set up a Telegram webhook", "add inline keyboards to a bot", "handle Telegram callback queries", "implement Telegram payments", "send media via Telegram bot", "configure Telegram bot commands", "deploy a Telegram bot", or mentions the Telegram Bot API, telegram bot tokens, getUpdates, setWebhook, or bot frameworks like node-telegram-bot-api, grammy, python-telegram-bot, or aiogram. Provides comprehensive guidance for building production-ready Telegram bots with Node.js and Python.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/telegram-bot-builder</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/telegram-bot-builder</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: Telegram Bot Builder
+description: This skill should be used when the user asks to &quot;create a Telegram bot&quot;, &quot;build a Telegram chatbot&quot;, &quot;set up a Telegram webhook&quot;, &quot;add inline keyboards to a bot&quot;, &quot;handle Telegram callback queries&quot;, &quot;implement Telegram payments&quot;, &quot;send media via Telegram bot&quot;, &quot;configure Telegram bot commands&quot;, &quot;deploy a Telegram bot&quot;, or mentions the Telegram Bot API, telegram bot tokens, getUpdates, setWebhook, or bot frameworks like node-telegram-bot-api, grammy, python-telegram-bot, or aiogram. Provides comprehensive guidance for building production-ready Telegram bots with Node.js and Python.
+---
+
+# Telegram Bot Builder
+
+Comprehensive guidance for building Telegram bots using the Bot API (v9.4). Covers both Node.js and Python ecosystems with production-ready patterns for authentication, messaging, keyboards, media handling, payments, inline mode, webhooks, and deployment.
+
+## When to Use This Skill
+
+Use this skill when:
+- Building a new Telegram bot from scratch
+- Integrating Telegram messaging into an existing application
+- Setting up webhooks or long polling for bot updates
+- Creating interactive menus with inline keyboards and callback queries
+- Handling media (photos, videos, documents, stickers)
+- Implementing Telegram Payments or Telegram Stars
+- Building inline mode functionality
+- Managing groups, channels, or forum topics via bot
+- Deploying bots to production (Docker, PM2, serverless)
+
+## Core Concepts
+
+### Authentication
+
+Every bot has a unique token obtained from [@BotFather](https://t.me/BotFather). Token format: `123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11`.
+
+All API calls go to: `https://api.telegram.org/bot&lt;TOKEN&gt;/METHOD_NAME`
+
+```bash
+# .env file
+BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
+```
+
+Store the token in environment variables. Never commit it to source code.
+
+### Receiving Updates: Polling vs Webhook
+
+**Long Polling** (`getUpdates`) - Simpler, no HTTPS required, ideal for development:
+
+```javascript
+// Node.js with node-telegram-bot-api
+const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+```
+
+```python
+# Python with python-telegram-bot
+app = Application.builder().token(os.getenv(&quot;BOT_TOKEN&quot;)).build()
+app.run_polling()
+```
+
+**Webhook** (`setWebhook`) - Better for production, lower latency, requires HTTPS (ports 443, 80, 88, or 8443):
+
+```javascript
+bot.setWebHook(&#039;https://yourdomain.com/webhook&#039;, { secret_token: SECRET });
+```
+
+Choose polling for development and small bots. Choose webhooks for production deployments handling high traffic.
+
+### Message Types &amp; Formatting
+
+Send text with `sendMessage`. Supported parse modes:
+
+- **HTML**: `&lt;b&gt;bold&lt;/b&gt;`, `&lt;i&gt;italic&lt;/i&gt;`, `&lt;code&gt;code&lt;/code&gt;`, `&lt;pre&gt;block&lt;/pre&gt;`, `&lt;a href=&quot;url&quot;&gt;link&lt;/a&gt;`, `&lt;tg-spoiler&gt;spoiler&lt;/tg-spoiler&gt;`
+- **MarkdownV2**: `*bold*`, `_italic_`, `` `code` ``, ` ```block``` `, `[link](url)`, `||spoiler||`. Requires escaping: `_*[]()~&gt;#+-=|{}.!`
+
+Prefer HTML for easier escaping. Use MarkdownV2 when simpler formatting suffices.
+
+### Keyboards &amp; Interactive Elements
+
+**Inline Keyboard** - Buttons attached to messages:
+
+```javascript
+bot.sendMessage(chatId, &#039;Choose:&#039;, {
+  reply_markup: {
+    inline_keyboard: [
+      [{ text: &#039;Option A&#039;, callback_data: &#039;a&#039; }, { text: &#039;Option B&#039;, callback_data: &#039;b&#039; }],
+      [{ text: &#039;Visit Site&#039;, url: &#039;https://example.com&#039; }]
+    ]
+  }
+});
+```
+
+**Reply Keyboard** - Custom keyboard below input field:
+
+```javascript
+bot.sendMessage(chatId, &#039;Choose:&#039;, {
+  reply_markup: {
+    keyboard: [[{ text: &#039;📊 Stats&#039; }, { text: &#039;⚙️ Settings&#039; }]],
+    resize_keyboard: true,
+    one_time_keyboard: true
+  }
+});
+```
+
+Handle inline button presses with `callback_query`. The `callback_data` field is limited to 64 bytes. Always call `answerCallbackQuery` to dismiss the loading indicator.
+
+### Sending Media
+
+```javascript
+// Photo (file_id, URL, or upload)
+bot.sendPhoto(chatId, &#039;https://example.com/photo.jpg&#039;, { caption: &#039;A photo&#039; });
+
+// Document
+bot.sendDocument(chatId, fs.createReadStream(&#039;./file.pdf&#039;), { caption: &#039;Report&#039; });
+
+// Album (2-10 items)
+bot.sendMediaGroup(chatId, [
+  { type: &#039;photo&#039;, media: &#039;https://example.com/1.jpg&#039;, caption: &#039;First&#039; },
+  { type: &#039;photo&#039;, media: &#039;https://example.com/2.jpg&#039; }
+]);
+```
+
+Three ways to specify files: `file_id` (reuse previously uploaded), HTTP URL (Telegram downloads it), or multipart upload. File limits: 50MB upload, 20MB download via Bot API.
+
+### Conversation State
+
+For multi-step interactions (registration, forms, wizards), maintain conversation state per chat:
+
+- **Node.js**: Use a `Map` or Redis to track `{ step, data }` per `chatId`
+- **Python**: Use `ConversationHandler` from `python-telegram-bot` (built-in state machine)
+
+See `reference/patterns_and_examples.md` for complete conversation flow implementations.
+
+### Error Handling
+
+Handle common error scenarios:
+- **429 Too Many Requests**: Read `retry_after` from response, wait, then retry
+- **403 Forbidden**: Bot was blocked by user or removed from chat
+- **400 Bad Request**: Invalid parameters (check `description` field)
+- **409 Conflict**: Another bot instance using same token with polling
+
+Rate limits: ~30 messages/second to different chats, ~20 messages/minute to same group. Implement exponential backoff for retries.
+
+### Bot Commands
+
+Register commands visible in the Telegram menu:
+
+```javascript
+bot.setMyCommands([
+  { command: &#039;start&#039;, description: &#039;Start the bot&#039; },
+  { command: &#039;help&#039;, description: &#039;Show help&#039; },
+  { command: &#039;settings&#039;, description: &#039;Bot settings&#039; }
+]);
+```
+
+Commands can be scoped to specific chats, users, or languages using `BotCommandScope`.
+
+## Common Patterns
+
+### Quick Start (Node.js)
+
+```bash
+mkdir my-bot &amp;&amp; cd my-bot
+npm init -y
+npm install node-telegram-bot-api dotenv
+echo &quot;BOT_TOKEN=your_token_here&quot; &gt; .env
+```
+
+### Quick Start (Python)
+
+```bash
+mkdir my-bot &amp;&amp; cd my-bot
+pip install python-telegram-bot python-dotenv
+echo &quot;BOT_TOKEN=your_token_here&quot; &gt; .env
+```
+
+### Popular Libraries
+
+| Language | Library | Style | Best For |
+|---|---|---|---|
+| Node.js | `node-telegram-bot-api` | Callback-based | Simple bots, quick prototypes |
+| Node.js | `grammy` | Middleware-based | Complex bots, plugins |
+| Node.js | `telegraf` | Middleware-based | Mature ecosystem |
+| Python | `python-telegram-bot` | Handler-based | Full-featured, conversations |
+| Python | `aiogram` | Async-first | High-performance async bots |
+
+### Key API Method Categories
+
+| Category | Key Methods |
+|---|---|
+| Messages | `sendMessage`, `sendPhoto`, `sendVideo`, `sendDocument`, `editMessageText`, `deleteMessage` |
+| Keyboards | `InlineKeyboardMarkup`, `ReplyKeyboardMarkup`, `answerCallbackQuery` |
+| Chat Mgmt | `getChat`, `banChatMember`, `promoteChatMember`, `setChatPermissions` |
+| Files | `getFile`, `sendMediaGroup`, `sendDocument` |
+| Inline Mode | `answerInlineQuery` with `InlineQueryResult*` types |
+| Payments | `sendInvoice`, `answerPreCheckoutQuery` (use `currency: &quot;XTR&quot;` for Telegram Stars) |
+| Bot Config | `setMyCommands`, `setMyDescription`, `setWebhook` |
+
+## Deployment Options
+
+- **PM2**: `pm2 start bot.js --name telegram-bot` - Process manager with auto-restart
+- **Docker**: Containerized deployment with `docker-compose`
+- **Serverless**: Webhook handler as Vercel/AWS Lambda function
+- **VPS**: Direct deployment with systemd service
+
+See `reference/patterns_and_examples.md` for Docker, PM2, and serverless deployment configurations.
+
+## Security Checklist
+
+- Store `BOT_TOKEN` in environment variables
+- Validate `X-Telegram-Bot-Api-Secret-Token` on webhook endpoints
+- Verify user IDs for admin commands
+- Implement per-user rate limiting
+- Sanitize user input before database storage
+- Use HTTPS for all webhook endpoints
+- Restrict `allowed_updates` to only needed types
+
+## Reference Files
+
+For detailed API documentation and implementation patterns, consult:
+
+- **[`reference/api_methods.md`](./reference/api_methods.md)** - Complete list of 100+ Bot API methods organized by category (messaging, chat management, stickers, payments, inline mode, games, forum topics, gifts, passport, and more)
+- **[`reference/api_types.md`](./reference/api_types.md)** - Complete list of 200+ Bot API types with all fields (Update, Message, Chat, User, keyboards, media types, payment types, chat members, reactions, and more)
+- **[`reference/patterns_and_examples.md`](./reference/patterns_and_examples.md)** - Production-ready implementation patterns for Node.js and Python including: inline keyboards, webhooks, media handling, conversation state management, database integration, admin panels, multi-language support, Docker/PM2/serverless deployment, Telegram Stars payments, and inline mode
+
+When building a bot, start with SKILL.md for core concepts, then load the appropriate reference file for detailed API information or implementation patterns as needed.
+</code>
       </div>
     </div>
 

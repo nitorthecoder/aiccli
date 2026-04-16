@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,415 @@
     <p class="desc">"Access ZINC (230M+ purchasable compounds). Search by ZINC ID/SMILES, similarity searches, 3D-ready structures for docking, analog discovery, for virtual screening and drug discovery."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/zinc-database</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/zinc-database</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: zinc-database
+description: &quot;Access ZINC (230M+ purchasable compounds). Search by ZINC ID/SMILES, similarity searches, 3D-ready structures for docking, analog discovery, for virtual screening and drug discovery.&quot;
+---
+
+# ZINC Database
+
+## Overview
+
+ZINC is a freely accessible repository of 230M+ purchasable compounds maintained by UCSF. Search by ZINC ID or SMILES, perform similarity searches, download 3D-ready structures for docking, discover analogs for virtual screening and drug discovery.
+
+## When to Use This Skill
+
+This skill should be used when:
+
+- **Virtual screening**: Finding compounds for molecular docking studies
+- **Lead discovery**: Identifying commercially-available compounds for drug development
+- **Structure searches**: Performing similarity or analog searches by SMILES
+- **Compound retrieval**: Looking up molecules by ZINC IDs or supplier codes
+- **Chemical space exploration**: Exploring purchasable chemical diversity
+- **Docking studies**: Accessing 3D-ready molecular structures
+- **Analog searches**: Finding similar compounds based on structural similarity
+- **Supplier queries**: Identifying compounds from specific chemical vendors
+- **Random sampling**: Obtaining random compound sets for screening
+
+## Database Versions
+
+ZINC has evolved through multiple versions:
+
+- **ZINC22** (Current): Largest version with 230+ million purchasable compounds and multi-billion scale make-on-demand compounds
+- **ZINC20**: Still maintained, focused on lead-like and drug-like compounds
+- **ZINC15**: Predecessor version, legacy but still documented
+
+This skill primarily focuses on ZINC22, the most current and comprehensive version.
+
+## Access Methods
+
+### Web Interface
+
+Primary access point: https://zinc.docking.org/
+Interactive searching: https://cartblanche22.docking.org/
+
+### API Access
+
+All ZINC22 searches can be performed programmatically via the CartBlanche22 API:
+
+**Base URL**: `https://cartblanche22.docking.org/`
+
+All API endpoints return data in text or JSON format with customizable fields.
+
+## Core Capabilities
+
+### 1. Search by ZINC ID
+
+Retrieve specific compounds using their ZINC identifiers.
+
+**Web interface**: https://cartblanche22.docking.org/search/zincid
+
+**API endpoint**:
+```bash
+curl &quot;https://cartblanche22.docking.org/[email protected]_fields=smiles,zinc_id&quot;
+```
+
+**Multiple IDs**:
+```bash
+curl &quot;https://cartblanche22.docking.org/substances.txt:zinc_id=ZINC000000000001,ZINC000000000002&amp;output_fields=smiles,zinc_id,tranche&quot;
+```
+
+**Response fields**: `zinc_id`, `smiles`, `sub_id`, `supplier_code`, `catalogs`, `tranche` (includes H-count, LogP, MW, phase)
+
+### 2. Search by SMILES
+
+Find compounds by chemical structure using SMILES notation, with optional distance parameters for analog searching.
+
+**Web interface**: https://cartblanche22.docking.org/search/smiles
+
+**API endpoint**:
+```bash
+curl &quot;https://cartblanche22.docking.org/[email protected]=4-Fadist=4&quot;
+```
+
+**Parameters**:
+- `smiles`: Query SMILES string (URL-encoded if necessary)
+- `dist`: Tanimoto distance threshold (default: 0 for exact match)
+- `adist`: Alternative distance parameter for broader searches (default: 0)
+- `output_fields`: Comma-separated list of desired output fields
+
+**Example - Exact match**:
+```bash
+curl &quot;https://cartblanche22.docking.org/smiles.txt:smiles=c1ccccc1&quot;
+```
+
+**Example - Similarity search**:
+```bash
+curl &quot;https://cartblanche22.docking.org/smiles.txt:smiles=c1ccccc1&amp;dist=3&amp;output_fields=zinc_id,smiles,tranche&quot;
+```
+
+### 3. Search by Supplier Codes
+
+Query compounds from specific chemical suppliers or retrieve all molecules from particular catalogs.
+
+**Web interface**: https://cartblanche22.docking.org/search/catitems
+
+**API endpoint**:
+```bash
+curl &quot;https://cartblanche22.docking.org/catitems.txt:catitem_id=SUPPLIER-CODE-123&quot;
+```
+
+**Use cases**:
+- Verify compound availability from specific vendors
+- Retrieve all compounds from a catalog
+- Cross-reference supplier codes with ZINC IDs
+
+### 4. Random Compound Sampling
+
+Generate random compound sets for screening or benchmarking purposes.
+
+**Web interface**: https://cartblanche22.docking.org/search/random
+
+**API endpoint**:
+```bash
+curl &quot;https://cartblanche22.docking.org/substance/random.txt:count=100&quot;
+```
+
+**Parameters**:
+- `count`: Number of random compounds to retrieve (default: 100)
+- `subset`: Filter by subset (e.g., &#039;lead-like&#039;, &#039;drug-like&#039;, &#039;fragment&#039;)
+- `output_fields`: Customize returned data fields
+
+**Example - Random lead-like molecules**:
+```bash
+curl &quot;https://cartblanche22.docking.org/substance/random.txt:count=1000&amp;subset=lead-like&amp;output_fields=zinc_id,smiles,tranche&quot;
+```
+
+## Common Workflows
+
+### Workflow 1: Preparing a Docking Library
+
+1. **Define search criteria** based on target properties or desired chemical space
+
+2. **Query ZINC22** using appropriate search method:
+   ```bash
+   # Example: Get drug-like compounds with specific LogP and MW
+   curl &quot;https://cartblanche22.docking.org/substance/random.txt:count=10000&amp;subset=drug-like&amp;output_fields=zinc_id,smiles,tranche&quot; &gt; docking_library.txt
+   ```
+
+3. **Parse results** to extract ZINC IDs and SMILES:
+   ```python
+   import pandas as pd
+
+   # Load results
+   df = pd.read_csv(&#039;docking_library.txt&#039;, sep=&#039;\t&#039;)
+
+   # Filter by properties in tranche data
+   # Tranche format: H##P###M###-phase
+   # H = H-bond donors, P = LogP*10, M = MW
+   ```
+
+4. **Download 3D structures** for docking using ZINC ID or download from file repositories
+
+### Workflow 2: Finding Analogs of a Hit Compound
+
+1. **Obtain SMILES** of the hit compound:
+   ```python
+   hit_smiles = &quot;CC(C)Cc1ccc(cc1)C(C)C(=O)O&quot;  # Example: Ibuprofen
+   ```
+
+2. **Perform similarity search** with distance threshold:
+   ```bash
+   curl &quot;https://cartblanche22.docking.org/smiles.txt:smiles=CC(C)Cc1ccc(cc1)C(C)C(=O)O&amp;dist=5&amp;output_fields=zinc_id,smiles,catalogs&quot; &gt; analogs.txt
+   ```
+
+3. **Analyze results** to identify purchasable analogs:
+   ```python
+   import pandas as pd
+
+   analogs = pd.read_csv(&#039;analogs.txt&#039;, sep=&#039;\t&#039;)
+   print(f&quot;Found {len(analogs)} analogs&quot;)
+   print(analogs[[&#039;zinc_id&#039;, &#039;smiles&#039;, &#039;catalogs&#039;]].head(10))
+   ```
+
+4. **Retrieve 3D structures** for the most promising analogs
+
+### Workflow 3: Batch Compound Retrieval
+
+1. **Compile list of ZINC IDs** from literature, databases, or previous screens:
+   ```python
+   zinc_ids = [
+       &quot;ZINC000000000001&quot;,
+       &quot;ZINC000000000002&quot;,
+       &quot;ZINC000000000003&quot;
+   ]
+   zinc_ids_str = &quot;,&quot;.join(zinc_ids)
+   ```
+
+2. **Query ZINC22 API**:
+   ```bash
+   curl &quot;https://cartblanche22.docking.org/substances.txt:zinc_id=ZINC000000000001,ZINC000000000002&amp;output_fields=zinc_id,smiles,supplier_code,catalogs&quot;
+   ```
+
+3. **Process results** for downstream analysis or purchasing
+
+### Workflow 4: Chemical Space Sampling
+
+1. **Select subset parameters** based on screening goals:
+   - Fragment: MW &lt; 250, good for fragment-based drug discovery
+   - Lead-like: MW 250-350, LogP ≤ 3.5
+   - Drug-like: MW 350-500, follows Lipinski&#039;s Rule of Five
+
+2. **Generate random sample**:
+   ```bash
+   curl &quot;https://cartblanche22.docking.org/substance/random.txt:count=5000&amp;subset=lead-like&amp;output_fields=zinc_id,smiles,tranche&quot; &gt; chemical_space_sample.txt
+   ```
+
+3. **Analyze chemical diversity** and prepare for virtual screening
+
+## Output Fields
+
+Customize API responses with the `output_fields` parameter:
+
+**Available fields**:
+- `zinc_id`: ZINC identifier
+- `smiles`: SMILES string representation
+- `sub_id`: Internal substance ID
+- `supplier_code`: Vendor catalog number
+- `catalogs`: List of suppliers offering the compound
+- `tranche`: Encoded molecular properties (H-count, LogP, MW, reactivity phase)
+
+**Example**:
+```bash
+curl &quot;https://cartblanche22.docking.org/substances.txt:zinc_id=ZINC000000000001&amp;output_fields=zinc_id,smiles,catalogs,tranche&quot;
+```
+
+## Tranche System
+
+ZINC organizes compounds into &quot;tranches&quot; based on molecular properties:
+
+**Format**: `H##P###M###-phase`
+
+- **H##**: Number of hydrogen bond donors (00-99)
+- **P###**: LogP × 10 (e.g., P035 = LogP 3.5)
+- **M###**: Molecular weight in Daltons (e.g., M400 = 400 Da)
+- **phase**: Reactivity classification
+
+**Example tranche**: `H05P035M400-0`
+- 5 H-bond donors
+- LogP = 3.5
+- MW = 400 Da
+- Reactivity phase 0
+
+Use tranche data to filter compounds by drug-likeness criteria.
+
+## Downloading 3D Structures
+
+For molecular docking, 3D structures are available via file repositories:
+
+**File repository**: https://files.docking.org/zinc22/
+
+Structures are organized by tranches and available in multiple formats:
+- MOL2: Multi-molecule format with 3D coordinates
+- SDF: Structure-data file format
+- DB2.GZ: Compressed database format for DOCK
+
+Refer to ZINC documentation at https://wiki.docking.org for downloading protocols and batch access methods.
+
+## Python Integration
+
+### Using curl with Python
+
+```python
+import subprocess
+import json
+
+def query_zinc_by_id(zinc_id, output_fields=&quot;zinc_id,smiles,catalogs&quot;):
+    &quot;&quot;&quot;Query ZINC22 by ZINC ID.&quot;&quot;&quot;
+    url = f&quot;https://cartblanche22.docking.org/[email protected]_id={zinc_id}&amp;output_fields={output_fields}&quot;
+    result = subprocess.run([&#039;curl&#039;, url], capture_output=True, text=True)
+    return result.stdout
+
+def search_by_smiles(smiles, dist=0, adist=0, output_fields=&quot;zinc_id,smiles&quot;):
+    &quot;&quot;&quot;Search ZINC22 by SMILES with optional distance parameters.&quot;&quot;&quot;
+    url = f&quot;https://cartblanche22.docking.org/smiles.txt:smiles={smiles}&amp;dist={dist}&amp;adist={adist}&amp;output_fields={output_fields}&quot;
+    result = subprocess.run([&#039;curl&#039;, url], capture_output=True, text=True)
+    return result.stdout
+
+def get_random_compounds(count=100, subset=None, output_fields=&quot;zinc_id,smiles,tranche&quot;):
+    &quot;&quot;&quot;Get random compounds from ZINC22.&quot;&quot;&quot;
+    url = f&quot;https://cartblanche22.docking.org/substance/random.txt:count={count}&amp;output_fields={output_fields}&quot;
+    if subset:
+        url += f&quot;&amp;subset={subset}&quot;
+    result = subprocess.run([&#039;curl&#039;, url], capture_output=True, text=True)
+    return result.stdout
+```
+
+### Parsing Results
+
+```python
+import pandas as pd
+from io import StringIO
+
+# Query ZINC and parse as DataFrame
+result = query_zinc_by_id(&quot;ZINC000000000001&quot;)
+df = pd.read_csv(StringIO(result), sep=&#039;\t&#039;)
+
+# Extract tranche properties
+def parse_tranche(tranche_str):
+    &quot;&quot;&quot;Parse ZINC tranche code to extract properties.&quot;&quot;&quot;
+    # Format: H##P###M###-phase
+    import re
+    match = re.match(r&#039;H(\d+)P(\d+)M(\d+)-(\d+)&#039;, tranche_str)
+    if match:
+        return {
+            &#039;h_donors&#039;: int(match.group(1)),
+            &#039;logP&#039;: int(match.group(2)) / 10.0,
+            &#039;mw&#039;: int(match.group(3)),
+            &#039;phase&#039;: int(match.group(4))
+        }
+    return None
+
+df[&#039;tranche_props&#039;] = df[&#039;tranche&#039;].apply(parse_tranche)
+```
+
+## Best Practices
+
+### Query Optimization
+
+- **Start specific**: Begin with exact searches before expanding to similarity searches
+- **Use appropriate distance parameters**: Small dist values (1-3) for close analogs, larger (5-10) for diverse analogs
+- **Limit output fields**: Request only necessary fields to reduce data transfer
+- **Batch queries**: Combine multiple ZINC IDs in a single API call when possible
+
+### Performance Considerations
+
+- **Rate limiting**: Respect server resources; avoid rapid consecutive requests
+- **Caching**: Store frequently accessed compounds locally
+- **Parallel downloads**: When downloading 3D structures, use parallel wget or aria2c for file repositories
+- **Subset filtering**: Use lead-like, drug-like, or fragment subsets to reduce search space
+
+### Data Quality
+
+- **Verify availability**: Supplier catalogs change; confirm compound availability before large orders
+- **Check stereochemistry**: SMILES may not fully specify stereochemistry; verify 3D structures
+- **Validate structures**: Use cheminformatics tools (RDKit, OpenBabel) to verify structure validity
+- **Cross-reference**: When possible, cross-check with other databases (PubChem, ChEMBL)
+
+## Resources
+
+### references/api_reference.md
+
+Comprehensive documentation including:
+
+- Complete API endpoint reference
+- URL syntax and parameter specifications
+- Advanced query patterns and examples
+- File repository organization and access
+- Bulk download methods
+- Error handling and troubleshooting
+- Integration with molecular docking software
+
+Consult this document for detailed technical information and advanced usage patterns.
+
+## Important Disclaimers
+
+### Data Reliability
+
+ZINC explicitly states: **&quot;We do not guarantee the quality of any molecule for any purpose and take no responsibility for errors arising from the use of this database.&quot;**
+
+- Compound availability may change without notice
+- Structure representations may contain errors
+- Supplier information should be verified independently
+- Use appropriate validation before experimental work
+
+### Appropriate Use
+
+- ZINC is intended for academic and research purposes in drug discovery
+- Verify licensing terms for commercial use
+- Respect intellectual property when working with patented compounds
+- Follow your institution&#039;s guidelines for compound procurement
+
+## Additional Resources
+
+- **ZINC Website**: https://zinc.docking.org/
+- **CartBlanche22 Interface**: https://cartblanche22.docking.org/
+- **ZINC Wiki**: https://wiki.docking.org/
+- **File Repository**: https://files.docking.org/zinc22/
+- **GitHub**: https://github.com/docking-org/
+- **Primary Publication**: Irwin et al., J. Chem. Inf. Model 2020 (ZINC15)
+- **ZINC22 Publication**: Irwin et al., J. Chem. Inf. Model 2023
+
+## Citations
+
+When using ZINC in publications, cite the appropriate version:
+
+**ZINC22**:
+Irwin, J. J., et al. &quot;ZINC22—A Free Multi-Billion-Scale Database of Tangible Compounds for Ligand Discovery.&quot; *Journal of Chemical Information and Modeling* 2023.
+
+**ZINC15**:
+Irwin, J. J., et al. &quot;ZINC15 – Ligand Discovery for Everyone.&quot; *Journal of Chemical Information and Modeling* 2020, 60, 6065–6073.
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,668 @@
     <p class="desc">Comprehensive Next.js performance audit with actionable optimization recommendations</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/nextjs-performance-audit</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Read, Edit, Bash
+argument-hint: [--lighthouse] [--bundle] [--runtime] [--all]
+description: Comprehensive Next.js performance audit with actionable optimization recommendations
+---
+
+## Next.js Performance Audit
+
+**Audit Type**: $ARGUMENTS
+
+## Current Application Analysis
+
+### Application State
+- Build status: !`ls -la .next/ 2&gt;/dev/null || echo &quot;No build found - run &#039;npm run build&#039; first&quot;`
+- Application running: !`curl -s http://localhost:3000 &gt; /dev/null &amp;&amp; echo &quot;App is running&quot; || echo &quot;App not running - start with &#039;npm run dev&#039;&quot;`
+- Bundle analysis: !`ls -la .next/analyze/ 2&gt;/dev/null || echo &quot;No bundle analysis found&quot;`
+
+### Project Configuration
+- Next.js config: @next.config.js
+- Package.json: @package.json
+- TypeScript config: @tsconfig.json (if exists)
+- Vercel config: @vercel.json (if exists)
+
+### Performance Monitoring Setup
+- Web Vitals: Check for @next/web-vitals or similar
+- Analytics: Check for Vercel Analytics or Google Analytics
+- Monitoring tools: Check for Sentry, DataDog, or other APM tools
+
+## Performance Audit Framework
+
+### 1. Lighthouse Audit
+```bash
+# Install Lighthouse CLI if not available
+npm install -g lighthouse
+
+# Run Lighthouse audit
+lighthouse http://localhost:3000 \
+  --output=json \
+  --output=html \
+  --output-path=./performance-audit \
+  --chrome-flags=&quot;--headless&quot; \
+  --preset=perf
+
+# Mobile performance audit
+lighthouse http://localhost:3000 \
+  --output=json \
+  --output-path=./performance-audit-mobile \
+  --preset=perf \
+  --form-factor=mobile \
+  --throttling-method=devtools \
+  --chrome-flags=&quot;--headless&quot;
+
+# Generate detailed report
+lighthouse http://localhost:3000 \
+  --output=html \
+  --output-path=./lighthouse-report.html \
+  --view
+```
+
+### 2. Bundle Analysis
+```javascript
+// next.config.js - Enable bundle analysis
+const withBundleAnalyzer = require(&#039;@next/bundle-analyzer&#039;)({
+  enabled: process.env.ANALYZE === &#039;true&#039;,
+});
+
+module.exports = withBundleAnalyzer({
+  // ... your config
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) =&gt; {
+    // Bundle analysis optimizations
+    if (!dev &amp;&amp; !isServer) {
+      config.optimization.splitChunks = {
+        chunks: &#039;all&#039;,
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: &#039;vendors&#039;,
+            chunks: &#039;all&#039;,
+          },
+        },
+      };
+    }
+    return config;
+  },
+});
+```
+
+### 3. Runtime Performance Analysis
+```bash
+# Build and analyze bundle
+ANALYZE=true npm run build
+
+# Check bundle sizes
+ls -lah .next/static/chunks/ | grep -E &quot;\\.js$&quot; | sort -k5 -hr | head -10
+
+# Analyze dependencies
+npm ls --depth=0 --prod | grep -v &quot;deduped&quot;
+
+# Check for duplicate dependencies
+npm ls --depth=0 | grep -E &quot;UNMET|invalid&quot;
+```
+
+## Performance Metrics Collection
+
+### 1. Core Web Vitals Implementation
+```typescript
+// lib/analytics.ts
+export function reportWebVitals({ id, name, label, value }: any) {
+  // Send to analytics service
+  if (typeof window !== &#039;undefined&#039;) {
+    // Client-side reporting
+    fetch(&#039;/api/analytics/web-vitals&#039;, {
+      method: &#039;POST&#039;,
+      headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
+      body: JSON.stringify({
+        id,
+        name,
+        label,
+        value,
+        url: window.location.href,
+        timestamp: Date.now(),
+      }),
+    }).catch(console.error);
+  }
+}
+
+// Track specific metrics
+export function trackMetric(name: string, value: number, labels?: Record&lt;string, string&gt;) {
+  reportWebVitals({
+    id: `${name}-${Date.now()}`,
+    name,
+    label: &#039;custom&#039;,
+    value,
+    ...labels,
+  });
+}
+
+// Performance observer for custom metrics
+export function initPerformanceObserver() {
+  if (typeof window === &#039;undefined&#039;) return;
+  
+  // Largest Contentful Paint
+  new PerformanceObserver((entryList) =&gt; {
+    for (const entry of entryList.getEntries()) {
+      trackMetric(&#039;LCP&#039;, entry.startTime);
+    }
+  }).observe({ entryTypes: [&#039;largest-contentful-paint&#039;] });
+  
+  // First Input Delay
+  new PerformanceObserver((entryList) =&gt; {
+    for (const entry of entryList.getEntries()) {
+      trackMetric(&#039;FID&#039;, entry.processingStart - entry.startTime);
+    }
+  }).observe({ entryTypes: [&#039;first-input&#039;] });
+  
+  // Cumulative Layout Shift
+  new PerformanceObserver((entryList) =&gt; {
+    let clsValue = 0;
+    for (const entry of entryList.getEntries()) {
+      if (!entry.hadRecentInput) {
+        clsValue += entry.value;
+      }
+    }
+    trackMetric(&#039;CLS&#039;, clsValue);
+  }).observe({ entryTypes: [&#039;layout-shift&#039;] });
+}
+```
+
+### 2. Server-Side Performance Monitoring
+```typescript
+// middleware.ts - Performance monitoring
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+export function middleware(request: NextRequest) {
+  const start = Date.now();
+  
+  const response = NextResponse.next();
+  
+  // Add performance headers
+  response.headers.set(&#039;X-Response-Time&#039;, `${Date.now() - start}ms`);
+  response.headers.set(&#039;X-Timestamp&#039;, new Date().toISOString());
+  
+  return response;
+}
+```
+
+## Performance Analysis Areas
+
+### 1. Loading Performance
+```typescript
+// Analyze loading performance
+const loadingPerformanceAudit = {
+  // First Contentful Paint (FCP)
+  fcp: {
+    target: &#039;&lt; 1.8s&#039;,
+    current: &#039;?&#039;, // From Lighthouse
+    optimizations: [
+      &#039;Optimize critical rendering path&#039;,
+      &#039;Inline critical CSS&#039;,
+      &#039;Preload key resources&#039;,
+      &#039;Minimize render-blocking resources&#039;,
+    ],
+  },
+  
+  // Largest Contentful Paint (LCP)
+  lcp: {
+    target: &#039;&lt; 2.5s&#039;,
+    current: &#039;?&#039;, // From Lighthouse
+    optimizations: [
+      &#039;Optimize images (Next.js Image component)&#039;,
+      &#039;Preload LCP element&#039;,
+      &#039;Optimize server response time&#039;,
+      &#039;Use CDN for static assets&#039;,
+    ],
+  },
+  
+  // Time to Interactive (TTI)
+  tti: {
+    target: &#039;&lt; 3.8s&#039;,
+    current: &#039;?&#039;, // From Lighthouse
+    optimizations: [
+      &#039;Reduce JavaScript bundle size&#039;,
+      &#039;Code splitting&#039;,
+      &#039;Remove unused code&#039;,
+      &#039;Optimize third-party scripts&#039;,
+    ],
+  },
+  
+  // Speed Index
+  speedIndex: {
+    target: &#039;&lt; 3.4s&#039;,
+    current: &#039;?&#039;, // From Lighthouse
+    optimizations: [
+      &#039;Optimize above-the-fold content&#039;,
+      &#039;Progressive image loading&#039;,
+      &#039;Critical resource prioritization&#039;,
+    ],
+  },
+};
+```
+
+### 2. Runtime Performance
+```typescript
+// Runtime performance analysis
+const runtimePerformanceAudit = {
+  // First Input Delay (FID)
+  fid: {
+    target: &#039;&lt; 100ms&#039;,
+    current: &#039;?&#039;,
+    optimizations: [
+      &#039;Reduce JavaScript execution time&#039;,
+      &#039;Break up long tasks&#039;,
+      &#039;Use web workers for heavy computation&#039;,
+      &#039;Optimize event handlers&#039;,
+    ],
+  },
+  
+  // Cumulative Layout Shift (CLS)
+  cls: {
+    target: &#039;&lt; 0.1&#039;,
+    current: &#039;?&#039;,
+    optimizations: [
+      &#039;Set dimensions for media elements&#039;,
+      &#039;Reserve space for ads/embeds&#039;,
+      &#039;Avoid dynamic content insertion&#039;,
+      &#039;Use CSS transforms for animations&#039;,
+    ],
+  },
+  
+  // Total Blocking Time (TBT)
+  tbt: {
+    target: &#039;&lt; 200ms&#039;,
+    current: &#039;?&#039;,
+    optimizations: [
+      &#039;Code splitting&#039;,
+      &#039;Remove unused polyfills&#039;,
+      &#039;Optimize third-party code&#039;,
+      &#039;Use setTimeout for heavy operations&#039;,
+    ],
+  },
+};
+```
+
+### 3. Bundle Performance
+```javascript
+// Bundle analysis report
+const bundleAnalysis = {
+  totalSize: &#039;?&#039;, // From webpack-bundle-analyzer
+  firstLoadJS: &#039;?&#039;, // Critical for performance
+  chunks: {
+    main: &#039;?&#039;,
+    framework: &#039;?&#039;,
+    vendor: &#039;?&#039;,
+    pages: &#039;?&#039;,
+  },
+  
+  recommendations: [
+    // Dynamic imports for code splitting
+    {
+      type: &#039;Dynamic Import&#039;,
+      description: &#039;Use dynamic imports for non-critical components&#039;,
+      example: `
+        const HeavyComponent = dynamic(() =&gt; import(&#039;./HeavyComponent&#039;), {
+          loading: () =&gt; &lt;Loading /&gt;,
+          ssr: false
+        });
+      `,
+    },
+    
+    // Tree shaking optimization
+    {
+      type: &#039;Tree Shaking&#039;,
+      description: &#039;Import only needed functions from libraries&#039;,
+      example: `
+        // ❌ Imports entire library
+        import * as _ from &#039;lodash&#039;;
         
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/nextjs-performance-audit</code>
-        </div>
+        // ✅ Import only needed functions
+        import { debounce, throttle } from &#039;lodash&#039;;
+      `,
+    },
+    
+    // Bundle splitting
+    {
+      type: &#039;Bundle Splitting&#039;,
+      description: &#039;Optimize webpack chunk splitting&#039;,
+      example: `
+        module.exports = {
+          webpack: (config, { isServer }) =&gt; {
+            if (!isServer) {
+              config.optimization.splitChunks.cacheGroups = {
+                vendor: {
+                  test: /[\\/]node_modules[\\/]/,
+                  name: &#039;vendors&#039;,
+                  chunks: &#039;all&#039;,
+                },
+              };
+            }
+            return config;
+          },
+        };
+      `,
+    },
+  ],
+};
+```
+
+## Optimization Recommendations
+
+### 1. Image Optimization
+```typescript
+// Image optimization analysis
+const imageOptimization = {
+  // Next.js Image component usage
+  nextImageUsage: &#039;Analyze usage of next/image vs &lt;img&gt;&#039;,
+  
+  recommendations: [
+    {
+      priority: &#039;High&#039;,
+      description: &#039;Replace &lt;img&gt; tags with Next.js Image component&#039;,
+      implementation: `
+        import Image from &#039;next/image&#039;;
+        
+        // ❌ Regular img tag
+        &lt;img src=&quot;/hero.jpg&quot; alt=&quot;Hero&quot; /&gt;
+        
+        // ✅ Next.js Image component
+        &lt;Image
+          src=&quot;/hero.jpg&quot;
+          alt=&quot;Hero&quot;
+          width={1200}
+          height={600}
+          priority={true} // For above-the-fold images
+          placeholder=&quot;blur&quot;
+          blurDataURL=&quot;data:image/jpeg;base64,...&quot;
+        /&gt;
+      `,
+    },
+    {
+      priority: &#039;Medium&#039;,
+      description: &#039;Implement responsive images with sizes prop&#039;,
+      implementation: `
+        &lt;Image
+          src=&quot;/hero.jpg&quot;
+          alt=&quot;Hero&quot;
+          width={1200}
+          height={600}
+          sizes=&quot;(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw&quot;
+        /&gt;
+      `,
+    },
+    {
+      priority: &#039;Low&#039;,
+      description: &#039;Configure custom image loader for CDN&#039;,
+      implementation: `
+        // next.config.js
+        module.exports = {
+          images: {
+            loader: &#039;cloudinary&#039;,
+            path: &#039;https://res.cloudinary.com/demo/image/fetch/&#039;,
+          },
+        };
+      `,
+    },
+  ],
+};
+```
+
+### 2. CSS Optimization
+```css
+/* Critical CSS analysis */
+.critical-css-audit {
+  /* Above-the-fold styles that should be inlined */
+}
+
+/* Non-critical CSS that can be loaded asynchronously */
+.non-critical-css {
+  /* Styles for below-the-fold content */
+}
+```
+
+```typescript
+// CSS optimization recommendations
+const cssOptimization = {
+  recommendations: [
+    {
+      type: &#039;Critical CSS&#039;,
+      description: &#039;Inline critical CSS for faster initial render&#039;,
+      implementation: &#039;Use styled-jsx or CSS-in-JS for critical styles&#039;,
+    },
+    {
+      type: &#039;CSS Modules&#039;,
+      description: &#039;Use CSS Modules to avoid global namespace pollution&#039;,
+      implementation: &#039;Import styles as modules: import styles from &quot;./Component.module.css&quot;&#039;,
+    },
+    {
+      type: &#039;Tailwind Purging&#039;,
+      description: &#039;Ensure unused Tailwind classes are purged&#039;,
+      implementation: &#039;Configure purge in tailwind.config.js&#039;,
+    },
+  ],
+};
+```
+
+### 3. JavaScript Optimization
+```typescript
+// JavaScript optimization analysis
+const jsOptimization = {
+  recommendations: [
+    {
+      priority: &#039;High&#039;,
+      type: &#039;Code Splitting&#039;,
+      description: &#039;Implement route-based and component-based code splitting&#039;,
+      example: `
+        // Route-based splitting (automatic with Next.js pages)
+        
+        // Component-based splitting
+        const LazyComponent = dynamic(() =&gt; import(&#039;./LazyComponent&#039;));
+        
+        // Conditional loading
+        const AdminPanel = dynamic(() =&gt; import(&#039;./AdminPanel&#039;), {
+          ssr: false,
+          loading: () =&gt; &lt;AdminSkeleton /&gt;,
+        });
+      `,
+    },
+    {
+      priority: &#039;Medium&#039;,
+      type: &#039;Tree Shaking&#039;,
+      description: &#039;Ensure unused code is eliminated&#039;,
+      example: `
+        // ❌ Imports entire library
+        import moment from &#039;moment&#039;;
+        
+        // ✅ Use tree-shakable alternative
+        import { format } from &#039;date-fns&#039;;
+        
+        // ✅ Or import specific functions
+        import debounce from &#039;lodash/debounce&#039;;
+      `,
+    },
+    {
+      priority: &#039;Medium&#039;,
+      type: &#039;Polyfill Optimization&#039;,
+      description: &#039;Reduce polyfill size by targeting modern browsers&#039;,
+      example: `
+        // next.config.js
+        module.exports = {
+          experimental: {
+            browsersListForSwc: true,
+          },
+        };
+      `,
+    },
+  ],
+};
+```
+
+## Performance Monitoring Setup
+
+### 1. Real User Monitoring (RUM)
+```typescript
+// pages/_app.tsx
+import { reportWebVitals } from &#039;../lib/analytics&#039;;
+
+export { reportWebVitals };
+
+export default function MyApp({ Component, pageProps }) {
+  return (
+    &lt;&gt;
+      &lt;Component {...pageProps} /&gt;
+      {process.env.NODE_ENV === &#039;production&#039; &amp;&amp; (
+        &lt;script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Custom RUM implementation
+              window.addEventListener(&#039;load&#039;, () =&gt; {
+                // Track page load time
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                fetch(&#039;/api/analytics/performance&#039;, {
+                  method: &#039;POST&#039;,
+                  headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
+                  body: JSON.stringify({
+                    metric: &#039;page_load_time&#039;,
+                    value: loadTime,
+                    url: window.location.href,
+                  }),
+                });
+              });
+            `,
+          }}
+        /&gt;
+      )}
+    &lt;/&gt;
+  );
+}
+```
+
+### 2. Performance Budget
+```javascript
+// webpack.config.js - Performance budgets
+module.exports = {
+  performance: {
+    maxAssetSize: 250000, // 250KB
+    maxEntrypointSize: 400000, // 400KB
+    hints: process.env.NODE_ENV === &#039;production&#039; ? &#039;error&#039; : &#039;warning&#039;,
+  },
+};
+```
+
+### 3. Continuous Performance Monitoring
+```yaml
+# .github/workflows/performance.yml
+name: Performance Audit
+on: 
+  pull_request:
+    branches: [main]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: &#039;18&#039;
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build Next.js
+        run: npm run build
+      
+      - name: Start Next.js
+        run: npm start &amp;
+        
+      - name: Wait for server
+        run: npx wait-on http://localhost:3000
+      
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.12.x
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+```
+
+## Performance Report Generation
+
+### 1. Comprehensive Audit Report
+Generate detailed performance report including:
+
+#### Executive Summary
+- Overall performance score (0-100)
+- Core Web Vitals status
+- Key performance issues
+- Impact on user experience
+
+#### Detailed Analysis
+- Loading performance breakdown
+- Runtime performance metrics  
+- Bundle analysis and recommendations
+- Image optimization opportunities
+- CSS and JavaScript optimization
+
+#### Action Plan
+- High priority fixes (immediate impact)
+- Medium priority improvements (moderate impact)
+- Long-term optimization strategy
+- Performance monitoring setup
+
+#### Implementation Roadmap
+1. **Week 1**: Critical performance fixes
+2. **Week 2-3**: Image and asset optimization  
+3. **Week 4**: Bundle optimization and code splitting
+4. **Ongoing**: Performance monitoring and regression prevention
+
+### 2. Performance Tracking Dashboard
+```typescript
+// Create performance dashboard component
+const PerformanceDashboard = () =&gt; {
+  return (
+    &lt;div className=&quot;performance-dashboard&quot;&gt;
+      &lt;h2&gt;Performance Metrics&lt;/h2&gt;
+      
+      {/* Core Web Vitals */}
+      &lt;section&gt;
+        &lt;h3&gt;Core Web Vitals&lt;/h3&gt;
+        &lt;div className=&quot;metrics-grid&quot;&gt;
+          &lt;MetricCard title=&quot;LCP&quot; value=&quot;2.1s&quot; target=&quot;&lt; 2.5s&quot; status=&quot;good&quot; /&gt;
+          &lt;MetricCard title=&quot;FID&quot; value=&quot;89ms&quot; target=&quot;&lt; 100ms&quot; status=&quot;good&quot; /&gt;
+          &lt;MetricCard title=&quot;CLS&quot; value=&quot;0.08&quot; target=&quot;&lt; 0.1&quot; status=&quot;good&quot; /&gt;
+        &lt;/div&gt;
+      &lt;/section&gt;
+      
+      {/* Bundle Analysis */}
+      &lt;section&gt;
+        &lt;h3&gt;Bundle Analysis&lt;/h3&gt;
+        &lt;BundleChart data={bundleData} /&gt;
+      &lt;/section&gt;
+      
+      {/* Performance Trends */}
+      &lt;section&gt;
+        &lt;h3&gt;Performance Trends&lt;/h3&gt;
+        &lt;TrendChart metrics={performanceHistory} /&gt;
+      &lt;/section&gt;
+    &lt;/div&gt;
+  );
+};
+```
+
+Provide comprehensive performance audit with specific, measurable recommendations and implementation guidance for immediate and long-term optimization.</code>
       </div>
     </div>
 

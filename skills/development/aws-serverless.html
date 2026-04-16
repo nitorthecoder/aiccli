@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,340 @@
     <p class="desc">"Specialized skill for building production-ready serverless applications on AWS. Covers Lambda functions, API Gateway, DynamoDB, SQS/SNS event-driven patterns, SAM/CDK deployment, and cold start optimization."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/aws-serverless</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/aws-serverless</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: aws-serverless
+description: &quot;Specialized skill for building production-ready serverless applications on AWS. Covers Lambda functions, API Gateway, DynamoDB, SQS/SNS event-driven patterns, SAM/CDK deployment, and cold start optimization.&quot;
+source: vibeship-spawner-skills (Apache 2.0)
+---
+
+# AWS Serverless
+
+## Patterns
+
+### Lambda Handler Pattern
+
+Proper Lambda function structure with error handling
+
+**When to use**: [&#039;Any Lambda function implementation&#039;, &#039;API handlers, event processors, scheduled tasks&#039;]
+
+```python
+```javascript
+// Node.js Lambda Handler
+// handler.js
+
+// Initialize outside handler (reused across invocations)
+const { DynamoDBClient } = require(&#039;@aws-sdk/client-dynamodb&#039;);
+const { DynamoDBDocumentClient, GetCommand } = require(&#039;@aws-sdk/lib-dynamodb&#039;);
+
+const client = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(client);
+
+// Handler function
+exports.handler = async (event, context) =&gt; {
+  // Optional: Don&#039;t wait for event loop to clear (Node.js)
+  context.callbackWaitsForEmptyEventLoop = false;
+
+  try {
+    // Parse input based on event source
+    const body = typeof event.body === &#039;string&#039;
+      ? JSON.parse(event.body)
+      : event.body;
+
+    // Business logic
+    const result = await processRequest(body);
+
+    // Return API Gateway compatible response
+    return {
+      statusCode: 200,
+      headers: {
+        &#039;Content-Type&#039;: &#039;application/json&#039;,
+        &#039;Access-Control-Allow-Origin&#039;: &#039;*&#039;
+      },
+      body: JSON.stringify(result)
+    };
+  } catch (error) {
+    console.error(&#039;Error:&#039;, JSON.stringify({
+      error: error.message,
+      stack: error.stack,
+      requestId: context.awsRequestId
+    }));
+
+    return {
+      statusCode: error.statusCode || 500,
+      headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
+      body: JSON.stringify({
+        error: error.message || &#039;Internal server error&#039;
+      })
+    };
+  }
+};
+
+async function processRequest(data) {
+  // Your business logic here
+  const result = await docClient.send(new GetCommand({
+    TableName: process.env.TABLE_NAME,
+    Key: { id: data.id }
+  }));
+  return result.Item;
+}
+```
+
+```python
+# Python Lambda Handler
+# handler.py
+
+import json
+import os
+import logging
+import boto3
+from botocore.exceptions import ClientError
+
+# Initialize outside handler (reused across invocations)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+dynamodb = boto3.resource(&#039;dynamodb&#039;)
+table = dynamodb.Table(os.environ[&#039;TABLE_NAME&#039;])
+
+def handler(event, context):
+    try:
+        # Parse i
+```
+
+### API Gateway Integration Pattern
+
+REST API and HTTP API integration with Lambda
+
+**When to use**: [&#039;Building REST APIs backed by Lambda&#039;, &#039;Need HTTP endpoints for functions&#039;]
+
+```javascript
+```yaml
+# template.yaml (SAM)
+AWSTemplateFormatVersion: &#039;2010-09-09&#039;
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 30
+    MemorySize: 256
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref ItemsTable
+
+Resources:
+  # HTTP API (recommended for simple use cases)
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+      CorsConfiguration:
+        AllowOrigins:
+          - &quot;*&quot;
+        AllowMethods:
+          - GET
+          - POST
+          - DELETE
+        AllowHeaders:
+          - &quot;*&quot;
+
+  # Lambda Functions
+  GetItemFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/get.handler
+      Events:
+        GetItem:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /items/{id}
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ItemsTable
+
+  CreateItemFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/create.handler
+      Events:
+        CreateItem:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /items
+            Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItemsTable
+
+  # DynamoDB Table
+  ItemsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+Outputs:
+  ApiUrl:
+    Value: !Sub &quot;https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/prod&quot;
+```
+
+```javascript
+// src/handlers/get.js
+const { getItem } = require(&#039;../lib/dynamodb&#039;);
+
+exports.handler = async (event) =&gt; {
+  const id = event.pathParameters?.id;
+
+  if (!id) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: &#039;Missing id parameter&#039; })
+    };
+  }
+
+  const item =
+```
+
+### Event-Driven SQS Pattern
+
+Lambda triggered by SQS for reliable async processing
+
+**When to use**: [&#039;Decoupled, asynchronous processing&#039;, &#039;Need retry logic and DLQ&#039;, &#039;Processing messages in batches&#039;]
+
+```python
+```yaml
+# template.yaml
+Resources:
+  ProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/processor.handler
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ProcessingQueue.Arn
+            BatchSize: 10
+            FunctionResponseTypes:
+              - ReportBatchItemFailures  # Partial batch failure handling
+
+  ProcessingQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 180  # 6x Lambda timeout
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: 3
+
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600  # 14 days
+```
+
+```javascript
+// src/handlers/processor.js
+exports.handler = async (event) =&gt; {
+  const batchItemFailures = [];
+
+  for (const record of event.Records) {
+    try {
+      const body = JSON.parse(record.body);
+      await processMessage(body);
+    } catch (error) {
+      console.error(`Failed to process message ${record.messageId}:`, error);
+      // Report this item as failed (will be retried)
+      batchItemFailures.push({
+        itemIdentifier: record.messageId
+      });
+    }
+  }
+
+  // Return failed items for retry
+  return { batchItemFailures };
+};
+
+async function processMessage(message) {
+  // Your processing logic
+  console.log(&#039;Processing:&#039;, message);
+
+  // Simulate work
+  await saveToDatabase(message);
+}
+```
+
+```python
+# Python version
+import json
+import logging
+
+logger = logging.getLogger()
+
+def handler(event, context):
+    batch_item_failures = []
+
+    for record in event[&#039;Records&#039;]:
+        try:
+            body = json.loads(record[&#039;body&#039;])
+            process_message(body)
+        except Exception as e:
+            logger.error(f&quot;Failed to process {record[&#039;messageId&#039;]}: {e}&quot;)
+            batch_item_failures.append({
+                &#039;itemIdentifier&#039;: record[&#039;messageId&#039;]
+            })
+
+    return {&#039;batchItemFailures&#039;: batch_ite
+```
+
+## Anti-Patterns
+
+### ❌ Monolithic Lambda
+
+**Why bad**: Large deployment packages cause slow cold starts.
+Hard to scale individual operations.
+Updates affect entire system.
+
+### ❌ Large Dependencies
+
+**Why bad**: Increases deployment package size.
+Slows down cold starts significantly.
+Most of SDK/library may be unused.
+
+### ❌ Synchronous Calls in VPC
+
+**Why bad**: VPC-attached Lambdas have ENI setup overhead.
+Blocking DNS lookups or connections worsen cold starts.
+
+## ⚠️ Sharp Edges
+
+| Issue | Severity | Solution |
+|-------|----------|----------|
+| Issue | high | ## Measure your INIT phase |
+| Issue | high | ## Set appropriate timeout |
+| Issue | high | ## Increase memory allocation |
+| Issue | medium | ## Verify VPC configuration |
+| Issue | medium | ## Tell Lambda not to wait for event loop |
+| Issue | medium | ## For large file uploads |
+| Issue | high | ## Use different buckets/prefixes |
+</code>
       </div>
     </div>
 

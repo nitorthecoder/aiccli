@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,105 @@
     <p class="desc">Create parallel worktrees for multi-task development with Ghostty panels</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/worktree-init</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/worktree-init</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Bash(git:*), Bash(mkdir:*), Bash(ls:*), Bash(cat:*), Bash(basename:*), Bash(pwd:*), Bash(sed:*)
+argument-hint: task 1 | task 2 | task 3
+description: Create parallel worktrees for multi-task development with Ghostty panels
+---
+
+# Worktree Parallel Init
+
+Create multiple git worktrees for parallel development: $ARGUMENTS
+
+## Instructions
+
+You are setting up parallel worktrees so the user can work on multiple tasks simultaneously in separate Ghostty terminal panels, each running its own Claude instance.
+
+### Step 1: Validate Environment
+
+1. Check this is a git repository: `git rev-parse --is-inside-work-tree`
+2. Get the repo name: `basename $(git rev-parse --show-toplevel)`
+3. Get the main branch name (check for `main` or `master`): `git symbolic-ref refs/remotes/origin/HEAD 2&gt;/dev/null | sed &#039;s@^refs/remotes/origin/@@&#039;` — if that fails, default to `main`
+4. Ensure working tree is clean: `git status --porcelain`. If dirty, warn the user and ask if they want to continue.
+5. Fetch latest: `git fetch origin`
+
+### Step 2: Parse Tasks
+
+Parse tasks from `$ARGUMENTS`. Tasks are separated by `|` (pipe character).
+
+If `$ARGUMENTS` is empty, use AskUserQuestion to ask the user to describe their tasks (they can provide multiple separated by `|`).
+
+For each task description:
+- Trim whitespace
+- Generate a kebab-case branch name: `claude/&lt;kebab-case-task&gt;` (max 50 chars, alphanumeric and hyphens only)
+- Generate a worktree directory path: `../worktrees/&lt;repo-name&gt;/claude-&lt;kebab-case-task&gt;`
+
+### Step 3: Create Worktrees
+
+For each task:
+
+1. Create the parent directory if needed: `mkdir -p ../worktrees/&lt;repo-name&gt;`
+2. Create the worktree:
+   ```bash
+   git worktree add -b claude/&lt;name&gt; ../worktrees/&lt;repo-name&gt;/claude-&lt;name&gt; origin/&lt;main-branch&gt;
+   ```
+3. Write a `.worktree-task.md` file inside the new worktree with this content:
+   ```markdown
+   # Worktree Task
+
+   **Branch:** claude/&lt;name&gt;
+   **Task:** &lt;original task description&gt;
+   **Created:** &lt;ISO date&gt;
+   **Source repo:** &lt;path to main repo&gt;
+   ```
+
+### Step 4: Check for Dependencies
+
+If a `package.json` exists in the repo root, note that each worktree may need `npm install` (or the appropriate package manager).
+
+Check for:
+- `package-lock.json` → npm install
+- `yarn.lock` → yarn install
+- `pnpm-lock.yaml` → pnpm install
+- `bun.lockb` → bun install
+
+### Step 5: Output Summary
+
+Display a clear summary table:
+
+```
+| # | Task | Branch | Path |
+|---|------|--------|------|
+| 1 | ... | claude/... | ../worktrees/repo/claude-... |
+```
+
+Then display ready-to-copy commands for Ghostty panels. For each worktree:
+
+```
+# Panel &lt;N&gt;: &lt;task description&gt;
+cd &lt;absolute-path-to-worktree&gt; &amp;&amp; claude
+```
+
+If dependencies were detected, add a note:
+```
+# Note: Run &lt;package-manager&gt; install in each worktree before starting
+```
+
+Finally, remind the user:
+- Open a new Ghostty panel with `Cmd+D` (split right) or `Cmd+Shift+D` (split down)
+- When done with a task, use `/worktree-deliver` to commit, push, and create a PR
+- After merging all PRs, use `/worktree-cleanup --all` from the main repo
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,33 @@
     <p class="desc">Enforce Next.js best practices, proper file structure, component patterns, and TypeScript usage with automated code reviews and suggestions. Validates Next.js App Router conventions, Server/Client component patterns, proper imports, and TypeScript usage. Provides real-time feedback on code quality and adherence to Next.js best practices.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install hooks/nextjs-code-quality-enforcer</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install hooks/nextjs-code-quality-enforcer</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">{
+  &quot;description&quot;: &quot;Enforce Next.js best practices, proper file structure, component patterns, and TypeScript usage with automated code reviews and suggestions. Validates Next.js App Router conventions, Server/Client component patterns, proper imports, and TypeScript usage. Provides real-time feedback on code quality and adherence to Next.js best practices.&quot;,
+  &quot;hooks&quot;: {
+    &quot;PostToolUse&quot;: [
+      {
+        &quot;matcher&quot;: &quot;Write|Edit|MultiEdit&quot;,
+        &quot;hooks&quot;: [
+          {
+            &quot;type&quot;: &quot;command&quot;,
+            &quot;command&quot;: &quot;bash -c &#039;input=$(cat); FILE_PATH=$(echo \&quot;$input\&quot; | jq -r \&quot;.tool_input.file_path // empty\&quot;); SUCCESS=$(echo \&quot;$input\&quot; | jq -r \&quot;.tool_response.success // false\&quot;); if [ \&quot;$SUCCESS\&quot; = \&quot;true\&quot; ] &amp;&amp; [[ \&quot;$FILE_PATH\&quot; =~ \\.(js|jsx|ts|tsx)$ ]] &amp;&amp; [[ ! \&quot;$FILE_PATH\&quot; =~ node_modules ]]; then echo \&quot;🔍 Next.js Code Quality Enforcer: Reviewing $FILE_PATH...\&quot;; ISSUES=0; if [ -f \&quot;$FILE_PATH\&quot; ]; then if [[ \&quot;$FILE_PATH\&quot; =~ app/.* ]]; then echo \&quot;📁 App Router file detected: $FILE_PATH\&quot;; if [[ \&quot;$FILE_PATH\&quot; =~ page\\.(js|jsx|ts|tsx)$ ]] &amp;&amp; ! grep -q \&quot;export default function\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null &amp;&amp; ! grep -q \&quot;export default async function\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;❌ Page component must export default function\&quot; &gt;&amp;2; ((ISSUES++)); fi; if [[ \&quot;$FILE_PATH\&quot; =~ layout\\.(js|jsx|ts|tsx)$ ]] &amp;&amp; ! grep -q \&quot;children\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;❌ Layout component should accept children prop\&quot; &gt;&amp;2; ((ISSUES++)); fi; if [[ \&quot;$FILE_PATH\&quot; =~ page\\.(js|jsx|ts|tsx)$ ]] &amp;&amp; ! grep -q \&quot;Metadata\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null &amp;&amp; ! grep -q \&quot;metadata\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;⚠️ Consider adding metadata export for SEO\&quot;; fi; if grep -q \&quot;use client\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;🖥️ Client Component detected\&quot;; if ! grep -E \&quot;(useState|useEffect|onClick|onChange|onSubmit)\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;⚠️ Client component without interactivity - consider Server Component\&quot;; fi; else echo \&quot;🚀 Server Component (default)\&quot;; if grep -E \&quot;(useState|useEffect|onClick|onChange|onSubmit)\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;❌ Interactive features in Server Component - add \\\&quot;use client\\\&quot; directive\&quot; &gt;&amp;2; ((ISSUES++)); fi; fi; fi; if [[ \&quot;$FILE_PATH\&quot; =~ \\.(jsx|tsx)$ ]]; then if ! grep -q \&quot;import.*React\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null &amp;&amp; grep -q \&quot;&lt;\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;⚠️ JSX without React import (Next.js 17+ handles this automatically)\&quot;; fi; if ! grep -q \&quot;FC\\|FunctionComponent\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null &amp;&amp; grep -q \&quot;props\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null &amp;&amp; [[ \&quot;$FILE_PATH\&quot; =~ \\.tsx$ ]]; then echo \&quot;💡 Consider using React.FC or explicit prop types for TypeScript\&quot;; fi; fi; if [[ \&quot;$FILE_PATH\&quot; =~ \\.js$ ]] &amp;&amp; [ -f \&quot;tsconfig.json\&quot; ]; then echo \&quot;📝 JavaScript file in TypeScript project: $FILE_PATH\&quot;; echo \&quot;💡 Consider migrating to TypeScript for better type safety\&quot;; fi; if grep -q \&quot;next/image\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;✅ Using next/image for optimized images\&quot;; elif grep -q \&quot;&lt;img\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;🖼️ Regular &lt;img&gt; tag detected\&quot;; echo \&quot;💡 Consider using next/image for better performance\&quot;; fi; if grep -q \&quot;next/link\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;✅ Using next/link for navigation\&quot;; elif grep -q \&quot;&lt;a href=\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null &amp;&amp; ! grep -q \&quot;http\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;🔗 Regular &lt;a&gt; tag for internal links detected\&quot;; echo \&quot;💡 Use next/link for internal navigation\&quot;; fi; if grep -q \&quot;getServerSideProps\\|getStaticProps\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;⚠️ Pages Router data fetching methods detected\&quot;; echo \&quot;💡 Consider migrating to App Router with Server Components\&quot;; fi; if grep -q \&quot;className=.*{\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;🎨 Dynamic className detected\&quot;; if ! grep -q \&quot;clsx\\|classnames\\|cn(\&quot; \&quot;$FILE_PATH\&quot; 2&gt;/dev/null; then echo \&quot;💡 Consider using clsx or similar utility for className concatenation\&quot;; fi; fi; if [ $ISSUES -eq 0 ]; then echo \&quot;✅ Code quality check passed for $FILE_PATH\&quot;; else echo \&quot;❌ Found $ISSUES code quality issues in $FILE_PATH\&quot; &gt;&amp;2; exit 2; fi; else echo \&quot;❌ File $FILE_PATH not found\&quot;; fi; else echo \&quot;ℹ️ Code quality check skipped (not a JavaScript/TypeScript file or failed operation)\&quot;; fi&#039;&quot;,
+            &quot;timeout&quot;: 20
+          }
+        ]
+      }
+    ]
+  }
+}</code>
       </div>
     </div>
 

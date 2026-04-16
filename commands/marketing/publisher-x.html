@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,149 @@
     <p class="desc">Generate copy-pastable X/Twitter threads from blog posts, articles, PDFs, or URLs with 3 format options</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/publisher-x</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/publisher-x</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Read, Write, Bash, Glob, WebFetch
+argument-hint: &lt;input&gt; [lang]
+description: Generate copy-pastable X/Twitter threads from blog posts, articles, PDFs, or URLs with 3 format options
+---
+
+# X/Twitter Thread Generator
+
+Generate a copy-pastable X thread from any content source - blog posts, articles, PDFs, URLs, or plain text.
+
+**Usage:** `$ARGUMENTS`
+
+**Process:**
+
+1. **Parse Input Arguments**
+   - Extract content input and optional language parameter
+   - Examples:
+     - `2025-10-06-my-post` (slug only, default English)
+     - `2025-10-06-my-post ja` (slug with Japanese)
+     - `path/to/article.md` (file path)
+     - `https://myblog.com/post` (URL)
+     - `docs/whitepaper.pdf en` (PDF with language)
+
+2. **Universal Input Detection**
+
+   **If input looks like a file path** (contains `/` or file extension):
+   - Use Read tool to check if file exists
+   - Detect format by extension:
+     - `.md` / `.mdx` → Parse markdown with frontmatter (extract title, description, body, metadata)
+     - `.pdf` → Inform user PDF parsing is limited, suggest converting to markdown first
+     - `.docx` → Inform user DOCX parsing is limited, suggest converting to markdown first
+     - `.html` → Read and extract main content, strip HTML tags
+     - `.txt` → Read as plain text
+     - `.json` → Parse JSON and extract relevant fields
+   - Extract: title, description, body content, metadata
+
+   **If input looks like a URL** (starts with `http://` or `https://`):
+   - Use WebFetch tool to retrieve the page
+   - Prompt: &quot;Extract the main article content, title, and description from this page&quot;
+   - Parse and clean the text
+
+   **If input is a slug** (no `/` and no protocol):
+   - Search codebase using Glob: `**/*${input}*.md`
+   - Common patterns to check:
+     - `src/content/blog/posts/{en,ja}/*${input}*.md`
+     - `content/blog/*${input}*.md`
+     - `posts/*${input}*.md`
+     - `blog/*${input}*.md`
+   - If language specified, prioritize matching language folder
+   - Use Read tool to parse markdown file with frontmatter
+
+3. **Determine Language** (default: English):
+   - If user explicitly specifies &quot;ja&quot; → Japanese
+   - If user explicitly specifies &quot;en&quot; → English
+   - If file path contains `/ja/` → Japanese
+   - If content appears to be in Japanese → Japanese
+   - Otherwise → English
+
+4. **Generate THREE versions** in the target language:
+
+   **Version 1: Thread (5-8 posts)**
+   - Professional and engaging tone
+   - Break into digestible posts (max 280 chars each)
+
+   **Version 2: Single Long (Premium)**
+   - Structured format with clear sections
+   - **For Japanese**: Use 【brackets】: 【とは】【誰のため】【主な特徴】【次にすべきこと】
+   - **For English**: Use headers: **What it is:** **Who it&#039;s for:** **Key features:** **What to do next:**
+
+   **Version 3: Single Short (~280 chars)**
+   - Concise announcement
+   - 2-3 key benefits with emojis
+   - Links and hashtags
+
+5. **Display all versions** to the user in terminal:
+   - Show thread posts with character counts
+   - Show single long version
+   - Show single short version
+   - Format for easy copy-pasting
+
+6. **Create tri-format HTML preview file** using Write tool:
+   - **IMPORTANT**: Check if file exists first: `ls -la x-thread-[LANG].html 2&gt;&amp;1`
+   - If file exists, use Read tool first (even just 1 line): `Read(&#039;x-thread-[LANG].html&#039;, limit=1)`
+   - Then use Write tool to create/update: `x-thread-[LANG].html` in user&#039;s current directory
+   - **Include THREE tabs with tab switcher UI**:
+     - **Tab 1: Thread** - 5-8 posts with individual &quot;Copy Post&quot; buttons
+     - **Tab 2: Single Long** - Structured format with sections, one &quot;Copy&quot; button
+     - **Tab 3: Single Short** - Concise version (~280 chars), one &quot;Copy&quot; button
+   - Use X branding (black theme)
+   - Tab switcher at top for easy navigation
+   - Use Bash tool to open: `open x-thread-[LANG].html &amp;&amp; open https://x.com/compose/post`
+
+---
+
+## X Thread Guidelines
+
+### Thread Structure (5-8 tweets):
+
+1. **Hook Tweet** (Tweet 1/X)
+   - Grab attention with a contrarian statement, stat, or bold claim
+   - Don&#039;t give away everything - create curiosity
+   - NO hashtags or links in first tweet (better algorithm reach)
+   - Max 280 chars including thread indicator
+
+2. **Problem/Context Tweets** (Tweets 2-3/X)
+   - Set up the problem or context
+   - Use specific data points from the blog
+   - Keep each tweet to ONE idea
+   - Max 280 chars each
+
+3. **Insight Tweets** (Tweets 4-6/X)
+   - Share 3-5 key insights from the blog
+   - Use bullet points (•) or numbered lists
+   - Include specific examples or stats
+   - Make each tweet self-contained
+   - Max 280 chars each
+
+4. **CTA Tweet** (Final tweet)
+   - Link to the full article
+   - Simple CTA: &quot;Read the full guide:&quot; or &quot;Full breakdown:&quot;
+   - Can include 2-3 relevant hashtags here
+   - Encourage engagement: &quot;What&#039;s your take?&quot;
+
+**Thread Numbering:**
+- Include &quot;(1/6)&quot; style numbering in EVERY tweet
+- Count MUST be accurate
+- Place at the end of each tweet
+
+**Character Limits:**
+- Each post: MAX 280 characters (including thread number)
+- Account for URL shortening: URLs = 23 chars on X
+- Leave buffer of 10-15 chars for safety
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,636 @@
     <p class="desc">Create and edit Obsidian Bases (.base files) with views, filters, formulas, and summaries. Use when working with .base files, creating database-like views of notes, or when the user mentions Bases, table views, card views, filters, or formulas in Obsidian.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/obsidian-bases</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/obsidian-bases</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: obsidian-bases
+description: Create and edit Obsidian Bases (.base files) with views, filters, formulas, and summaries. Use when working with .base files, creating database-like views of notes, or when the user mentions Bases, table views, card views, filters, or formulas in Obsidian.
+---
+
+# Obsidian Bases Skill
+
+This skill enables Claude Code to create and edit valid Obsidian Bases (`.base` files) including views, filters, formulas, and all related configurations.
+
+## Overview
+
+Obsidian Bases are YAML-based files that define dynamic views of notes in an Obsidian vault. A Base file can contain multiple views, global filters, formulas, property configurations, and custom summaries.
+
+## File Format
+
+Base files use the `.base` extension and contain valid YAML. They can also be embedded in Markdown code blocks.
+
+## Complete Schema
+
+```yaml
+# Global filters apply to ALL views in the base
+filters:
+  # Can be a single filter string
+  # OR a recursive filter object with and/or/not
+  and: []
+  or: []
+  not: []
+
+# Define formula properties that can be used across all views
+formulas:
+  formula_name: &#039;expression&#039;
+
+# Configure display names and settings for properties
+properties:
+  property_name:
+    displayName: &quot;Display Name&quot;
+  formula.formula_name:
+    displayName: &quot;Formula Display Name&quot;
+  file.ext:
+    displayName: &quot;Extension&quot;
+
+# Define custom summary formulas
+summaries:
+  custom_summary_name: &#039;values.mean().round(3)&#039;
+
+# Define one or more views
+views:
+  - type: table | cards | list | map
+    name: &quot;View Name&quot;
+    limit: 10                    # Optional: limit results
+    groupBy:                     # Optional: group results
+      property: property_name
+      direction: ASC | DESC
+    filters:                     # View-specific filters
+      and: []
+    order:                       # Properties to display in order
+      - file.name
+      - property_name
+      - formula.formula_name
+    summaries:                   # Map properties to summary formulas
+      property_name: Average
+```
+
+## Filter Syntax
+
+Filters narrow down results. They can be applied globally or per-view.
+
+### Filter Structure
+
+```yaml
+# Single filter
+filters: &#039;status == &quot;done&quot;&#039;
+
+# AND - all conditions must be true
+filters:
+  and:
+    - &#039;status == &quot;done&quot;&#039;
+    - &#039;priority &gt; 3&#039;
+
+# OR - any condition can be true
+filters:
+  or:
+    - &#039;file.hasTag(&quot;book&quot;)&#039;
+    - &#039;file.hasTag(&quot;article&quot;)&#039;
+
+# NOT - exclude matching items
+filters:
+  not:
+    - &#039;file.hasTag(&quot;archived&quot;)&#039;
+
+# Nested filters
+filters:
+  or:
+    - file.hasTag(&quot;tag&quot;)
+    - and:
+        - file.hasTag(&quot;book&quot;)
+        - file.hasLink(&quot;Textbook&quot;)
+    - not:
+        - file.hasTag(&quot;book&quot;)
+        - file.inFolder(&quot;Required Reading&quot;)
+```
+
+### Filter Operators
+
+| Operator | Description |
+|----------|-------------|
+| `==` | equals |
+| `!=` | not equal |
+| `&gt;` | greater than |
+| `&lt;` | less than |
+| `&gt;=` | greater than or equal |
+| `&lt;=` | less than or equal |
+| `&amp;&amp;` | logical and |
+| `\|\|` | logical or |
+| `!` | logical not |
+
+## Properties
+
+### Three Types of Properties
+
+1. **Note properties** - From frontmatter: `note.author` or just `author`
+2. **File properties** - File metadata: `file.name`, `file.mtime`, etc.
+3. **Formula properties** - Computed values: `formula.my_formula`
+
+### File Properties Reference
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `file.name` | String | File name |
+| `file.basename` | String | File name without extension |
+| `file.path` | String | Full path to file |
+| `file.folder` | String | Parent folder path |
+| `file.ext` | String | File extension |
+| `file.size` | Number | File size in bytes |
+| `file.ctime` | Date | Created time |
+| `file.mtime` | Date | Modified time |
+| `file.tags` | List | All tags in file |
+| `file.links` | List | Internal links in file |
+| `file.backlinks` | List | Files linking to this file |
+| `file.embeds` | List | Embeds in the note |
+| `file.properties` | Object | All frontmatter properties |
+
+### The `this` Keyword
+
+- In main content area: refers to the base file itself
+- When embedded: refers to the embedding file
+- In sidebar: refers to the active file in main content
+
+## Formula Syntax
+
+Formulas compute values from properties. Defined in the `formulas` section.
+
+```yaml
+formulas:
+  # Simple arithmetic
+  total: &quot;price * quantity&quot;
+  
+  # Conditional logic
+  status_icon: &#039;if(done, &quot;✅&quot;, &quot;⏳&quot;)&#039;
+  
+  # String formatting
+  formatted_price: &#039;if(price, price.toFixed(2) + &quot; dollars&quot;)&#039;
+  
+  # Date formatting
+  created: &#039;file.ctime.format(&quot;YYYY-MM-DD&quot;)&#039;
+  
+  # Complex expressions
+  days_old: &#039;((now() - file.ctime) / 86400000).round(0)&#039;
+```
+
+## Functions Reference
+
+### Global Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `date()` | `date(string): date` | Parse string to date. Format: `YYYY-MM-DD HH:mm:ss` |
+| `duration()` | `duration(string): duration` | Parse duration string |
+| `now()` | `now(): date` | Current date and time |
+| `today()` | `today(): date` | Current date (time = 00:00:00) |
+| `if()` | `if(condition, trueResult, falseResult?)` | Conditional |
+| `min()` | `min(n1, n2, ...): number` | Smallest number |
+| `max()` | `max(n1, n2, ...): number` | Largest number |
+| `number()` | `number(any): number` | Convert to number |
+| `link()` | `link(path, display?): Link` | Create a link |
+| `list()` | `list(element): List` | Wrap in list if not already |
+| `file()` | `file(path): file` | Get file object |
+| `image()` | `image(path): image` | Create image for rendering |
+| `icon()` | `icon(name): icon` | Lucide icon by name |
+| `html()` | `html(string): html` | Render as HTML |
+| `escapeHTML()` | `escapeHTML(string): string` | Escape HTML characters |
+
+### Any Type Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `isTruthy()` | `any.isTruthy(): boolean` | Coerce to boolean |
+| `isType()` | `any.isType(type): boolean` | Check type |
+| `toString()` | `any.toString(): string` | Convert to string |
+
+### Date Functions &amp; Fields
+
+**Fields:** `date.year`, `date.month`, `date.day`, `date.hour`, `date.minute`, `date.second`, `date.millisecond`
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `date()` | `date.date(): date` | Remove time portion |
+| `format()` | `date.format(string): string` | Format with Moment.js pattern |
+| `time()` | `date.time(): string` | Get time as string |
+| `relative()` | `date.relative(): string` | Human-readable relative time |
+| `isEmpty()` | `date.isEmpty(): boolean` | Always false for dates |
+
+### Date Arithmetic
+
+```yaml
+# Duration units: y/year/years, M/month/months, d/day/days, 
+#                 w/week/weeks, h/hour/hours, m/minute/minutes, s/second/seconds
+
+# Add/subtract durations
+&quot;date + \&quot;1M\&quot;&quot;           # Add 1 month
+&quot;date - \&quot;2h\&quot;&quot;           # Subtract 2 hours
+&quot;now() + \&quot;1 day\&quot;&quot;       # Tomorrow
+&quot;today() + \&quot;7d\&quot;&quot;        # A week from today
+
+# Subtract dates for millisecond difference
+&quot;now() - file.ctime&quot;
+
+# Complex duration arithmetic
+&quot;now() + (duration(&#039;1d&#039;) * 2)&quot;
+```
+
+### String Functions
+
+**Field:** `string.length`
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `contains()` | `string.contains(value): boolean` | Check substring |
+| `containsAll()` | `string.containsAll(...values): boolean` | All substrings present |
+| `containsAny()` | `string.containsAny(...values): boolean` | Any substring present |
+| `startsWith()` | `string.startsWith(query): boolean` | Starts with query |
+| `endsWith()` | `string.endsWith(query): boolean` | Ends with query |
+| `isEmpty()` | `string.isEmpty(): boolean` | Empty or not present |
+| `lower()` | `string.lower(): string` | To lowercase |
+| `title()` | `string.title(): string` | To Title Case |
+| `trim()` | `string.trim(): string` | Remove whitespace |
+| `replace()` | `string.replace(pattern, replacement): string` | Replace pattern |
+| `repeat()` | `string.repeat(count): string` | Repeat string |
+| `reverse()` | `string.reverse(): string` | Reverse string |
+| `slice()` | `string.slice(start, end?): string` | Substring |
+| `split()` | `string.split(separator, n?): list` | Split to list |
+
+### Number Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `abs()` | `number.abs(): number` | Absolute value |
+| `ceil()` | `number.ceil(): number` | Round up |
+| `floor()` | `number.floor(): number` | Round down |
+| `round()` | `number.round(digits?): number` | Round to digits |
+| `toFixed()` | `number.toFixed(precision): string` | Fixed-point notation |
+| `isEmpty()` | `number.isEmpty(): boolean` | Not present |
+
+### List Functions
+
+**Field:** `list.length`
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `contains()` | `list.contains(value): boolean` | Element exists |
+| `containsAll()` | `list.containsAll(...values): boolean` | All elements exist |
+| `containsAny()` | `list.containsAny(...values): boolean` | Any element exists |
+| `filter()` | `list.filter(expression): list` | Filter by condition (uses `value`, `index`) |
+| `map()` | `list.map(expression): list` | Transform elements (uses `value`, `index`) |
+| `reduce()` | `list.reduce(expression, initial): any` | Reduce to single value (uses `value`, `index`, `acc`) |
+| `flat()` | `list.flat(): list` | Flatten nested lists |
+| `join()` | `list.join(separator): string` | Join to string |
+| `reverse()` | `list.reverse(): list` | Reverse order |
+| `slice()` | `list.slice(start, end?): list` | Sublist |
+| `sort()` | `list.sort(): list` | Sort ascending |
+| `unique()` | `list.unique(): list` | Remove duplicates |
+| `isEmpty()` | `list.isEmpty(): boolean` | No elements |
+
+### File Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `asLink()` | `file.asLink(display?): Link` | Convert to link |
+| `hasLink()` | `file.hasLink(otherFile): boolean` | Has link to file |
+| `hasTag()` | `file.hasTag(...tags): boolean` | Has any of the tags |
+| `hasProperty()` | `file.hasProperty(name): boolean` | Has property |
+| `inFolder()` | `file.inFolder(folder): boolean` | In folder or subfolder |
+
+### Link Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `asFile()` | `link.asFile(): file` | Get file object |
+| `linksTo()` | `link.linksTo(file): boolean` | Links to file |
+
+### Object Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `isEmpty()` | `object.isEmpty(): boolean` | No properties |
+| `keys()` | `object.keys(): list` | List of keys |
+| `values()` | `object.values(): list` | List of values |
+
+### Regular Expression Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `matches()` | `regexp.matches(string): boolean` | Test if matches |
+
+## View Types
+
+### Table View
+
+```yaml
+views:
+  - type: table
+    name: &quot;My Table&quot;
+    order:
+      - file.name
+      - status
+      - due_date
+    summaries:
+      price: Sum
+      count: Average
+```
+
+### Cards View
+
+```yaml
+views:
+  - type: cards
+    name: &quot;Gallery&quot;
+    order:
+      - file.name
+      - cover_image
+      - description
+```
+
+### List View
+
+```yaml
+views:
+  - type: list
+    name: &quot;Simple List&quot;
+    order:
+      - file.name
+      - status
+```
+
+### Map View
+
+Requires latitude/longitude properties and the Maps plugin.
+
+```yaml
+views:
+  - type: map
+    name: &quot;Locations&quot;
+    # Map-specific settings for lat/lng properties
+```
+
+## Default Summary Formulas
+
+| Name | Input Type | Description |
+|------|------------|-------------|
+| `Average` | Number | Mathematical mean |
+| `Min` | Number | Smallest number |
+| `Max` | Number | Largest number |
+| `Sum` | Number | Sum of all numbers |
+| `Range` | Number | Max - Min |
+| `Median` | Number | Mathematical median |
+| `Stddev` | Number | Standard deviation |
+| `Earliest` | Date | Earliest date |
+| `Latest` | Date | Latest date |
+| `Range` | Date | Latest - Earliest |
+| `Checked` | Boolean | Count of true values |
+| `Unchecked` | Boolean | Count of false values |
+| `Empty` | Any | Count of empty values |
+| `Filled` | Any | Count of non-empty values |
+| `Unique` | Any | Count of unique values |
+
+## Complete Examples
+
+### Task Tracker Base
+
+```yaml
+filters:
+  and:
+    - file.hasTag(&quot;task&quot;)
+    - &#039;file.ext == &quot;md&quot;&#039;
+
+formulas:
+  days_until_due: &#039;if(due, ((date(due) - today()) / 86400000).round(0), &quot;&quot;)&#039;
+  is_overdue: &#039;if(due, date(due) &lt; today() &amp;&amp; status != &quot;done&quot;, false)&#039;
+  priority_label: &#039;if(priority == 1, &quot;🔴 High&quot;, if(priority == 2, &quot;🟡 Medium&quot;, &quot;🟢 Low&quot;))&#039;
+
+properties:
+  status:
+    displayName: Status
+  formula.days_until_due:
+    displayName: &quot;Days Until Due&quot;
+  formula.priority_label:
+    displayName: Priority
+
+views:
+  - type: table
+    name: &quot;Active Tasks&quot;
+    filters:
+      and:
+        - &#039;status != &quot;done&quot;&#039;
+    order:
+      - file.name
+      - status
+      - formula.priority_label
+      - due
+      - formula.days_until_due
+    groupBy:
+      property: status
+      direction: ASC
+    summaries:
+      formula.days_until_due: Average
+
+  - type: table
+    name: &quot;Completed&quot;
+    filters:
+      and:
+        - &#039;status == &quot;done&quot;&#039;
+    order:
+      - file.name
+      - completed_date
+```
+
+### Reading List Base
+
+```yaml
+filters:
+  or:
+    - file.hasTag(&quot;book&quot;)
+    - file.hasTag(&quot;article&quot;)
+
+formulas:
+  reading_time: &#039;if(pages, (pages * 2).toString() + &quot; min&quot;, &quot;&quot;)&#039;
+  status_icon: &#039;if(status == &quot;reading&quot;, &quot;📖&quot;, if(status == &quot;done&quot;, &quot;✅&quot;, &quot;📚&quot;))&#039;
+  year_read: &#039;if(finished_date, date(finished_date).year, &quot;&quot;)&#039;
+
+properties:
+  author:
+    displayName: Author
+  formula.status_icon:
+    displayName: &quot;&quot;
+  formula.reading_time:
+    displayName: &quot;Est. Time&quot;
+
+views:
+  - type: cards
+    name: &quot;Library&quot;
+    order:
+      - cover
+      - file.name
+      - author
+      - formula.status_icon
+    filters:
+      not:
+        - &#039;status == &quot;dropped&quot;&#039;
+
+  - type: table
+    name: &quot;Reading List&quot;
+    filters:
+      and:
+        - &#039;status == &quot;to-read&quot;&#039;
+    order:
+      - file.name
+      - author
+      - pages
+      - formula.reading_time
+```
+
+### Project Notes Base
+
+```yaml
+filters:
+  and:
+    - file.inFolder(&quot;Projects&quot;)
+    - &#039;file.ext == &quot;md&quot;&#039;
+
+formulas:
+  last_updated: &#039;file.mtime.relative()&#039;
+  link_count: &#039;file.links.length&#039;
+  
+summaries:
+  avgLinks: &#039;values.filter(value.isType(&quot;number&quot;)).mean().round(1)&#039;
+
+properties:
+  formula.last_updated:
+    displayName: &quot;Updated&quot;
+  formula.link_count:
+    displayName: &quot;Links&quot;
+
+views:
+  - type: table
+    name: &quot;All Projects&quot;
+    order:
+      - file.name
+      - status
+      - formula.last_updated
+      - formula.link_count
+    summaries:
+      formula.link_count: avgLinks
+    groupBy:
+      property: status
+      direction: ASC
+
+  - type: list
+    name: &quot;Quick List&quot;
+    order:
+      - file.name
+      - status
+```
+
+### Daily Notes Index
+
+```yaml
+filters:
+  and:
+    - file.inFolder(&quot;Daily Notes&quot;)
+    - &#039;/^\d{4}-\d{2}-\d{2}$/.matches(file.basename)&#039;
+
+formulas:
+  word_estimate: &#039;(file.size / 5).round(0)&#039;
+  day_of_week: &#039;date(file.basename).format(&quot;dddd&quot;)&#039;
+
+properties:
+  formula.day_of_week:
+    displayName: &quot;Day&quot;
+  formula.word_estimate:
+    displayName: &quot;~Words&quot;
+
+views:
+  - type: table
+    name: &quot;Recent Notes&quot;
+    limit: 30
+    order:
+      - file.name
+      - formula.day_of_week
+      - formula.word_estimate
+      - file.mtime
+```
+
+## Embedding Bases
+
+Embed in Markdown files:
+
+```markdown
+![[MyBase.base]]
+
+&lt;!-- Specific view --&gt;
+![[MyBase.base#View Name]]
+```
+
+## YAML Quoting Rules
+
+- Use single quotes for formulas containing double quotes: `&#039;if(done, &quot;Yes&quot;, &quot;No&quot;)&#039;`
+- Use double quotes for simple strings: `&quot;My View Name&quot;`
+- Escape nested quotes properly in complex expressions
+
+## Common Patterns
+
+### Filter by Tag
+```yaml
+filters:
+  and:
+    - file.hasTag(&quot;project&quot;)
+```
+
+### Filter by Folder
+```yaml
+filters:
+  and:
+    - file.inFolder(&quot;Notes&quot;)
+```
+
+### Filter by Date Range
+```yaml
+filters:
+  and:
+    - &#039;file.mtime &gt; now() - &quot;7d&quot;&#039;
+```
+
+### Filter by Property Value
+```yaml
+filters:
+  and:
+    - &#039;status == &quot;active&quot;&#039;
+    - &#039;priority &gt;= 3&#039;
+```
+
+### Combine Multiple Conditions
+```yaml
+filters:
+  or:
+    - and:
+        - file.hasTag(&quot;important&quot;)
+        - &#039;status != &quot;done&quot;&#039;
+    - and:
+        - &#039;priority == 1&#039;
+        - &#039;due != &quot;&quot;&#039;
+```
+
+## References
+
+- [Bases Syntax](https://help.obsidian.md/bases/syntax)
+- [Functions](https://help.obsidian.md/bases/functions)
+- [Views](https://help.obsidian.md/bases/views)
+- [Formulas](https://help.obsidian.md/formulas)
+
+</code>
       </div>
     </div>
 

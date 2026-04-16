@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,204 @@
     <p class="desc">Optimizes LLM inference with NVIDIA TensorRT for maximum throughput and lowest latency. Use for production deployment on NVIDIA GPUs (A100/H100), when you need 10-100x faster inference than PyTorch, or for serving models with quantization (FP8/INT4), in-flight batching, and multi-GPU scaling.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/inference-serving-tensorrt-llm</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/inference-serving-tensorrt-llm</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: tensorrt-llm
+description: Optimizes LLM inference with NVIDIA TensorRT for maximum throughput and lowest latency. Use for production deployment on NVIDIA GPUs (A100/H100), when you need 10-100x faster inference than PyTorch, or for serving models with quantization (FP8/INT4), in-flight batching, and multi-GPU scaling.
+version: 1.0.0
+author: Orchestra Research
+license: MIT
+tags: [Inference Serving, TensorRT-LLM, NVIDIA, Inference Optimization, High Throughput, Low Latency, Production, FP8, INT4, In-Flight Batching, Multi-GPU]
+dependencies: [tensorrt-llm, torch]
+---
+
+# TensorRT-LLM
+
+NVIDIA&#039;s open-source library for optimizing LLM inference with state-of-the-art performance on NVIDIA GPUs.
+
+## When to use TensorRT-LLM
+
+**Use TensorRT-LLM when:**
+- Deploying on NVIDIA GPUs (A100, H100, GB200)
+- Need maximum throughput (24,000+ tokens/sec on Llama 3)
+- Require low latency for real-time applications
+- Working with quantized models (FP8, INT4, FP4)
+- Scaling across multiple GPUs or nodes
+
+**Use vLLM instead when:**
+- Need simpler setup and Python-first API
+- Want PagedAttention without TensorRT compilation
+- Working with AMD GPUs or non-NVIDIA hardware
+
+**Use llama.cpp instead when:**
+- Deploying on CPU or Apple Silicon
+- Need edge deployment without NVIDIA GPUs
+- Want simpler GGUF quantization format
+
+## Quick start
+
+### Installation
+
+```bash
+# Docker (recommended)
+docker pull nvidia/tensorrt_llm:latest
+
+# pip install
+pip install tensorrt_llm==1.2.0rc3
+
+# Requires CUDA 13.0.0, TensorRT 10.13.2, Python 3.10-3.12
+```
+
+### Basic inference
+
+```python
+from tensorrt_llm import LLM, SamplingParams
+
+# Initialize model
+llm = LLM(model=&quot;meta-llama/Meta-Llama-3-8B&quot;)
+
+# Configure sampling
+sampling_params = SamplingParams(
+    max_tokens=100,
+    temperature=0.7,
+    top_p=0.9
+)
+
+# Generate
+prompts = [&quot;Explain quantum computing&quot;]
+outputs = llm.generate(prompts, sampling_params)
+
+for output in outputs:
+    print(output.text)
+```
+
+### Serving with trtllm-serve
+
+```bash
+# Start server (automatic model download and compilation)
+trtllm-serve meta-llama/Meta-Llama-3-8B \
+    --tp_size 4 \              # Tensor parallelism (4 GPUs)
+    --max_batch_size 256 \
+    --max_num_tokens 4096
+
+# Client request
+curl -X POST http://localhost:8000/v1/chat/completions \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{
+    &quot;model&quot;: &quot;meta-llama/Meta-Llama-3-8B&quot;,
+    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}],
+    &quot;temperature&quot;: 0.7,
+    &quot;max_tokens&quot;: 100
+  }&#039;
+```
+
+## Key features
+
+### Performance optimizations
+- **In-flight batching**: Dynamic batching during generation
+- **Paged KV cache**: Efficient memory management
+- **Flash Attention**: Optimized attention kernels
+- **Quantization**: FP8, INT4, FP4 for 2-4× faster inference
+- **CUDA graphs**: Reduced kernel launch overhead
+
+### Parallelism
+- **Tensor parallelism (TP)**: Split model across GPUs
+- **Pipeline parallelism (PP)**: Layer-wise distribution
+- **Expert parallelism**: For Mixture-of-Experts models
+- **Multi-node**: Scale beyond single machine
+
+### Advanced features
+- **Speculative decoding**: Faster generation with draft models
+- **LoRA serving**: Efficient multi-adapter deployment
+- **Disaggregated serving**: Separate prefill and generation
+
+## Common patterns
+
+### Quantized model (FP8)
+
+```python
+from tensorrt_llm import LLM
+
+# Load FP8 quantized model (2× faster, 50% memory)
+llm = LLM(
+    model=&quot;meta-llama/Meta-Llama-3-70B&quot;,
+    dtype=&quot;fp8&quot;,
+    max_num_tokens=8192
+)
+
+# Inference same as before
+outputs = llm.generate([&quot;Summarize this article...&quot;])
+```
+
+### Multi-GPU deployment
+
+```python
+# Tensor parallelism across 8 GPUs
+llm = LLM(
+    model=&quot;meta-llama/Meta-Llama-3-405B&quot;,
+    tensor_parallel_size=8,
+    dtype=&quot;fp8&quot;
+)
+```
+
+### Batch inference
+
+```python
+# Process 100 prompts efficiently
+prompts = [f&quot;Question {i}: ...&quot; for i in range(100)]
+
+outputs = llm.generate(
+    prompts,
+    sampling_params=SamplingParams(max_tokens=200)
+)
+
+# Automatic in-flight batching for maximum throughput
+```
+
+## Performance benchmarks
+
+**Meta Llama 3-8B** (H100 GPU):
+- Throughput: 24,000 tokens/sec
+- Latency: ~10ms per token
+- vs PyTorch: **100× faster**
+
+**Llama 3-70B** (8× A100 80GB):
+- FP8 quantization: 2× faster than FP16
+- Memory: 50% reduction with FP8
+
+## Supported models
+
+- **LLaMA family**: Llama 2, Llama 3, CodeLlama
+- **GPT family**: GPT-2, GPT-J, GPT-NeoX
+- **Qwen**: Qwen, Qwen2, QwQ
+- **DeepSeek**: DeepSeek-V2, DeepSeek-V3
+- **Mixtral**: Mixtral-8x7B, Mixtral-8x22B
+- **Vision**: LLaVA, Phi-3-vision
+- **100+ models** on HuggingFace
+
+## References
+
+- **[Optimization Guide](references/optimization.md)** - Quantization, batching, KV cache tuning
+- **[Multi-GPU Setup](references/multi-gpu.md)** - Tensor/pipeline parallelism, multi-node
+- **[Serving Guide](references/serving.md)** - Production deployment, monitoring, autoscaling
+
+## Resources
+
+- **Docs**: https://nvidia.github.io/TensorRT-LLM/
+- **GitHub**: https://github.com/NVIDIA/TensorRT-LLM
+- **Models**: https://huggingface.co/models?library=tensorrt_llm
+
+
+</code>
       </div>
     </div>
 

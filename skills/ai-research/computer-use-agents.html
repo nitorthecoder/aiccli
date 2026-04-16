@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,332 @@
     <p class="desc">"Build AI agents that interact with computers like humans do - viewing screens, moving cursors, clicking buttons, and typing text. Covers Anthropic's Computer Use, OpenAI's Operator/CUA, and open-source alternatives. Critical focus on sandboxing, security, and handling the unique challenges of vision-based control. Use when: computer use, desktop automation agent, screen control AI, vision-based agent, GUI automation."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/computer-use-agents</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/computer-use-agents</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: computer-use-agents
+description: &quot;Build AI agents that interact with computers like humans do - viewing screens, moving cursors, clicking buttons, and typing text. Covers Anthropic&#039;s Computer Use, OpenAI&#039;s Operator/CUA, and open-source alternatives. Critical focus on sandboxing, security, and handling the unique challenges of vision-based control. Use when: computer use, desktop automation agent, screen control AI, vision-based agent, GUI automation.&quot;
+source: vibeship-spawner-skills (Apache 2.0)
+---
+
+# Computer Use Agents
+
+## Patterns
+
+### Perception-Reasoning-Action Loop
+
+The fundamental architecture of computer use agents: observe screen,
+reason about next action, execute action, repeat. This loop integrates
+vision models with action execution through an iterative pipeline.
+
+Key components:
+1. PERCEPTION: Screenshot captures current screen state
+2. REASONING: Vision-language model analyzes and plans
+3. ACTION: Execute mouse/keyboard operations
+4. FEEDBACK: Observe result, continue or correct
+
+Critical insight: Vision agents are completely still during &quot;thinking&quot;
+phase (1-5 seconds), creating a detectable pause pattern.
+
+
+**When to use**: [&#039;Building any computer use agent from scratch&#039;, &#039;Integrating vision models with desktop control&#039;, &#039;Understanding agent behavior patterns&#039;]
+
+```python
+from anthropic import Anthropic
+from PIL import Image
+import base64
+import pyautogui
+import time
+
+class ComputerUseAgent:
+    &quot;&quot;&quot;
+    Perception-Reasoning-Action loop implementation.
+    Based on Anthropic Computer Use patterns.
+    &quot;&quot;&quot;
+
+    def __init__(self, client: Anthropic, model: str = &quot;claude-sonnet-4-20250514&quot;):
+        self.client = client
+        self.model = model
+        self.max_steps = 50  # Prevent runaway loops
+        self.action_delay = 0.5  # Seconds between actions
+
+    def capture_screenshot(self) -&gt; str:
+        &quot;&quot;&quot;Capture screen and return base64 encoded image.&quot;&quot;&quot;
+        screenshot = pyautogui.screenshot()
+        # Resize for token efficiency (1280x800 is good balance)
+        screenshot = screenshot.resize((1280, 800), Image.LANCZOS)
+
+        import io
+        buffer = io.BytesIO()
+        screenshot.save(buffer, format=&quot;PNG&quot;)
+        return base64.b64encode(buffer.getvalue()).decode()
+
+    def execute_action(self, action: dict) -&gt; dict:
+        &quot;&quot;&quot;Execute mouse/keyboard action on the computer.&quot;&quot;&quot;
+        action_type = action.get(&quot;type&quot;)
+
+        if action_type == &quot;click&quot;:
+            x, y = action[&quot;x&quot;], action[&quot;y&quot;]
+            button = action.get(&quot;button&quot;, &quot;left&quot;)
+            pyautogui.click(x, y, button=button)
+            return {&quot;success&quot;: True, &quot;action&quot;: f&quot;clicked at ({x}, {y})&quot;}
+
+        elif action_type == &quot;type&quot;:
+            text = action[&quot;text&quot;]
+            pyautogui.typewrite(text, interval=0.02)
+            return {&quot;success&quot;: True, &quot;action&quot;: f&quot;typed {len(text)} chars&quot;}
+
+        elif action_type == &quot;key&quot;:
+            key = action[&quot;key&quot;]
+            pyautogui.press(key)
+            return {&quot;success&quot;: True, &quot;action&quot;: f&quot;pressed {key}&quot;}
+
+        elif action_type == &quot;scroll&quot;:
+            direction = action.get(&quot;direction&quot;, &quot;down&quot;)
+            amount = action.get(&quot;amount&quot;, 3)
+            scroll = -amount if direction == &quot;down&quot; else amount
+            pyautogui.scroll(scroll)
+            return {&quot;success&quot;: True, &quot;action&quot;: f&quot;scrolled {dir
+```
+
+### Sandboxed Environment Pattern
+
+Computer use agents MUST run in isolated, sandboxed environments.
+Never give agents direct access to your main system - the security
+risks are too high. Use Docker containers with virtual desktops.
+
+Key isolation requirements:
+1. NETWORK: Restrict to necessary endpoints only
+2. FILESYSTEM: Read-only or scoped to temp directories
+3. CREDENTIALS: No access to host credentials
+4. SYSCALLS: Filter dangerous system calls
+5. RESOURCES: Limit CPU, memory, time
+
+The goal is &quot;blast radius minimization&quot; - if the agent goes wrong,
+damage is contained to the sandbox.
+
+
+**When to use**: [&#039;Deploying any computer use agent&#039;, &#039;Testing agent behavior safely&#039;, &#039;Running untrusted automation tasks&#039;]
+
+```python
+# Dockerfile for sandboxed computer use environment
+# Based on Anthropic&#039;s reference implementation pattern
+
+FROM ubuntu:22.04
+
+# Install desktop environment
+RUN apt-get update &amp;&amp; apt-get install -y \
+    xvfb \
+    x11vnc \
+    fluxbox \
+    xterm \
+    firefox \
+    python3 \
+    python3-pip \
+    supervisor
+
+# Security: Create non-root user
+RUN useradd -m -s /bin/bash agent &amp;&amp; \
+    mkdir -p /home/agent/.vnc
+
+# Install Python dependencies
+COPY requirements.txt /tmp/
+RUN pip3 install -r /tmp/requirements.txt
+
+# Security: Drop capabilities
+RUN apt-get install -y --no-install-recommends libcap2-bin &amp;&amp; \
+    setcap -r /usr/bin/python3 || true
+
+# Copy agent code
+COPY --chown=agent:agent . /app
+WORKDIR /app
+
+# Supervisor config for virtual display + VNC
+COPY supervisord.conf /etc/supervisor/conf.d/
+
+# Expose VNC port only (not desktop directly)
+EXPOSE 5900
+
+# Run as non-root
+USER agent
+
+CMD [&quot;/usr/bin/supervisord&quot;, &quot;-c&quot;, &quot;/etc/supervisor/conf.d/supervisord.conf&quot;]
+
+---
+
+# docker-compose.yml with security constraints
+version: &#039;3.8&#039;
+
+services:
+  computer-use-agent:
+    build: .
+    ports:
+      - &quot;5900:5900&quot;  # VNC for observation
+      - &quot;8080:8080&quot;  # API for control
+
+    # Security constraints
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:seccomp-profile.json
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: &#039;2&#039;
+          memory: 4G
+        reservations:
+          cpus: &#039;0.5&#039;
+          memory: 1G
+
+    # Network isolation
+    networks:
+      - agent-network
+
+    # No access to host filesystem
+    volumes:
+      - agent-tmp:/tmp
+
+    # Read-only root filesystem
+    read_only: true
+    tmpfs:
+      - /run
+      - /var/run
+
+    # Environment
+    environment:
+      - DISPLAY=:99
+      - NO_PROXY=localhost
+
+networks:
+  agent-network:
+    driver: bridge
+    internal: true  # No internet by default
+
+volumes:
+  agent-tmp:
+
+---
+
+# Python wrapper with additional runtime sandboxing
+import subprocess
+import os
+from dataclasses im
+```
+
+### Anthropic Computer Use Implementation
+
+Official implementation pattern using Claude&#039;s computer use capability.
+Claude 3.5 Sonnet was the first frontier model to offer computer use.
+Claude Opus 4.5 is now the &quot;best model in the world for computer use.&quot;
+
+Key capabilities:
+- screenshot: Capture current screen state
+- mouse: Click, move, drag operations
+- keyboard: Type text, press keys
+- bash: Run shell commands
+- text_editor: View and edit files
+
+Tool versions:
+- computer_20251124 (Opus 4.5): Adds zoom action for detailed inspection
+- computer_20250124 (All other models): Standard capabilities
+
+Critical limitation: &quot;Some UI elements (like dropdowns and scrollbars)
+might be tricky for Claude to manipulate&quot; - Anthropic docs
+
+
+**When to use**: [&#039;Building production computer use agents&#039;, &#039;Need highest quality vision understanding&#039;, &#039;Full desktop control (not just browser)&#039;]
+
+```python
+from anthropic import Anthropic
+from anthropic.types.beta import (
+    BetaToolComputerUse20241022,
+    BetaToolBash20241022,
+    BetaToolTextEditor20241022,
+)
+import subprocess
+import base64
+from PIL import Image
+import io
+
+class AnthropicComputerUse:
+    &quot;&quot;&quot;
+    Official Anthropic Computer Use implementation.
+
+    Requires:
+    - Docker container with virtual display
+    - VNC for viewing agent actions
+    - Proper tool implementations
+    &quot;&quot;&quot;
+
+    def __init__(self):
+        self.client = Anthropic()
+        self.model = &quot;claude-sonnet-4-20250514&quot;  # Best for computer use
+        self.screen_size = (1280, 800)
+
+    def get_tools(self) -&gt; list:
+        &quot;&quot;&quot;Define computer use tools.&quot;&quot;&quot;
+        return [
+            BetaToolComputerUse20241022(
+                type=&quot;computer_20241022&quot;,
+                name=&quot;computer&quot;,
+                display_width_px=self.screen_size[0],
+                display_height_px=self.screen_size[1],
+            ),
+            BetaToolBash20241022(
+                type=&quot;bash_20241022&quot;,
+                name=&quot;bash&quot;,
+            ),
+            BetaToolTextEditor20241022(
+                type=&quot;text_editor_20241022&quot;,
+                name=&quot;str_replace_editor&quot;,
+            ),
+        ]
+
+    def execute_tool(self, name: str, input: dict) -&gt; dict:
+        &quot;&quot;&quot;Execute a tool and return result.&quot;&quot;&quot;
+
+        if name == &quot;computer&quot;:
+            return self._handle_computer_action(input)
+        elif name == &quot;bash&quot;:
+            return self._handle_bash(input)
+        elif name == &quot;str_replace_editor&quot;:
+            return self._handle_editor(input)
+        else:
+            return {&quot;error&quot;: f&quot;Unknown tool: {name}&quot;}
+
+    def _handle_computer_action(self, input: dict) -&gt; dict:
+        &quot;&quot;&quot;Handle computer control actions.&quot;&quot;&quot;
+        action = input.get(&quot;action&quot;)
+
+        if action == &quot;screenshot&quot;:
+            # Capture via xdotool/scrot
+            subprocess.run([&quot;scrot&quot;, &quot;/tmp/screenshot.png&quot;])
+
+            with open(&quot;/tmp/screenshot.png&quot;, &quot;rb&quot;) as f:
+            
+```
+
+## ⚠️ Sharp Edges
+
+| Issue | Severity | Solution |
+|-------|----------|----------|
+| Issue | critical | ## Defense in depth - no single solution works |
+| Issue | medium | ## Add human-like variance to actions |
+| Issue | high | ## Use keyboard alternatives when possible |
+| Issue | medium | ## Accept the tradeoff |
+| Issue | high | ## Implement context management |
+| Issue | high | ## Monitor and limit costs |
+| Issue | critical | ## ALWAYS use sandboxing |
+</code>
       </div>
     </div>
 

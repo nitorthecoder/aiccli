@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,386 @@
     <p class="desc">"Production deployment for PocketBase. Use when deploying PocketBase to a server, setting up Docker, configuring systemd, reverse proxy (nginx/Caddy), TLS, SMTP, backups, S3 storage, rate limiting, or hardening for production. Provides ready-to-use configs."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/pb-deploy</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/pb-deploy</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: &quot;PocketBase Deploy&quot;
+description: &quot;Production deployment for PocketBase. Use when deploying PocketBase to a server, setting up Docker, configuring systemd, reverse proxy (nginx/Caddy), TLS, SMTP, backups, S3 storage, rate limiting, or hardening for production. Provides ready-to-use configs.&quot;
+---
+
+# PocketBase Production Deployment
+
+## Single Binary Deployment
+
+PocketBase is a single binary. No runtime dependencies.
+
+```bash
+# Download
+wget https://github.com/pocketbase/pocketbase/releases/download/v0.X.X/pocketbase_0.X.X_linux_amd64.zip
+unzip pocketbase_*.zip
+chmod +x pocketbase
+
+# Run
+./pocketbase serve --http=&quot;0.0.0.0:8090&quot;
+```
+
+Data stored in `pb_data/` (SQLite DB, uploaded files, logs).
+
+## systemd Service
+
+```ini
+# /etc/systemd/system/pocketbase.service
+[Unit]
+Description=PocketBase
+After=network.target
+
+[Service]
+Type=simple
+User=pocketbase
+Group=pocketbase
+LimitNOFILE=4096
+Restart=always
+RestartSec=5s
+WorkingDirectory=/opt/pocketbase
+ExecStart=/opt/pocketbase/pocketbase serve --http=&quot;127.0.0.1:8090&quot;
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/pocketbase/pb_data /opt/pocketbase/pb_hooks /opt/pocketbase/pb_migrations
+PrivateTmp=true
+
+# Memory limit (adjust to your server)
+# MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+# Setup
+sudo useradd --system --no-create-home pocketbase
+sudo mkdir -p /opt/pocketbase
+sudo cp pocketbase /opt/pocketbase/
+sudo chown -R pocketbase:pocketbase /opt/pocketbase
+
+# Enable &amp; start
+sudo systemctl daemon-reload
+sudo systemctl enable pocketbase
+sudo systemctl start pocketbase
+sudo systemctl status pocketbase
+
+# Logs
+sudo journalctl -u pocketbase -f
+```
+
+### File descriptor limit
+
+For high-traffic deployments, increase the limit:
+
+```ini
+# In the [Service] section:
+LimitNOFILE=65535
+```
+
+Also set system-wide in `/etc/security/limits.conf`:
+```
+pocketbase soft nofile 65535
+pocketbase hard nofile 65535
+```
+
+### Go memory limit
+
+For constrained environments:
+
+```ini
+Environment=GOMEMLIMIT=400MiB
+```
+
+## Docker
+
+### Dockerfile
+
+```dockerfile
+FROM alpine:latest
+
+ARG PB_VERSION=0.25.0
+
+RUN apk add --no-cache \
+    unzip \
+    ca-certificates
+
+# Download and install PocketBase
+# NOTE: verify the checksum in production — see https://github.com/pocketbase/pocketbase/releases
+ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
+RUN unzip /tmp/pb.zip -d /pb/ &amp;&amp; rm /tmp/pb.zip
+
+# Copy hooks and migrations
+COPY ./pb_hooks /pb/pb_hooks
+COPY ./pb_migrations /pb/pb_migrations
+
+EXPOSE 8090
+
+CMD [&quot;/pb/pocketbase&quot;, &quot;serve&quot;, &quot;--http=0.0.0.0:8090&quot;]
+```
+
+### docker-compose.yml
+
+```yaml
+services:
+  pocketbase:
+    build: .
+    ports:
+      - &quot;127.0.0.1:8090:8090&quot;  # bind to localhost only — expose via reverse proxy
+    volumes:
+      - pb_data:/pb/pb_data
+      - ./pb_hooks:/pb/pb_hooks
+      - ./pb_migrations:/pb/pb_migrations
+    restart: unless-stopped
+    healthcheck:
+      test: [&quot;CMD&quot;, &quot;wget&quot;, &quot;--no-verbose&quot;, &quot;--tries=1&quot;, &quot;--spider&quot;, &quot;http://localhost:8090/api/health&quot;]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  pb_data:
+```
+
+## Reverse Proxy
+
+### Caddy (recommended — auto TLS)
+
+```
+# /etc/caddy/Caddyfile
+myapp.com {
+    reverse_proxy localhost:8090
+}
+```
+
+That&#039;s it. Caddy handles TLS certificates automatically via Let&#039;s Encrypt.
+
+### nginx
+
+```nginx
+# /etc/nginx/sites-available/pocketbase
+server {
+    listen 80;
+    server_name myapp.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name myapp.com;
+
+    ssl_certificate /etc/letsencrypt/live/myapp.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/myapp.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    client_max_body_size 50M;
+
+    # Block public access to the admin dashboard
+    location /_/ {
+        return 403;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8090;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection &quot;upgrade&quot;;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # SSE support for realtime
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 3600s;
+    }
+}
+```
+
+**Critical for realtime**: `proxy_buffering off` and `proxy_read_timeout` must be set for SSE subscriptions to work.
+
+```bash
+# Let&#039;s Encrypt with nginx
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d myapp.com
+```
+
+## SMTP Configuration
+
+Configure in Dashboard &gt; Settings &gt; Mail settings, or via hooks:
+
+```js
+// pb_hooks/settings.pb.js
+onBootstrap(function(e) {
+    var settings = e.app.settings()
+    settings.smtp.enabled = true
+    settings.smtp.host = $os.getenv(&quot;SMTP_HOST&quot;)
+    settings.smtp.port = parseInt($os.getenv(&quot;SMTP_PORT&quot;) || &quot;587&quot;)
+    settings.smtp.username = $os.getenv(&quot;SMTP_USER&quot;)
+    settings.smtp.password = $os.getenv(&quot;SMTP_PASS&quot;)
+    settings.smtp.tls = true  // STARTTLS
+    // settings.smtp.authMethod = &quot;PLAIN&quot;  // or &quot;LOGIN&quot;
+    settings.meta.senderName = &quot;My App&quot;
+    settings.meta.senderAddress = &quot;noreply@myapp.com&quot;
+    e.app.save(settings)
+    return e.next()
+})
+```
+
+## Security Hardening
+
+### Superuser MFA
+
+Always enable MFA for superuser accounts in production:
+Dashboard &gt; Superusers &gt; Auth options &gt; MFA &gt; Enable
+
+### Settings encryption key
+
+Encrypt sensitive settings (SMTP passwords, S3 keys) at rest:
+
+```bash
+./pocketbase serve --encryptionEnv=PB_ENCRYPTION_KEY
+```
+
+Set `PB_ENCRYPTION_KEY` environment variable to a 32+ character random string. Once set, settings are encrypted in the DB. **Do not lose this key** — you won&#039;t be able to decrypt settings without it.
+
+### Rate limiting
+
+Built-in rate limiter (enabled by default). Configure in Dashboard &gt; Settings &gt; Rate limits, or:
+
+```js
+settings.rateLimits.enabled = true
+settings.rateLimits.rules = [
+    { label: &quot;*:auth*&quot;, maxRequests: 10, duration: 300 },  // 10 auth attempts per 5 min
+    { label: &quot;POST:/api/collections/*/records&quot;, maxRequests: 50, duration: 60 },
+]
+```
+
+### Hide the Dashboard in production
+
+```bash
+./pocketbase serve --http=&quot;127.0.0.1:8090&quot;  # bind to localhost only
+```
+
+Access the dashboard only via SSH tunnel:
+```bash
+ssh -L 8090:127.0.0.1:8090 user@server
+```
+
+## S3 Storage
+
+For file uploads, offload to S3-compatible storage:
+
+Dashboard &gt; Settings &gt; Files storage &gt; S3
+
+```js
+// Or via hooks:
+onBootstrap(function(e) {
+    var settings = e.app.settings()
+    settings.s3.enabled = true
+    settings.s3.bucket = $os.getenv(&quot;S3_BUCKET&quot;)
+    settings.s3.region = $os.getenv(&quot;S3_REGION&quot;)
+    settings.s3.endpoint = $os.getenv(&quot;S3_ENDPOINT&quot;)
+    settings.s3.accessKey = $os.getenv(&quot;S3_ACCESS_KEY&quot;)
+    settings.s3.secret = $os.getenv(&quot;S3_SECRET&quot;)
+    settings.s3.forcePathStyle = true  // for MinIO/Backblaze
+    e.app.save(settings)
+    return e.next()
+})
+```
+
+Compatible providers: AWS S3, Backblaze B2, Cloudflare R2, MinIO, DigitalOcean Spaces, Wasabi.
+
+## Backups
+
+### Small databases (&lt; 1GB)
+
+Use the built-in backup feature:
+- Dashboard &gt; Settings &gt; Backups
+- Or via API: `POST /api/backups`
+- Auto-schedule: configure cron in Dashboard
+
+### Large databases
+
+The Dashboard backup uses SQLite&#039;s online backup API (locks DB briefly). For large DBs, use:
+
+```bash
+# sqlite3 .backup command (hot backup, minimal locking)
+sqlite3 /opt/pocketbase/pb_data/data.db &quot;.backup &#039;/tmp/backup.db&#039;&quot;
+
+# Then rsync to remote
+rsync -avz /tmp/backup.db backup-server:/backups/pocketbase/data-$(date +%Y%m%d).db
+```
+
+**Never copy the `.db` file directly** while PocketBase is running — it may be in an inconsistent state.
+
+### Backup script
+
+```bash
+#!/bin/bash
+# /opt/pocketbase/backup.sh
+set -euo pipefail
+
+BACKUP_DIR=&quot;/backups/pocketbase&quot;
+DB_PATH=&quot;/opt/pocketbase/pb_data/data.db&quot;
+DATE=$(date +%Y%m%d_%H%M%S)
+
+mkdir -p &quot;$BACKUP_DIR&quot;
+
+# Hot backup
+sqlite3 &quot;$DB_PATH&quot; &quot;.backup &#039;${BACKUP_DIR}/data_${DATE}.db&#039;&quot;
+
+# Also backup pb_data files (uploads, if not using S3)
+tar -czf &quot;${BACKUP_DIR}/pb_data_${DATE}.tar.gz&quot; -C /opt/pocketbase pb_data --exclude=&#039;pb_data/data.db*&#039;
+
+# Retain last 30 days
+find &quot;$BACKUP_DIR&quot; -name &quot;data_*.db&quot; -mtime +30 -delete
+find &quot;$BACKUP_DIR&quot; -name &quot;pb_data_*.tar.gz&quot; -mtime +30 -delete
+```
+
+```bash
+# Crontab: daily at 2 AM
+0 2 * * * /opt/pocketbase/backup.sh &gt;&gt; /var/log/pocketbase-backup.log 2&gt;&amp;1
+```
+
+## Health Check
+
+```bash
+curl http://localhost:8090/api/health
+# {&quot;code&quot;:200,&quot;message&quot;:&quot;API is healthy.&quot;}
+```
+
+## Deployment Checklist
+
+1. **Binary**: correct architecture (linux_amd64 / linux_arm64)
+2. **systemd**: service enabled, LimitNOFILE set
+3. **Reverse proxy**: Caddy or nginx with TLS, proxy_buffering off for SSE
+4. **SMTP**: configured and tested (send a test verification email)
+5. **Superuser**: strong password + MFA enabled
+6. **Encryption key**: `--encryptionEnv` set for sensitive settings
+7. **Backups**: automated daily, tested restore procedure
+8. **Rate limiting**: enabled with sane defaults
+9. **File storage**: S3 configured if expecting many uploads
+10. **Monitoring**: health check endpoint monitored, journalctl logs reviewed
+11. **Firewall**: only 80/443 exposed, 8090 bound to localhost
+12. **GOMEMLIMIT**: set if on constrained VPS
+</code>
       </div>
     </div>
 

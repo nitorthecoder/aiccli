@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,439 @@
     <p class="desc">LLM observability platform for tracing, evaluation, and monitoring. Use when debugging LLM applications, evaluating model outputs against datasets, monitoring production systems, or building systematic testing pipelines for AI applications.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/observability-langsmith</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/observability-langsmith</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: langsmith-observability
+description: LLM observability platform for tracing, evaluation, and monitoring. Use when debugging LLM applications, evaluating model outputs against datasets, monitoring production systems, or building systematic testing pipelines for AI applications.
+version: 1.0.0
+author: Orchestra Research
+license: MIT
+tags: [Observability, LangSmith, Tracing, Evaluation, Monitoring, Debugging, Testing, LLM Ops, Production]
+dependencies: [langsmith&gt;=0.2.0]
+---
+
+# LangSmith - LLM Observability Platform
+
+Development platform for debugging, evaluating, and monitoring language models and AI applications.
+
+## When to use LangSmith
+
+**Use LangSmith when:**
+- Debugging LLM application issues (prompts, chains, agents)
+- Evaluating model outputs systematically against datasets
+- Monitoring production LLM systems
+- Building regression testing for AI features
+- Analyzing latency, token usage, and costs
+- Collaborating on prompt engineering
+
+**Key features:**
+- **Tracing**: Capture inputs, outputs, latency for all LLM calls
+- **Evaluation**: Systematic testing with built-in and custom evaluators
+- **Datasets**: Create test sets from production traces or manually
+- **Monitoring**: Track metrics, errors, and costs in production
+- **Integrations**: Works with OpenAI, Anthropic, LangChain, LlamaIndex
+
+**Use alternatives instead:**
+- **Weights &amp; Biases**: Deep learning experiment tracking, model training
+- **MLflow**: General ML lifecycle, model registry focus
+- **Arize/WhyLabs**: ML monitoring, data drift detection
+
+## Quick start
+
+### Installation
+
+```bash
+pip install langsmith
+
+# Set environment variables
+export LANGSMITH_API_KEY=&quot;your-api-key&quot;
+export LANGSMITH_TRACING=true
+```
+
+### Basic tracing with @traceable
+
+```python
+from langsmith import traceable
+from openai import OpenAI
+
+client = OpenAI()
+
+@traceable
+def generate_response(prompt: str) -&gt; str:
+    response = client.chat.completions.create(
+        model=&quot;gpt-4o&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}]
+    )
+    return response.choices[0].message.content
+
+# Automatically traced to LangSmith
+result = generate_response(&quot;What is machine learning?&quot;)
+```
+
+### OpenAI wrapper (automatic tracing)
+
+```python
+from langsmith.wrappers import wrap_openai
+from openai import OpenAI
+
+# Wrap client for automatic tracing
+client = wrap_openai(OpenAI())
+
+# All calls automatically traced
+response = client.chat.completions.create(
+    model=&quot;gpt-4o&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello!&quot;}]
+)
+```
+
+## Core concepts
+
+### Runs and traces
+
+A **run** is a single execution unit (LLM call, chain, tool). Runs form hierarchical **traces** showing the full execution flow.
+
+```python
+from langsmith import traceable
+
+@traceable(run_type=&quot;chain&quot;)
+def process_query(query: str) -&gt; str:
+    # Parent run
+    context = retrieve_context(query)  # Child run
+    response = generate_answer(query, context)  # Child run
+    return response
+
+@traceable(run_type=&quot;retriever&quot;)
+def retrieve_context(query: str) -&gt; list:
+    return vector_store.search(query)
+
+@traceable(run_type=&quot;llm&quot;)
+def generate_answer(query: str, context: list) -&gt; str:
+    return llm.invoke(f&quot;Context: {context}\n\nQuestion: {query}&quot;)
+```
+
+### Projects
+
+Projects organize related runs. Set via environment or code:
+
+```python
+import os
+os.environ[&quot;LANGSMITH_PROJECT&quot;] = &quot;my-project&quot;
+
+# Or per-function
+@traceable(project_name=&quot;my-project&quot;)
+def my_function():
+    pass
+```
+
+## Client API
+
+```python
+from langsmith import Client
+
+client = Client()
+
+# List runs
+runs = list(client.list_runs(
+    project_name=&quot;my-project&quot;,
+    filter=&#039;eq(status, &quot;success&quot;)&#039;,
+    limit=100
+))
+
+# Get run details
+run = client.read_run(run_id=&quot;...&quot;)
+
+# Create feedback
+client.create_feedback(
+    run_id=&quot;...&quot;,
+    key=&quot;correctness&quot;,
+    score=0.9,
+    comment=&quot;Good answer&quot;
+)
+```
+
+## Datasets and evaluation
+
+### Create dataset
+
+```python
+from langsmith import Client
+
+client = Client()
+
+# Create dataset
+dataset = client.create_dataset(&quot;qa-test-set&quot;, description=&quot;QA evaluation&quot;)
+
+# Add examples
+client.create_examples(
+    inputs=[
+        {&quot;question&quot;: &quot;What is Python?&quot;},
+        {&quot;question&quot;: &quot;What is ML?&quot;}
+    ],
+    outputs=[
+        {&quot;answer&quot;: &quot;A programming language&quot;},
+        {&quot;answer&quot;: &quot;Machine learning&quot;}
+    ],
+    dataset_id=dataset.id
+)
+```
+
+### Run evaluation
+
+```python
+from langsmith import evaluate
+
+def my_model(inputs: dict) -&gt; dict:
+    # Your model logic
+    return {&quot;answer&quot;: generate_answer(inputs[&quot;question&quot;])}
+
+def correctness_evaluator(run, example):
+    prediction = run.outputs[&quot;answer&quot;]
+    reference = example.outputs[&quot;answer&quot;]
+    score = 1.0 if reference.lower() in prediction.lower() else 0.0
+    return {&quot;key&quot;: &quot;correctness&quot;, &quot;score&quot;: score}
+
+results = evaluate(
+    my_model,
+    data=&quot;qa-test-set&quot;,
+    evaluators=[correctness_evaluator],
+    experiment_prefix=&quot;v1&quot;
+)
+
+print(f&quot;Average score: {results.aggregate_metrics[&#039;correctness&#039;]}&quot;)
+```
+
+### Built-in evaluators
+
+```python
+from langsmith.evaluation import LangChainStringEvaluator
+
+# Use LangChain evaluators
+results = evaluate(
+    my_model,
+    data=&quot;qa-test-set&quot;,
+    evaluators=[
+        LangChainStringEvaluator(&quot;qa&quot;),
+        LangChainStringEvaluator(&quot;cot_qa&quot;)
+    ]
+)
+```
+
+## Advanced tracing
+
+### Tracing context
+
+```python
+from langsmith import tracing_context
+
+with tracing_context(
+    project_name=&quot;experiment-1&quot;,
+    tags=[&quot;production&quot;, &quot;v2&quot;],
+    metadata={&quot;version&quot;: &quot;2.0&quot;}
+):
+    # All traceable calls inherit context
+    result = my_function()
+```
+
+### Manual runs
+
+```python
+from langsmith import trace
+
+with trace(
+    name=&quot;custom_operation&quot;,
+    run_type=&quot;tool&quot;,
+    inputs={&quot;query&quot;: &quot;test&quot;}
+) as run:
+    result = do_something()
+    run.end(outputs={&quot;result&quot;: result})
+```
+
+### Process inputs/outputs
+
+```python
+def sanitize_inputs(inputs: dict) -&gt; dict:
+    if &quot;password&quot; in inputs:
+        inputs[&quot;password&quot;] = &quot;***&quot;
+    return inputs
+
+@traceable(process_inputs=sanitize_inputs)
+def login(username: str, password: str):
+    return authenticate(username, password)
+```
+
+### Sampling
+
+```python
+import os
+os.environ[&quot;LANGSMITH_TRACING_SAMPLING_RATE&quot;] = &quot;0.1&quot;  # 10% sampling
+```
+
+## LangChain integration
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+
+# Tracing enabled automatically with LANGSMITH_TRACING=true
+llm = ChatOpenAI(model=&quot;gpt-4o&quot;)
+prompt = ChatPromptTemplate.from_messages([
+    (&quot;system&quot;, &quot;You are a helpful assistant.&quot;),
+    (&quot;user&quot;, &quot;{input}&quot;)
+])
+
+chain = prompt | llm
+
+# All chain runs traced automatically
+response = chain.invoke({&quot;input&quot;: &quot;Hello!&quot;})
+```
+
+## Production monitoring
+
+### Hub prompts
+
+```python
+from langsmith import Client
+
+client = Client()
+
+# Pull prompt from hub
+prompt = client.pull_prompt(&quot;my-org/qa-prompt&quot;)
+
+# Use in application
+result = prompt.invoke({&quot;question&quot;: &quot;What is AI?&quot;})
+```
+
+### Async client
+
+```python
+from langsmith import AsyncClient
+
+async def main():
+    client = AsyncClient()
+
+    runs = []
+    async for run in client.list_runs(project_name=&quot;my-project&quot;):
+        runs.append(run)
+
+    return runs
+```
+
+### Feedback collection
+
+```python
+from langsmith import Client
+
+client = Client()
+
+# Collect user feedback
+def record_feedback(run_id: str, user_rating: int, comment: str = None):
+    client.create_feedback(
+        run_id=run_id,
+        key=&quot;user_rating&quot;,
+        score=user_rating / 5.0,  # Normalize to 0-1
+        comment=comment
+    )
+
+# In your application
+record_feedback(run_id=&quot;...&quot;, user_rating=4, comment=&quot;Helpful response&quot;)
+```
+
+## Testing integration
+
+### Pytest integration
+
+```python
+from langsmith import test
+
+@test
+def test_qa_accuracy():
+    result = my_qa_function(&quot;What is Python?&quot;)
+    assert &quot;programming&quot; in result.lower()
+```
+
+### Evaluation in CI/CD
+
+```python
+from langsmith import evaluate
+
+def run_evaluation():
+    results = evaluate(
+        my_model,
+        data=&quot;regression-test-set&quot;,
+        evaluators=[accuracy_evaluator]
+    )
+
+    # Fail CI if accuracy drops
+    assert results.aggregate_metrics[&quot;accuracy&quot;] &gt;= 0.9, \
+        f&quot;Accuracy {results.aggregate_metrics[&#039;accuracy&#039;]} below threshold&quot;
+```
+
+## Best practices
+
+1. **Structured naming** - Use consistent project/run naming conventions
+2. **Add metadata** - Include version, environment, user info
+3. **Sample in production** - Use sampling rate to control volume
+4. **Create datasets** - Build test sets from interesting production cases
+5. **Automate evaluation** - Run evaluations in CI/CD pipelines
+6. **Monitor costs** - Track token usage and latency trends
+
+## Common issues
+
+**Traces not appearing:**
+```python
+import os
+# Ensure tracing is enabled
+os.environ[&quot;LANGSMITH_TRACING&quot;] = &quot;true&quot;
+os.environ[&quot;LANGSMITH_API_KEY&quot;] = &quot;your-key&quot;
+
+# Verify connection
+from langsmith import Client
+client = Client()
+print(client.list_projects())  # Should work
+```
+
+**High latency from tracing:**
+```python
+# Enable background batching (default)
+from langsmith import Client
+client = Client(auto_batch_tracing=True)
+
+# Or use sampling
+os.environ[&quot;LANGSMITH_TRACING_SAMPLING_RATE&quot;] = &quot;0.1&quot;
+```
+
+**Large payloads:**
+```python
+# Hide sensitive/large fields
+@traceable(
+    process_inputs=lambda x: {k: v for k, v in x.items() if k != &quot;large_field&quot;}
+)
+def my_function(data):
+    pass
+```
+
+## References
+
+- **[Advanced Usage](references/advanced-usage.md)** - Custom evaluators, distributed tracing, hub prompts
+- **[Troubleshooting](references/troubleshooting.md)** - Common issues, debugging, performance
+
+## Resources
+
+- **Documentation**: https://docs.smith.langchain.com
+- **Python SDK**: https://github.com/langchain-ai/langsmith-sdk
+- **Web App**: https://smith.langchain.com
+- **Version**: 0.2.0+
+- **License**: MIT
+</code>
       </div>
     </div>
 

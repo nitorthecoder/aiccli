@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,92 @@
     <p class="desc">Get AI-powered match predictions for Premier League and Champions League including scores, next goal, and corners.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/footballbin-predictions</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/footballbin-predictions</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: footballbin-predictions
+description: Get AI-powered match predictions for Premier League and Champions League including scores, next goal, and corners.
+homepage: https://apps.apple.com/app/footballbin/id6757111871
+metadata: {&quot;clawdbot&quot;:{&quot;emoji&quot;:&quot;⚽&quot;,&quot;requires&quot;:{&quot;bins&quot;:[&quot;curl&quot;,&quot;jq&quot;]},&quot;files&quot;:[&quot;scripts/*&quot;]}}
+---
+
+# FootballBin Match Predictions
+
+Get AI-powered predictions for Premier League and Champions League matches via the FootballBin MCP API.
+
+## Quick Start
+
+Run `scripts/footballbin.sh` with the following commands:
+
+### Get current matchweek predictions
+```bash
+scripts/footballbin.sh predictions premier_league
+scripts/footballbin.sh predictions champions_league
+```
+
+### Get specific matchweek
+```bash
+scripts/footballbin.sh predictions premier_league 27
+```
+
+### Filter by team
+```bash
+scripts/footballbin.sh predictions premier_league --home arsenal
+scripts/footballbin.sh predictions premier_league --away liverpool
+scripts/footballbin.sh predictions premier_league --home chelsea --away wolves
+```
+
+### List available tools
+```bash
+scripts/footballbin.sh tools
+```
+
+## Supported Leagues
+
+| Input | League |
+|-------|--------|
+| `premier_league`, `epl`, `pl`, `prem` | Premier League |
+| `champions_league`, `ucl`, `cl` | Champions League |
+
+## Supported Team Aliases
+
+Common aliases work: `united` (Man Utd), `city` (Man City), `spurs` (Tottenham), `wolves` (Wolverhampton), `gunners` (Arsenal), `reds` (Liverpool), `blues` (Chelsea), `villa` (Aston Villa), `forest` (Nottingham Forest), `palace` (Crystal Palace), `barca` (Barcelona), `real` (Real Madrid), `bayern` (Bayern Munich), `psg` (PSG), `juve` (Juventus), `inter` (Inter Milan), `bvb` (Dortmund), `atleti` (Atletico Madrid).
+
+## Response Data
+
+Each match prediction includes:
+- **Half-time score** (e.g., &quot;1:0&quot;)
+- **Full-time score** (e.g., &quot;2:1&quot;)
+- **Next goal scorer** (e.g., &quot;Home,Salah&quot;)
+- **Corner count** (e.g., &quot;7:4&quot;)
+- **Key players** with form-based reasoning
+
+## External Endpoints
+
+| URL | Data Sent | Purpose |
+|-----|-----------|---------|
+| `https://ru7m5svay1.execute-api.eu-central-1.amazonaws.com/prod/mcp` | League, matchweek, team filters | Fetch match predictions |
+
+## Security &amp; Privacy
+
+- No API key required (public endpoint, rate-limited)
+- No user data collected or stored
+- Read-only: only fetches prediction data
+- No secrets or environment variables needed
+
+## Links
+
+- iOS App: https://apps.apple.com/app/footballbin/id6757111871
+- Android App: https://play.google.com/store/apps/details?id=com.achan.footballbinandroid
+</code>
       </div>
     </div>
 

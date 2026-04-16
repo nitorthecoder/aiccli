@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,347 @@
     <p class="desc">"Access COSMIC cancer mutation database. Query somatic mutations, Cancer Gene Census, mutational signatures, gene fusions, for cancer research and precision oncology. Requires authentication."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/cosmic-database</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/cosmic-database</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: cosmic-database
+description: &quot;Access COSMIC cancer mutation database. Query somatic mutations, Cancer Gene Census, mutational signatures, gene fusions, for cancer research and precision oncology. Requires authentication.&quot;
+---
+
+# COSMIC Database
+
+## Overview
+
+COSMIC (Catalogue of Somatic Mutations in Cancer) is the world&#039;s largest and most comprehensive database for exploring somatic mutations in human cancer. Access COSMIC&#039;s extensive collection of cancer genomics data, including millions of mutations across thousands of cancer types, curated gene lists, mutational signatures, and clinical annotations programmatically.
+
+## When to Use This Skill
+
+This skill should be used when:
+- Downloading cancer mutation data from COSMIC
+- Accessing the Cancer Gene Census for curated cancer gene lists
+- Retrieving mutational signature profiles
+- Querying structural variants, copy number alterations, or gene fusions
+- Analyzing drug resistance mutations
+- Working with cancer cell line genomics data
+- Integrating cancer mutation data into bioinformatics pipelines
+- Researching specific genes or mutations in cancer contexts
+
+## Prerequisites
+
+### Account Registration
+COSMIC requires authentication for data downloads:
+- **Academic users**: Free access with registration at https://cancer.sanger.ac.uk/cosmic/register
+- **Commercial users**: License required (contact QIAGEN)
+
+### Python Requirements
+```bash
+uv pip install requests pandas
+```
+
+## Quick Start
+
+### 1. Basic File Download
+
+Use the `scripts/download_cosmic.py` script to download COSMIC data files:
+
+```python
+from scripts.download_cosmic import download_cosmic_file
+
+# Download mutation data
+download_cosmic_file(
+    email=&quot;your_email@institution.edu&quot;,
+    password=&quot;your_password&quot;,
+    filepath=&quot;GRCh38/cosmic/latest/CosmicMutantExport.tsv.gz&quot;,
+    output_filename=&quot;cosmic_mutations.tsv.gz&quot;
+)
+```
+
+### 2. Command-Line Usage
+
+```bash
+# Download using shorthand data type
+python scripts/download_cosmic.py user@email.com --data-type mutations
+
+# Download specific file
+python scripts/download_cosmic.py user@email.com \
+    --filepath GRCh38/cosmic/latest/cancer_gene_census.csv
+
+# Download for specific genome assembly
+python scripts/download_cosmic.py user@email.com \
+    --data-type gene_census --assembly GRCh37 -o cancer_genes.csv
+```
+
+### 3. Working with Downloaded Data
+
+```python
+import pandas as pd
+
+# Read mutation data
+mutations = pd.read_csv(&#039;cosmic_mutations.tsv.gz&#039;, sep=&#039;\t&#039;, compression=&#039;gzip&#039;)
+
+# Read Cancer Gene Census
+gene_census = pd.read_csv(&#039;cancer_gene_census.csv&#039;)
+
+# Read VCF format
+import pysam
+vcf = pysam.VariantFile(&#039;CosmicCodingMuts.vcf.gz&#039;)
+```
+
+## Available Data Types
+
+### Core Mutations
+Download comprehensive mutation data including point mutations, indels, and genomic annotations.
+
+**Common data types**:
+- `mutations` - Complete coding mutations (TSV format)
+- `mutations_vcf` - Coding mutations in VCF format
+- `sample_info` - Sample metadata and tumor information
+
+```python
+# Download all coding mutations
+download_cosmic_file(
+    email=&quot;user@email.com&quot;,
+    password=&quot;password&quot;,
+    filepath=&quot;GRCh38/cosmic/latest/CosmicMutantExport.tsv.gz&quot;
+)
+```
+
+### Cancer Gene Census
+Access the expert-curated list of ~700+ cancer genes with substantial evidence of cancer involvement.
+
+```python
+# Download Cancer Gene Census
+download_cosmic_file(
+    email=&quot;user@email.com&quot;,
+    password=&quot;password&quot;,
+    filepath=&quot;GRCh38/cosmic/latest/cancer_gene_census.csv&quot;
+)
+```
+
+**Use cases**:
+- Identifying known cancer genes
+- Filtering variants by cancer relevance
+- Understanding gene roles (oncogene vs tumor suppressor)
+- Target gene selection for research
+
+### Mutational Signatures
+Download signature profiles for mutational signature analysis.
+
+```python
+# Download signature definitions
+download_cosmic_file(
+    email=&quot;user@email.com&quot;,
+    password=&quot;password&quot;,
+    filepath=&quot;signatures/signatures.tsv&quot;
+)
+```
+
+**Signature types**:
+- Single Base Substitution (SBS) signatures
+- Doublet Base Substitution (DBS) signatures
+- Insertion/Deletion (ID) signatures
+
+### Structural Variants and Fusions
+Access gene fusion data and structural rearrangements.
+
+**Available data types**:
+- `structural_variants` - Structural breakpoints
+- `fusion_genes` - Gene fusion events
+
+```python
+# Download gene fusions
+download_cosmic_file(
+    email=&quot;user@email.com&quot;,
+    password=&quot;password&quot;,
+    filepath=&quot;GRCh38/cosmic/latest/CosmicFusionExport.tsv.gz&quot;
+)
+```
+
+### Copy Number and Expression
+Retrieve copy number alterations and gene expression data.
+
+**Available data types**:
+- `copy_number` - Copy number gains/losses
+- `gene_expression` - Over/under-expression data
+
+```python
+# Download copy number data
+download_cosmic_file(
+    email=&quot;user@email.com&quot;,
+    password=&quot;password&quot;,
+    filepath=&quot;GRCh38/cosmic/latest/CosmicCompleteCNA.tsv.gz&quot;
+)
+```
+
+### Resistance Mutations
+Access drug resistance mutation data with clinical annotations.
+
+```python
+# Download resistance mutations
+download_cosmic_file(
+    email=&quot;user@email.com&quot;,
+    password=&quot;password&quot;,
+    filepath=&quot;GRCh38/cosmic/latest/CosmicResistanceMutations.tsv.gz&quot;
+)
+```
+
+## Working with COSMIC Data
+
+### Genome Assemblies
+COSMIC provides data for two reference genomes:
+- **GRCh38** (recommended, current standard)
+- **GRCh37** (legacy, for older pipelines)
+
+Specify the assembly in file paths:
+```python
+# GRCh38 (recommended)
+filepath=&quot;GRCh38/cosmic/latest/CosmicMutantExport.tsv.gz&quot;
+
+# GRCh37 (legacy)
+filepath=&quot;GRCh37/cosmic/latest/CosmicMutantExport.tsv.gz&quot;
+```
+
+### Versioning
+- Use `latest` in file paths to always get the most recent release
+- COSMIC is updated quarterly (current version: v102, May 2025)
+- Specific versions can be used for reproducibility: `v102`, `v101`, etc.
+
+### File Formats
+- **TSV/CSV**: Tab/comma-separated, gzip compressed, read with pandas
+- **VCF**: Standard variant format, use with pysam, bcftools, or GATK
+- All files include headers describing column contents
+
+### Common Analysis Patterns
+
+**Filter mutations by gene**:
+```python
+import pandas as pd
+
+mutations = pd.read_csv(&#039;cosmic_mutations.tsv.gz&#039;, sep=&#039;\t&#039;, compression=&#039;gzip&#039;)
+tp53_mutations = mutations[mutations[&#039;Gene name&#039;] == &#039;TP53&#039;]
+```
+
+**Identify cancer genes by role**:
+```python
+gene_census = pd.read_csv(&#039;cancer_gene_census.csv&#039;)
+oncogenes = gene_census[gene_census[&#039;Role in Cancer&#039;].str.contains(&#039;oncogene&#039;, na=False)]
+tumor_suppressors = gene_census[gene_census[&#039;Role in Cancer&#039;].str.contains(&#039;TSG&#039;, na=False)]
+```
+
+**Extract mutations by cancer type**:
+```python
+mutations = pd.read_csv(&#039;cosmic_mutations.tsv.gz&#039;, sep=&#039;\t&#039;, compression=&#039;gzip&#039;)
+lung_mutations = mutations[mutations[&#039;Primary site&#039;] == &#039;lung&#039;]
+```
+
+**Work with VCF files**:
+```python
+import pysam
+
+vcf = pysam.VariantFile(&#039;CosmicCodingMuts.vcf.gz&#039;)
+for record in vcf.fetch(&#039;17&#039;, 7577000, 7579000):  # TP53 region
+    print(record.id, record.ref, record.alts, record.info)
+```
+
+## Data Reference
+
+For comprehensive information about COSMIC data structure, available files, and field descriptions, see `references/cosmic_data_reference.md`. This reference includes:
+
+- Complete list of available data types and files
+- Detailed field descriptions for each file type
+- File format specifications
+- Common file paths and naming conventions
+- Data update schedule and versioning
+- Citation information
+
+Use this reference when:
+- Exploring what data is available in COSMIC
+- Understanding specific field meanings
+- Determining the correct file path for a data type
+- Planning analysis workflows with COSMIC data
+
+## Helper Functions
+
+The download script includes helper functions for common operations:
+
+### Get Common File Paths
+```python
+from scripts.download_cosmic import get_common_file_path
+
+# Get path for mutations file
+path = get_common_file_path(&#039;mutations&#039;, genome_assembly=&#039;GRCh38&#039;)
+# Returns: &#039;GRCh38/cosmic/latest/CosmicMutantExport.tsv.gz&#039;
+
+# Get path for gene census
+path = get_common_file_path(&#039;gene_census&#039;)
+# Returns: &#039;GRCh38/cosmic/latest/cancer_gene_census.csv&#039;
+```
+
+**Available shortcuts**:
+- `mutations` - Core coding mutations
+- `mutations_vcf` - VCF format mutations
+- `gene_census` - Cancer Gene Census
+- `resistance_mutations` - Drug resistance data
+- `structural_variants` - Structural variants
+- `gene_expression` - Expression data
+- `copy_number` - Copy number alterations
+- `fusion_genes` - Gene fusions
+- `signatures` - Mutational signatures
+- `sample_info` - Sample metadata
+
+## Troubleshooting
+
+### Authentication Errors
+- Verify email and password are correct
+- Ensure account is registered at cancer.sanger.ac.uk/cosmic
+- Check if commercial license is required for your use case
+
+### File Not Found
+- Verify the filepath is correct
+- Check that the requested version exists
+- Use `latest` for the most recent version
+- Confirm genome assembly (GRCh37 vs GRCh38) is correct
+
+### Large File Downloads
+- COSMIC files can be several GB in size
+- Ensure sufficient disk space
+- Download may take several minutes depending on connection
+- The script shows download progress for large files
+
+### Commercial Use
+- Commercial users must license COSMIC through QIAGEN
+- Contact: cosmic-translation@sanger.ac.uk
+- Academic access is free but requires registration
+
+## Integration with Other Tools
+
+COSMIC data integrates well with:
+- **Variant annotation**: VEP, ANNOVAR, SnpEff
+- **Signature analysis**: SigProfiler, deconstructSigs, MuSiCa
+- **Cancer genomics**: cBioPortal, OncoKB, CIViC
+- **Bioinformatics**: Bioconductor, TCGA analysis tools
+- **Data science**: pandas, scikit-learn, PyTorch
+
+## Additional Resources
+
+- **COSMIC Website**: https://cancer.sanger.ac.uk/cosmic
+- **Documentation**: https://cancer.sanger.ac.uk/cosmic/help
+- **Release Notes**: https://cancer.sanger.ac.uk/cosmic/release_notes
+- **Contact**: cosmic@sanger.ac.uk
+
+## Citation
+
+When using COSMIC data, cite:
+Tate JG, Bamford S, Jubb HC, et al. COSMIC: the Catalogue Of Somatic Mutations In Cancer. Nucleic Acids Research. 2019;47(D1):D941-D947.
+</code>
       </div>
     </div>
 

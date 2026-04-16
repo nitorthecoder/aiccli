@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,599 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/code-to-task</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/code-to-task</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># Convert Code Analysis to Linear Tasks
+
+Convert code analysis to Linear tasks
+
+## Purpose
+This command scans your codebase for TODO/FIXME comments, technical debt markers, deprecated code, and other indicators that should be tracked as tasks. It automatically creates organized, prioritized Linear tasks to ensure important code improvements aren&#039;t forgotten.
+
+## Usage
+```bash
+# Scan entire codebase for TODOs and create tasks
+claude &quot;Create tasks from all TODO comments in the codebase&quot;
+
+# Scan specific directory or module
+claude &quot;Find TODOs in src/api and create Linear tasks&quot;
+
+# Create tasks from specific patterns
+claude &quot;Create tasks for all deprecated functions&quot;
+
+# Generate technical debt report
+claude &quot;Analyze technical debt in the project and create improvement tasks&quot;
+```
+
+## Instructions
+
+### 1. Scan for Task Markers
+Search for common patterns indicating needed work:
+
+```bash
+# Find TODO comments
+rg &quot;TODO|FIXME|HACK|XXX|OPTIMIZE|REFACTOR&quot; --type-add &#039;code:*.{js,ts,py,java,go,rb,php}&#039; -t code
+
+# Find deprecated markers
+rg &quot;@deprecated|DEPRECATED|@obsolete&quot; -t code
+
+# Find temporary code
+rg &quot;TEMPORARY|TEMP|REMOVE BEFORE|DELETE ME&quot; -t code -i
+
+# Find technical debt markers
+rg &quot;TECHNICAL DEBT|TECH DEBT|REFACTOR|NEEDS REFACTORING&quot; -t code -i
+
+# Find security concerns
+rg &quot;SECURITY|INSECURE|VULNERABILITY|CVE-&quot; -t code -i
+
+# Find performance issues
+rg &quot;SLOW|PERFORMANCE|OPTIMIZE|BOTTLENECK&quot; -t code -i
+```
+
+### 2. Parse Comment Context
+Extract meaningful information from comments:
+
+```javascript
+class CommentParser {
+  parseComment(file, lineNumber, comment) {
+    const parsed = {
+      type: &#039;todo&#039;,
+      priority: &#039;medium&#039;,
+      title: &#039;&#039;,
+      description: &#039;&#039;,
+      author: null,
+      date: null,
+      tags: [],
+      code_context: &#039;&#039;,
+      file_path: file,
+      line_number: lineNumber
+    };
+    
+    // Detect comment type
+    if (comment.match(/FIXME/i)) {
+      parsed.type = &#039;fixme&#039;;
+      parsed.priority = &#039;high&#039;;
+    } else if (comment.match(/HACK|XXX/i)) {
+      parsed.type = &#039;hack&#039;;
+      parsed.priority = &#039;high&#039;;
+    } else if (comment.match(/OPTIMIZE|PERFORMANCE/i)) {
+      parsed.type = &#039;optimization&#039;;
+    } else if (comment.match(/DEPRECATED/i)) {
+      parsed.type = &#039;deprecation&#039;;
+      parsed.priority = &#039;high&#039;;
+    } else if (comment.match(/SECURITY/i)) {
+      parsed.type = &#039;security&#039;;
+      parsed.priority = &#039;urgent&#039;;
+    }
+    
+    // Extract author and date
+    const authorMatch = comment.match(/@(\w+)|by (\w+)/i);
+    if (authorMatch) {
+      parsed.author = authorMatch[1] || authorMatch[2];
+    }
+    
+    const dateMatch = comment.match(/(\d{4}-\d{2}-\d{2})|(\d{1,2}\/\d{1,2}\/\d{2,4})/);
+    if (dateMatch) {
+      parsed.date = dateMatch[0];
+    }
+    
+    // Extract title and description
+    const cleanComment = comment
+      .replace(/^\/\/\s*|^\/\*\s*|\*\/\s*$|^#\s*/g, &#039;&#039;)
+      .replace(/TODO|FIXME|HACK|XXX/i, &#039;&#039;)
+      .trim();
+    
+    const parts = cleanComment.split(/[:\-–—]/);
+    if (parts.length &gt; 1) {
+      parsed.title = parts[0].trim();
+      parsed.description = parts.slice(1).join(&#039;:&#039;).trim();
+    } else {
+      parsed.title = cleanComment;
+    }
+    
+    // Extract tags
+    const tagMatch = comment.match(/#(\w+)/g);
+    if (tagMatch) {
+      parsed.tags = tagMatch.map(tag =&gt; tag.substring(1));
+    }
+    
+    return parsed;
+  }
+  
+  getCodeContext(file, lineNumber, contextLines = 5) {
+    const lines = readFileLines(file);
+    const start = Math.max(0, lineNumber - contextLines);
+    const end = Math.min(lines.length, lineNumber + contextLines);
+    
+    return lines.slice(start, end).map((line, i) =&gt; ({
+      number: start + i + 1,
+      content: line,
+      isTarget: start + i + 1 === lineNumber
+    }));
+  }
+}
+```
+
+### 3. Group and Deduplicate
+Organize found issues intelligently:
+
+```javascript
+class TaskGrouper {
+  groupTasks(parsedComments) {
+    const groups = {
+      byFile: new Map(),
+      byType: new Map(),
+      byAuthor: new Map(),
+      byModule: new Map()
+    };
+    
+    for (const comment of parsedComments) {
+      // Group by file
+      if (!groups.byFile.has(comment.file_path)) {
+        groups.byFile.set(comment.file_path, []);
+      }
+      groups.byFile.get(comment.file_path).push(comment);
+      
+      // Group by type
+      if (!groups.byType.has(comment.type)) {
+        groups.byType.set(comment.type, []);
+      }
+      groups.byType.get(comment.type).push(comment);
+      
+      // Group by module
+      const module = this.extractModule(comment.file_path);
+      if (!groups.byModule.has(module)) {
+        groups.byModule.set(module, []);
+      }
+      groups.byModule.get(module).push(comment);
+    }
+    
+    return groups;
+  }
+  
+  mergeSimilarTasks(tasks) {
+    const merged = [];
+    const seen = new Set();
+    
+    for (const task of tasks) {
+      if (seen.has(task)) continue;
+      
+      // Find similar tasks
+      const similar = tasks.filter(t =&gt; 
+        t !== task &amp;&amp;
+        !seen.has(t) &amp;&amp;
+        this.areSimilar(task, t)
+      );
+      
+      if (similar.length &gt; 0) {
+        // Merge into one task
+        const mergedTask = {
+          ...task,
+          title: this.generateMergedTitle(task, similar),
+          description: this.generateMergedDescription(task, similar),
+          locations: [task, ...similar].map(t =&gt; ({
+            file: t.file_path,
+            line: t.line_number
+          }))
+        };
+        merged.push(mergedTask);
+        seen.add(task);
+        similar.forEach(t =&gt; seen.add(t));
+      } else {
+        merged.push(task);
+        seen.add(task);
+      }
+    }
+    
+    return merged;
+  }
+}
+```
+
+### 4. Analyze Technical Debt
+Identify code quality issues:
+
+```javascript
+class TechnicalDebtAnalyzer {
+  async analyzeFile(filePath) {
+    const issues = [];
+    const content = await readFile(filePath);
+    const lines = content.split(&#039;\n&#039;);
+    
+    // Check for long functions
+    const functionMatches = content.matchAll(/function\s+(\w+)|(\w+)\s*=\s*\(.*?\)\s*=&gt;/g);
+    for (const match of functionMatches) {
+      const functionName = match[1] || match[2];
+      const startLine = getLineNumber(content, match.index);
+      const functionLength = this.getFunctionLength(lines, startLine);
+      
+      if (functionLength &gt; 50) {
+        issues.push({
+          type: &#039;long_function&#039;,
+          severity: functionLength &gt; 100 ? &#039;high&#039; : &#039;medium&#039;,
+          title: `Refactor long function: ${functionName}`,
+          description: `Function ${functionName} is ${functionLength} lines long. Consider breaking it into smaller functions.`,
+          file_path: filePath,
+          line_number: startLine
+        });
+      }
+    }
+    
+    // Check for duplicate code
+    const duplicates = await this.findDuplicateCode(filePath);
+    for (const dup of duplicates) {
+      issues.push({
+        type: &#039;duplicate_code&#039;,
+        severity: &#039;medium&#039;,
+        title: &#039;Remove duplicate code&#039;,
+        description: `Similar code found in ${dup.otherFile}:${dup.otherLine}`,
+        file_path: filePath,
+        line_number: dup.line
+      });
+    }
+    
+    // Check for complex conditionals
+    const complexConditions = content.matchAll(/if\s*\([^)]{50,}\)/g);
+    for (const match of complexConditions) {
+      issues.push({
+        type: &#039;complex_condition&#039;,
+        severity: &#039;low&#039;,
+        title: &#039;Simplify complex conditional&#039;,
+        description: &#039;Consider extracting conditional logic into named variables or functions&#039;,
+        file_path: filePath,
+        line_number: getLineNumber(content, match.index)
+      });
+    }
+    
+    // Check for outdated dependencies
+    if (filePath.endsWith(&#039;package.json&#039;)) {
+      const outdated = await this.checkOutdatedDependencies(filePath);
+      for (const dep of outdated) {
+        issues.push({
+          type: &#039;outdated_dependency&#039;,
+          severity: dep.major ? &#039;high&#039; : &#039;low&#039;,
+          title: `Update ${dep.name} from ${dep.current} to ${dep.latest}`,
+          description: dep.major ? &#039;Major version update available&#039; : &#039;Minor update available&#039;,
+          file_path: filePath
+        });
+      }
+    }
+    
+    return issues;
+  }
+}
+```
+
+### 5. Create Linear Tasks
+Convert findings into actionable tasks:
+
+```javascript
+async function createLinearTasks(groupedTasks, options = {}) {
+  const created = [];
+  const skipped = [];
+  
+  // Check for existing tasks to avoid duplicates
+  const existingTasks = await linear.searchTasks(&#039;TODO OR FIXME&#039;);
+  const existingTitles = new Set(existingTasks.map(t =&gt; t.title));
+  
+  // Create parent task for large groups
+  if (options.createEpic &amp;&amp; groupedTasks.length &gt; 10) {
+    const epic = await linear.createTask({
+      title: `Technical Debt: ${options.module || &#039;Codebase&#039;} Cleanup`,
+      description: `Parent task for ${groupedTasks.length} code improvements`,
+      priority: 2,
+      labels: [&#039;technical-debt&#039;, &#039;code-quality&#039;]
+    });
+    options.parentId = epic.id;
+  }
+  
+  for (const task of groupedTasks) {
+    // Skip if similar task exists
+    if (existingTitles.has(task.title)) {
+      skipped.push({ task, reason: &#039;duplicate&#039; });
+      continue;
+    }
+    
+    // Build task description
+    const description = buildTaskDescription(task);
+    
+    // Map priority
+    const priorityMap = {
+      urgent: 1,
+      high: 2,
+      medium: 3,
+      low: 4
+    };
+    
+    try {
+      const linearTask = await linear.createTask({
+        title: task.title,
+        description,
+        priority: priorityMap[task.priority] || 3,
+        labels: getLabelsForTask(task),
+        parentId: options.parentId,
+        estimate: estimateTaskSize(task)
+      });
+      
+      created.push({
+        linear: linearTask,
+        source: task
+      });
+      
+      // Add code link as comment
+      await linear.createComment({
+        issueId: linearTask.id,
+        body: `📍 Code location: \`${task.file_path}:${task.line_number}\``
+      });
+      
+    } catch (error) {
+      skipped.push({ task, reason: error.message });
+    }
+  }
+  
+  return { created, skipped };
+}
+
+function buildTaskDescription(task) {
+  let description = task.description || &#039;&#039;;
+  
+  // Add code context
+  if (task.code_context) {
+    description += &#039;\n\n### Code Context\n```\n&#039;;
+    task.code_context.forEach(line =&gt; {
+      const prefix = line.isTarget ? &#039;&gt;&gt;&gt; &#039; : &#039;    &#039;;
+      description += `${prefix}${line.number}: ${line.content}\n`;
+    });
+    description += &#039;```\n&#039;;
+  }
+  
+  // Add metadata
+  description += &#039;\n\n### Details\n&#039;;
+  description += `- **Type**: ${task.type}\n`;
+  description += `- **File**: \`${task.file_path}\`\n`;
+  description += `- **Line**: ${task.line_number}\n`;
+  
+  if (task.author) {
+    description += `- **Author**: @${task.author}\n`;
+  }
+  if (task.date) {
+    description += `- **Date**: ${task.date}\n`;
+  }
+  if (task.tags.length &gt; 0) {
+    description += `- **Tags**: ${task.tags.join(&#039;, &#039;)}\n`;
+  }
+  
+  // Add suggestions
+  if (task.type === &#039;deprecated&#039;) {
+    description += &#039;\n### Suggested Actions\n&#039;;
+    description += &#039;1. Identify all usages of this deprecated code\n&#039;;
+    description += &#039;2. Update to use the recommended alternative\n&#039;;
+    description += &#039;3. Add deprecation warnings if not present\n&#039;;
+    description += &#039;4. Schedule for removal in next major version\n&#039;;
+  }
+  
+  return description;
+}
+```
+
+### 6. Generate Summary Report
+Create overview of findings:
+
+```javascript
+function generateReport(scanResults, createdTasks) {
+  const report = {
+    summary: {
+      totalFound: scanResults.length,
+      tasksCreated: createdTasks.created.length,
+      tasksSkipped: createdTasks.skipped.length,
+      byType: {},
+      byPriority: {},
+      byFile: {}
+    },
+    details: [],
+    recommendations: []
+  };
+  
+  // Analyze distribution
+  for (const result of scanResults) {
+    report.summary.byType[result.type] = (report.summary.byType[result.type] || 0) + 1;
+    report.summary.byPriority[result.priority] = (report.summary.byPriority[result.priority] || 0) + 1;
+  }
+  
+  // Generate recommendations
+  if (report.summary.byType.security &gt; 0) {
+    report.recommendations.push({
+      priority: &#039;urgent&#039;,
+      action: &#039;Address security-related TODOs immediately&#039;,
+      tasks: scanResults.filter(r =&gt; r.type === &#039;security&#039;).length
+    });
+  }
+  
+  if (report.summary.byType.deprecated &gt; 5) {
+    report.recommendations.push({
+      priority: &#039;high&#039;,
+      action: &#039;Create deprecation removal sprint&#039;,
+      tasks: report.summary.byType.deprecated
+    });
+  }
+  
+  return report;
+}
+```
+
+### 7. Error Handling
+```javascript
+// Handle access errors
+try {
+  await scanDirectory(path);
+} catch (error) {
+  if (error.code === &#039;EACCES&#039;) {
+    console.warn(`Skipping ${path} - permission denied`);
+  }
+}
+
+// Handle Linear API limits
+const rateLimiter = {
+  tasksCreated: 0,
+  resetTime: Date.now() + 3600000,
+  
+  async createTask(taskData) {
+    if (this.tasksCreated &gt;= 50) {
+      console.log(&#039;Rate limit approaching, batching remaining tasks...&#039;);
+      // Create single task with list of TODOs
+      return this.createBatchTask(remainingTasks);
+    }
+    this.tasksCreated++;
+    return linear.createTask(taskData);
+  }
+};
+
+// Handle malformed comments
+const safeParser = {
+  parse(comment) {
+    try {
+      return this.parseComment(comment);
+    } catch (error) {
+      return {
+        type: &#039;todo&#039;,
+        title: comment.substring(0, 50) + &#039;...&#039;,
+        priority: &#039;low&#039;,
+        parseError: true
+      };
+    }
+  }
+};
+```
+
+## Example Output
+
+```
+Scanning codebase for TODOs and technical debt...
+
+📊 Scan Results:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Found 47 items across 23 files:
+  • 24 TODOs
+  • 8 FIXMEs 
+  • 5 Deprecated functions
+  • 3 Security concerns
+  • 7 Performance optimizations
+
+🔍 Breakdown by Priority:
+  🔴 Urgent: 3 (security related)
+  🟠 High: 13 (FIXMEs + deprecations)
+  🟡 Medium: 24 (standard TODOs)
+  🟢 Low: 7 (optimizations)
+
+📁 Hotspot Files:
+  1. src/api/auth.js - 8 items
+  2. src/utils/validation.js - 6 items
+  3. src/models/User.js - 5 items
+
+🚨 Critical Findings:
+
+1. SECURITY: Hardcoded API key
+   File: src/config/api.js:45
+   TODO: Remove hardcoded key and use env variable
+   → Creating task with URGENT priority
+
+2. DEPRECATED: Legacy authentication method
+   File: src/api/auth.js:120
+   Multiple usages found in 4 files
+   → Creating migration task
+
+3. FIXME: Race condition in concurrent updates
+   File: src/services/sync.js:78
+   Author: @alice (2024-01-03)
+   → Creating high-priority bug task
+
+📝 Task Creation Summary:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Created 32 Linear tasks:
+   - Epic: &quot;Q1 Technical Debt Cleanup&quot; (LIN-456)
+   - 3 urgent security tasks
+   - 10 high-priority fixes
+   - 19 medium-priority improvements
+
+⏭️ Skipped 15 items:
+   - 8 duplicates (tasks already exist)
+   - 4 low-value comments (e.g., &quot;TODO: think about this&quot;)
+   - 3 external dependencies (waiting on upstream)
+
+📊 Estimates:
+   - Total story points: 89
+   - Estimated effort: 2-3 sprints
+   - Recommended team size: 2-3 developers
+
+🎯 Recommended Actions:
+1. Schedule security sprint immediately (3 urgent items)
+2. Assign deprecation removal to next sprint (5 items)
+3. Create coding standards to reduce future TODOs
+4. Set up pre-commit hook to limit new TODOs
+
+View all created tasks:
+https://linear.app/yourteam/project/q1-technical-debt-cleanup
+```
+
+## Advanced Features
+
+### Custom Patterns
+Define project-specific patterns:
+```bash
+# Add custom markers to scan
+claude &quot;Scan for REVIEW, QUESTION, and ASSUMPTION comments&quot;
+```
+
+### Integration with CI/CD
+```bash
+# Fail build if critical TODOs found
+claude &quot;Check for SECURITY or FIXME comments and exit with error if found&quot;
+```
+
+### Scheduled Scans
+```bash
+# Weekly technical debt report
+claude &quot;Generate weekly technical debt report and create tasks for new items&quot;
+```
+
+## Tips
+- Run regularly to prevent TODO accumulation
+- Use consistent comment formats across the team
+- Include author and date in TODOs
+- Link TODOs to existing Linear issues when possible
+- Set up IDE snippets for properly formatted TODOs
+- Review and close completed TODO tasks
+- Use TODO comments as a quality gate in PR reviews</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,181 @@
     <p class="desc">Set up and run local web searches using Bright Data SERP API with the unfancy-search pipeline (query expansion, SERP retrieval, RRF reranking).</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/brightdata-local-search</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/brightdata-local-search</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: brightdata-local-search
+description: Set up and run local web searches using Bright Data SERP API with the unfancy-search pipeline (query expansion, SERP retrieval, RRF reranking).
+---
+
+# Bright Data Local Search
+
+Run powerful web searches locally using Bright Data&#039;s SERP API. This skill sets up the [unfancy-search](https://github.com/yaronbeen/unfancy-search) pipeline — a local search engine with query expansion, multi-engine SERP retrieval, RRF reranking, deduplication, and domain clustering.
+
+**Important: This skill uses the LOCAL version only. Do not use the hosted endpoint.**
+
+## Prerequisites
+
+- [Bright Data](https://brightdata.com) account with SERP API access
+- [Anthropic API key](https://console.anthropic.com) (for query expansion, optional)
+- Docker (recommended) or Node.js 18+ with pnpm
+
+## Setup
+
+### Step 1: Clone and Configure
+
+```bash
+git clone https://github.com/yaronbeen/unfancy-search.git
+cd unfancy-search
+cp .env.example .env
+```
+
+### Step 2: Set Environment Variables
+
+Edit `.env` with your credentials:
+
+```env
+BRIGHT_DATA_API_TOKEN=your_brightdata_token
+BRIGHT_DATA_SERP_ZONE=serp_api1
+ANTHROPIC_API_KEY=your_anthropic_key   # Optional: enables AI query expansion
+```
+
+Get your Bright Data token from: https://brightdata.com (SERP API section)
+
+### Step 3: Start the Local Server
+
+**Docker (recommended):**
+```bash
+docker compose up -d
+# Server runs at http://localhost:3000
+```
+
+**Node.js:**
+```bash
+pnpm install
+pnpm dev
+# Server runs at http://localhost:3000
+```
+
+## API Endpoints
+
+All requests go to `http://localhost:3000`:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/search` | POST | Start a search job |
+| `/api/search-status/{jobId}` | GET | Poll for results |
+| `/api/baseline` | POST | Trigger baseline collection |
+| `/api/baseline-status/{id}` | GET | Poll baseline progress |
+
+## Running a Search
+
+### Step 1: Submit Search
+
+```bash
+curl -X POST http://localhost:3000/api/search \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{&quot;query&quot;: &quot;your search term&quot;}&#039;
+```
+
+The response returns a `jobId`.
+
+### Step 2: Poll for Results
+
+```bash
+curl http://localhost:3000/api/search-status/{jobId}
+```
+
+Poll every 3 seconds until `status` is `&quot;done&quot;`.
+
+### Search Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `query` | string | required | Search query |
+| `expand` | boolean | `false` | Enable AI query expansion via Claude |
+| `research` | boolean | `false` | Research mode (12 sub-queries for max coverage) |
+| `engines` | string[] | all | SERP engines to use |
+| `geo` | string | — | Geographic region filter |
+| `count` | number | 10 | Max results (up to 10) |
+| `includeDomains` | string[] | — | Only include results from these domains |
+| `excludeDomains` | string[] | — | Exclude results from these domains |
+
+### Search Modes
+
+- **Basic** (`expand: false`): Single query, fastest, no AI cost
+- **Expanded** (`expand: true`): Claude Haiku generates 3 sub-queries for broader coverage
+- **Research** (`research: true`): 12 sub-queries for maximum coverage
+
+## Usage Examples
+
+### Basic Search from an Agent
+
+```bash
+# Start search
+JOB_ID=$(curl -s -X POST http://localhost:3000/api/search \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{&quot;query&quot;: &quot;best practices for API rate limiting&quot;}&#039; | jq -r &#039;.jobId&#039;)
+
+# Poll until done
+while true; do
+  RESULT=$(curl -s http://localhost:3000/api/search-status/$JOB_ID)
+  STATUS=$(echo $RESULT | jq -r &#039;.status&#039;)
+  if [ &quot;$STATUS&quot; = &quot;done&quot; ]; then
+    echo $RESULT | jq &#039;.results&#039;
+    break
+  fi
+  sleep 3
+done
+```
+
+### Research Mode with Domain Filtering
+
+```bash
+curl -X POST http://localhost:3000/api/search \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{
+    &quot;query&quot;: &quot;kubernetes scaling strategies&quot;,
+    &quot;research&quot;: true,
+    &quot;excludeDomains&quot;: [&quot;pinterest.com&quot;, &quot;quora.com&quot;]
+  }&#039;
+```
+
+### Adding Search to an Existing Agent
+
+To give your Claude Code agent search capabilities:
+
+1. Ensure the local server is running (`docker compose up -d` in the unfancy-search directory)
+2. Your agent can use `curl` or `fetch` to query `http://localhost:3000/api/search`
+3. Parse the ranked results to ground responses with real web data
+
+## Response Format
+
+Results include:
+- Ranked URLs with RRF scores
+- Domain clustering (grouped by source)
+- Cost transparency (per-search expense breakdown)
+- Raw and unique result counts
+- Search duration
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Server won&#039;t start | Verify Docker is running or Node.js 18+ installed |
+| No results returned | Check `BRIGHT_DATA_API_TOKEN` is valid and SERP API zone is active |
+| Query expansion not working | Verify `ANTHROPIC_API_KEY` is set and valid |
+| Slow responses | Disable `expand` mode for faster single-query searches |
+| Port 3000 in use | Stop other services or modify the port in docker-compose.yml |
+</code>
       </div>
     </div>
 

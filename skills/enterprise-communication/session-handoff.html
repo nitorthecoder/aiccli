@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,206 @@
     <p class="desc">"Creates comprehensive handoff documents for seamless AI agent session transfers. Triggered when: (1) user requests handoff/memory/context save, (2) context window approaches capacity, (3) major task milestone completed, (4) work session ending, (5) user says 'save state', 'create handoff', 'I need to pause', 'context is getting full', (6) resuming work with 'load handoff', 'resume from', 'continue where we left off'. Proactively suggests handoffs after substantial work (multiple file edits, complex debugging, architecture decisions). Solves long-running agent context exhaustion by enabling fresh agents to continue with zero ambiguity."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/session-handoff</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/session-handoff</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: session-handoff
+description: &quot;Creates comprehensive handoff documents for seamless AI agent session transfers. Triggered when: (1) user requests handoff/memory/context save, (2) context window approaches capacity, (3) major task milestone completed, (4) work session ending, (5) user says &#039;save state&#039;, &#039;create handoff&#039;, &#039;I need to pause&#039;, &#039;context is getting full&#039;, (6) resuming work with &#039;load handoff&#039;, &#039;resume from&#039;, &#039;continue where we left off&#039;. Proactively suggests handoffs after substantial work (multiple file edits, complex debugging, architecture decisions). Solves long-running agent context exhaustion by enabling fresh agents to continue with zero ambiguity.&quot;
+---
+
+# Handoff
+
+Creates comprehensive handoff documents that enable fresh AI agents to seamlessly continue work with zero ambiguity. Solves the long-running agent context exhaustion problem.
+
+## Mode Selection
+
+Determine which mode applies:
+
+**Creating a handoff?** User wants to save current state, pause work, or context is getting full.
+- Follow: CREATE Workflow below
+
+**Resuming from a handoff?** User wants to continue previous work, load context, or mentions an existing handoff.
+- Follow: RESUME Workflow below
+
+**Proactive suggestion?** After substantial work (5+ file edits, complex debugging, major decisions), suggest:
+&gt; &quot;We&#039;ve made significant progress. Consider creating a handoff document to preserve this context for future sessions. Say &#039;create handoff&#039; when ready.&quot;
+
+## CREATE Workflow
+
+### Step 1: Generate Scaffold
+
+Run the smart scaffold script to create a pre-filled handoff document:
+
+```bash
+python scripts/create_handoff.py [task-slug]
+```
+
+Example: `python scripts/create_handoff.py implementing-user-auth`
+
+**For continuation handoffs** (linking to previous work):
+```bash
+python scripts/create_handoff.py &quot;auth-part-2&quot; --continues-from 2024-01-15-auth.md
+```
+
+The script will:
+- Create `.claude/handoffs/` directory if needed
+- Generate timestamped filename
+- Pre-fill: timestamp, project path, git branch, recent commits, modified files
+- Add handoff chain links if continuing from previous
+- Output file path for editing
+
+### Step 2: Complete the Handoff Document
+
+Open the generated file and fill in all `[TODO: ...]` sections. Prioritize these sections:
+
+1. **Current State Summary** - What&#039;s happening right now
+2. **Important Context** - Critical info the next agent MUST know
+3. **Immediate Next Steps** - Clear, actionable first steps
+4. **Decisions Made** - Choices with rationale (not just outcomes)
+
+Use the template structure in [references/handoff-template.md](references/handoff-template.md) for guidance.
+
+### Step 3: Validate the Handoff
+
+Run the validation script to check completeness and security:
+
+```bash
+python scripts/validate_handoff.py &lt;handoff-file&gt;
+```
+
+The validator checks:
+- [ ] No `[TODO: ...]` placeholders remaining
+- [ ] Required sections present and populated
+- [ ] No potential secrets detected (API keys, passwords, tokens)
+- [ ] Referenced files exist
+- [ ] Quality score (0-100)
+
+**Do not finalize a handoff with secrets detected or score below 70.**
+
+### Step 4: Confirm Handoff
+
+Report to user:
+- Handoff file location
+- Validation score and any warnings
+- Summary of captured context
+- First action item for next session
+
+## RESUME Workflow
+
+### Step 1: Find Available Handoffs
+
+List handoffs in the current project:
+
+```bash
+python scripts/list_handoffs.py
+```
+
+This shows all handoffs with dates, titles, and completion status.
+
+### Step 2: Check Staleness
+
+Before loading, check how current the handoff is:
+
+```bash
+python scripts/check_staleness.py &lt;handoff-file&gt;
+```
+
+Staleness levels:
+- **FRESH**: Safe to resume - minimal changes since handoff
+- **SLIGHTLY_STALE**: Review changes, then resume
+- **STALE**: Verify context carefully before resuming
+- **VERY_STALE**: Consider creating a fresh handoff
+
+The script checks:
+- Time since handoff was created
+- Git commits since handoff
+- Files changed since handoff
+- Branch divergence
+- Missing referenced files
+
+### Step 3: Load the Handoff
+
+Read the relevant handoff document completely before taking any action.
+
+If handoff is part of a chain (has &quot;Continues from&quot; link), also read the linked previous handoff for full context.
+
+### Step 4: Verify Context
+
+Follow the checklist in [references/resume-checklist.md](references/resume-checklist.md):
+
+1. Verify project directory and git branch match
+2. Check if blockers have been resolved
+3. Validate assumptions still hold
+4. Review modified files for conflicts
+5. Check environment state
+
+### Step 5: Begin Work
+
+Start with &quot;Immediate Next Steps&quot; item #1 from the handoff document.
+
+Reference these sections as you work:
+- &quot;Critical Files&quot; for important locations
+- &quot;Key Patterns Discovered&quot; for conventions to follow
+- &quot;Potential Gotchas&quot; to avoid known issues
+
+### Step 6: Update or Chain Handoffs
+
+As you work:
+- Mark completed items in &quot;Pending Work&quot;
+- Add new discoveries to relevant sections
+- For long sessions: create a new handoff with `--continues-from` to chain them
+
+## Handoff Chaining
+
+For long-running projects, chain handoffs together to maintain context lineage:
+
+```
+handoff-1.md (initial work)
+    ↓
+handoff-2.md --continues-from handoff-1.md
+    ↓
+handoff-3.md --continues-from handoff-2.md
+```
+
+Each handoff in the chain:
+- Links to its predecessor
+- Can mark older handoffs as superseded
+- Provides context breadcrumbs for new agents
+
+When resuming from a chain, read the most recent handoff first, then reference predecessors as needed.
+
+## Storage Location
+
+Handoffs are stored in: `.claude/handoffs/`
+
+Naming convention: `YYYY-MM-DD-HHMMSS-[slug].md`
+
+Example: `2024-01-15-143022-implementing-auth.md`
+
+## Resources
+
+### scripts/
+
+| Script | Purpose |
+|--------|---------|
+| `create_handoff.py [slug] [--continues-from &lt;file&gt;]` | Generate new handoff with smart scaffolding |
+| `list_handoffs.py [path]` | List available handoffs in a project |
+| `validate_handoff.py &lt;file&gt;` | Check completeness, quality, and security |
+| `check_staleness.py &lt;file&gt;` | Assess if handoff context is still current |
+
+### references/
+
+- [handoff-template.md](references/handoff-template.md) - Complete template structure with guidance
+- [resume-checklist.md](references/resume-checklist.md) - Verification checklist for resuming agents
+</code>
       </div>
     </div>
 

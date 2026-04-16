@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,825 @@
     <p class="desc">Generate optimized Vercel Edge Functions with geolocation, authentication, and data transformation</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/vercel-edge-function</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/vercel-edge-function</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Read, Write, Edit
+argument-hint: [function-name] [--auth] [--geo] [--transform] [--proxy]
+description: Generate optimized Vercel Edge Functions with geolocation, authentication, and data transformation
+---
+
+## Vercel Edge Function Generator
+
+**Function Name**: $ARGUMENTS
+
+## Current Project Analysis
+
+### Project Structure
+- Vercel config: @vercel.json (if exists)
+- Next.js config: @next.config.js
+- API routes: @app/api/ or @pages/api/
+- Middleware: @middleware.ts (if exists)
+
+### Framework Detection
+- Package.json: @package.json
+- TypeScript config: @tsconfig.json (if exists)
+- Environment variables: @.env.local (if exists)
+
+## Edge Function Implementation Strategy
+
+### 1. File Structure Creation
+Generate comprehensive edge function structure:
+```
+api/edge/[function-name]/
+├── index.ts                    # Main edge function
+├── types.ts                   # TypeScript types
+├── utils.ts                   # Utility functions
+├── config.ts                  # Configuration
+└── __tests__/
+    └── [function-name].test.ts # Unit tests
+```
+
+### 2. Base Edge Function Template
+```typescript
+// api/edge/[function-name]/index.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+export const runtime = &#039;edge&#039;;
+
+export async function GET(request: NextRequest) {
+  try {
+    // Get geolocation data
+    const country = request.geo?.country || &#039;Unknown&#039;;
+    const city = request.geo?.city || &#039;Unknown&#039;;
+    const region = request.geo?.region || &#039;Unknown&#039;;
+    
+    // Get request metadata
+    const ip = request.headers.get(&#039;x-forwarded-for&#039;) || &#039;Unknown&#039;;
+    const userAgent = request.headers.get(&#039;user-agent&#039;) || &#039;Unknown&#039;;
+    const referer = request.headers.get(&#039;referer&#039;) || &#039;Unknown&#039;;
+    
+    // Process request
+    const result = await processRequest({
+      geo: { country, city, region },
+      ip,
+      userAgent,
+      referer,
+      url: request.url,
+    });
+    
+    return NextResponse.json(result, {
+      status: 200,
+      headers: {
+        &#039;Cache-Control&#039;: &#039;public, s-maxage=60, stale-while-revalidate=300&#039;,
+        &#039;Content-Type&#039;: &#039;application/json&#039;,
+        &#039;X-Edge-Location&#039;: region,
+      },
+    });
+    
+  } catch (error) {
+    console.error(&#039;Edge function error:&#039;, error);
+    
+    return NextResponse.json(
+      { error: &#039;Internal server error&#039; },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    
+    // Validate request body
+    const validationResult = validateRequestBody(body);
+    if (!validationResult.valid) {
+      return NextResponse.json(
+        { error: &#039;Invalid request body&#039;, details: validationResult.errors },
+        { status: 400 }
+      );
+    }
+    
+    // Process POST request
+    const result = await processPostRequest(body, request);
+    
+    return NextResponse.json(result, {
+      status: 201,
+      headers: {
+        &#039;Content-Type&#039;: &#039;application/json&#039;,
+      },
+    });
+    
+  } catch (error) {
+    console.error(&#039;Edge function POST error:&#039;, error);
+    
+    return NextResponse.json(
+      { error: &#039;Internal server error&#039; },
+      { status: 500 }
+    );
+  }
+}
+
+async function processRequest(metadata: RequestMetadata): Promise&lt;any&gt; {
+  // Implement your edge function logic here
+  return {
+    message: &#039;Edge function executed successfully&#039;,
+    metadata,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+async function processPostRequest(body: any, request: NextRequest): Promise&lt;any&gt; {
+  // Implement POST logic here
+  return {
+    message: &#039;POST processed successfully&#039;,
+    data: body,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+function validateRequestBody(body: any): ValidationResult {
+  // Implement validation logic
+  return { valid: true, errors: [] };
+}
+
+interface RequestMetadata {
+  geo: {
+    country: string;
+    city: string;
+    region: string;
+  };
+  ip: string;
+  userAgent: string;
+  referer: string;
+  url: string;
+}
+
+interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+}
+```
+
+## Specialized Edge Function Types
+
+### 1. Geolocation-Based Content Delivery
+```typescript
+// api/edge/geo-content/index.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+export const runtime = &#039;edge&#039;;
+
+interface ContentConfig {
+  [country: string]: {
+    currency: string;
+    language: string;
+    content: string;
+    pricing: number;
+  };
+}
+
+const contentConfig: ContentConfig = {
+  &#039;US&#039;: {
+    currency: &#039;USD&#039;,
+    language: &#039;en-US&#039;,
+    content: &#039;Welcome to our US store!&#039;,
+    pricing: 99.99,
+  },
+  &#039;GB&#039;: {
+    currency: &#039;GBP&#039;,
+    language: &#039;en-GB&#039;,
+    content: &#039;Welcome to our UK store!&#039;,
+    pricing: 79.99,
+  },
+  &#039;DE&#039;: {
+    currency: &#039;EUR&#039;,
+    language: &#039;de-DE&#039;,
+    content: &#039;Willkommen in unserem deutschen Shop!&#039;,
+    pricing: 89.99,
+  },
+};
+
+export async function GET(request: NextRequest) {
+  const country = request.geo?.country || &#039;US&#039;;
+  const config = contentConfig[country] || contentConfig[&#039;US&#039;];
+  
+  // Add region-specific headers
+  const response = NextResponse.json({
+    country,
+    ...config,
+    edgeLocation: request.geo?.region,
+    timestamp: new Date().toISOString(),
+  });
+  
+  response.headers.set(&#039;Cache-Control&#039;, &#039;public, s-maxage=3600, stale-while-revalidate=86400&#039;);
+  response.headers.set(&#039;Vary&#039;, &#039;Accept-Language, CloudFront-Viewer-Country&#039;);
+  response.headers.set(&#039;Content-Language&#039;, config.language);
+  
+  return response;
+}
+```
+
+### 2. Authentication Edge Function
+```typescript
+// api/edge/auth-check/index.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+import { jwtVerify } from &#039;jose&#039;;
+
+export const runtime = &#039;edge&#039;;
+
+const JWT_SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET || &#039;your-secret-key&#039;
+);
+
+export async function GET(request: NextRequest) {
+  try {
+    // Extract token from header or cookie
+    const authHeader = request.headers.get(&#039;authorization&#039;);
+    const cookieToken = request.cookies.get(&#039;auth-token&#039;)?.value;
+    
+    const token = authHeader?.replace(&#039;Bearer &#039;, &#039;&#039;) || cookieToken;
+    
+    if (!token) {
+      return NextResponse.json(
+        { error: &#039;No token provided&#039;, authenticated: false },
+        { status: 401 }
+      );
+    }
+    
+    // Verify JWT token
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    
+    // Return user info
+    return NextResponse.json({
+      authenticated: true,
+      user: {
+        id: payload.sub,
+        email: payload.email,
+        role: payload.role,
+        exp: payload.exp,
+      },
+      location: {
+        country: request.geo?.country,
+        city: request.geo?.city,
+      },
+    });
+    
+  } catch (error) {
+    console.error(&#039;Auth verification failed:&#039;, error);
+    
+    return NextResponse.json(
+      { error: &#039;Invalid token&#039;, authenticated: false },
+      { status: 401 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { username, password } = await request.json();
+    
+    // Validate credentials (implement your logic)
+    const user = await validateCredentials(username, password);
+    
+    if (!user) {
+      return NextResponse.json(
+        { error: &#039;Invalid credentials&#039; },
+        { status: 401 }
+      );
+    }
+    
+    // Generate JWT token
+    const token = await generateJWT(user);
+    
+    const response = NextResponse.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+    });
+    
+    // Set secure cookie
+    response.cookies.set(&#039;auth-token&#039;, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === &#039;production&#039;,
+      sameSite: &#039;strict&#039;,
+      maxAge: 24 * 60 * 60, // 24 hours
+    });
+    
+    return response;
+    
+  } catch (error) {
+    console.error(&#039;Authentication error:&#039;, error);
+    
+    return NextResponse.json(
+      { error: &#039;Authentication failed&#039; },
+      { status: 500 }
+    );
+  }
+}
+
+async function validateCredentials(username: string, password: string) {
+  // Implement credential validation
+  // This would typically involve database lookup
+  return null; // Placeholder
+}
+
+async function generateJWT(user: any): Promise&lt;string&gt; {
+  // Implement JWT generation
+  // This would use a proper JWT library
+  return &#039;jwt-token&#039;; // Placeholder
+}
+```
+
+### 3. Data Transformation Edge Function
+```typescript
+// api/edge/transform/index.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+export const runtime = &#039;edge&#039;;
+
+interface TransformConfig {
+  format: &#039;json&#039; | &#039;xml&#039; | &#039;csv&#039;;
+  fields?: string[];
+  transforms?: Record&lt;string, (value: any) =&gt; any&gt;;
+}
+
+const transformers = {
+  // Currency conversion
+  currency: (value: number, targetCurrency: string = &#039;USD&#039;) =&gt; {
+    const rates = { USD: 1, EUR: 0.85, GBP: 0.73 };
+    return value * (rates[targetCurrency as keyof typeof rates] || 1);
+  },
+  
+  // Date formatting
+  date: (value: string, format: string = &#039;ISO&#039;) =&gt; {
+    const date = new Date(value);
+    if (format === &#039;ISO&#039;) return date.toISOString();
+    if (format === &#039;US&#039;) return date.toLocaleDateString(&#039;en-US&#039;);
+    return date.toString();
+  },
+  
+  // Text formatting
+  text: (value: string, caseType: string = &#039;lower&#039;) =&gt; {
+    if (caseType === &#039;upper&#039;) return value.toUpperCase();
+    if (caseType === &#039;title&#039;) return value.replace(/\w\S*/g, txt =&gt; 
+      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
+    return value.toLowerCase();
+  },
+};
+
+export async function POST(request: NextRequest) {
+  try {
+    const { data, config }: { data: any; config: TransformConfig } = await request.json();
+    
+    if (!data || !config) {
+      return NextResponse.json(
+        { error: &#039;Missing data or config&#039; },
+        { status: 400 }
+      );
+    }
+    
+    // Apply transformations
+    const transformedData = await transformData(data, config, request);
+    
+    // Format output based on requested format
+    const output = await formatOutput(transformedData, config.format);
+    
+    const response = new NextResponse(output, {
+      status: 200,
+      headers: {
+        &#039;Content-Type&#039;: getContentType(config.format),
+        &#039;Cache-Control&#039;: &#039;public, s-maxage=300&#039;,
+      },
+    });
+    
+    return response;
+    
+  } catch (error) {
+    console.error(&#039;Transform error:&#039;, error);
+    
+    return NextResponse.json(
+      { error: &#039;Transformation failed&#039; },
+      { status: 500 }
+    );
+  }
+}
+
+async function transformData(data: any, config: TransformConfig, request: NextRequest) {
+  const country = request.geo?.country || &#039;US&#039;;
+  
+  // Apply field filtering if specified
+  if (config.fields &amp;&amp; Array.isArray(data)) {
+    data = data.map(item =&gt; {
+      const filtered: any = {};
+      config.fields!.forEach(field =&gt; {
+        if (item.hasOwnProperty(field)) {
+          filtered[field] = item[field];
+        }
+      });
+      return filtered;
+    });
+  }
+  
+  // Apply custom transforms
+  if (config.transforms) {
+    Object.entries(config.transforms).forEach(([field, transformFunc]) =&gt; {
+      if (Array.isArray(data)) {
+        data = data.map(item =&gt; ({
+          ...item,
+          [field]: transformFunc(item[field]),
+        }));
+      } else if (data.hasOwnProperty(field)) {
+        data[field] = transformFunc(data[field]);
+      }
+    });
+  }
+  
+  // Add geo context
+  return {
+    ...data,
+    _meta: {
+      transformedAt: new Date().toISOString(),
+      location: country,
+      edgeRegion: request.geo?.region,
+    },
+  };
+}
+
+async function formatOutput(data: any, format: string): Promise&lt;string&gt; {
+  switch (format) {
+    case &#039;xml&#039;:
+      return jsonToXml(data);
+    case &#039;csv&#039;:
+      return jsonToCsv(data);
+    case &#039;json&#039;:
+    default:
+      return JSON.stringify(data, null, 2);
+  }
+}
+
+function getContentType(format: string): string {
+  switch (format) {
+    case &#039;xml&#039;: return &#039;application/xml&#039;;
+    case &#039;csv&#039;: return &#039;text/csv&#039;;
+    case &#039;json&#039;:
+    default: return &#039;application/json&#039;;
+  }
+}
+
+function jsonToXml(data: any): string {
+  // Simple XML conversion (implement proper XML library for production)
+  return `&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;root&gt;${JSON.stringify(data)}&lt;/root&gt;`;
+}
+
+function jsonToCsv(data: any): string {
+  // Simple CSV conversion (implement proper CSV library for production)
+  if (Array.isArray(data) &amp;&amp; data.length &gt; 0) {
+    const headers = Object.keys(data[0]);
+    const rows = data.map(row =&gt; headers.map(header =&gt; row[header] || &#039;&#039;).join(&#039;,&#039;));
+    return [headers.join(&#039;,&#039;), ...rows].join(&#039;\n&#039;);
+  }
+  return &#039;&#039;;
+}
+```
+
+### 4. Proxy and Cache Edge Function
+```typescript
+// api/edge/proxy/index.ts
+import { NextRequest, NextResponse } from &#039;next/server&#039;;
+
+export const runtime = &#039;edge&#039;;
+
+interface ProxyConfig {
+  targetUrl: string;
+  cacheTime: number;
+  headers?: Record&lt;string, string&gt;;
+  transformResponse?: boolean;
+}
+
+const proxyConfigs: Record&lt;string, ProxyConfig&gt; = {
+  &#039;api&#039;: {
+    targetUrl: &#039;https://jsonplaceholder.typicode.com&#039;,
+    cacheTime: 300, // 5 minutes
+    headers: {
+      &#039;User-Agent&#039;: &#039;Vercel-Edge-Proxy/1.0&#039;,
+    },
+  },
+  &#039;cdn&#039;: {
+    targetUrl: &#039;https://cdn.example.com&#039;,
+    cacheTime: 3600, // 1 hour
+    transformResponse: false,
+  },
+};
+
+export async function GET(request: NextRequest) {
+  try {
+    const url = new URL(request.url);
+    const proxyType = url.searchParams.get(&#039;type&#039;) || &#039;api&#039;;
+    const targetPath = url.searchParams.get(&#039;path&#039;) || &#039;&#039;;
+    
+    const config = proxyConfigs[proxyType];
+    if (!config) {
+      return NextResponse.json(
+        { error: &#039;Invalid proxy type&#039; },
+        { status: 400 }
+      );
+    }
+    
+    // Build target URL
+    const targetUrl = `${config.targetUrl}${targetPath}`;
+    
+    // Check cache first (simplified - use proper cache in production)
+    const cacheKey = `proxy:${targetUrl}`;
+    
+    // Make request to target
+    const response = await fetch(targetUrl, {
+      headers: {
+        ...config.headers,
+        &#039;X-Forwarded-For&#039;: request.headers.get(&#039;x-forwarded-for&#039;) || &#039;&#039;,
+        &#039;X-Real-IP&#039;: request.headers.get(&#039;x-real-ip&#039;) || &#039;&#039;,
+      },
+    });
+    
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: &#039;Upstream server error&#039; },
+        { status: response.status }
+      );
+    }
+    
+    let data;
+    const contentType = response.headers.get(&#039;content-type&#039;) || &#039;&#039;;
+    
+    if (contentType.includes(&#039;application/json&#039;)) {
+      data = await response.json();
+      
+      // Transform response if configured
+      if (config.transformResponse) {
+        data = await transformProxyResponse(data, request);
+      }
+      
+      return NextResponse.json(data, {
+        status: 200,
+        headers: {
+          &#039;Cache-Control&#039;: `public, s-maxage=${config.cacheTime}, stale-while-revalidate=${config.cacheTime * 2}`,
+          &#039;X-Proxy-Cache&#039;: &#039;MISS&#039;,
+          &#039;X-Edge-Location&#039;: request.geo?.region || &#039;unknown&#039;,
+        },
+      });
+    } else {
+      // For non-JSON responses, pass through
+      const blob = await response.blob();
+      
+      return new NextResponse(blob, {
+        status: 200,
+        headers: {
+          &#039;Content-Type&#039;: contentType,
+          &#039;Cache-Control&#039;: `public, s-maxage=${config.cacheTime}`,
+        },
+      });
+    }
+    
+  } catch (error) {
+    console.error(&#039;Proxy error:&#039;, error);
+    
+    return NextResponse.json(
+      { error: &#039;Proxy request failed&#039; },
+      { status: 502 }
+    );
+  }
+}
+
+async function transformProxyResponse(data: any, request: NextRequest) {
+  // Add geo context to proxied data
+  return {
+    ...data,
+    _proxy: {
+      timestamp: new Date().toISOString(),
+      location: request.geo?.country,
+      region: request.geo?.region,
+    },
+  };
+}
+```
+
+## Edge Function Utilities
+
+### 1. Configuration Management
+```typescript
+// api/edge/[function-name]/config.ts
+export interface EdgeFunctionConfig {
+  cacheTime: number;
+  rateLimit: {
+    requests: number;
+    windowMs: number;
+  };
+  geo: {
+    enabled: boolean;
+    restrictedCountries?: string[];
+  };
+  security: {
+    corsOrigins: string[];
+    requireAuth: boolean;
+  };
+}
+
+export const defaultConfig: EdgeFunctionConfig = {
+  cacheTime: 300, // 5 minutes
+  rateLimit: {
+    requests: 100,
+    windowMs: 60000, // 1 minute
+  },
+  geo: {
+    enabled: true,
+  },
+  security: {
+    corsOrigins: [&#039;*&#039;],
+    requireAuth: false,
+  },
+};
+```
+
+### 2. Utility Functions
+```typescript
+// api/edge/[function-name]/utils.ts
+export function getClientIP(request: NextRequest): string {
+  return request.headers.get(&#039;x-forwarded-for&#039;) ||
+    request.headers.get(&#039;x-real-ip&#039;) ||
+    request.ip ||
+    &#039;unknown&#039;;
+}
+
+export function generateCacheKey(request: NextRequest, suffix?: string): string {
+  const url = new URL(request.url);
+  const baseKey = `${url.pathname}${url.search}`;
+  return suffix ? `${baseKey}:${suffix}` : baseKey;
+}
+
+export function createCorsResponse(
+  data: any,
+  origins: string[] = [&#039;*&#039;]
+): NextResponse {
+  const response = NextResponse.json(data);
+  
+  response.headers.set(&#039;Access-Control-Allow-Origin&#039;, origins.join(&#039;, &#039;));
+  response.headers.set(&#039;Access-Control-Allow-Methods&#039;, &#039;GET, POST, OPTIONS&#039;);
+  response.headers.set(&#039;Access-Control-Allow-Headers&#039;, &#039;Content-Type, Authorization&#039;);
+  
+  return response;
+}
+
+export function validateGeoRestrictions(
+  request: NextRequest,
+  restrictedCountries: string[] = []
+): boolean {
+  const country = request.geo?.country;
+  return !country || !restrictedCountries.includes(country);
+}
+```
+
+### 3. Testing Framework
+```typescript
+// api/edge/[function-name]/__tests__/[function-name].test.ts
+import { NextRequest } from &#039;next/server&#039;;
+import { GET, POST } from &#039;../index&#039;;
+
+// Mock geo data
+const createMockRequest = (url: string, options: any = {}) =&gt; {
+  const request = new NextRequest(url, options);
+  
+  // Mock geo property
+  Object.defineProperty(request, &#039;geo&#039;, {
+    value: {
+      country: &#039;US&#039;,
+      city: &#039;New York&#039;,
+      region: &#039;us-east-1&#039;,
+    },
+  });
+  
+  return request;
+};
+
+describe(&#039;Edge Function&#039;, () =&gt; {
+  describe(&#039;GET requests&#039;, () =&gt; {
+    it(&#039;should return geo-based content&#039;, async () =&gt; {
+      const request = createMockRequest(&#039;http://localhost:3000/api/edge/test&#039;);
+      const response = await GET(request);
+      const data = await response.json();
+      
+      expect(response.status).toBe(200);
+      expect(data.metadata.geo.country).toBe(&#039;US&#039;);
+    });
+    
+    it(&#039;should handle missing geo data&#039;, async () =&gt; {
+      const request = new NextRequest(&#039;http://localhost:3000/api/edge/test&#039;);
+      const response = await GET(request);
+      const data = await response.json();
+      
+      expect(response.status).toBe(200);
+      expect(data.metadata.geo.country).toBe(&#039;Unknown&#039;);
+    });
+  });
+  
+  describe(&#039;POST requests&#039;, () =&gt; {
+    it(&#039;should validate request body&#039;, async () =&gt; {
+      const request = createMockRequest(&#039;http://localhost:3000/api/edge/test&#039;, {
+        method: &#039;POST&#039;,
+        body: JSON.stringify({ invalid: &#039;data&#039; }),
+        headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
+      });
+      
+      const response = await POST(request);
+      const data = await response.json();
+      
+      expect(response.status).toBe(400);
+      expect(data.error).toBe(&#039;Invalid request body&#039;);
+    });
+  });
+});
+```
+
+## Performance and Optimization
+
+### 1. Response Optimization
+```typescript
+// Optimize responses for edge performance
+export function optimizeResponse(data: any, request: NextRequest): NextResponse {
+  const response = NextResponse.json(data);
+  
+  // Set appropriate cache headers
+  const cacheTime = getCacheTime(request.url);
+  response.headers.set(
+    &#039;Cache-Control&#039;,
+    `public, s-maxage=${cacheTime}, stale-while-revalidate=${cacheTime * 2}`
+  );
+  
+  // Add compression hints
+  response.headers.set(&#039;Content-Encoding&#039;, &#039;gzip&#039;);
+  
+  // Add performance headers
+  response.headers.set(&#039;X-Edge-Location&#039;, request.geo?.region || &#039;unknown&#039;);
+  
+  return response;
+}
+
+function getCacheTime(url: string): number {
+  // Dynamic cache time based on URL patterns
+  if (url.includes(&#039;/static/&#039;)) return 3600; // 1 hour
+  if (url.includes(&#039;/api/&#039;)) return 60; // 1 minute
+  return 300; // 5 minutes default
+}
+```
+
+### 2. Error Handling
+```typescript
+export function createErrorResponse(
+  error: unknown,
+  request: NextRequest
+): NextResponse {
+  console.error(&#039;Edge function error:&#039;, error);
+  
+  // Log error with context
+  const errorContext = {
+    url: request.url,
+    method: request.method,
+    country: request.geo?.country,
+    timestamp: new Date().toISOString(),
+  };
+  
+  // Return appropriate error response
+  return NextResponse.json(
+    {
+      error: &#039;Internal server error&#039;,
+      requestId: generateRequestId(),
+    },
+    {
+      status: 500,
+      headers: {
+        &#039;X-Error-Context&#039;: JSON.stringify(errorContext),
+      },
+    }
+  );
+}
+
+function generateRequestId(): string {
+  return Math.random().toString(36).substr(2, 9);
+}
+```
+
+Generate comprehensive edge function implementation with the requested features, proper TypeScript types, error handling, and optimization patterns.</code>
       </div>
     </div>
 

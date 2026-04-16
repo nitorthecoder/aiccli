@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,303 @@
     <p class="desc">"Build full-stack web applications with SvelteKit — file-based routing, SSR, SSG, API routes, and form actions in one framework."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/sveltekit</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/sveltekit</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: sveltekit
+description: &quot;Build full-stack web applications with SvelteKit — file-based routing, SSR, SSG, API routes, and form actions in one framework.&quot;
+category: frontend
+risk: safe
+source: community
+date_added: &quot;2026-03-18&quot;
+author: suhaibjanjua
+tags: [svelte, sveltekit, fullstack, ssr, ssg, typescript]
+tools: [claude, cursor, gemini]
+---
+
+# SvelteKit Full-Stack Development
+
+## Overview
+
+SvelteKit is the official full-stack framework built on top of Svelte. It provides file-based routing, server-side rendering (SSR), static site generation (SSG), API routes, and progressive form actions — all with Svelte&#039;s compile-time reactivity model that ships zero runtime overhead to the browser. Use this skill when building fast, modern web apps where both DX and performance matter.
+
+## When to Use This Skill
+
+- Use when building a new full-stack web application with Svelte
+- Use when you need SSR or SSG with fine-grained control per route
+- Use when migrating a SPA to a framework with server capabilities
+- Use when working on a project that needs file-based routing and collocated API endpoints
+- Use when the user asks about `+page.svelte`, `+layout.svelte`, `load` functions, or form actions
+
+## How It Works
+
+### Step 1: Project Setup
+
+```bash
+npm create svelte@latest my-app
+cd my-app
+npm install
+npm run dev
+```
+
+Choose **Skeleton project** + **TypeScript** + **ESLint/Prettier** when prompted.
+
+Directory structure after scaffolding:
+
+```
+src/
+  routes/
+    +page.svelte        ← Root page component
+    +layout.svelte      ← Root layout (wraps all pages)
+    +error.svelte       ← Error boundary
+  lib/
+    server/             ← Server-only code (never bundled to client)
+    components/         ← Shared components
+  app.html              ← HTML shell
+static/                 ← Static assets
+```
+
+### Step 2: File-Based Routing
+
+Every `+page.svelte` file in `src/routes/` maps directly to a URL:
+
+```
+src/routes/+page.svelte          → /
+src/routes/about/+page.svelte    → /about
+src/routes/blog/[slug]/+page.svelte  → /blog/:slug
+src/routes/shop/[...path]/+page.svelte → /shop/* (catch-all)
+```
+
+**Route groups** (no URL segment): wrap in `(group)/` folder.
+**Private routes** (not accessible as URLs): prefix with `_` or `(group)`.
+
+### Step 3: Loading Data with `load` Functions
+
+Use a `+page.ts` (universal) or `+page.server.ts` (server-only) file alongside the page:
+
+```typescript
+// src/routes/blog/[slug]/+page.server.ts
+import { error } from &#039;@sveltejs/kit&#039;;
+import type { PageServerLoad } from &#039;./$types&#039;;
+
+export const load: PageServerLoad = async ({ params, fetch }) =&gt; {
+  const post = await fetch(`/api/posts/${params.slug}`).then(r =&gt; r.json());
+
+  if (!post) {
+    error(404, &#039;Post not found&#039;);
+  }
+
+  return { post };
+};
+```
+
+```svelte
+&lt;!-- src/routes/blog/[slug]/+page.svelte --&gt;
+&lt;script lang=&quot;ts&quot;&gt;
+  import type { PageData } from &#039;./$types&#039;;
+  export let data: PageData;
+&lt;/script&gt;
+
+&lt;h1&gt;{data.post.title}&lt;/h1&gt;
+&lt;article&gt;{@html data.post.content}&lt;/article&gt;
+```
+
+### Step 4: API Routes (Server Endpoints)
+
+Create `+server.ts` files for REST-style endpoints:
+
+```typescript
+// src/routes/api/posts/+server.ts
+import { json } from &#039;@sveltejs/kit&#039;;
+import type { RequestHandler } from &#039;./$types&#039;;
+
+export const GET: RequestHandler = async ({ url }) =&gt; {
+  const limit = Number(url.searchParams.get(&#039;limit&#039;) ?? 10);
+  const posts = await db.post.findMany({ take: limit });
+  return json(posts);
+};
+
+export const POST: RequestHandler = async ({ request }) =&gt; {
+  const body = await request.json();
+  const post = await db.post.create({ data: body });
+  return json(post, { status: 201 });
+};
+```
+
+### Step 5: Form Actions
+
+Form actions are the SvelteKit-native way to handle mutations — no client-side fetch required:
+
+```typescript
+// src/routes/contact/+page.server.ts
+import { fail, redirect } from &#039;@sveltejs/kit&#039;;
+import type { Actions } from &#039;./$types&#039;;
+
+export const actions: Actions = {
+  default: async ({ request }) =&gt; {
+    const data = await request.formData();
+    const email = data.get(&#039;email&#039;);
+
+    if (!email) {
+      return fail(400, { email, missing: true });
+    }
+
+    await sendEmail(String(email));
+    redirect(303, &#039;/thank-you&#039;);
+  }
+};
+```
+
+```svelte
+&lt;!-- src/routes/contact/+page.svelte --&gt;
+&lt;script lang=&quot;ts&quot;&gt;
+  import { enhance } from &#039;$app/forms&#039;;
+  import type { ActionData } from &#039;./$types&#039;;
+  export let form: ActionData;
+&lt;/script&gt;
+
+&lt;form method=&quot;POST&quot; use:enhance&gt;
+  &lt;input name=&quot;email&quot; type=&quot;email&quot; /&gt;
+  {#if form?.missing}&lt;p class=&quot;error&quot;&gt;Email is required&lt;/p&gt;{/if}
+  &lt;button type=&quot;submit&quot;&gt;Subscribe&lt;/button&gt;
+&lt;/form&gt;
+```
+
+### Step 6: Layouts and Nested Routes
+
+```svelte
+&lt;!-- src/routes/+layout.svelte --&gt;
+&lt;script lang=&quot;ts&quot;&gt;
+  import type { LayoutData } from &#039;./$types&#039;;
+  export let data: LayoutData;
+&lt;/script&gt;
+
+&lt;nav&gt;
+  &lt;a href=&quot;/&quot;&gt;Home&lt;/a&gt;
+  &lt;a href=&quot;/blog&quot;&gt;Blog&lt;/a&gt;
+  {#if data.user}
+    &lt;a href=&quot;/dashboard&quot;&gt;Dashboard&lt;/a&gt;
+  {/if}
+&lt;/nav&gt;
+
+&lt;slot /&gt;  &lt;!-- child page renders here --&gt;
+```
+
+```typescript
+// src/routes/+layout.server.ts
+import type { LayoutServerLoad } from &#039;./$types&#039;;
+
+export const load: LayoutServerLoad = async ({ locals }) =&gt; {
+  return { user: locals.user ?? null };
+};
+```
+
+### Step 7: Rendering Modes
+
+Control per-route rendering with page options:
+
+```typescript
+// src/routes/docs/+page.ts
+export const prerender = true;   // Static — generated at build time
+export const ssr = true;         // Default — rendered on server per request
+export const csr = false;        // Disable client-side hydration entirely
+```
+
+## Examples
+
+### Example 1: Protected Dashboard Route
+
+```typescript
+// src/routes/dashboard/+layout.server.ts
+import { redirect } from &#039;@sveltejs/kit&#039;;
+import type { LayoutServerLoad } from &#039;./$types&#039;;
+
+export const load: LayoutServerLoad = async ({ locals }) =&gt; {
+  if (!locals.user) {
+    redirect(303, &#039;/login&#039;);
+  }
+  return { user: locals.user };
+};
+```
+
+### Example 2: Hooks — Session Middleware
+
+```typescript
+// src/hooks.server.ts
+import type { Handle } from &#039;@sveltejs/kit&#039;;
+import { verifyToken } from &#039;$lib/server/auth&#039;;
+
+export const handle: Handle = async ({ event, resolve }) =&gt; {
+  const token = event.cookies.get(&#039;session&#039;);
+  if (token) {
+    event.locals.user = await verifyToken(token);
+  }
+  return resolve(event);
+};
+```
+
+### Example 3: Preloading and Invalidation
+
+```svelte
+&lt;script lang=&quot;ts&quot;&gt;
+  import { invalidateAll } from &#039;$app/navigation&#039;;
+
+  async function refresh() {
+    await invalidateAll(); // re-runs all load functions on the page
+  }
+&lt;/script&gt;
+
+&lt;button on:click={refresh}&gt;Refresh&lt;/button&gt;
+```
+
+## Best Practices
+
+- ✅ Use `+page.server.ts` for database/auth logic — it never ships to the client
+- ✅ Use `$lib/server/` for shared server-only modules (DB client, auth helpers)
+- ✅ Use form actions for mutations instead of client-side `fetch` — works without JS
+- ✅ Type all `load` return values with generated `$types` (`PageData`, `LayoutData`)
+- ✅ Use `event.locals` in hooks to pass server-side context to load functions
+- ❌ Don&#039;t import server-only code in `+page.svelte` or `+layout.svelte` directly
+- ❌ Don&#039;t store sensitive state in stores — use `locals` on the server
+- ❌ Don&#039;t skip `use:enhance` on forms — without it, forms lose progressive enhancement
+
+## Security &amp; Safety Notes
+
+- All code in `+page.server.ts`, `+server.ts`, and `$lib/server/` runs exclusively on the server — safe for DB queries, secrets, and session validation.
+- Always validate and sanitize form data before database writes.
+- Use `error(403)` or `redirect(303)` from `@sveltejs/kit` rather than returning raw error objects.
+- Set `httpOnly: true` and `secure: true` on all auth cookies.
+- CSRF protection is built-in for form actions — do not disable `checkOrigin` in production.
+
+## Common Pitfalls
+
+- **Problem:** `Cannot use import statement in a module` in `+page.server.ts`
+  **Solution:** The file must be `.ts` or `.js`, not `.svelte`. Server files and Svelte components are separate.
+
+- **Problem:** Store value is `undefined` on first SSR render
+  **Solution:** Populate the store from the `load` function return value (`data` prop), not from client-side `onMount`.
+
+- **Problem:** Form action does not redirect after submit
+  **Solution:** Use `redirect(303, &#039;/path&#039;)` from `@sveltejs/kit`, not a plain `return`. 303 is required for POST redirects.
+
+- **Problem:** `locals.user` is undefined inside a `+page.server.ts` load function
+  **Solution:** Set `event.locals.user` in `src/hooks.server.ts` before the `resolve()` call.
+
+## Related Skills
+
+- `@nextjs-app-router-patterns` — When you prefer React over Svelte for SSR/SSG
+- `@trpc-fullstack` — Add end-to-end type safety to SvelteKit API routes
+- `@auth-implementation-patterns` — Authentication patterns usable with SvelteKit hooks
+- `@tailwind-patterns` — Styling SvelteKit apps with Tailwind CSS
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,130 @@
     <p class="desc">Review and fix Swift concurrency issues such as actor isolation and Sendable violations.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/swift-concurrency-expert</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/swift-concurrency-expert</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: swift-concurrency-expert
+description: Review and fix Swift concurrency issues such as actor isolation and Sendable violations.
+risk: safe
+source: &quot;Dimillian/Skills (MIT)&quot;
+date_added: &quot;2026-03-25&quot;
+---
+
+# Swift Concurrency Expert
+
+## Overview
+
+Review and fix Swift Concurrency issues in Swift 6.2+ codebases by applying actor isolation, Sendable safety, and modern concurrency patterns with minimal behavior changes.
+
+## When to Use
+
+- When the user asks to review Swift concurrency usage or fix compiler diagnostics.
+- When you need guidance on actor isolation, `Sendable`, `@MainActor`, or async migration.
+
+## Workflow
+
+### 1. Triage the issue
+
+- Capture the exact compiler diagnostics and the offending symbol(s).
+- Check project concurrency settings: Swift language version (6.2+), strict concurrency level, and whether approachable concurrency (default actor isolation / main-actor-by-default) is enabled.
+- Identify the current actor context (`@MainActor`, `actor`, `nonisolated`) and whether a default actor isolation mode is enabled.
+- Confirm whether the code is UI-bound or intended to run off the main actor.
+
+### 2. Apply the smallest safe fix
+
+Prefer edits that preserve existing behavior while satisfying data-race safety.
+
+Common fixes:
+- **UI-bound types**: annotate the type or relevant members with `@MainActor`.
+- **Protocol conformance on main actor types**: make the conformance isolated (e.g., `extension Foo: @MainActor SomeProtocol`).
+- **Global/static state**: protect with `@MainActor` or move into an actor.
+- **Background work**: move expensive work into a `@concurrent` async function on a `nonisolated` type or use an `actor` to guard mutable state.
+- **Sendable errors**: prefer immutable/value types; add `Sendable` conformance only when correct; avoid `@unchecked Sendable` unless you can prove thread safety.
+
+### 3. Verify the fix
+
+- Rebuild and confirm all concurrency diagnostics are resolved with no new warnings introduced.
+- Run the test suite to check for regressions — concurrency changes can introduce subtle runtime issues even when the build is clean.
+- If the fix surfaces new warnings, treat each one as a fresh triage (return to step 1) and resolve iteratively until the build is clean and tests pass.
+
+### Examples
+
+**UI-bound type — adding `@MainActor`**
+
+```swift
+// Before: data-race warning because ViewModel is accessed from the main thread
+// but has no actor isolation
+class ViewModel: ObservableObject {
+    @Published var title: String = &quot;&quot;
+    func load() { title = &quot;Loaded&quot; }
+}
+
+// After: annotate the whole type so all stored state and methods are
+// automatically isolated to the main actor
+@MainActor
+class ViewModel: ObservableObject {
+    @Published var title: String = &quot;&quot;
+    func load() { title = &quot;Loaded&quot; }
+}
+```
+
+**Protocol conformance isolation**
+
+```swift
+// Before: compiler error — SomeProtocol method is nonisolated but the
+// conforming type is @MainActor
+@MainActor
+class Foo: SomeProtocol {
+    func protocolMethod() { /* accesses main-actor state */ }
+}
+
+// After: scope the conformance to @MainActor so the requirement is
+// satisfied inside the correct isolation context
+@MainActor
+extension Foo: SomeProtocol {
+    func protocolMethod() { /* safely accesses main-actor state */ }
+}
+```
+
+**Background work with `@concurrent`**
+
+```swift
+// Before: expensive computation blocks the main actor
+@MainActor
+func processData(_ input: [Int]) -&gt; [Int] {
+    input.map { heavyTransform($0) }   // runs on main thread
+}
+
+// After: hop off the main actor for the heavy work, then return the result
+// The caller awaits the result and stays on its own actor
+nonisolated func processData(_ input: [Int]) async -&gt; [Int] {
+    await Task.detached(priority: .userInitiated) {
+        input.map { heavyTransform($0) }
+    }.value
+}
+
+// Or, using a @concurrent async function (Swift 6.2+):
+@concurrent
+func processData(_ input: [Int]) async -&gt; [Int] {
+    input.map { heavyTransform($0) }
+}
+```
+
+## Reference material
+
+- See `references/swift-6-2-concurrency.md` for Swift 6.2 changes, patterns, and examples.
+- See `references/approachable-concurrency.md` when the project is opted into approachable concurrency mode.
+- See `references/swiftui-concurrency-tour-wwdc.md` for SwiftUI-specific concurrency guidance.
+</code>
       </div>
     </div>
 

@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,421 @@
     <p class="desc">Analyze and optimize Next.js bundle size with detailed recommendations</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/nextjs-bundle-analyzer</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/nextjs-bundle-analyzer</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Read, Edit, Bash
+argument-hint: [--build] [--analyze] [--report]
+description: Analyze and optimize Next.js bundle size with detailed recommendations
+---
+
+## Next.js Bundle Analyzer
+
+**Analysis Mode**: $ARGUMENTS
+
+## Current Project Analysis
+
+### Build Configuration
+- Next.js config: @next.config.js
+- Package.json: @package.json
+- TypeScript config: @tsconfig.json (if exists)
+- Build output: !`ls -la .next/ 2&gt;/dev/null || echo &quot;No build found&quot;`
+
+### Dependencies Analysis
+- Production dependencies: !`npm list --prod --depth=0 2&gt;/dev/null || echo &quot;Run npm install first&quot;`
+- Development dependencies: !`npm list --dev --depth=0 2&gt;/dev/null || echo &quot;Run npm install first&quot;`
+- Package vulnerabilities: !`npm audit --audit-level=moderate 2&gt;/dev/null || echo &quot;No audit available&quot;`
+
+## Bundle Analysis Setup
+
+### 1. Install Bundle Analyzer
+```bash
+# Install webpack-bundle-analyzer
+npm install --save-dev @next/bundle-analyzer
+
+# Or use built-in Next.js analyzer
+npm install --save-dev cross-env
+```
+
+### 2. Configure Next.js Bundle Analyzer
+```javascript
+// next.config.js
+const withBundleAnalyzer = require(&#039;@next/bundle-analyzer&#039;)({
+  enabled: process.env.ANALYZE === &#039;true&#039;,
+});
+
+/** @type {import(&#039;next&#039;).NextConfig} */
+const nextConfig = {
+  // Your existing config
+  experimental: {
+    optimizePackageImports: [
+      &#039;lucide-react&#039;,
+      &#039;@heroicons/react&#039;,
+      &#039;date-fns&#039;,
+      &#039;lodash&#039;,
+    ],
+  },
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) =&gt; {
+    // Bundle analysis optimizations
+    if (!dev &amp;&amp; !isServer) {
+      config.optimization.splitChunks = {
+        chunks: &#039;all&#039;,
+        cacheGroups: {
+          default: false,
+          vendors: false,
+          // Vendor chunk for common libraries
+          vendor: {
+            name: &#039;vendors&#039;,
+            chunks: &#039;all&#039;,
+            test: /node_modules/,
+            priority: 20,
+          },
+          // Common chunk for shared code
+          common: {
+            name: &#039;commons&#039;,
+            minChunks: 2,
+            chunks: &#039;all&#039;,
+            priority: 10,
+            reuseExistingChunk: true,
+            enforce: true,
+          },
+          // UI libraries chunk
+          ui: {
+            name: &#039;ui-libs&#039;,
+            chunks: &#039;all&#039;,
+            test: /node_modules\/(react|react-dom|@radix-ui|@headlessui)/,
+            priority: 15,
+          },
+          // Utility libraries chunk
+          utils: {
+            name: &#039;utils&#039;,
+            chunks: &#039;all&#039;,
+            test: /node_modules\/(lodash|date-fns|clsx|classnames)/,
+            priority: 15,
+          },
+        },
+      };
+    }
+
+    return config;
+  },
+};
+
+module.exports = withBundleAnalyzer(nextConfig);
+```
+
+### 3. Package.json Scripts
+```json
+{
+  &quot;scripts&quot;: {
+    &quot;analyze&quot;: &quot;cross-env ANALYZE=true next build&quot;,
+    &quot;analyze:server&quot;: &quot;cross-env BUNDLE_ANALYZE=server next build&quot;,
+    &quot;analyze:browser&quot;: &quot;cross-env BUNDLE_ANALYZE=browser next build&quot;,
+    &quot;build:analyze&quot;: &quot;npm run build &amp;&amp; npm run analyze&quot;
+  }
+}
+```
+
+## Bundle Analysis Execution
+
+### 1. Generate Analysis Report
+```bash
+# Full bundle analysis
+ANALYZE=true npm run build
+
+# Server-side bundle analysis
+BUNDLE_ANALYZE=server npm run build
+
+# Client-side bundle analysis  
+BUNDLE_ANALYZE=browser npm run build
+
+# Production build with analysis
+npm run analyze
+```
+
+### 2. Bundle Size Check
+```bash
+# Check current bundle size
+ls -lah .next/static/chunks/ | head -20
+
+# Check bundle sizes with details
+find .next/static/chunks -name &quot;*.js&quot; -exec ls -lah {} \; | sort -k5 -hr
+
+# Gzipped size analysis
+find .next/static/chunks -name &quot;*.js&quot; -exec gzip -c {} \; | wc -c
+```
+
+## Bundle Analysis Results
+
+### 1. Bundle Size Breakdown
+Analyze the generated webpack-bundle-analyzer report for:
+
+#### Client Bundles
+- **Main bundle**: Core application code
+- **Framework bundle**: Next.js runtime and React
+- **Vendor bundles**: Third-party libraries
+- **Page bundles**: Individual page chunks
+- **Shared bundles**: Common code between pages
+
+#### Server Bundles
+- **API routes**: Server-side API handlers  
+- **Middleware**: Edge and server middleware
+- **Server components**: RSC bundles
+
+### 2. Size Thresholds and Recommendations
+```javascript
+// Bundle size thresholds
+const bundleThresholds = {
+  // First Load JS (critical)
+  firstLoadJS: {
+    warning: 200 * 1024, // 200KB
+    error: 300 * 1024,   // 300KB
+  },
+  // Individual chunks
+  chunk: {
+    warning: 150 * 1024, // 150KB
+    error: 250 * 1024,   // 250KB
+  },
+  // Total bundle size
+  total: {
+    warning: 1024 * 1024, // 1MB
+    error: 2048 * 1024,   // 2MB
+  }
+};
+```
+
+## Bundle Optimization Strategies
+
+### 1. Code Splitting Optimization
+```typescript
+// Dynamic imports for large components
+import dynamic from &#039;next/dynamic&#039;;
+
+const HeavyComponent = dynamic(() =&gt; import(&#039;./HeavyComponent&#039;), {
+  loading: () =&gt; &lt;p&gt;Loading...&lt;/p&gt;,
+  ssr: false, // Disable SSR for client-only components
+});
+
+// Route-based code splitting
+const AdminDashboard = dynamic(() =&gt; import(&#039;./AdminDashboard&#039;), {
+  loading: () =&gt; &lt;DashboardSkeleton /&gt;,
+});
+
+// Conditional loading
+const ChartComponent = dynamic(
+  () =&gt; import(&#039;./ChartComponent&#039;),
+  { 
+    ssr: false,
+    loading: () =&gt; &lt;ChartSkeleton /&gt;
+  }
+);
+```
+
+### 2. Library Optimization
+```javascript
+// Optimize lodash imports
+// ❌ Imports entire lodash library
+import _ from &#039;lodash&#039;;
+
+// ✅ Import only needed functions
+import { debounce, throttle } from &#039;lodash&#039;;
+
+// ✅ Even better - use tree-shaking friendly alternatives
+import debounce from &#039;lodash/debounce&#039;;
+import throttle from &#039;lodash/throttle&#039;;
+```
+
+```javascript
+// Date library optimization
+// ❌ Moment.js (large bundle)
+import moment from &#039;moment&#039;;
+
+// ✅ date-fns (tree-shakable)
+import { format, parseISO } from &#039;date-fns&#039;;
+
+// ✅ Day.js (smaller alternative)
+import dayjs from &#039;dayjs&#039;;
+```
+
+### 3. Next.js Specific Optimizations
+```javascript
+// next.config.js optimizations
+const nextConfig = {
+  // Optimize package imports
+  experimental: {
+    optimizePackageImports: [
+      &#039;react-icons&#039;,
+      &#039;@heroicons/react&#039;,
+      &#039;lucide-react&#039;,
+      &#039;date-fns&#039;,
+      &#039;lodash&#039;,
+    ],
+  },
+  
+  // Tree shaking for CSS
+  experimental: {
+    optimizeCss: true,
+  },
+  
+  // Minimize client-side JavaScript
+  compiler: {
+    removeConsole: process.env.NODE_ENV === &#039;production&#039;,
+  },
+  
+  // Webpack optimizations
+  webpack: (config, { dev, isServer }) =&gt; {
+    if (!dev &amp;&amp; !isServer) {
+      // Analyze bundle size
+      config.optimization.concatenateModules = true;
+      
+      // Enable compression
+      config.plugins.push(
+        new (require(&#039;compression-webpack-plugin&#039;))({
+          algorithm: &#039;gzip&#039;,
+          test: /\.(js|css|html|svg)$/,
+          threshold: 8192,
+          minRatio: 0.8,
+        })
+      );
+    }
+    return config;
+  },
+};
+```
+
+### 4. Image Optimization
+```typescript
+// Next.js Image component with optimization
+import Image from &#039;next/image&#039;;
+
+// Optimize images with proper sizing
+&lt;Image
+  src=&quot;/hero-image.jpg&quot;
+  alt=&quot;Hero&quot;
+  width={1200}
+  height={600}
+  priority={isAboveFold}
+  placeholder=&quot;blur&quot;
+  blurDataURL=&quot;data:image/jpeg;base64,...&quot;
+  sizes=&quot;(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw&quot;
+/&gt;
+```
+
+## Performance Impact Analysis
+
+### 1. Core Web Vitals Impact
+Analyze bundle size impact on:
+- **Largest Contentful Paint (LCP)**: Large bundles delay content rendering
+- **First Input Delay (FID)**: JavaScript blocking main thread
+- **Cumulative Layout Shift (CLS)**: Dynamic imports causing layout shifts
+
+### 2. Network Performance
+```javascript
+// Simulate network conditions for testing
+const networkConditions = {
+  &#039;Fast 3G&#039;: { downloadThroughput: 1500, uploadThroughput: 750, latency: 562.5 },
+  &#039;Slow 3G&#039;: { downloadThroughput: 500, uploadThroughput: 500, latency: 2000 },
+  &#039;Offline&#039;: { downloadThroughput: 0, uploadThroughput: 0, latency: 0 }
+};
+```
+
+### 3. Bundle Loading Strategies
+```typescript
+// Preload critical chunks
+useEffect(() =&gt; {
+  // Preload likely next page
+  router.prefetch(&#039;/dashboard&#039;);
+  
+  // Preload critical components
+  import(&#039;./CriticalComponent&#039;);
+}, []);
+
+// Lazy load non-critical features
+const LazyFeature = lazy(() =&gt; 
+  import(&#039;./LazyFeature&#039;).then(module =&gt; ({
+    default: module.LazyFeature
+  }))
+);
+```
+
+## Optimization Recommendations
+
+### 1. Immediate Actions
+- **Remove unused dependencies**: Audit and remove packages not in use
+- **Optimize imports**: Use tree-shaking friendly import patterns
+- **Enable compression**: Configure gzip/brotli compression
+- **Minimize polyfills**: Use modern JavaScript features with targeted polyfills
+
+### 2. Medium-term Improvements
+- **Code splitting strategy**: Implement route and component-based splitting
+- **Library replacements**: Replace large libraries with smaller alternatives
+- **Bundle caching**: Implement long-term caching strategies
+- **Performance monitoring**: Set up bundle size monitoring in CI/CD
+
+### 3. Long-term Optimization
+- **Micro-frontends**: Consider architecture changes for large applications
+- **Edge computing**: Move computation closer to users
+- **Progressive enhancement**: Implement progressive loading strategies
+- **Performance budgets**: Establish and enforce bundle size budgets
+
+## Monitoring and Maintenance
+
+### 1. Automated Bundle Monitoring
+```yaml
+# GitHub Action for bundle monitoring
+name: Bundle Size Check
+on: [pull_request]
+
+jobs:
+  bundle-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: &#039;18&#039;
+      - run: npm ci
+      - run: npm run build
+      - uses: nextjs-bundle-analysis/bundle-analyzer@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### 2. Performance Budgets
+```javascript
+// webpack.config.js performance budgets
+module.exports = {
+  performance: {
+    maxAssetSize: 250000, // 250KB
+    maxEntrypointSize: 350000, // 350KB
+    hints: &#039;error&#039;,
+  },
+};
+```
+
+### 3. Regular Audit Schedule
+- **Weekly**: Dependency updates and security audit
+- **Monthly**: Full bundle analysis and optimization review  
+- **Quarterly**: Architecture review and major optimizations
+
+## Analysis Report Generation
+
+Generate comprehensive report including:
+1. **Current Bundle Sizes**: Detailed breakdown by chunk type
+2. **Optimization Opportunities**: Specific recommendations with size impact
+3. **Performance Metrics**: Core Web Vitals impact analysis
+4. **Implementation Roadmap**: Prioritized optimization tasks
+5. **Monitoring Setup**: Tools and processes for ongoing monitoring
+
+Provide specific, actionable recommendations for immediate and long-term bundle optimization.</code>
       </div>
     </div>
 

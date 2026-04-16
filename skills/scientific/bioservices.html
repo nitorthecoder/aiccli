@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,372 @@
     <p class="desc">"Primary Python tool for 40+ bioinformatics services. Preferred for multi-database workflows: UniProt, KEGG, ChEMBL, PubChem, Reactome, QuickGO. Unified API for queries, ID mapping, pathway analysis. For direct REST control, use individual database skills (uniprot-database, kegg-database)."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/bioservices</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/bioservices</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: bioservices
+description: &quot;Primary Python tool for 40+ bioinformatics services. Preferred for multi-database workflows: UniProt, KEGG, ChEMBL, PubChem, Reactome, QuickGO. Unified API for queries, ID mapping, pathway analysis. For direct REST control, use individual database skills (uniprot-database, kegg-database).&quot;
+---
+
+# BioServices
+
+## Overview
+
+BioServices is a Python package providing programmatic access to approximately 40 bioinformatics web services and databases. Retrieve biological data, perform cross-database queries, map identifiers, analyze sequences, and integrate multiple biological resources in Python workflows. The package handles both REST and SOAP/WSDL protocols transparently.
+
+## When to Use This Skill
+
+This skill should be used when:
+- Retrieving protein sequences, annotations, or structures from UniProt, PDB, Pfam
+- Analyzing metabolic pathways and gene functions via KEGG or Reactome
+- Searching compound databases (ChEBI, ChEMBL, PubChem) for chemical information
+- Converting identifiers between different biological databases (KEGG↔UniProt, compound IDs)
+- Running sequence similarity searches (BLAST, MUSCLE alignment)
+- Querying gene ontology terms (QuickGO, GO annotations)
+- Accessing protein-protein interaction data (PSICQUIC, IntactComplex)
+- Mining genomic data (BioMart, ArrayExpress, ENA)
+- Integrating data from multiple bioinformatics resources in a single workflow
+
+## Core Capabilities
+
+### 1. Protein Analysis
+
+Retrieve protein information, sequences, and functional annotations:
+
+```python
+from bioservices import UniProt
+
+u = UniProt(verbose=False)
+
+# Search for protein by name
+results = u.search(&quot;ZAP70_HUMAN&quot;, frmt=&quot;tab&quot;, columns=&quot;id,genes,organism&quot;)
+
+# Retrieve FASTA sequence
+sequence = u.retrieve(&quot;P43403&quot;, &quot;fasta&quot;)
+
+# Map identifiers between databases
+kegg_ids = u.mapping(fr=&quot;UniProtKB_AC-ID&quot;, to=&quot;KEGG&quot;, query=&quot;P43403&quot;)
+```
+
+**Key methods:**
+- `search()`: Query UniProt with flexible search terms
+- `retrieve()`: Get protein entries in various formats (FASTA, XML, tab)
+- `mapping()`: Convert identifiers between databases
+
+Reference: `references/services_reference.md` for complete UniProt API details.
+
+### 2. Pathway Discovery and Analysis
+
+Access KEGG pathway information for genes and organisms:
+
+```python
+from bioservices import KEGG
+
+k = KEGG()
+k.organism = &quot;hsa&quot;  # Set to human
+
+# Search for organisms
+k.lookfor_organism(&quot;droso&quot;)  # Find Drosophila species
+
+# Find pathways by name
+k.lookfor_pathway(&quot;B cell&quot;)  # Returns matching pathway IDs
+
+# Get pathways containing specific genes
+pathways = k.get_pathway_by_gene(&quot;7535&quot;, &quot;hsa&quot;)  # ZAP70 gene
+
+# Retrieve and parse pathway data
+data = k.get(&quot;hsa04660&quot;)
+parsed = k.parse(data)
+
+# Extract pathway interactions
+interactions = k.parse_kgml_pathway(&quot;hsa04660&quot;)
+relations = interactions[&#039;relations&#039;]  # Protein-protein interactions
+
+# Convert to Simple Interaction Format
+sif_data = k.pathway2sif(&quot;hsa04660&quot;)
+```
+
+**Key methods:**
+- `lookfor_organism()`, `lookfor_pathway()`: Search by name
+- `get_pathway_by_gene()`: Find pathways containing genes
+- `parse_kgml_pathway()`: Extract structured pathway data
+- `pathway2sif()`: Get protein interaction networks
+
+Reference: `references/workflow_patterns.md` for complete pathway analysis workflows.
+
+### 3. Compound Database Searches
+
+Search and cross-reference compounds across multiple databases:
+
+```python
+from bioservices import KEGG, UniChem
+
+k = KEGG()
+
+# Search compounds by name
+results = k.find(&quot;compound&quot;, &quot;Geldanamycin&quot;)  # Returns cpd:C11222
+
+# Get compound information with database links
+compound_info = k.get(&quot;cpd:C11222&quot;)  # Includes ChEBI links
+
+# Cross-reference KEGG → ChEMBL using UniChem
+u = UniChem()
+chembl_id = u.get_compound_id_from_kegg(&quot;C11222&quot;)  # Returns CHEMBL278315
+```
+
+**Common workflow:**
+1. Search compound by name in KEGG
+2. Extract KEGG compound ID
+3. Use UniChem for KEGG → ChEMBL mapping
+4. ChEBI IDs are often provided in KEGG entries
+
+Reference: `references/identifier_mapping.md` for complete cross-database mapping guide.
+
+### 4. Sequence Analysis
+
+Run BLAST searches and sequence alignments:
+
+```python
+from bioservices import NCBIblast
+
+s = NCBIblast(verbose=False)
+
+# Run BLASTP against UniProtKB
+jobid = s.run(
+    program=&quot;blastp&quot;,
+    sequence=protein_sequence,
+    stype=&quot;protein&quot;,
+    database=&quot;uniprotkb&quot;,
+    email=&quot;your.email@example.com&quot;  # Required by NCBI
+)
+
+# Check job status and retrieve results
+s.getStatus(jobid)
+results = s.getResult(jobid, &quot;out&quot;)
+```
+
+**Note:** BLAST jobs are asynchronous. Check status before retrieving results.
+
+### 5. Identifier Mapping
+
+Convert identifiers between different biological databases:
+
+```python
+from bioservices import UniProt, KEGG
+
+# UniProt mapping (many database pairs supported)
+u = UniProt()
+results = u.mapping(
+    fr=&quot;UniProtKB_AC-ID&quot;,  # Source database
+    to=&quot;KEGG&quot;,              # Target database
+    query=&quot;P43403&quot;          # Identifier(s) to convert
+)
+
+# KEGG gene ID → UniProt
+kegg_to_uniprot = u.mapping(fr=&quot;KEGG&quot;, to=&quot;UniProtKB_AC-ID&quot;, query=&quot;hsa:7535&quot;)
+
+# For compounds, use UniChem
+from bioservices import UniChem
+u = UniChem()
+chembl_from_kegg = u.get_compound_id_from_kegg(&quot;C11222&quot;)
+```
+
+**Supported mappings (UniProt):**
+- UniProtKB ↔ KEGG
+- UniProtKB ↔ Ensembl
+- UniProtKB ↔ PDB
+- UniProtKB ↔ RefSeq
+- And many more (see `references/identifier_mapping.md`)
+
+### 6. Gene Ontology Queries
+
+Access GO terms and annotations:
+
+```python
+from bioservices import QuickGO
+
+g = QuickGO(verbose=False)
+
+# Retrieve GO term information
+term_info = g.Term(&quot;GO:0003824&quot;, frmt=&quot;obo&quot;)
+
+# Search annotations
+annotations = g.Annotation(protein=&quot;P43403&quot;, format=&quot;tsv&quot;)
+```
+
+### 7. Protein-Protein Interactions
+
+Query interaction databases via PSICQUIC:
+
+```python
+from bioservices import PSICQUIC
+
+s = PSICQUIC(verbose=False)
+
+# Query specific database (e.g., MINT)
+interactions = s.query(&quot;mint&quot;, &quot;ZAP70 AND species:9606&quot;)
+
+# List available interaction databases
+databases = s.activeDBs
+```
+
+**Available databases:** MINT, IntAct, BioGRID, DIP, and 30+ others.
+
+## Multi-Service Integration Workflows
+
+BioServices excels at combining multiple services for comprehensive analysis. Common integration patterns:
+
+### Complete Protein Analysis Pipeline
+
+Execute a full protein characterization workflow:
+
+```bash
+python scripts/protein_analysis_workflow.py ZAP70_HUMAN your.email@example.com
+```
+
+This script demonstrates:
+1. UniProt search for protein entry
+2. FASTA sequence retrieval
+3. BLAST similarity search
+4. KEGG pathway discovery
+5. PSICQUIC interaction mapping
+
+### Pathway Network Analysis
+
+Analyze all pathways for an organism:
+
+```bash
+python scripts/pathway_analysis.py hsa output_directory/
+```
+
+Extracts and analyzes:
+- All pathway IDs for organism
+- Protein-protein interactions per pathway
+- Interaction type distributions
+- Exports to CSV/SIF formats
+
+### Cross-Database Compound Search
+
+Map compound identifiers across databases:
+
+```bash
+python scripts/compound_cross_reference.py Geldanamycin
+```
+
+Retrieves:
+- KEGG compound ID
+- ChEBI identifier
+- ChEMBL identifier
+- Basic compound properties
+
+### Batch Identifier Conversion
+
+Convert multiple identifiers at once:
+
+```bash
+python scripts/batch_id_converter.py input_ids.txt --from UniProtKB_AC-ID --to KEGG
+```
+
+## Best Practices
+
+### Output Format Handling
+
+Different services return data in various formats:
+- **XML**: Parse using BeautifulSoup (most SOAP services)
+- **Tab-separated (TSV)**: Pandas DataFrames for tabular data
+- **Dictionary/JSON**: Direct Python manipulation
+- **FASTA**: BioPython integration for sequence analysis
+
+### Rate Limiting and Verbosity
+
+Control API request behavior:
+
+```python
+from bioservices import KEGG
+
+k = KEGG(verbose=False)  # Suppress HTTP request details
+k.TIMEOUT = 30  # Adjust timeout for slow connections
+```
+
+### Error Handling
+
+Wrap service calls in try-except blocks:
+
+```python
+try:
+    results = u.search(&quot;ambiguous_query&quot;)
+    if results:
+        # Process results
+        pass
+except Exception as e:
+    print(f&quot;Search failed: {e}&quot;)
+```
+
+### Organism Codes
+
+Use standard organism abbreviations:
+- `hsa`: Homo sapiens (human)
+- `mmu`: Mus musculus (mouse)
+- `dme`: Drosophila melanogaster
+- `sce`: Saccharomyces cerevisiae (yeast)
+
+List all organisms: `k.list(&quot;organism&quot;)` or `k.organismIds`
+
+### Integration with Other Tools
+
+BioServices works well with:
+- **BioPython**: Sequence analysis on retrieved FASTA data
+- **Pandas**: Tabular data manipulation
+- **PyMOL**: 3D structure visualization (retrieve PDB IDs)
+- **NetworkX**: Network analysis of pathway interactions
+- **Galaxy**: Custom tool wrappers for workflow platforms
+
+## Resources
+
+### scripts/
+
+Executable Python scripts demonstrating complete workflows:
+
+- `protein_analysis_workflow.py`: End-to-end protein characterization
+- `pathway_analysis.py`: KEGG pathway discovery and network extraction
+- `compound_cross_reference.py`: Multi-database compound searching
+- `batch_id_converter.py`: Bulk identifier mapping utility
+
+Scripts can be executed directly or adapted for specific use cases.
+
+### references/
+
+Detailed documentation loaded as needed:
+
+- `services_reference.md`: Comprehensive list of all 40+ services with methods
+- `workflow_patterns.md`: Detailed multi-step analysis workflows
+- `identifier_mapping.md`: Complete guide to cross-database ID conversion
+
+Load references when working with specific services or complex integration tasks.
+
+## Installation
+
+```bash
+uv pip install bioservices
+```
+
+Dependencies are automatically managed. Package is tested on Python 3.9-3.12.
+
+## Additional Information
+
+For detailed API documentation and advanced features, refer to:
+- Official documentation: https://bioservices.readthedocs.io/
+- Source code: https://github.com/cokelaer/bioservices
+- Service-specific references in `references/services_reference.md`
+</code>
       </div>
     </div>
 

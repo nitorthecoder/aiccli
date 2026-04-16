@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,272 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/resume</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/resume</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># Orchestration Resume Command
+
+Resume work on existing task orchestrations after session loss or context switch.
+
+## Usage
+
+```
+/orchestration/resume [options]
+```
+
+## Description
+
+Restores full context for active orchestrations, showing current progress, identifying next actions, and providing all necessary information to continue work seamlessly.
+
+## Basic Commands
+
+### List Active Orchestrations
+```
+/orchestration/resume
+```
+Shows all orchestrations with active (non-completed) tasks.
+
+### Resume Specific Orchestration
+```
+/orchestration/resume --date 03_15_2024 --project auth_system
+```
+Loads complete context for a specific orchestration.
+
+### Resume Most Recent
+```
+/orchestration/resume --latest
+```
+Automatically resumes the most recently active orchestration.
+
+## Output Format
+
+### Orchestration List View
+```
+Active Task Orchestrations
+==========================
+
+1. 03_15_2024/authentication_system
+   Started: 3 days ago | Progress: 65% | Active Tasks: 3
+   └─ Focus: JWT implementation, OAuth integration
+
+2. 03_14_2024/payment_processing  
+   Started: 4 days ago | Progress: 40% | Active Tasks: 2
+   └─ Focus: Stripe webhooks, refund handling
+
+3. 03_12_2024/admin_dashboard
+   Started: 1 week ago | Progress: 85% | Active Tasks: 1
+   └─ Focus: Final testing and deployment
+
+Select orchestration to resume: [1-3] or use --date and --project
+```
+
+### Detailed Resume View
+```
+Resuming: authentication_system (03_15_2024)
+============================================
+
+## Current Status Summary
+- Total Tasks: 24 (12 completed, 3 in progress, 2 on hold, 7 todos)
+- Time Elapsed: 3 days
+- Estimated Remaining: 2 days
+
+## Tasks In Progress
+┌──────────┬────────────────────────────┬───────────────┬──────────────┐
+│ Task ID  │ Title                      │ Agent         │ Duration     │
+├──────────┼────────────────────────────┼───────────────┼──────────────┤
+│ TASK-003 │ JWT token validation       │ dev-backend   │ 2.5h         │
+│ TASK-007 │ OAuth provider setup       │ dev-frontend  │ 1h           │
+│ TASK-011 │ Integration tests          │ test-dev      │ 30m          │
+└──────────┴────────────────────────────┴───────────────┴──────────────┘
+
+## Blocked Tasks (Require Attention)
+- TASK-005: User profile API - Blocked by TASK-003 (JWT validation)
+- TASK-009: OAuth callback handling - Waiting for provider credentials
+
+## Next Available Tasks (Ready to Start)
+1. TASK-013: Password reset flow (4h, frontend)
+   Files: src/auth/reset.tsx, src/api/auth.ts
+   
+2. TASK-014: Session management (3h, backend)
+   Files: src/services/session.ts, src/middleware/auth.ts
+
+## Recent Git Activity
+- feature/jwt-auth: 2 commits behind, last commit 2h ago
+- feature/oauth-setup: clean, last commit 1h ago
+
+## Quick Actions
+[1] Show TASK-003 details (current focus)
+[2] Pick up TASK-013 (password reset)
+[3] View dependency graph
+[4] Show recent commits
+[5] Generate status report
+```
+
+## Context Recovery Features
+
+### Task Context
+```
+/orchestration/resume --task TASK-003
+```
+Shows:
+- Full task description and requirements
+- Implementation progress and notes
+- Related files with recent changes
+- Test requirements and status
+- Dependencies and blockers
+
+### File Context
+```
+/orchestration/resume --show-files
+```
+Lists all files mentioned in active tasks with:
+- Last modified time
+- Current git status
+- Which tasks reference them
+
+### Dependency Context
+```
+/orchestration/resume --deps
+```
+Shows dependency graph focused on active tasks.
+
+## Working State Recovery
+
+### Git State Summary
+```
+## Git Working State
+Current Branch: feature/jwt-auth
+Status: 2 files modified, 1 untracked
+
+Modified Files:
+- src/auth/jwt.ts (related to TASK-003)
+- tests/auth.test.ts (related to TASK-003)
+
+Untracked:
+- src/auth/jwt.config.ts (new file for TASK-003)
+
+Recommendation: Commit current changes before switching tasks
+```
+
+### Last Session Summary
+```
+## Last Session (2 hours ago)
+- Completed: TASK-002 (Database schema)
+- Started: TASK-003 (JWT validation)
+- Commits: 2 (feat: add user auth schema, test: auth unit tests)
+- Next planned: Continue TASK-003, then TASK-005
+```
+
+## Filtering Options
+
+### By Status
+```
+/orchestration/resume --show in_progress,on_hold
+```
+
+### By Date Range
+```
+/orchestration/resume --since &quot;last week&quot;
+```
+
+### By Completion
+```
+/orchestration/resume --incomplete  # &lt; 50% done
+/orchestration/resume --nearly-done  # &gt; 80% done
+```
+
+## Integration Features
+
+### Direct Task Pickup
+```
+/orchestration/resume --pickup TASK-013
+```
+Automatically:
+1. Shows task details
+2. Moves to in_progress
+3. Shows relevant files
+4. Creates feature branch if needed
+
+### Status Check Integration
+```
+/orchestration/resume --with-status
+```
+Includes full status report with resume context.
+
+### Commit History
+```
+/orchestration/resume --commits 5
+```
+Shows last 5 commits related to the orchestration.
+
+## Quick Resume Patterns
+
+### Morning Standup
+```
+/orchestration/resume --latest --with-status
+```
+Perfect for daily standups - shows what you were working on and current state.
+
+### Context Switch
+```
+/orchestration/resume --save-state
+```
+Saves current working state before switching to another orchestration.
+
+### Team Handoff
+```
+/orchestration/resume --handoff
+```
+Generates detailed handoff notes for another developer.
+
+## Examples
+
+### Example 1: Quick Continue
+```
+/orchestration/resume --latest --pickup-where-left-off
+```
+Resumes exactly where you stopped, showing the in-progress task.
+
+### Example 2: Monday Morning
+```
+/orchestration/resume --since friday --show-completed
+```
+Shows what was done Friday and what&#039;s next for Monday.
+
+### Example 3: Multiple Projects
+```
+/orchestration/resume --all --summary
+```
+Quick overview of all active orchestrations.
+
+## State Persistence
+
+The command reads from:
+- EXECUTION-TRACKER.md for progress metrics
+- TASK-STATUS-TRACKER.yaml for current state
+- Task files for detailed context
+- Git for working directory state
+
+## Best Practices
+
+1. **Use at Session Start**: Run `/orchestration/resume` when starting work
+2. **Save State**: Use `--save-state` before extended breaks
+3. **Check Dependencies**: Review blocked tasks that may now be unblocked
+4. **Commit Regularly**: Keep git state aligned with task progress
+
+## Notes
+
+- Automatically detects uncommitted changes related to tasks
+- Suggests next actions based on dependencies and priorities
+- Integrates with git worktrees if in use
+- Preserves task history for full context</code>
       </div>
     </div>
 

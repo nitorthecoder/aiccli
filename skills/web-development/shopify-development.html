@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,383 @@
     <p class="desc">|</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/shopify-development</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/shopify-development</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: shopify-development
+description: |
+  Build Shopify apps, extensions, themes using GraphQL Admin API, Shopify CLI, Polaris UI, and Liquid.
+  TRIGGER: &quot;shopify&quot;, &quot;shopify app&quot;, &quot;checkout extension&quot;, &quot;admin extension&quot;, &quot;POS extension&quot;,
+  &quot;shopify theme&quot;, &quot;liquid template&quot;, &quot;polaris&quot;, &quot;shopify graphql&quot;, &quot;shopify webhook&quot;,
+  &quot;shopify billing&quot;, &quot;app subscription&quot;, &quot;metafields&quot;, &quot;shopify functions&quot;
+---
+
+# Shopify Development Skill
+
+Use this skill when the user asks about:
+
+- Building Shopify apps or extensions
+- Creating checkout/admin/POS UI customizations
+- Developing themes with Liquid templating
+- Integrating with Shopify GraphQL or REST APIs
+- Implementing webhooks or billing
+- Working with metafields or Shopify Functions
+
+---
+
+## ROUTING: What to Build
+
+**IF user wants to integrate external services OR build merchant tools OR charge for features:**
+→ Build an **App** (see `references/app-development.md`)
+
+**IF user wants to customize checkout OR add admin UI OR create POS actions OR implement discount rules:**
+→ Build an **Extension** (see `references/extensions.md`)
+
+**IF user wants to customize storefront design OR modify product/collection pages:**
+→ Build a **Theme** (see `references/themes.md`)
+
+**IF user needs both backend logic AND storefront UI:**
+→ Build **App + Theme Extension** combination
+
+---
+
+## Shopify CLI Commands
+
+Install CLI:
+
+```bash
+npm install -g @shopify/cli@latest
+```
+
+Create and run app:
+
+```bash
+shopify app init          # Create new app
+shopify app dev           # Start dev server with tunnel
+shopify app deploy        # Build and upload to Shopify
+```
+
+Generate extension:
+
+```bash
+shopify app generate extension --type checkout_ui_extension
+shopify app generate extension --type admin_action
+shopify app generate extension --type admin_block
+shopify app generate extension --type pos_ui_extension
+shopify app generate extension --type function
+```
+
+Theme development:
+
+```bash
+shopify theme init        # Create new theme
+shopify theme dev         # Start local preview at localhost:9292
+shopify theme pull --live # Pull live theme
+shopify theme push --development  # Push to dev theme
+```
+
+---
+
+## Access Scopes
+
+Configure in `shopify.app.toml`:
+
+```toml
+[access_scopes]
+scopes = &quot;read_products,write_products,read_orders,write_orders,read_customers&quot;
+```
+
+Common scopes:
+
+- `read_products`, `write_products` - Product catalog access
+- `read_orders`, `write_orders` - Order management
+- `read_customers`, `write_customers` - Customer data
+- `read_inventory`, `write_inventory` - Stock levels
+- `read_fulfillments`, `write_fulfillments` - Order fulfillment
+
+---
+
+## GraphQL Patterns (Validated against API 2026-01)
+
+### Query Products
+
+```graphql
+query GetProducts($first: Int!, $query: String) {
+  products(first: $first, query: $query) {
+    edges {
+      node {
+        id
+        title
+        handle
+        status
+        variants(first: 5) {
+          edges {
+            node {
+              id
+              price
+              inventoryQuantity
+            }
+          }
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+```
+
+### Query Orders
+
+```graphql
+query GetOrders($first: Int!) {
+  orders(first: $first) {
+    edges {
+      node {
+        id
+        name
+        createdAt
+        displayFinancialStatus
+        totalPriceSet {
+          shopMoney {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Set Metafields
+
+```graphql
+mutation SetMetafields($metafields: [MetafieldsSetInput!]!) {
+  metafieldsSet(metafields: $metafields) {
+    metafields {
+      id
+      namespace
+      key
+      value
+    }
+    userErrors {
+      field
+      message
+    }
+  }
+}
+```
+
+Variables example:
+
+```json
+{
+  &quot;metafields&quot;: [
+    {
+      &quot;ownerId&quot;: &quot;gid://shopify/Product/123&quot;,
+      &quot;namespace&quot;: &quot;custom&quot;,
+      &quot;key&quot;: &quot;care_instructions&quot;,
+      &quot;value&quot;: &quot;Handle with care&quot;,
+      &quot;type&quot;: &quot;single_line_text_field&quot;
+    }
+  ]
+}
+```
+
+---
+
+## Checkout Extension Example
+
+```tsx
+import {
+  reactExtension,
+  BlockStack,
+  TextField,
+  Checkbox,
+  useApplyAttributeChange,
+} from &quot;@shopify/ui-extensions-react/checkout&quot;;
+
+export default reactExtension(&quot;purchase.checkout.block.render&quot;, () =&gt; (
+  &lt;GiftMessage /&gt;
+));
+
+function GiftMessage() {
+  const [isGift, setIsGift] = useState(false);
+  const [message, setMessage] = useState(&quot;&quot;);
+  const applyAttributeChange = useApplyAttributeChange();
+
+  useEffect(() =&gt; {
+    if (isGift &amp;&amp; message) {
+      applyAttributeChange({
+        type: &quot;updateAttribute&quot;,
+        key: &quot;gift_message&quot;,
+        value: message,
+      });
+    }
+  }, [isGift, message]);
+
+  return (
+    &lt;BlockStack spacing=&quot;loose&quot;&gt;
+      &lt;Checkbox checked={isGift} onChange={setIsGift}&gt;
+        This is a gift
+      &lt;/Checkbox&gt;
+      {isGift &amp;&amp; (
+        &lt;TextField
+          label=&quot;Gift Message&quot;
+          value={message}
+          onChange={setMessage}
+          multiline={3}
+        /&gt;
+      )}
+    &lt;/BlockStack&gt;
+  );
+}
+```
+
+---
+
+## Liquid Template Example
+
+```liquid
+{% comment %} Product Card Snippet {% endcomment %}
+&lt;div class=&quot;product-card&quot;&gt;
+  &lt;a href=&quot;{{ product.url }}&quot;&gt;
+    {% if product.featured_image %}
+      &lt;img
+        src=&quot;{{ product.featured_image | img_url: &#039;medium&#039; }}&quot;
+        alt=&quot;{{ product.title | escape }}&quot;
+        loading=&quot;lazy&quot;
+      &gt;
+    {% endif %}
+    &lt;h3&gt;{{ product.title }}&lt;/h3&gt;
+    &lt;p class=&quot;price&quot;&gt;{{ product.price | money }}&lt;/p&gt;
+    {% if product.compare_at_price &gt; product.price %}
+      &lt;p class=&quot;sale-badge&quot;&gt;Sale&lt;/p&gt;
+    {% endif %}
+  &lt;/a&gt;
+&lt;/div&gt;
+```
+
+---
+
+## Webhook Configuration
+
+In `shopify.app.toml`:
+
+```toml
+[webhooks]
+api_version = &quot;2026-01&quot;
+
+[[webhooks.subscriptions]]
+topics = [&quot;orders/create&quot;, &quot;orders/updated&quot;]
+uri = &quot;/webhooks/orders&quot;
+
+[[webhooks.subscriptions]]
+topics = [&quot;products/update&quot;]
+uri = &quot;/webhooks/products&quot;
+
+# GDPR mandatory webhooks (required for app approval)
+[webhooks.privacy_compliance]
+customer_data_request_url = &quot;/webhooks/gdpr/data-request&quot;
+customer_deletion_url = &quot;/webhooks/gdpr/customer-deletion&quot;
+shop_deletion_url = &quot;/webhooks/gdpr/shop-deletion&quot;
+```
+
+---
+
+## Best Practices
+
+### API Usage
+
+- Use GraphQL over REST for new development
+- Request only fields you need (reduces query cost)
+- Implement cursor-based pagination with `pageInfo.endCursor`
+- Use bulk operations for processing more than 250 items
+- Handle rate limits with exponential backoff
+
+### Security
+
+- Store API credentials in environment variables
+- Always verify webhook HMAC signatures before processing
+- Validate OAuth state parameter to prevent CSRF
+- Request minimal access scopes
+- Use session tokens for embedded apps
+
+### Performance
+
+- Cache API responses when data doesn&#039;t change frequently
+- Use lazy loading in extensions
+- Optimize images in themes using `img_url` filter
+- Monitor GraphQL query costs via response headers
+
+---
+
+## Troubleshooting
+
+**IF you see rate limit errors:**
+→ Implement exponential backoff retry logic
+→ Switch to bulk operations for large datasets
+→ Monitor `X-Shopify-Shop-Api-Call-Limit` header
+
+**IF authentication fails:**
+→ Verify the access token is still valid
+→ Check that all required scopes were granted
+→ Ensure OAuth flow completed successfully
+
+**IF extension is not appearing:**
+→ Verify the extension target is correct
+→ Check that extension is published via `shopify app deploy`
+→ Confirm the app is installed on the test store
+
+**IF webhook is not receiving events:**
+→ Verify the webhook URL is publicly accessible
+→ Check HMAC signature validation logic
+→ Review webhook logs in Partner Dashboard
+
+**IF GraphQL query fails:**
+→ Validate query against schema (use GraphiQL explorer)
+→ Check for deprecated fields in error message
+→ Verify you have required access scopes
+
+---
+
+## Reference Files
+
+For detailed implementation guides, read these files:
+
+- `references/app-development.md` - OAuth authentication flow, GraphQL mutations for products/orders/billing, webhook handlers, billing API integration
+- `references/extensions.md` - Checkout UI components, Admin UI extensions, POS extensions, Shopify Functions for discounts/payment/delivery
+- `references/themes.md` - Liquid syntax reference, theme directory structure, sections and snippets, common patterns
+
+---
+
+## Scripts
+
+- `scripts/shopify_init.py` - Interactive project scaffolding. Run: `python scripts/shopify_init.py`
+- `scripts/shopify_graphql.py` - GraphQL utilities with query templates, pagination, rate limiting. Import: `from shopify_graphql import ShopifyGraphQL`
+
+---
+
+## Official Documentation Links
+
+- Shopify Developer Docs: https://shopify.dev/docs
+- GraphQL Admin API Reference: https://shopify.dev/docs/api/admin-graphql
+- Shopify CLI Reference: https://shopify.dev/docs/api/shopify-cli
+- Polaris Design System: https://polaris.shopify.com
+
+API Version: 2026-01 (quarterly releases, 12-month deprecation window)
+</code>
       </div>
     </div>
 

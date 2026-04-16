@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,400 @@
     <p class="desc">"Query ChEMBL's bioactive molecules and drug discovery data. Search compounds by structure/properties, retrieve bioactivity data (IC50, Ki), find inhibitors, perform SAR studies, for medicinal chemistry."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/chembl-database</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/chembl-database</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: chembl-database
+description: &quot;Query ChEMBL&#039;s bioactive molecules and drug discovery data. Search compounds by structure/properties, retrieve bioactivity data (IC50, Ki), find inhibitors, perform SAR studies, for medicinal chemistry.&quot;
+---
+
+# ChEMBL Database
+
+## Overview
+
+ChEMBL is a manually curated database of bioactive molecules maintained by the European Bioinformatics Institute (EBI), containing over 2 million compounds, 19 million bioactivity measurements, 13,000+ drug targets, and data on approved drugs and clinical candidates. Access and query this data programmatically using the ChEMBL Python client for drug discovery and medicinal chemistry research.
+
+## When to Use This Skill
+
+This skill should be used when:
+
+- **Compound searches**: Finding molecules by name, structure, or properties
+- **Target information**: Retrieving data about proteins, enzymes, or biological targets
+- **Bioactivity data**: Querying IC50, Ki, EC50, or other activity measurements
+- **Drug information**: Looking up approved drugs, mechanisms, or indications
+- **Structure searches**: Performing similarity or substructure searches
+- **Cheminformatics**: Analyzing molecular properties and drug-likeness
+- **Target-ligand relationships**: Exploring compound-target interactions
+- **Drug discovery**: Identifying inhibitors, agonists, or bioactive molecules
+
+## Installation and Setup
+
+### Python Client
+
+The ChEMBL Python client is required for programmatic access:
+
+```bash
+uv pip install chembl_webresource_client
+```
+
+### Basic Usage Pattern
+
+```python
+from chembl_webresource_client.new_client import new_client
+
+# Access different endpoints
+molecule = new_client.molecule
+target = new_client.target
+activity = new_client.activity
+drug = new_client.drug
+```
+
+## Core Capabilities
+
+### 1. Molecule Queries
+
+**Retrieve by ChEMBL ID:**
+```python
+molecule = new_client.molecule
+aspirin = molecule.get(&#039;CHEMBL25&#039;)
+```
+
+**Search by name:**
+```python
+results = molecule.filter(pref_name__icontains=&#039;aspirin&#039;)
+```
+
+**Filter by properties:**
+```python
+# Find small molecules (MW &lt;= 500) with favorable LogP
+results = molecule.filter(
+    molecule_properties__mw_freebase__lte=500,
+    molecule_properties__alogp__lte=5
+)
+```
+
+### 2. Target Queries
+
+**Retrieve target information:**
+```python
+target = new_client.target
+egfr = target.get(&#039;CHEMBL203&#039;)
+```
+
+**Search for specific target types:**
+```python
+# Find all kinase targets
+kinases = target.filter(
+    target_type=&#039;SINGLE PROTEIN&#039;,
+    pref_name__icontains=&#039;kinase&#039;
+)
+```
+
+### 3. Bioactivity Data
+
+**Query activities for a target:**
+```python
+activity = new_client.activity
+# Find potent EGFR inhibitors
+results = activity.filter(
+    target_chembl_id=&#039;CHEMBL203&#039;,
+    standard_type=&#039;IC50&#039;,
+    standard_value__lte=100,
+    standard_units=&#039;nM&#039;
+)
+```
+
+**Get all activities for a compound:**
+```python
+compound_activities = activity.filter(
+    molecule_chembl_id=&#039;CHEMBL25&#039;,
+    pchembl_value__isnull=False
+)
+```
+
+### 4. Structure-Based Searches
+
+**Similarity search:**
+```python
+similarity = new_client.similarity
+# Find compounds similar to aspirin
+similar = similarity.filter(
+    smiles=&#039;CC(=O)Oc1ccccc1C(=O)O&#039;,
+    similarity=85  # 85% similarity threshold
+)
+```
+
+**Substructure search:**
+```python
+substructure = new_client.substructure
+# Find compounds containing benzene ring
+results = substructure.filter(smiles=&#039;c1ccccc1&#039;)
+```
+
+### 5. Drug Information
+
+**Retrieve drug data:**
+```python
+drug = new_client.drug
+drug_info = drug.get(&#039;CHEMBL25&#039;)
+```
+
+**Get mechanisms of action:**
+```python
+mechanism = new_client.mechanism
+mechanisms = mechanism.filter(molecule_chembl_id=&#039;CHEMBL25&#039;)
+```
+
+**Query drug indications:**
+```python
+drug_indication = new_client.drug_indication
+indications = drug_indication.filter(molecule_chembl_id=&#039;CHEMBL25&#039;)
+```
+
+## Query Workflow
+
+### Workflow 1: Finding Inhibitors for a Target
+
+1. **Identify the target** by searching by name:
+   ```python
+   targets = new_client.target.filter(pref_name__icontains=&#039;EGFR&#039;)
+   target_id = targets[0][&#039;target_chembl_id&#039;]
+   ```
+
+2. **Query bioactivity data** for that target:
+   ```python
+   activities = new_client.activity.filter(
+       target_chembl_id=target_id,
+       standard_type=&#039;IC50&#039;,
+       standard_value__lte=100
+   )
+   ```
+
+3. **Extract compound IDs** and retrieve details:
+   ```python
+   compound_ids = [act[&#039;molecule_chembl_id&#039;] for act in activities]
+   compounds = [new_client.molecule.get(cid) for cid in compound_ids]
+   ```
+
+### Workflow 2: Analyzing a Known Drug
+
+1. **Get drug information**:
+   ```python
+   drug_info = new_client.drug.get(&#039;CHEMBL1234&#039;)
+   ```
+
+2. **Retrieve mechanisms**:
+   ```python
+   mechanisms = new_client.mechanism.filter(molecule_chembl_id=&#039;CHEMBL1234&#039;)
+   ```
+
+3. **Find all bioactivities**:
+   ```python
+   activities = new_client.activity.filter(molecule_chembl_id=&#039;CHEMBL1234&#039;)
+   ```
+
+### Workflow 3: Structure-Activity Relationship (SAR) Study
+
+1. **Find similar compounds**:
+   ```python
+   similar = new_client.similarity.filter(smiles=&#039;query_smiles&#039;, similarity=80)
+   ```
+
+2. **Get activities for each compound**:
+   ```python
+   for compound in similar:
+       activities = new_client.activity.filter(
+           molecule_chembl_id=compound[&#039;molecule_chembl_id&#039;]
+       )
+   ```
+
+3. **Analyze property-activity relationships** using molecular properties from results.
+
+## Filter Operators
+
+ChEMBL supports Django-style query filters:
+
+- `__exact` - Exact match
+- `__iexact` - Case-insensitive exact match
+- `__contains` / `__icontains` - Substring matching
+- `__startswith` / `__endswith` - Prefix/suffix matching
+- `__gt`, `__gte`, `__lt`, `__lte` - Numeric comparisons
+- `__range` - Value in range
+- `__in` - Value in list
+- `__isnull` - Null/not null check
+
+## Data Export and Analysis
+
+Convert results to pandas DataFrame for analysis:
+
+```python
+import pandas as pd
+
+activities = new_client.activity.filter(target_chembl_id=&#039;CHEMBL203&#039;)
+df = pd.DataFrame(list(activities))
+
+# Analyze results
+print(df[&#039;standard_value&#039;].describe())
+print(df.groupby(&#039;standard_type&#039;).size())
+```
+
+## Performance Optimization
+
+### Caching
+
+The client automatically caches results for 24 hours. Configure caching:
+
+```python
+from chembl_webresource_client.settings import Settings
+
+# Disable caching
+Settings.Instance().CACHING = False
+
+# Adjust cache expiration (seconds)
+Settings.Instance().CACHE_EXPIRE = 86400
+```
+
+### Lazy Evaluation
+
+Queries execute only when data is accessed. Convert to list to force execution:
+
+```python
+# Query is not executed yet
+results = molecule.filter(pref_name__icontains=&#039;aspirin&#039;)
+
+# Force execution
+results_list = list(results)
+```
+
+### Pagination
+
+Results are paginated automatically. Iterate through all results:
+
+```python
+for activity in new_client.activity.filter(target_chembl_id=&#039;CHEMBL203&#039;):
+    # Process each activity
+    print(activity[&#039;molecule_chembl_id&#039;])
+```
+
+## Common Use Cases
+
+### Find Kinase Inhibitors
+
+```python
+# Identify kinase targets
+kinases = new_client.target.filter(
+    target_type=&#039;SINGLE PROTEIN&#039;,
+    pref_name__icontains=&#039;kinase&#039;
+)
+
+# Get potent inhibitors
+for kinase in kinases[:5]:  # First 5 kinases
+    activities = new_client.activity.filter(
+        target_chembl_id=kinase[&#039;target_chembl_id&#039;],
+        standard_type=&#039;IC50&#039;,
+        standard_value__lte=50
+    )
+```
+
+### Explore Drug Repurposing
+
+```python
+# Get approved drugs
+drugs = new_client.drug.filter()
+
+# For each drug, find all targets
+for drug in drugs[:10]:
+    mechanisms = new_client.mechanism.filter(
+        molecule_chembl_id=drug[&#039;molecule_chembl_id&#039;]
+    )
+```
+
+### Virtual Screening
+
+```python
+# Find compounds with desired properties
+candidates = new_client.molecule.filter(
+    molecule_properties__mw_freebase__range=[300, 500],
+    molecule_properties__alogp__lte=5,
+    molecule_properties__hba__lte=10,
+    molecule_properties__hbd__lte=5
+)
+```
+
+## Resources
+
+### scripts/example_queries.py
+
+Ready-to-use Python functions demonstrating common ChEMBL query patterns:
+
+- `get_molecule_info()` - Retrieve molecule details by ID
+- `search_molecules_by_name()` - Name-based molecule search
+- `find_molecules_by_properties()` - Property-based filtering
+- `get_bioactivity_data()` - Query bioactivities for targets
+- `find_similar_compounds()` - Similarity searching
+- `substructure_search()` - Substructure matching
+- `get_drug_info()` - Retrieve drug information
+- `find_kinase_inhibitors()` - Specialized kinase inhibitor search
+- `export_to_dataframe()` - Convert results to pandas DataFrame
+
+Consult this script for implementation details and usage examples.
+
+### references/api_reference.md
+
+Comprehensive API documentation including:
+
+- Complete endpoint listing (molecule, target, activity, assay, drug, etc.)
+- All filter operators and query patterns
+- Molecular properties and bioactivity fields
+- Advanced query examples
+- Configuration and performance tuning
+- Error handling and rate limiting
+
+Refer to this document when detailed API information is needed or when troubleshooting queries.
+
+## Important Notes
+
+### Data Reliability
+
+- ChEMBL data is manually curated but may contain inconsistencies
+- Always check `data_validity_comment` field in activity records
+- Be aware of `potential_duplicate` flags
+
+### Units and Standards
+
+- Bioactivity values use standard units (nM, uM, etc.)
+- `pchembl_value` provides normalized activity (-log scale)
+- Check `standard_type` to understand measurement type (IC50, Ki, EC50, etc.)
+
+### Rate Limiting
+
+- Respect ChEMBL&#039;s fair usage policies
+- Use caching to minimize repeated requests
+- Consider bulk downloads for large datasets
+- Avoid hammering the API with rapid consecutive requests
+
+### Chemical Structure Formats
+
+- SMILES strings are the primary structure format
+- InChI keys available for compounds
+- SVG images can be generated via the image endpoint
+
+## Additional Resources
+
+- ChEMBL website: https://www.ebi.ac.uk/chembl/
+- API documentation: https://www.ebi.ac.uk/chembl/api/data/docs
+- Python client GitHub: https://github.com/chembl/chembl_webresource_client
+- Interface documentation: https://chembl.gitbook.io/chembl-interface-documentation/
+- Example notebooks: https://github.com/chembl/notebooks
+</code>
       </div>
     </div>
 

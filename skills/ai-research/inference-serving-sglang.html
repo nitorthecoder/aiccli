@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,459 @@
     <p class="desc">Fast structured generation and serving for LLMs with RadixAttention prefix caching. Use for JSON/regex outputs, constrained decoding, agentic workflows with tool calls, or when you need 5× faster inference than vLLM with prefix sharing. Powers 300,000+ GPUs at xAI, AMD, NVIDIA, and LinkedIn.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/inference-serving-sglang</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/inference-serving-sglang</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: sglang
+description: Fast structured generation and serving for LLMs with RadixAttention prefix caching. Use for JSON/regex outputs, constrained decoding, agentic workflows with tool calls, or when you need 5× faster inference than vLLM with prefix sharing. Powers 300,000+ GPUs at xAI, AMD, NVIDIA, and LinkedIn.
+version: 1.0.0
+author: Orchestra Research
+license: MIT
+tags: [Inference Serving, SGLang, Structured Generation, RadixAttention, Prefix Caching, Constrained Decoding, Agents, JSON Output, Fast Inference, Production Scale]
+dependencies: [sglang, torch, transformers]
+---
+
+# SGLang
+
+High-performance serving framework for LLMs and VLMs with RadixAttention for automatic prefix caching.
+
+## When to use SGLang
+
+**Use SGLang when:**
+- Need structured outputs (JSON, regex, grammar)
+- Building agents with repeated prefixes (system prompts, tools)
+- Agentic workflows with function calling
+- Multi-turn conversations with shared context
+- Need faster JSON decoding (3× vs standard)
+
+**Use vLLM instead when:**
+- Simple text generation without structure
+- Don&#039;t need prefix caching
+- Want mature, widely-tested production system
+
+**Use TensorRT-LLM instead when:**
+- Maximum single-request latency (no batching needed)
+- NVIDIA-only deployment
+- Need FP8/INT4 quantization on H100
+
+## Quick start
+
+### Installation
+
+```bash
+# pip install (recommended)
+pip install &quot;sglang[all]&quot;
+
+# With FlashInfer (faster, CUDA 11.8/12.1)
+pip install sglang[all] flashinfer -i https://flashinfer.ai/whl/cu121/torch2.4/
+
+# From source
+git clone https://github.com/sgl-project/sglang.git
+cd sglang
+pip install -e &quot;python[all]&quot;
+```
+
+### Launch server
+
+```bash
+# Basic server (Llama 3-8B)
+python -m sglang.launch_server \
+    --model-path meta-llama/Meta-Llama-3-8B-Instruct \
+    --port 30000
+
+# With RadixAttention (automatic prefix caching)
+python -m sglang.launch_server \
+    --model-path meta-llama/Meta-Llama-3-8B-Instruct \
+    --port 30000 \
+    --enable-radix-cache  # Default: enabled
+
+# Multi-GPU (tensor parallelism)
+python -m sglang.launch_server \
+    --model-path meta-llama/Meta-Llama-3-70B-Instruct \
+    --tp 4 \
+    --port 30000
+```
+
+### Basic inference
+
+```python
+import sglang as sgl
+
+# Set backend
+sgl.set_default_backend(sgl.OpenAI(&quot;http://localhost:30000/v1&quot;))
+
+# Simple generation
+@sgl.function
+def simple_gen(s, question):
+    s += &quot;Q: &quot; + question + &quot;\n&quot;
+    s += &quot;A:&quot; + sgl.gen(&quot;answer&quot;, max_tokens=100)
+
+# Run
+state = simple_gen.run(question=&quot;What is the capital of France?&quot;)
+print(state[&quot;answer&quot;])
+# Output: &quot;The capital of France is Paris.&quot;
+```
+
+### Structured JSON output
+
+```python
+import sglang as sgl
+
+@sgl.function
+def extract_person(s, text):
+    s += f&quot;Extract person information from: {text}\n&quot;
+    s += &quot;Output JSON:\n&quot;
+
+    # Constrained JSON generation
+    s += sgl.gen(
+        &quot;json_output&quot;,
+        max_tokens=200,
+        regex=r&#039;\{&quot;name&quot;: &quot;[^&quot;]+&quot;, &quot;age&quot;: \d+, &quot;occupation&quot;: &quot;[^&quot;]+&quot;\}&#039;
+    )
+
+# Run
+state = extract_person.run(
+    text=&quot;John Smith is a 35-year-old software engineer.&quot;
+)
+print(state[&quot;json_output&quot;])
+# Output: {&quot;name&quot;: &quot;John Smith&quot;, &quot;age&quot;: 35, &quot;occupation&quot;: &quot;software engineer&quot;}
+```
+
+## RadixAttention (Key Innovation)
+
+**What it does**: Automatically caches and reuses common prefixes across requests.
+
+**Performance**:
+- **5× faster** for agentic workloads with shared system prompts
+- **10× faster** for few-shot prompting with repeated examples
+- **Zero configuration** - works automatically
+
+**How it works**:
+1. Builds radix tree of all processed tokens
+2. Automatically detects shared prefixes
+3. Reuses KV cache for matching prefixes
+4. Only computes new tokens
+
+**Example** (Agent with system prompt):
+
+```
+Request 1: [SYSTEM_PROMPT] + &quot;What&#039;s the weather?&quot;
+→ Computes full prompt (1000 tokens)
+
+Request 2: [SAME_SYSTEM_PROMPT] + &quot;Book a flight&quot;
+→ Reuses system prompt KV cache (998 tokens)
+→ Only computes 2 new tokens
+→ 5× faster!
+```
+
+## Structured generation patterns
+
+### JSON with schema
+
+```python
+@sgl.function
+def structured_extraction(s, article):
+    s += f&quot;Article: {article}\n\n&quot;
+    s += &quot;Extract key information as JSON:\n&quot;
+
+    # JSON schema constraint
+    schema = {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+            &quot;title&quot;: {&quot;type&quot;: &quot;string&quot;},
+            &quot;author&quot;: {&quot;type&quot;: &quot;string&quot;},
+            &quot;summary&quot;: {&quot;type&quot;: &quot;string&quot;},
+            &quot;sentiment&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: [&quot;positive&quot;, &quot;negative&quot;, &quot;neutral&quot;]}
+        },
+        &quot;required&quot;: [&quot;title&quot;, &quot;author&quot;, &quot;summary&quot;, &quot;sentiment&quot;]
+    }
+
+    s += sgl.gen(&quot;info&quot;, max_tokens=300, json_schema=schema)
+
+state = structured_extraction.run(article=&quot;...&quot;)
+print(state[&quot;info&quot;])
+# Output: Valid JSON matching schema
+```
+
+### Regex-constrained generation
+
+```python
+@sgl.function
+def extract_email(s, text):
+    s += f&quot;Extract email from: {text}\n&quot;
+    s += &quot;Email: &quot;
+
+    # Email regex pattern
+    s += sgl.gen(
+        &quot;email&quot;,
+        max_tokens=50,
+        regex=r&#039;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}&#039;
+    )
+
+state = extract_email.run(text=&quot;Contact john.doe@example.com for details&quot;)
+print(state[&quot;email&quot;])
+# Output: &quot;john.doe@example.com&quot;
+```
+
+### Grammar-based generation
+
+```python
+@sgl.function
+def generate_code(s, description):
+    s += f&quot;Generate Python code for: {description}\n&quot;
+    s += &quot;```python\n&quot;
+
+    # EBNF grammar for Python
+    python_grammar = &quot;&quot;&quot;
+    ?start: function_def
+    function_def: &quot;def&quot; NAME &quot;(&quot; [parameters] &quot;):&quot; suite
+    parameters: parameter (&quot;,&quot; parameter)*
+    parameter: NAME
+    suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
+    &quot;&quot;&quot;
+
+    s += sgl.gen(&quot;code&quot;, max_tokens=200, grammar=python_grammar)
+    s += &quot;\n```&quot;
+```
+
+## Agent workflows with function calling
+
+```python
+import sglang as sgl
+
+# Define tools
+tools = [
+    {
+        &quot;name&quot;: &quot;get_weather&quot;,
+        &quot;description&quot;: &quot;Get weather for a location&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;location&quot;: {&quot;type&quot;: &quot;string&quot;}
+            }
+        }
+    },
+    {
+        &quot;name&quot;: &quot;book_flight&quot;,
+        &quot;description&quot;: &quot;Book a flight&quot;,
+        &quot;parameters&quot;: {
+            &quot;type&quot;: &quot;object&quot;,
+            &quot;properties&quot;: {
+                &quot;from&quot;: {&quot;type&quot;: &quot;string&quot;},
+                &quot;to&quot;: {&quot;type&quot;: &quot;string&quot;},
+                &quot;date&quot;: {&quot;type&quot;: &quot;string&quot;}
+            }
+        }
+    }
+]
+
+@sgl.function
+def agent_workflow(s, user_query, tools):
+    # System prompt (cached with RadixAttention)
+    s += &quot;You are a helpful assistant with access to tools.\n&quot;
+    s += f&quot;Available tools: {tools}\n\n&quot;
+
+    # User query
+    s += f&quot;User: {user_query}\n&quot;
+    s += &quot;Assistant: &quot;
+
+    # Generate with function calling
+    s += sgl.gen(
+        &quot;response&quot;,
+        max_tokens=200,
+        tools=tools,  # SGLang handles tool call format
+        stop=[&quot;User:&quot;, &quot;\n\n&quot;]
+    )
+
+# Multiple queries reuse system prompt
+state1 = agent_workflow.run(
+    user_query=&quot;What&#039;s the weather in NYC?&quot;,
+    tools=tools
+)
+# First call: Computes full system prompt
+
+state2 = agent_workflow.run(
+    user_query=&quot;Book a flight to LA&quot;,
+    tools=tools
+)
+# Second call: Reuses system prompt (5× faster)
+```
+
+## Performance benchmarks
+
+### RadixAttention speedup
+
+**Few-shot prompting** (10 examples in prompt):
+- vLLM: 2.5 sec/request
+- SGLang: **0.25 sec/request** (10× faster)
+- Throughput: 4× higher
+
+**Agent workflows** (1000-token system prompt):
+- vLLM: 1.8 sec/request
+- SGLang: **0.35 sec/request** (5× faster)
+
+**JSON decoding**:
+- Standard: 45 tok/s
+- SGLang: **135 tok/s** (3× faster)
+
+### Throughput (Llama 3-8B, A100)
+
+| Workload | vLLM | SGLang | Speedup |
+|----------|------|--------|---------|
+| Simple generation | 2500 tok/s | 2800 tok/s | 1.12× |
+| Few-shot (10 examples) | 500 tok/s | 5000 tok/s | 10× |
+| Agent (tool calls) | 800 tok/s | 4000 tok/s | 5× |
+| JSON output | 600 tok/s | 2400 tok/s | 4× |
+
+## Multi-turn conversations
+
+```python
+@sgl.function
+def multi_turn_chat(s, history, new_message):
+    # System prompt (always cached)
+    s += &quot;You are a helpful AI assistant.\n\n&quot;
+
+    # Conversation history (cached as it grows)
+    for msg in history:
+        s += f&quot;{msg[&#039;role&#039;]}: {msg[&#039;content&#039;]}\n&quot;
+
+    # New user message (only new part)
+    s += f&quot;User: {new_message}\n&quot;
+    s += &quot;Assistant: &quot;
+    s += sgl.gen(&quot;response&quot;, max_tokens=200)
+
+# Turn 1
+history = []
+state = multi_turn_chat.run(history=history, new_message=&quot;Hi there!&quot;)
+history.append({&quot;role&quot;: &quot;User&quot;, &quot;content&quot;: &quot;Hi there!&quot;})
+history.append({&quot;role&quot;: &quot;Assistant&quot;, &quot;content&quot;: state[&quot;response&quot;]})
+
+# Turn 2 (reuses Turn 1 KV cache)
+state = multi_turn_chat.run(history=history, new_message=&quot;What&#039;s 2+2?&quot;)
+# Only computes new message (much faster!)
+
+# Turn 3 (reuses Turn 1 + Turn 2 KV cache)
+state = multi_turn_chat.run(history=history, new_message=&quot;Tell me a joke&quot;)
+# Progressively faster as history grows
+```
+
+## Advanced features
+
+### Speculative decoding
+
+```bash
+# Launch with draft model (2-3× faster)
+python -m sglang.launch_server \
+    --model-path meta-llama/Meta-Llama-3-70B-Instruct \
+    --speculative-model meta-llama/Meta-Llama-3-8B-Instruct \
+    --speculative-num-steps 5
+```
+
+### Multi-modal (vision models)
+
+```python
+@sgl.function
+def describe_image(s, image_path):
+    s += sgl.image(image_path)
+    s += &quot;Describe this image in detail: &quot;
+    s += sgl.gen(&quot;description&quot;, max_tokens=200)
+
+state = describe_image.run(image_path=&quot;photo.jpg&quot;)
+print(state[&quot;description&quot;])
+```
+
+### Batching and parallel requests
+
+```python
+# Automatic batching (continuous batching)
+states = sgl.run_batch(
+    [
+        simple_gen.bind(question=&quot;What is AI?&quot;),
+        simple_gen.bind(question=&quot;What is ML?&quot;),
+        simple_gen.bind(question=&quot;What is DL?&quot;),
+    ]
+)
+
+# All 3 processed in single batch (efficient)
+```
+
+## OpenAI-compatible API
+
+```bash
+# Start server with OpenAI API
+python -m sglang.launch_server \
+    --model-path meta-llama/Meta-Llama-3-8B-Instruct \
+    --port 30000
+
+# Use with OpenAI client
+curl http://localhost:30000/v1/chat/completions \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{
+    &quot;model&quot;: &quot;default&quot;,
+    &quot;messages&quot;: [
+      {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are helpful&quot;},
+      {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello&quot;}
+    ],
+    &quot;temperature&quot;: 0.7,
+    &quot;max_tokens&quot;: 100
+  }&#039;
+
+# Works with OpenAI Python SDK
+from openai import OpenAI
+client = OpenAI(base_url=&quot;http://localhost:30000/v1&quot;, api_key=&quot;EMPTY&quot;)
+
+response = client.chat.completions.create(
+    model=&quot;default&quot;,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello&quot;}]
+)
+```
+
+## Supported models
+
+**Text models**:
+- Llama 2, Llama 3, Llama 3.1, Llama 3.2
+- Mistral, Mixtral
+- Qwen, Qwen2, QwQ
+- DeepSeek-V2, DeepSeek-V3
+- Gemma, Phi-3
+
+**Vision models**:
+- LLaVA, LLaVA-OneVision
+- Phi-3-Vision
+- Qwen2-VL
+
+**100+ models** from HuggingFace
+
+## Hardware support
+
+**NVIDIA**: A100, H100, L4, T4 (CUDA 11.8+)
+**AMD**: MI300, MI250 (ROCm 6.0+)
+**Intel**: Xeon with GPU (coming soon)
+**Apple**: M1/M2/M3 via MPS (experimental)
+
+## References
+
+- **[Structured Generation Guide](references/structured-generation.md)** - JSON schemas, regex, grammars, validation
+- **[RadixAttention Deep Dive](references/radix-attention.md)** - How it works, optimization, benchmarks
+- **[Production Deployment](references/deployment.md)** - Multi-GPU, monitoring, autoscaling
+
+## Resources
+
+- **GitHub**: https://github.com/sgl-project/sglang
+- **Docs**: https://sgl-project.github.io/
+- **Paper**: RadixAttention (arXiv:2312.07104)
+- **Discord**: https://discord.gg/sglang
+
+
+</code>
       </div>
     </div>
 

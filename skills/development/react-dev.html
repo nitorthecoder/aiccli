@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,408 @@
     <p class="desc">This skill should be used when building React components with TypeScript, typing hooks, handling events, or when React TypeScript, React 19, Server Components are mentioned. Covers type-safe patterns for React 18-19 including generic components, proper event typing, and routing integration (TanStack Router, React Router).</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/react-dev</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/react-dev</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: react-dev
+version: 1.0.0
+description: This skill should be used when building React components with TypeScript, typing hooks, handling events, or when React TypeScript, React 19, Server Components are mentioned. Covers type-safe patterns for React 18-19 including generic components, proper event typing, and routing integration (TanStack Router, React Router).
+---
+
+# React TypeScript
+
+Type-safe React = compile-time guarantees = confident refactoring.
+
+&lt;when_to_use&gt;
+
+- Building typed React components
+- Implementing generic components
+- Typing event handlers, forms, refs
+- Using React 19 features (Actions, Server Components, use())
+- Router integration (TanStack Router, React Router)
+- Custom hooks with proper typing
+
+NOT for: non-React TypeScript, vanilla JS React
+
+&lt;/when_to_use&gt;
+
+&lt;react_19_changes&gt;
+
+React 19 breaking changes require migration. Key patterns:
+
+**ref as prop** - forwardRef deprecated:
+
+```typescript
+// React 19 - ref as regular prop
+type ButtonProps = {
+  ref?: React.Ref&lt;HTMLButtonElement&gt;;
+} &amp; React.ComponentPropsWithoutRef&lt;&#039;button&#039;&gt;;
+
+function Button({ ref, children, ...props }: ButtonProps) {
+  return &lt;button ref={ref} {...props}&gt;{children}&lt;/button&gt;;
+}
+```
+
+**useActionState** - replaces useFormState:
+
+```typescript
+import { useActionState } from &#039;react&#039;;
+
+type FormState = { errors?: string[]; success?: boolean };
+
+function Form() {
+  const [state, formAction, isPending] = useActionState(submitAction, {});
+  return &lt;form action={formAction}&gt;...&lt;/form&gt;;
+}
+```
+
+**use()** - unwraps promises/context:
+
+```typescript
+function UserProfile({ userPromise }: { userPromise: Promise&lt;User&gt; }) {
+  const user = use(userPromise); // Suspends until resolved
+  return &lt;div&gt;{user.name}&lt;/div&gt;;
+}
+```
+
+See [react-19-patterns.md](references/react-19-patterns.md) for useOptimistic, useTransition, migration checklist.
+
+&lt;/react_19_changes&gt;
+
+&lt;component_patterns&gt;
+
+**Props** - extend native elements:
+
+```typescript
+type ButtonProps = {
+  variant: &#039;primary&#039; | &#039;secondary&#039;;
+} &amp; React.ComponentPropsWithoutRef&lt;&#039;button&#039;&gt;;
+
+function Button({ variant, children, ...props }: ButtonProps) {
+  return &lt;button className={variant} {...props}&gt;{children}&lt;/button&gt;;
+}
+```
+
+**Children typing**:
+
+```typescript
+type Props = {
+  children: React.ReactNode;          // Anything renderable
+  icon: React.ReactElement;           // Single element
+  render: (data: T) =&gt; React.ReactNode;  // Render prop
+};
+```
+
+**Discriminated unions** for variant props:
+
+```typescript
+type ButtonProps =
+  | { variant: &#039;link&#039;; href: string }
+  | { variant: &#039;button&#039;; onClick: () =&gt; void };
+
+function Button(props: ButtonProps) {
+  if (props.variant === &#039;link&#039;) {
+    return &lt;a href={props.href}&gt;Link&lt;/a&gt;;
+  }
+  return &lt;button onClick={props.onClick}&gt;Button&lt;/button&gt;;
+}
+```
+
+&lt;/component_patterns&gt;
+
+&lt;event_handlers&gt;
+
+Use specific event types for accurate target typing:
+
+```typescript
+// Mouse
+function handleClick(e: React.MouseEvent&lt;HTMLButtonElement&gt;) {
+  e.currentTarget.disabled = true;
+}
+
+// Form
+function handleSubmit(e: React.FormEvent&lt;HTMLFormElement&gt;) {
+  e.preventDefault();
+  const formData = new FormData(e.currentTarget);
+}
+
+// Input
+function handleChange(e: React.ChangeEvent&lt;HTMLInputElement&gt;) {
+  console.log(e.target.value);
+}
+
+// Keyboard
+function handleKeyDown(e: React.KeyboardEvent&lt;HTMLInputElement&gt;) {
+  if (e.key === &#039;Enter&#039;) e.currentTarget.blur();
+}
+```
+
+See [event-handlers.md](references/event-handlers.md) for focus, drag, clipboard, touch, wheel events.
+
+&lt;/event_handlers&gt;
+
+&lt;hooks_typing&gt;
+
+**useState** - explicit for unions/null:
+
+```typescript
+const [user, setUser] = useState&lt;User | null&gt;(null);
+const [status, setStatus] = useState&lt;&#039;idle&#039; | &#039;loading&#039;&gt;(&#039;idle&#039;);
+```
+
+**useRef** - null for DOM, value for mutable:
+
+```typescript
+const inputRef = useRef&lt;HTMLInputElement&gt;(null);  // DOM - use ?.
+const countRef = useRef&lt;number&gt;(0);               // Mutable - direct access
+```
+
+**useReducer** - discriminated unions for actions:
+
+```typescript
+type Action =
+  | { type: &#039;increment&#039; }
+  | { type: &#039;set&#039;; payload: number };
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case &#039;set&#039;: return { ...state, count: action.payload };
+    default: return state;
+  }
+}
+```
+
+**Custom hooks** - tuple returns with as const:
+
+```typescript
+function useToggle(initial = false) {
+  const [value, setValue] = useState(initial);
+  const toggle = () =&gt; setValue(v =&gt; !v);
+  return [value, toggle] as const;
+}
+```
+
+**useContext** - null guard pattern:
+
+```typescript
+const UserContext = createContext&lt;User | null&gt;(null);
+
+function useUser() {
+  const user = useContext(UserContext);
+  if (!user) throw new Error(&#039;useUser outside UserProvider&#039;);
+  return user;
+}
+```
+
+See [hooks.md](references/hooks.md) for useCallback, useMemo, useImperativeHandle, useSyncExternalStore.
+
+&lt;/hooks_typing&gt;
+
+&lt;generic_components&gt;
+
+Generic components infer types from props - no manual annotations at call site.
+
+**Pattern** - keyof T for column keys, render props for custom rendering:
+
+```typescript
+type Column&lt;T&gt; = {
+  key: keyof T;
+  header: string;
+  render?: (value: T[keyof T], item: T) =&gt; React.ReactNode;
+};
+
+type TableProps&lt;T&gt; = {
+  data: T[];
+  columns: Column&lt;T&gt;[];
+  keyExtractor: (item: T) =&gt; string | number;
+};
+
+function Table&lt;T&gt;({ data, columns, keyExtractor }: TableProps&lt;T&gt;) {
+  return (
+    &lt;table&gt;
+      &lt;thead&gt;
+        &lt;tr&gt;{columns.map(col =&gt; &lt;th key={String(col.key)}&gt;{col.header}&lt;/th&gt;)}&lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+        {data.map(item =&gt; (
+          &lt;tr key={keyExtractor(item)}&gt;
+            {columns.map(col =&gt; (
+              &lt;td key={String(col.key)}&gt;
+                {col.render ? col.render(item[col.key], item) : String(item[col.key])}
+              &lt;/td&gt;
+            ))}
+          &lt;/tr&gt;
+        ))}
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  );
+}
+```
+
+**Constrained generics** for required properties:
+
+```typescript
+type HasId = { id: string | number };
+
+function List&lt;T extends HasId&gt;({ items }: { items: T[] }) {
+  return &lt;ul&gt;{items.map(item =&gt; &lt;li key={item.id}&gt;...&lt;/li&gt;)}&lt;/ul&gt;;
+}
+```
+
+See [generic-components.md](examples/generic-components.md) for Select, List, Modal, FormField patterns.
+
+&lt;/generic_components&gt;
+
+&lt;server_components&gt;
+
+React 19 Server Components run on server, can be async.
+
+**Async data fetching**:
+
+```typescript
+export default async function UserPage({ params }: { params: { id: string } }) {
+  const user = await fetchUser(params.id);
+  return &lt;div&gt;{user.name}&lt;/div&gt;;
+}
+```
+
+**Server Actions** - &#039;use server&#039; for mutations:
+
+```typescript
+&#039;use server&#039;;
+
+export async function updateUser(userId: string, formData: FormData) {
+  await db.user.update({ where: { id: userId }, data: { ... } });
+  revalidatePath(`/users/${userId}`);
+}
+```
+
+**Client + Server Action**:
+
+```typescript
+&#039;use client&#039;;
+
+import { useActionState } from &#039;react&#039;;
+import { updateUser } from &#039;@/actions/user&#039;;
+
+function UserForm({ userId }: { userId: string }) {
+  const [state, formAction, isPending] = useActionState(
+    (prev, formData) =&gt; updateUser(userId, formData), {}
+  );
+  return &lt;form action={formAction}&gt;...&lt;/form&gt;;
+}
+```
+
+**use() for promise handoff**:
+
+```typescript
+// Server: pass promise without await
+async function Page() {
+  const userPromise = fetchUser(&#039;123&#039;);
+  return &lt;UserProfile userPromise={userPromise} /&gt;;
+}
+
+// Client: unwrap with use()
+&#039;use client&#039;;
+function UserProfile({ userPromise }: { userPromise: Promise&lt;User&gt; }) {
+  const user = use(userPromise);
+  return &lt;div&gt;{user.name}&lt;/div&gt;;
+}
+```
+
+See [server-components.md](examples/server-components.md) for parallel fetching, streaming, error boundaries.
+
+&lt;/server_components&gt;
+
+&lt;routing&gt;
+
+Both TanStack Router and React Router v7 provide type-safe routing solutions.
+
+**TanStack Router** - Compile-time type safety with Zod validation:
+
+```typescript
+import { createRoute } from &#039;@tanstack/react-router&#039;;
+import { z } from &#039;zod&#039;;
+
+const userRoute = createRoute({
+  path: &#039;/users/$userId&#039;,
+  component: UserPage,
+  loader: async ({ params }) =&gt; ({ user: await fetchUser(params.userId) }),
+  validateSearch: z.object({
+    tab: z.enum([&#039;profile&#039;, &#039;settings&#039;]).optional(),
+    page: z.number().int().positive().default(1),
+  }),
+});
+
+function UserPage() {
+  const { user } = useLoaderData({ from: userRoute.id });
+  const { tab, page } = useSearch({ from: userRoute.id });
+  const { userId } = useParams({ from: userRoute.id });
+}
+```
+
+**React Router v7** - Automatic type generation with Framework Mode:
+
+```typescript
+import type { Route } from &quot;./+types/user&quot;;
+
+export async function loader({ params }: Route.LoaderArgs) {
+  return { user: await fetchUser(params.userId) };
+}
+
+export default function UserPage({ loaderData }: Route.ComponentProps) {
+  const { user } = loaderData; // Typed from loader
+  return &lt;h1&gt;{user.name}&lt;/h1&gt;;
+}
+```
+
+See [tanstack-router.md](references/tanstack-router.md) for TanStack patterns and [react-router.md](references/react-router.md) for React Router patterns.
+
+&lt;/routing&gt;
+
+&lt;rules&gt;
+
+ALWAYS:
+- Specific event types (MouseEvent, ChangeEvent, etc)
+- Explicit useState for unions/null
+- ComponentPropsWithoutRef for native element extension
+- Discriminated unions for variant props
+- as const for tuple returns
+- ref as prop in React 19 (no forwardRef)
+- useActionState for form actions
+- Type-safe routing patterns (see routing section)
+
+NEVER:
+- any for event handlers
+- JSX.Element for children (use ReactNode)
+- forwardRef in React 19+
+- useFormState (deprecated)
+- Forget null handling for DOM refs
+- Mix Server/Client components in same file
+- Await promises when passing to use()
+
+&lt;/rules&gt;
+
+&lt;references&gt;
+
+- [hooks.md](references/hooks.md) - useState, useRef, useReducer, useContext, custom hooks
+- [event-handlers.md](references/event-handlers.md) - all event types, generic handlers
+- [react-19-patterns.md](references/react-19-patterns.md) - useActionState, use(), useOptimistic, migration
+- [generic-components.md](examples/generic-components.md) - Table, Select, List, Modal patterns
+- [server-components.md](examples/server-components.md) - async components, Server Actions, streaming
+- [tanstack-router.md](references/tanstack-router.md) - TanStack Router typed routes, search params, navigation
+- [react-router.md](references/react-router.md) - React Router v7 loaders, actions, type generation, forms
+
+&lt;/references&gt;
+</code>
       </div>
     </div>
 

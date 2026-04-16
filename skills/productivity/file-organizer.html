@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,267 @@
     <p class="desc">Intelligently organizes files and folders by understanding context, finding duplicates, and suggesting better organizational structures. Use when user wants to clean up directories, organize downloads, remove duplicates, or restructure projects.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/file-organizer</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/file-organizer</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: file-organizer
+description: Intelligently organizes files and folders by understanding context, finding duplicates, and suggesting better organizational structures. Use when user wants to clean up directories, organize downloads, remove duplicates, or restructure projects.
+---
+
+# File Organizer
+
+## When to Use This Skill
+
+- Your Downloads folder is a chaotic mess
+- You can&#039;t find files because they&#039;re scattered everywhere
+- You have duplicate files taking up space
+- Your folder structure doesn&#039;t make sense anymore
+- You want to establish better organization habits
+- You&#039;re starting a new project and need a good structure
+- You&#039;re cleaning up before archiving old projects
+
+## What This Skill Does
+
+1. **Analyzes Current Structure**: Reviews your folders and files to understand what you have
+2. **Finds Duplicates**: Identifies duplicate files across your system
+3. **Suggests Organization**: Proposes logical folder structures based on your content
+4. **Automates Cleanup**: Moves, renames, and organizes files with your approval
+5. **Maintains Context**: Makes smart decisions based on file types, dates, and content
+6. **Reduces Clutter**: Identifies old files you probably don&#039;t need anymore
+
+## Instructions
+
+When a user requests file organization help:
+
+1. **Understand the Scope**
+
+   Ask clarifying questions:
+
+   - Which directory needs organization? (Downloads, Documents, entire home folder?)
+   - What&#039;s the main problem? (Can&#039;t find things, duplicates, too messy, no structure?)
+   - Any files or folders to avoid? (Current projects, sensitive data?)
+   - How aggressively to organize? (Conservative vs. comprehensive cleanup)
+
+2. **Analyze Current State**
+
+   Review the target directory:
+
+   ```bash
+   # Get overview of current structure
+   ls -la [target_directory]
+
+   # Check file types and sizes
+   find [target_directory] -type f -exec file {} \; | head -20
+
+   # Identify largest files
+   du -sh [target_directory]/* | sort -rh | head -20
+
+   # Count file types
+   find [target_directory] -type f | sed &#039;s/.*\.//&#039; | sort | uniq -c | sort -rn
+   ```
+
+   Summarize findings:
+
+   - Total files and folders
+   - File type breakdown
+   - Size distribution
+   - Date ranges
+   - Obvious organization issues
+
+3. **Identify Organization Patterns**
+
+   Based on the files, determine logical groupings:
+
+   **By Type**:
+
+   - Documents (PDFs, DOCX, TXT)
+   - Images (JPG, PNG, SVG)
+   - Videos (MP4, MOV)
+   - Archives (ZIP, TAR, DMG)
+   - Code/Projects (directories with code)
+   - Spreadsheets (XLSX, CSV)
+   - Presentations (PPTX, KEY)
+
+   **By Purpose**:
+
+   - Work vs. Personal
+   - Active vs. Archive
+   - Project-specific
+   - Reference materials
+   - Temporary/scratch files
+
+   **By Date**:
+
+   - Current year/month
+   - Previous years
+   - Very old (archive candidates)
+
+4. **Find Duplicates**
+
+   When requested, search for duplicates:
+
+   ```bash
+   # Find exact duplicates by hash
+   find [directory] -type f -exec md5 {} \; | sort | uniq -d
+
+   # Find files with similar names
+   find [directory] -type f -printf &#039;%f\n&#039; | sort | uniq -d
+
+   # Find similar-sized files
+   find [directory] -type f -printf &#039;%s %p\n&#039; | sort -n
+   ```
+
+   For each set of duplicates:
+
+   - Show all file paths
+   - Display sizes and modification dates
+   - Recommend which to keep (usually newest or best-named)
+   - **Important**: Always ask for confirmation before deleting
+
+5. **Propose Organization Plan**
+
+   Present a clear plan before making changes:
+
+   ```markdown
+   # Organization Plan for [Directory]
+
+   ## Current State
+
+   - X files across Y folders
+   - [Size] total
+   - File types: [breakdown]
+   - Issues: [list problems]
+
+   ## Proposed Structure
+
+   [Directory]/
+   ├── Work/
+   │ ├── Projects/
+   │ ├── Documents/
+   │ └── Archive/
+   ├── Personal/
+   │ ├── Photos/
+   │ ├── Documents/
+   │ └── Media/
+   └── Downloads/
+   ├── To-Sort/
+   └── Archive/
+
+   ## Changes I&#039;ll Make
+
+   1. **Create new folders**: [list]
+   2. **Move files**:
+      - X PDFs → Work/Documents/
+      - Y images → Personal/Photos/
+      - Z old files → Archive/
+   3. **Rename files**: [any renaming patterns]
+   4. **Delete**: [duplicates or trash files]
+
+   ## Files Needing Your Decision
+
+   - [List any files you&#039;re unsure about]
+
+   Ready to proceed? (yes/no/modify)
+   ```
+
+6. **Execute Organization**
+
+   After approval, organize systematically:
+
+   ```bash
+   # Create folder structure
+   mkdir -p &quot;path/to/new/folders&quot;
+
+   # Move files with clear logging
+   mv &quot;old/path/file.pdf&quot; &quot;new/path/file.pdf&quot;
+
+   # Rename files with consistent patterns
+   # Example: &quot;YYYY-MM-DD - Description.ext&quot;
+   ```
+
+   **Important Rules**:
+
+   - Always confirm before deleting anything
+   - Log all moves for potential undo
+   - Preserve original modification dates
+   - Handle filename conflicts gracefully
+   - Stop and ask if you encounter unexpected situations
+
+7. **Provide Summary and Maintenance Tips**
+
+   After organizing:
+
+   ```markdown
+   # Organization Complete! ✨
+
+   ## What Changed
+
+   - Created [X] new folders
+   - Organized [Y] files
+   - Freed [Z] GB by removing duplicates
+   - Archived [W] old files
+
+   ## New Structure
+
+   [Show the new folder tree]
+
+   ## Maintenance Tips
+
+   To keep this organized:
+
+   1. **Weekly**: Sort new downloads
+   2. **Monthly**: Review and archive completed projects
+   3. **Quarterly**: Check for new duplicates
+   4. **Yearly**: Archive old files
+
+   ## Quick Commands for You
+
+   # Find files modified this week
+
+   find . -type f -mtime -7
+
+   # Sort downloads by type
+
+   [custom command for their setup]
+
+   # Find duplicates
+
+   [custom command]
+   ```
+
+   Want to organize another folder?
+
+## Best Practices
+
+### Folder Naming
+
+- Use clear, descriptive names
+- Avoid spaces (use hyphens or underscores)
+- Be specific: &quot;client-proposals&quot; not &quot;docs&quot;
+- Use prefixes for ordering: &quot;01-current&quot;, &quot;02-archive&quot;
+
+### File Naming
+
+- Include dates: &quot;2024-10-17-meeting-notes.md&quot;
+- Be descriptive: &quot;q3-financial-report.xlsx&quot;
+- Avoid version numbers in names (use version control instead)
+- Remove download artifacts: &quot;document-final-v2 (1).pdf&quot; → &quot;document.pdf&quot;
+
+### When to Archive
+
+- Projects not touched in 6+ months
+- Completed work that might be referenced later
+- Old versions after migration to new systems
+- Files you&#039;re hesitant to delete (archive first)
+</code>
       </div>
     </div>
 

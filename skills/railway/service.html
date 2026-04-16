@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,269 @@
     <p class="desc">Check service status, rename services, change service icons, link services, or create services with Docker images. For creating services with local code, prefer railway-new skill. For GitHub repo sources, use railway-new skill to create empty service then railway-environment skill to configure source.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/service</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/service</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: railway-service
+description: Check service status, rename services, change service icons, link services, or create services with Docker images. For creating services with local code, prefer railway-new skill. For GitHub repo sources, use railway-new skill to create empty service then railway-environment skill to configure source.
+version: 1.0.0
+author: Railway
+license: MIT
+tags: [Railway, Service, Status, Docker, Container, Infrastructure, Management]
+dependencies: [railway-cli]
+allowed-tools: Bash(railway:*)
+---
+
+# Railway Service Management
+
+Check status, update properties, and advanced service creation.
+
+## When to Use
+
+- User asks about service status, health, or deployments
+- User asks &quot;is my service deployed?&quot;
+- User wants to rename a service or change service icon
+- User wants to link a different service
+- User wants to deploy a Docker image as a new service (advanced)
+
+**Note:** For creating services with local code (the common case), prefer the railway-new skill which handles project setup, scaffolding, and service creation together.
+
+**For GitHub repo sources:** Use railway-new skill to create empty service, then railway-environment skill to configure source.repo via staged changes API.
+
+## Create Service
+
+Create a new service via GraphQL API. There is no CLI command for this.
+
+### Get Context
+
+```bash
+railway status --json
+```
+
+Extract:
+- `project.id` - for creating the service
+- `environment.id` - for staging the instance config
+
+### Create Service Mutation
+
+```graphql
+mutation serviceCreate($input: ServiceCreateInput!) {
+  serviceCreate(input: $input) {
+    id
+    name
+  }
+}
+```
+
+### ServiceCreateInput Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `projectId` | String! | Project ID (required) |
+| `name` | String | Service name (auto-generated if omitted) |
+| `source.image` | String | Docker image (e.g., `nginx:latest`) |
+| `source.repo` | String | GitHub repo (e.g., `user/repo`) |
+| `branch` | String | Git branch for repo source |
+| `environmentId` | String | If set and is a fork, only creates in that env |
+
+### Example: Create empty service
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;mutation createService($input: ServiceCreateInput!) {
+    serviceCreate(input: $input) { id name }
+  }&#039; \
+  &#039;{&quot;input&quot;: {&quot;projectId&quot;: &quot;PROJECT_ID&quot;}}&#039;
+SCRIPT
+```
+
+### Example: Create service with image
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;mutation createService($input: ServiceCreateInput!) {
+    serviceCreate(input: $input) { id name }
+  }&#039; \
+  &#039;{&quot;input&quot;: {&quot;projectId&quot;: &quot;PROJECT_ID&quot;, &quot;name&quot;: &quot;my-service&quot;, &quot;source&quot;: {&quot;image&quot;: &quot;nginx:latest&quot;}}}&#039;
+SCRIPT
+```
+
+### Connecting a GitHub Repo
+
+**Do NOT use serviceCreate with source.repo** - use staged changes API instead.
+
+Flow:
+1. Create empty service: `serviceCreate(input: {projectId: &quot;...&quot;, name: &quot;my-service&quot;})`
+2. Use railway-environment skill to configure source via staged changes API
+3. Apply to trigger deployment
+
+### After Creating: Configure Instance
+
+Use railway-environment skill to configure the service instance:
+
+```json
+{
+  &quot;services&quot;: {
+    &quot;&lt;serviceId&gt;&quot;: {
+      &quot;isCreated&quot;: true,
+      &quot;source&quot;: { &quot;image&quot;: &quot;nginx:latest&quot; },
+      &quot;variables&quot;: {
+        &quot;PORT&quot;: { &quot;value&quot;: &quot;8080&quot; }
+      }
+    }
+  }
+}
+```
+
+**Critical:** Always include `isCreated: true` for new service instances.
+
+Then use railway-environment skill to apply and deploy.
+
+## Check Service Status
+
+```bash
+railway service status --json
+```
+
+Returns current deployment status for the linked service.
+
+### Deployment History
+
+```bash
+railway deployment list --json --limit 5
+```
+
+### Present Status
+
+Show:
+- **Service**: name and current status
+- **Latest Deployment**: status (SUCCESS, FAILED, DEPLOYING, CRASHED, etc.)
+- **Deployed At**: when the current deployment went live
+- **Recent Deployments**: last 3-5 with status and timestamps
+
+### Deployment Statuses
+
+| Status | Meaning |
+|--------|---------|
+| SUCCESS | Deployed and running |
+| FAILED | Build or deploy failed |
+| DEPLOYING | Currently deploying |
+| BUILDING | Build in progress |
+| CRASHED | Runtime crash |
+| REMOVED | Deployment removed |
+
+## Update Service
+
+Update service name or icon via GraphQL API.
+
+### Get Service ID
+
+```bash
+railway status --json
+```
+
+Extract `service.id` from the response.
+
+### Update Name
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;mutation updateService($id: String!, $input: ServiceUpdateInput!) {
+    serviceUpdate(id: $id, input: $input) { id name }
+  }&#039; \
+  &#039;{&quot;id&quot;: &quot;SERVICE_ID&quot;, &quot;input&quot;: {&quot;name&quot;: &quot;new-name&quot;}}&#039;
+SCRIPT
+```
+
+### Update Icon
+
+Icons can be image URLs or animated GIFs.
+
+| Type | Example |
+|------|---------|
+| Image URL | `&quot;icon&quot;: &quot;https://example.com/logo.png&quot;` |
+| Animated GIF | `&quot;icon&quot;: &quot;https://example.com/animated.gif&quot;` |
+| Devicons | `&quot;icon&quot;: &quot;https://devicons.railway.app/github&quot;` |
+
+**Railway Devicons:** Query `https://devicons.railway.app/{query}` for common developer icons (e.g., `github`, `postgres`, `redis`, `nodejs`). Browse all at https://devicons.railway.app
+
+```bash
+bash &lt;&lt;&#039;SCRIPT&#039;
+${CLAUDE_PLUGIN_ROOT}/skills/lib/railway-api.sh \
+  &#039;mutation updateService($id: String!, $input: ServiceUpdateInput!) {
+    serviceUpdate(id: $id, input: $input) { id icon }
+  }&#039; \
+  &#039;{&quot;id&quot;: &quot;SERVICE_ID&quot;, &quot;input&quot;: {&quot;icon&quot;: &quot;https://devicons.railway.app/github&quot;}}&#039;
+SCRIPT
+```
+
+### ServiceUpdateInput Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | String | Service name |
+| `icon` | String | Emoji or image URL (including animated GIFs) |
+
+## Link Service
+
+Switch the linked service for the current directory:
+
+```bash
+railway service link
+```
+
+Or specify directly:
+
+```bash
+railway service link &lt;service-name&gt;
+```
+
+## Composability
+
+- **Create service with local code**: Use railway-new skill (handles scaffolding + creation)
+- **Configure service**: Use railway-environment skill (variables, commands, image, etc.)
+- **Delete service**: Use railway-environment skill with `isDeleted: true`
+- **Apply changes**: Use railway-environment skill
+- **View logs**: Use railway-deployment skill
+- **Deploy local code**: Use railway-deploy skill
+
+## Error Handling
+
+### No Service Linked
+```
+No service linked. Run `railway service link` to link a service.
+```
+
+### No Deployments
+```
+Service exists but has no deployments yet. Deploy with `railway up`.
+```
+
+### Service Not Found
+```
+Service &quot;foo&quot; not found. Check available services with `railway status`.
+```
+
+### Project Not Found
+User may not be in a linked project. Check `railway status`.
+
+### Permission Denied
+User needs at least DEVELOPER role to create services.
+
+### Invalid Image
+Docker image must be accessible (public or with registry credentials).
+</code>
       </div>
     </div>
 

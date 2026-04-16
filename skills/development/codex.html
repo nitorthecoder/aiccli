@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,83 @@
     <p class="desc">Use when the user asks to run Codex CLI (codex exec, codex resume) or references OpenAI Codex for code analysis, refactoring, or automated editing. Uses GPT-5.2 by default for state-of-the-art software engineering.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/codex</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/codex</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: codex
+description: Use when the user asks to run Codex CLI (codex exec, codex resume) or references OpenAI Codex for code analysis, refactoring, or automated editing. Uses GPT-5.2 by default for state-of-the-art software engineering.
+---
+
+# Codex Skill Guide
+
+## Running a Task
+1. Default to `gpt-5.2` model. Ask the user (via `AskUserQuestion`) which reasoning effort to use (`xhigh`,`high`, `medium`, or `low`). User can override model if needed (see Model Options below).
+2. Select the sandbox mode required for the task; default to `--sandbox read-only` unless edits or network access are necessary.
+3. Assemble the command with the appropriate options:
+   - `-m, --model &lt;MODEL&gt;`
+   - `--config model_reasoning_effort=&quot;&lt;high|medium|low&gt;&quot;`
+   - `--sandbox &lt;read-only|workspace-write|danger-full-access&gt;`
+   - `--full-auto`
+   - `-C, --cd &lt;DIR&gt;`
+   - `--skip-git-repo-check`
+3. Always use --skip-git-repo-check.
+4. When continuing a previous session, use `codex exec --skip-git-repo-check resume --last` via stdin. When resuming don&#039;t use any configuration flags unless explicitly requested by the user e.g. if he species the model or the reasoning effort when requesting to resume a session. Resume syntax: `echo &quot;your prompt here&quot; | codex exec --skip-git-repo-check resume --last 2&gt;/dev/null`. All flags have to be inserted between exec and resume.
+5. **IMPORTANT**: By default, append `2&gt;/dev/null` to all `codex exec` commands to suppress thinking tokens (stderr). Only show stderr if the user explicitly requests to see thinking tokens or if debugging is needed.
+6. Run the command, capture stdout/stderr (filtered as appropriate), and summarize the outcome for the user.
+7. **After Codex completes**, inform the user: &quot;You can resume this Codex session at any time by saying &#039;codex resume&#039; or asking me to continue with additional analysis or changes.&quot;
+
+### Quick Reference
+| Use case | Sandbox mode | Key flags |
+| --- | --- | --- |
+| Read-only review or analysis | `read-only` | `--sandbox read-only 2&gt;/dev/null` |
+| Apply local edits | `workspace-write` | `--sandbox workspace-write --full-auto 2&gt;/dev/null` |
+| Permit network or broad access | `danger-full-access` | `--sandbox danger-full-access --full-auto 2&gt;/dev/null` |
+| Resume recent session | Inherited from original | `echo &quot;prompt&quot; \| codex exec --skip-git-repo-check resume --last 2&gt;/dev/null` (no flags allowed) |
+| Run from another directory | Match task needs | `-C &lt;DIR&gt;` plus other flags `2&gt;/dev/null` |
+
+## Model Options
+
+| Model | Best for | Context window | Key features |
+| --- | --- | --- | --- |
+| `gpt-5.2-max` | **Max model**: Ultra-complex reasoning, deep problem analysis | 400K input / 128K output | 76.3% SWE-bench, adaptive reasoning, $1.25/$10.00 |
+| `gpt-5.2` ⭐ | **Flagship model**: Software engineering, agentic coding workflows | 400K input / 128K output | 76.3% SWE-bench, adaptive reasoning, $1.25/$10.00 |
+| `gpt-5.2-mini` | Cost-efficient coding (4x more usage allowance) | 400K input / 128K output | Near SOTA performance, $0.25/$2.00 |
+| `gpt-5.1-thinking` | Ultra-complex reasoning, deep problem analysis | 400K input / 128K output | Adaptive thinking depth, runs 2x slower on hardest tasks |
+
+**GPT-5.2 Advantages**: 76.3% SWE-bench (vs 72.8% GPT-5), 30% faster on average tasks, better tool handling, reduced hallucinations, improved code quality. Knowledge cutoff: September 30, 2024.
+
+**Reasoning Effort Levels**:
+- `xhigh` - Ultra-complex tasks (deep problem analysis, complex reasoning, deep understanding of the problem)
+- `high` - Complex tasks (refactoring, architecture, security analysis, performance optimization)
+- `medium` - Standard tasks (refactoring, code organization, feature additions, bug fixes)
+- `low` - Simple tasks (quick fixes, simple changes, code formatting, documentation)
+
+**Cached Input Discount**: 90% off ($0.125/M tokens) for repeated context, cache lasts up to 24 hours.
+
+## Following Up
+- After every `codex` command, immediately use `AskUserQuestion` to confirm next steps, collect clarifications, or decide whether to resume with `codex exec resume --last`.
+- When resuming, pipe the new prompt via stdin: `echo &quot;new prompt&quot; | codex exec resume --last 2&gt;/dev/null`. The resumed session automatically uses the same model, reasoning effort, and sandbox mode from the original session.
+- Restate the chosen model, reasoning effort, and sandbox mode when proposing follow-up actions.
+
+## Error Handling
+- Stop and report failures whenever `codex --version` or a `codex exec` command exits non-zero; request direction before retrying.
+- Before you use high-impact flags (`--full-auto`, `--sandbox danger-full-access`, `--skip-git-repo-check`) ask the user for permission using AskUserQuestion unless it was already given.
+- When output includes warnings or partial results, summarize them and ask how to adjust using `AskUserQuestion`.
+
+## CLI Version
+
+Requires Codex CLI v0.57.0 or later for GPT-5.2 model support. The CLI defaults to `gpt-5.2` on macOS/Linux and `gpt-5.2` on Windows. Check version: `codex --version`
+
+Use `/model` slash command within a Codex session to switch models, or configure default in `~/.codex/config.toml`.
+</code>
       </div>
     </div>
 

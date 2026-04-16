@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,503 @@
     <p class="desc">"Master comprehensive evaluation strategies for LLM applications, from automated metrics to human evaluation and A/B testing."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/llm-evaluation</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/llm-evaluation</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: llm-evaluation
+description: &quot;Master comprehensive evaluation strategies for LLM applications, from automated metrics to human evaluation and A/B testing.&quot;
+risk: unknown
+source: community
+date_added: &quot;2026-02-27&quot;
+---
+
+# LLM Evaluation
+
+Master comprehensive evaluation strategies for LLM applications, from automated metrics to human evaluation and A/B testing.
+
+## Do not use this skill when
+
+- The task is unrelated to llm evaluation
+- You need a different domain or tool outside this scope
+
+## Instructions
+
+- Clarify goals, constraints, and required inputs.
+- Apply relevant best practices and validate outcomes.
+- Provide actionable steps and verification.
+- If detailed examples are required, open `resources/implementation-playbook.md`.
+
+## Use this skill when
+
+- Measuring LLM application performance systematically
+- Comparing different models or prompts
+- Detecting performance regressions before deployment
+- Validating improvements from prompt changes
+- Building confidence in production systems
+- Establishing baselines and tracking progress over time
+- Debugging unexpected model behavior
+
+## Core Evaluation Types
+
+### 1. Automated Metrics
+Fast, repeatable, scalable evaluation using computed scores.
+
+**Text Generation:**
+- **BLEU**: N-gram overlap (translation)
+- **ROUGE**: Recall-oriented (summarization)
+- **METEOR**: Semantic similarity
+- **BERTScore**: Embedding-based similarity
+- **Perplexity**: Language model confidence
+
+**Classification:**
+- **Accuracy**: Percentage correct
+- **Precision/Recall/F1**: Class-specific performance
+- **Confusion Matrix**: Error patterns
+- **AUC-ROC**: Ranking quality
+
+**Retrieval (RAG):**
+- **MRR**: Mean Reciprocal Rank
+- **NDCG**: Normalized Discounted Cumulative Gain
+- **Precision@K**: Relevant in top K
+- **Recall@K**: Coverage in top K
+
+### 2. Human Evaluation
+Manual assessment for quality aspects difficult to automate.
+
+**Dimensions:**
+- **Accuracy**: Factual correctness
+- **Coherence**: Logical flow
+- **Relevance**: Answers the question
+- **Fluency**: Natural language quality
+- **Safety**: No harmful content
+- **Helpfulness**: Useful to the user
+
+### 3. LLM-as-Judge
+Use stronger LLMs to evaluate weaker model outputs.
+
+**Approaches:**
+- **Pointwise**: Score individual responses
+- **Pairwise**: Compare two responses
+- **Reference-based**: Compare to gold standard
+- **Reference-free**: Judge without ground truth
+
+## Quick Start
+
+```python
+from llm_eval import EvaluationSuite, Metric
+
+# Define evaluation suite
+suite = EvaluationSuite([
+    Metric.accuracy(),
+    Metric.bleu(),
+    Metric.bertscore(),
+    Metric.custom(name=&quot;groundedness&quot;, fn=check_groundedness)
+])
+
+# Prepare test cases
+test_cases = [
+    {
+        &quot;input&quot;: &quot;What is the capital of France?&quot;,
+        &quot;expected&quot;: &quot;Paris&quot;,
+        &quot;context&quot;: &quot;France is a country in Europe. Paris is its capital.&quot;
+    },
+    # ... more test cases
+]
+
+# Run evaluation
+results = suite.evaluate(
+    model=your_model,
+    test_cases=test_cases
+)
+
+print(f&quot;Overall Accuracy: {results.metrics[&#039;accuracy&#039;]}&quot;)
+print(f&quot;BLEU Score: {results.metrics[&#039;bleu&#039;]}&quot;)
+```
+
+## Automated Metrics Implementation
+
+### BLEU Score
+```python
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+
+def calculate_bleu(reference, hypothesis):
+    &quot;&quot;&quot;Calculate BLEU score between reference and hypothesis.&quot;&quot;&quot;
+    smoothie = SmoothingFunction().method4
+
+    return sentence_bleu(
+        [reference.split()],
+        hypothesis.split(),
+        smoothing_function=smoothie
+    )
+
+# Usage
+bleu = calculate_bleu(
+    reference=&quot;The cat sat on the mat&quot;,
+    hypothesis=&quot;A cat is sitting on the mat&quot;
+)
+```
+
+### ROUGE Score
+```python
+from rouge_score import rouge_scorer
+
+def calculate_rouge(reference, hypothesis):
+    &quot;&quot;&quot;Calculate ROUGE scores.&quot;&quot;&quot;
+    scorer = rouge_scorer.RougeScorer([&#039;rouge1&#039;, &#039;rouge2&#039;, &#039;rougeL&#039;], use_stemmer=True)
+    scores = scorer.score(reference, hypothesis)
+
+    return {
+        &#039;rouge1&#039;: scores[&#039;rouge1&#039;].fmeasure,
+        &#039;rouge2&#039;: scores[&#039;rouge2&#039;].fmeasure,
+        &#039;rougeL&#039;: scores[&#039;rougeL&#039;].fmeasure
+    }
+```
+
+### BERTScore
+```python
+from bert_score import score
+
+def calculate_bertscore(references, hypotheses):
+    &quot;&quot;&quot;Calculate BERTScore using pre-trained BERT.&quot;&quot;&quot;
+    P, R, F1 = score(
+        hypotheses,
+        references,
+        lang=&#039;en&#039;,
+        model_type=&#039;microsoft/deberta-xlarge-mnli&#039;
+    )
+
+    return {
+        &#039;precision&#039;: P.mean().item(),
+        &#039;recall&#039;: R.mean().item(),
+        &#039;f1&#039;: F1.mean().item()
+    }
+```
+
+### Custom Metrics
+```python
+def calculate_groundedness(response, context):
+    &quot;&quot;&quot;Check if response is grounded in provided context.&quot;&quot;&quot;
+    # Use NLI model to check entailment
+    from transformers import pipeline
+
+    nli = pipeline(&quot;text-classification&quot;, model=&quot;microsoft/deberta-large-mnli&quot;)
+
+    result = nli(f&quot;{context} [SEP] {response}&quot;)[0]
+
+    # Return confidence that response is entailed by context
+    return result[&#039;score&#039;] if result[&#039;label&#039;] == &#039;ENTAILMENT&#039; else 0.0
+
+def calculate_toxicity(text):
+    &quot;&quot;&quot;Measure toxicity in generated text.&quot;&quot;&quot;
+    from detoxify import Detoxify
+
+    results = Detoxify(&#039;original&#039;).predict(text)
+    return max(results.values())  # Return highest toxicity score
+
+def calculate_factuality(claim, knowledge_base):
+    &quot;&quot;&quot;Verify factual claims against knowledge base.&quot;&quot;&quot;
+    # Implementation depends on your knowledge base
+    # Could use retrieval + NLI, or fact-checking API
+    pass
+```
+
+## LLM-as-Judge Patterns
+
+### Single Output Evaluation
+```python
+def llm_judge_quality(response, question):
+    &quot;&quot;&quot;Use GPT-5 to judge response quality.&quot;&quot;&quot;
+    prompt = f&quot;&quot;&quot;Rate the following response on a scale of 1-10 for:
+1. Accuracy (factually correct)
+2. Helpfulness (answers the question)
+3. Clarity (well-written and understandable)
+
+Question: {question}
+Response: {response}
+
+Provide ratings in JSON format:
+{{
+  &quot;accuracy&quot;: &lt;1-10&gt;,
+  &quot;helpfulness&quot;: &lt;1-10&gt;,
+  &quot;clarity&quot;: &lt;1-10&gt;,
+  &quot;reasoning&quot;: &quot;&lt;brief explanation&gt;&quot;
+}}
+&quot;&quot;&quot;
+
+    result = openai.ChatCompletion.create(
+        model=&quot;gpt-5&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+        temperature=0
+    )
+
+    return json.loads(result.choices[0].message.content)
+```
+
+### Pairwise Comparison
+```python
+def compare_responses(question, response_a, response_b):
+    &quot;&quot;&quot;Compare two responses using LLM judge.&quot;&quot;&quot;
+    prompt = f&quot;&quot;&quot;Compare these two responses to the question and determine which is better.
+
+Question: {question}
+
+Response A: {response_a}
+
+Response B: {response_b}
+
+Which response is better and why? Consider accuracy, helpfulness, and clarity.
+
+Answer with JSON:
+{{
+  &quot;winner&quot;: &quot;A&quot; or &quot;B&quot; or &quot;tie&quot;,
+  &quot;reasoning&quot;: &quot;&lt;explanation&gt;&quot;,
+  &quot;confidence&quot;: &lt;1-10&gt;
+}}
+&quot;&quot;&quot;
+
+    result = openai.ChatCompletion.create(
+        model=&quot;gpt-5&quot;,
+        messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+        temperature=0
+    )
+
+    return json.loads(result.choices[0].message.content)
+```
+
+## Human Evaluation Frameworks
+
+### Annotation Guidelines
+```python
+class AnnotationTask:
+    &quot;&quot;&quot;Structure for human annotation task.&quot;&quot;&quot;
+
+    def __init__(self, response, question, context=None):
+        self.response = response
+        self.question = question
+        self.context = context
+
+    def get_annotation_form(self):
+        return {
+            &quot;question&quot;: self.question,
+            &quot;context&quot;: self.context,
+            &quot;response&quot;: self.response,
+            &quot;ratings&quot;: {
+                &quot;accuracy&quot;: {
+                    &quot;scale&quot;: &quot;1-5&quot;,
+                    &quot;description&quot;: &quot;Is the response factually correct?&quot;
+                },
+                &quot;relevance&quot;: {
+                    &quot;scale&quot;: &quot;1-5&quot;,
+                    &quot;description&quot;: &quot;Does it answer the question?&quot;
+                },
+                &quot;coherence&quot;: {
+                    &quot;scale&quot;: &quot;1-5&quot;,
+                    &quot;description&quot;: &quot;Is it logically consistent?&quot;
+                }
+            },
+            &quot;issues&quot;: {
+                &quot;factual_error&quot;: False,
+                &quot;hallucination&quot;: False,
+                &quot;off_topic&quot;: False,
+                &quot;unsafe_content&quot;: False
+            },
+            &quot;feedback&quot;: &quot;&quot;
+        }
+```
+
+### Inter-Rater Agreement
+```python
+from sklearn.metrics import cohen_kappa_score
+
+def calculate_agreement(rater1_scores, rater2_scores):
+    &quot;&quot;&quot;Calculate inter-rater agreement.&quot;&quot;&quot;
+    kappa = cohen_kappa_score(rater1_scores, rater2_scores)
+
+    interpretation = {
+        kappa &lt; 0: &quot;Poor&quot;,
+        kappa &lt; 0.2: &quot;Slight&quot;,
+        kappa &lt; 0.4: &quot;Fair&quot;,
+        kappa &lt; 0.6: &quot;Moderate&quot;,
+        kappa &lt; 0.8: &quot;Substantial&quot;,
+        kappa &lt;= 1.0: &quot;Almost Perfect&quot;
+    }
+
+    return {
+        &quot;kappa&quot;: kappa,
+        &quot;interpretation&quot;: interpretation[True]
+    }
+```
+
+## A/B Testing
+
+### Statistical Testing Framework
+```python
+from scipy import stats
+import numpy as np
+
+class ABTest:
+    def __init__(self, variant_a_name=&quot;A&quot;, variant_b_name=&quot;B&quot;):
+        self.variant_a = {&quot;name&quot;: variant_a_name, &quot;scores&quot;: []}
+        self.variant_b = {&quot;name&quot;: variant_b_name, &quot;scores&quot;: []}
+
+    def add_result(self, variant, score):
+        &quot;&quot;&quot;Add evaluation result for a variant.&quot;&quot;&quot;
+        if variant == &quot;A&quot;:
+            self.variant_a[&quot;scores&quot;].append(score)
+        else:
+            self.variant_b[&quot;scores&quot;].append(score)
+
+    def analyze(self, alpha=0.05):
+        &quot;&quot;&quot;Perform statistical analysis.&quot;&quot;&quot;
+        a_scores = self.variant_a[&quot;scores&quot;]
+        b_scores = self.variant_b[&quot;scores&quot;]
+
+        # T-test
+        t_stat, p_value = stats.ttest_ind(a_scores, b_scores)
+
+        # Effect size (Cohen&#039;s d)
+        pooled_std = np.sqrt((np.std(a_scores)**2 + np.std(b_scores)**2) / 2)
+        cohens_d = (np.mean(b_scores) - np.mean(a_scores)) / pooled_std
+
+        return {
+            &quot;variant_a_mean&quot;: np.mean(a_scores),
+            &quot;variant_b_mean&quot;: np.mean(b_scores),
+            &quot;difference&quot;: np.mean(b_scores) - np.mean(a_scores),
+            &quot;relative_improvement&quot;: (np.mean(b_scores) - np.mean(a_scores)) / np.mean(a_scores),
+            &quot;p_value&quot;: p_value,
+            &quot;statistically_significant&quot;: p_value &lt; alpha,
+            &quot;cohens_d&quot;: cohens_d,
+            &quot;effect_size&quot;: self.interpret_cohens_d(cohens_d),
+            &quot;winner&quot;: &quot;B&quot; if np.mean(b_scores) &gt; np.mean(a_scores) else &quot;A&quot;
+        }
+
+    @staticmethod
+    def interpret_cohens_d(d):
+        &quot;&quot;&quot;Interpret Cohen&#039;s d effect size.&quot;&quot;&quot;
+        abs_d = abs(d)
+        if abs_d &lt; 0.2:
+            return &quot;negligible&quot;
+        elif abs_d &lt; 0.5:
+            return &quot;small&quot;
+        elif abs_d &lt; 0.8:
+            return &quot;medium&quot;
+        else:
+            return &quot;large&quot;
+```
+
+## Regression Testing
+
+### Regression Detection
+```python
+class RegressionDetector:
+    def __init__(self, baseline_results, threshold=0.05):
+        self.baseline = baseline_results
+        self.threshold = threshold
+
+    def check_for_regression(self, new_results):
+        &quot;&quot;&quot;Detect if new results show regression.&quot;&quot;&quot;
+        regressions = []
+
+        for metric in self.baseline.keys():
+            baseline_score = self.baseline[metric]
+            new_score = new_results.get(metric)
+
+            if new_score is None:
+                continue
+
+            # Calculate relative change
+            relative_change = (new_score - baseline_score) / baseline_score
+
+            # Flag if significant decrease
+            if relative_change &lt; -self.threshold:
+                regressions.append({
+                    &quot;metric&quot;: metric,
+                    &quot;baseline&quot;: baseline_score,
+                    &quot;current&quot;: new_score,
+                    &quot;change&quot;: relative_change
+                })
+
+        return {
+            &quot;has_regression&quot;: len(regressions) &gt; 0,
+            &quot;regressions&quot;: regressions
+        }
+```
+
+## Benchmarking
+
+### Running Benchmarks
+```python
+class BenchmarkRunner:
+    def __init__(self, benchmark_dataset):
+        self.dataset = benchmark_dataset
+
+    def run_benchmark(self, model, metrics):
+        &quot;&quot;&quot;Run model on benchmark and calculate metrics.&quot;&quot;&quot;
+        results = {metric.name: [] for metric in metrics}
+
+        for example in self.dataset:
+            # Generate prediction
+            prediction = model.predict(example[&quot;input&quot;])
+
+            # Calculate each metric
+            for metric in metrics:
+                score = metric.calculate(
+                    prediction=prediction,
+                    reference=example[&quot;reference&quot;],
+                    context=example.get(&quot;context&quot;)
+                )
+                results[metric.name].append(score)
+
+        # Aggregate results
+        return {
+            metric: {
+                &quot;mean&quot;: np.mean(scores),
+                &quot;std&quot;: np.std(scores),
+                &quot;min&quot;: min(scores),
+                &quot;max&quot;: max(scores)
+            }
+            for metric, scores in results.items()
+        }
+```
+
+## Resources
+
+- **references/metrics.md**: Comprehensive metric guide
+- **references/human-evaluation.md**: Annotation best practices
+- **references/benchmarking.md**: Standard benchmarks
+- **references/a-b-testing.md**: Statistical testing guide
+- **references/regression-testing.md**: CI/CD integration
+- **assets/evaluation-framework.py**: Complete evaluation harness
+- **assets/benchmark-dataset.jsonl**: Example datasets
+- **scripts/evaluate-model.py**: Automated evaluation runner
+
+## Best Practices
+
+1. **Multiple Metrics**: Use diverse metrics for comprehensive view
+2. **Representative Data**: Test on real-world, diverse examples
+3. **Baselines**: Always compare against baseline performance
+4. **Statistical Rigor**: Use proper statistical tests for comparisons
+5. **Continuous Evaluation**: Integrate into CI/CD pipeline
+6. **Human Validation**: Combine automated metrics with human judgment
+7. **Error Analysis**: Investigate failures to understand weaknesses
+8. **Version Control**: Track evaluation results over time
+
+## Common Pitfalls
+
+- **Single Metric Obsession**: Optimizing for one metric at the expense of others
+- **Small Sample Size**: Drawing conclusions from too few examples
+- **Data Contamination**: Testing on training data
+- **Ignoring Variance**: Not accounting for statistical uncertainty
+- **Metric Mismatch**: Using metrics not aligned with business goals
+</code>
       </div>
     </div>
 

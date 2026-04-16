@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,681 @@
     <p class="desc">Synchronize environment variables between local development and Vercel deployments</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/vercel-env-sync</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/vercel-env-sync</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Read, Write, Edit, Bash
+argument-hint: [--pull] [--push] [--validate] [--backup]
+description: Synchronize environment variables between local development and Vercel deployments
+---
+
+## Vercel Environment Sync
+
+**Sync Operation**: $ARGUMENTS
+
+## Current Environment Analysis
+
+### Local Environment
+- Environment files: 
+  - @.env.local (if exists)
+  - @.env.development (if exists)
+  - @.env.production (if exists)
+  - @.env (if exists)
+- Environment example: @.env.example (if exists)
+- Vercel config: @vercel.json (if exists)
+
+### Project Status
+- Vercel CLI status: !`vercel --version 2&gt;/dev/null || echo &quot;Vercel CLI not installed&quot;`
+- Current project: !`vercel project ls 2&gt;/dev/null | head -5 || echo &quot;Not linked to Vercel project&quot;`
+- Git status: !`git status --porcelain | head -5`
+
+## Environment Synchronization Strategy
+
+### 1. Environment File Analysis
+```typescript
+// Environment file structure analysis
+interface EnvironmentConfig {
+  development: Record&lt;string, string&gt;;
+  preview: Record&lt;string, string&gt;;
+  production: Record&lt;string, string&gt;;
+}
+
+const environmentFiles = {
+  &#039;.env.local&#039;: &#039;Local development overrides&#039;,
+  &#039;.env.development&#039;: &#039;Development environment&#039;,
+  &#039;.env.staging&#039;: &#039;Staging/preview environment&#039;, 
+  &#039;.env.production&#039;: &#039;Production environment&#039;,
+  &#039;.env&#039;: &#039;Default environment (committed to git)&#039;,
+  &#039;.env.example&#039;: &#039;Environment template (safe to commit)&#039;,
+};
+```
+
+### 2. Vercel Environment Management
+```bash
+# List all environment variables for all environments
+vercel env ls
+
+# List environment variables for specific environment
+vercel env ls --environment=production
+vercel env ls --environment=preview
+vercel env ls --environment=development
+
+# Pull environment variables from Vercel
+vercel env pull .env.vercel
+
+# Add new environment variable
+vercel env add [name] [environment]
+
+# Remove environment variable
+vercel env rm [name] [environment]
+```
+
+## Synchronization Operations
+
+### 1. Pull Environment Variables from Vercel
+```bash
+#!/bin/bash
+# Pull environments from Vercel
+
+echo &quot;🔄 Pulling environment variables from Vercel...&quot;
+
+# Create backup of existing files
+if [ -f .env.local ]; then
+  cp .env.local .env.local.backup.$(date +%Y%m%d_%H%M%S)
+  echo &quot;📦 Backup created for .env.local&quot;
+fi
+
+# Pull from Vercel (creates .env.local by default)
+vercel env pull .env.local
+
+if [ $? -eq 0 ]; then
+  echo &quot;✅ Successfully pulled environment variables&quot;
+  echo &quot;📁 Variables saved to .env.local&quot;
+  
+  # Show summary
+  echo &quot;&quot;
+  echo &quot;📊 Environment Variables Summary:&quot;
+  echo &quot;================================&quot;
+  grep -c &quot;=&quot; .env.local 2&gt;/dev/null &amp;&amp; echo &quot;Total variables: $(grep -c &quot;=&quot; .env.local)&quot;
+  
+  # List variable names (hide values for security)
+  echo &quot;&quot;
+  echo &quot;🔑 Variable Names:&quot;
+  grep &quot;^[A-Z]&quot; .env.local | cut -d&#039;=&#039; -f1 | sort
+else
+  echo &quot;❌ Failed to pull environment variables&quot;
+  exit 1
+fi
+```
+
+### 2. Push Environment Variables to Vercel
+```bash
+#!/bin/bash
+# Push environment variables to Vercel
+
+echo &quot;🚀 Pushing environment variables to Vercel...&quot;
+
+# Check if environment files exist
+ENV_FILES=(&quot;.env.production&quot; &quot;.env.staging&quot; &quot;.env.development&quot;)
+FOUND_FILES=()
+
+for file in &quot;${ENV_FILES[@]}&quot;; do
+  if [ -f &quot;$file&quot; ]; then
+    FOUND_FILES+=(&quot;$file&quot;)
+  fi
+done
+
+if [ ${#FOUND_FILES[@]} -eq 0 ]; then
+  echo &quot;❌ No environment files found to push&quot;
+  echo &quot;💡 Expected files: ${ENV_FILES[*]}&quot;
+  exit 1
+fi
+
+# Push each environment file
+for file in &quot;${FOUND_FILES[@]}&quot;; do
+  echo &quot;📤 Processing $file...&quot;
+  
+  # Determine target environment
+  if [[ &quot;$file&quot; == *&quot;production&quot;* ]]; then
+    ENV=&quot;production&quot;
+  elif [[ &quot;$file&quot; == *&quot;staging&quot;* ]]; then
+    ENV=&quot;preview&quot;  # Vercel uses &#039;preview&#039; for staging
+  elif [[ &quot;$file&quot; == *&quot;development&quot;* ]]; then
+    ENV=&quot;development&quot;
+  else
+    ENV=&quot;development&quot;  # Default
+  fi
+  
+  echo &quot;🎯 Pushing to $ENV environment...&quot;
+  
+  # Read variables from file and push to Vercel
+  while IFS=&#039;=&#039; read -r key value; do
+    # Skip empty lines and comments
+    if [[ -z &quot;$key&quot; || &quot;$key&quot; =~ ^#.* ]]; then
+      continue
+    fi
+    
+    # Remove quotes from value if present
+    value=$(echo &quot;$value&quot; | sed &#039;s/^&quot;\(.*\)&quot;$/\1/&#039; | sed &quot;s/^&#039;\(.*\)&#039;$/\1/&quot;)
+    
+    echo &quot;  🔑 Setting $key...&quot;
+    echo &quot;$value&quot; | vercel env add &quot;$key&quot; &quot;$ENV&quot; --force
+    
+  done &lt; &quot;$file&quot;
+  
+  echo &quot;✅ Completed $file -&gt; $ENV&quot;
+  echo &quot;&quot;
+done
+
+echo &quot;🎉 All environment variables pushed successfully!&quot;
+```
+
+### 3. Environment Validation
+```typescript
+// Environment validation script
+interface ValidationRule {
+  name: string;
+  required: boolean;
+  pattern?: RegExp;
+  description: string;
+}
+
+const validationRules: ValidationRule[] = [
+  {
+    name: &#039;DATABASE_URL&#039;,
+    required: true,
+    pattern: /^(postgresql|mysql|sqlite):\/\/.+/,
+    description: &#039;Database connection string&#039;,
+  },
+  {
+    name: &#039;NEXTAUTH_SECRET&#039;,
+    required: true,
+    pattern: /.{32,}/,
+    description: &#039;NextAuth.js secret key (min 32 characters)&#039;,
+  },
+  {
+    name: &#039;NEXTAUTH_URL&#039;,
+    required: true,
+    pattern: /^https?:\/\/.+/,
+    description: &#039;NextAuth.js canonical URL&#039;,
+  },
+  {
+    name: &#039;API_KEY&#039;,
+    required: false,
+    pattern: /^[A-Za-z0-9_-]+$/,
+    description: &#039;API key for external services&#039;,
+  },
+];
+
+function validateEnvironment(envFile: string): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const env = readEnvironmentFile(envFile);
+  
+  // Check required variables
+  validationRules.forEach(rule =&gt; {
+    const value = env[rule.name];
+    
+    if (rule.required &amp;&amp; !value) {
+      errors.push(`Missing required variable: ${rule.name}`);
+      return;
+    }
+    
+    if (value &amp;&amp; rule.pattern &amp;&amp; !rule.pattern.test(value)) {
+      errors.push(`Invalid format for ${rule.name}: ${rule.description}`);
+    }
+  });
+  
+  // Check for common issues
+  Object.entries(env).forEach(([key, value]) =&gt; {
+    // Check for placeholder values
+    if (value === &#039;your-secret-here&#039; || value === &#039;change-me&#039;) {
+      warnings.push(`Placeholder value detected for ${key}`);
+    }
+    
+    // Check for potentially committed secrets
+    if (key.includes(&#039;SECRET&#039;) || key.includes(&#039;PRIVATE&#039;)) {
+      if (value.length &lt; 16) {
+        warnings.push(`${key} appears to be too short for a secret`);
+      }
+    }
+  });
+  
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings,
+  };
+}
+
+function readEnvironmentFile(filePath: string): Record&lt;string, string&gt; {
+  // Implementation to read and parse environment file
+  return {};
+}
+
+interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+```
+
+### 4. Environment Backup and Restore
+```bash
+#!/bin/bash
+# Backup and restore environment variables
+
+BACKUP_DIR=&quot;.env-backups&quot;
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+backup_environment() {
+  echo &quot;📦 Creating environment backup...&quot;
+  
+  mkdir -p &quot;$BACKUP_DIR&quot;
+  
+  # Backup local files
+  for file in .env.local .env.development .env.staging .env.production; do
+    if [ -f &quot;$file&quot; ]; then
+      cp &quot;$file&quot; &quot;$BACKUP_DIR/${file}.${TIMESTAMP}&quot;
+      echo &quot;✅ Backed up $file&quot;
+    fi
+  done
+  
+  # Backup Vercel environment variables
+  echo &quot;📤 Backing up Vercel environment variables...&quot;
+  
+  for env in production preview development; do
+    vercel env ls --environment=&quot;$env&quot; &gt; &quot;$BACKUP_DIR/vercel-${env}.${TIMESTAMP}.txt&quot;
+    echo &quot;✅ Backed up Vercel $env environment&quot;
+  done
+  
+  echo &quot;🎉 Backup completed in $BACKUP_DIR/&quot;
+  ls -la &quot;$BACKUP_DIR/&quot; | grep &quot;$TIMESTAMP&quot;
+}
+
+restore_environment() {
+  local backup_timestamp=&quot;$1&quot;
+  
+  if [ -z &quot;$backup_timestamp&quot; ]; then
+    echo &quot;❌ Please specify backup timestamp&quot;
+    echo &quot;💡 Available backups:&quot;
+    ls -1 &quot;$BACKUP_DIR/&quot; | grep -E &quot;\.env&quot; | cut -d&#039;.&#039; -f3 | sort -u
+    exit 1
+  fi
+  
+  echo &quot;🔄 Restoring environment from backup $backup_timestamp...&quot;
+  
+  # Restore local files
+  for file in .env.local .env.development .env.staging .env.production; do
+    backup_file=&quot;$BACKUP_DIR/${file}.${backup_timestamp}&quot;
+    if [ -f &quot;$backup_file&quot; ]; then
+      cp &quot;$backup_file&quot; &quot;$file&quot;
+      echo &quot;✅ Restored $file&quot;
+    fi
+  done
+  
+  echo &quot;🎉 Environment restored from backup&quot;
+}
+
+# Usage functions
+case &quot;$1&quot; in
+  backup)
+    backup_environment
+    ;;
+  restore)
+    restore_environment &quot;$2&quot;
+    ;;
+  *)
+    echo &quot;Usage: $0 {backup|restore} [timestamp]&quot;
+    exit 1
+    ;;
+esac
+```
+
+## Advanced Synchronization Features
+
+### 1. Environment Diff and Comparison
+```typescript
+// Environment comparison tool
+interface EnvironmentDiff {
+  added: string[];
+  removed: string[];
+  modified: Array&lt;{
+    key: string;
+    local: string;
+    remote: string;
+  }&gt;;
+  unchanged: string[];
+}
+
+function compareEnvironments(
+  local: Record&lt;string, string&gt;,
+  remote: Record&lt;string, string&gt;
+): EnvironmentDiff {
+  const diff: EnvironmentDiff = {
+    added: [],
+    removed: [],
+    modified: [],
+    unchanged: [],
+  };
+  
+  const allKeys = new Set([...Object.keys(local), ...Object.keys(remote)]);
+  
+  allKeys.forEach(key =&gt; {
+    if (!(key in local)) {
+      diff.added.push(key);
+    } else if (!(key in remote)) {
+      diff.removed.push(key);
+    } else if (local[key] !== remote[key]) {
+      diff.modified.push({
+        key,
+        local: local[key],
+        remote: remote[key],
+      });
+    } else {
+      diff.unchanged.push(key);
+    }
+  });
+  
+  return diff;
+}
+
+// Generate diff report
+function generateDiffReport(diff: EnvironmentDiff): string {
+  let report = &#039;# Environment Variables Comparison\n\n&#039;;
+  
+  if (diff.added.length &gt; 0) {
+    report += &#039;## ➕ Variables in Remote (not in Local)\n&#039;;
+    diff.added.forEach(key =&gt; {
+      report += `- \`${key}\`\n`;
+    });
+    report += &#039;\n&#039;;
+  }
+  
+  if (diff.removed.length &gt; 0) {
+    report += &#039;## ➖ Variables in Local (not in Remote)\n&#039;;
+    diff.removed.forEach(key =&gt; {
+      report += `- \`${key}\`\n`;
+    });
+    report += &#039;\n&#039;;
+  }
+  
+  if (diff.modified.length &gt; 0) {
+    report += &#039;## 🔄 Modified Variables\n&#039;;
+    diff.modified.forEach(({ key, local, remote }) =&gt; {
+      report += `### \`${key}\`\n`;
+      report += `- **Local**: \`${maskSensitive(local)}\`\n`;
+      report += `- **Remote**: \`${maskSensitive(remote)}\`\n\n`;
+    });
+  }
+  
+  if (diff.unchanged.length &gt; 0) {
+    report += `## ✅ Unchanged Variables (${diff.unchanged.length})\n`;
+    report += `${diff.unchanged.map(key =&gt; `- \`${key}\``).join(&#039;\n&#039;)}\n\n`;
+  }
+  
+  return report;
+}
+
+function maskSensitive(value: string): string {
+  // Mask sensitive values for security
+  if (value.length &lt;= 8) {
+    return &#039;*&#039;.repeat(value.length);
+  }
+  return `${value.substring(0, 4)}${&#039;*&#039;.repeat(value.length - 8)}${value.substring(value.length - 4)}`;
+}
+```
+
+### 2. Environment Template Generation
+```typescript
+// Generate .env.example from existing environment
+function generateEnvExample(envFile: string): string {
+  const env = readEnvironmentFile(envFile);
+  let template = &#039;# Environment Variables Template\n&#039;;
+  template += &#039;# Copy this file to .env.local and fill in the values\n\n&#039;;
+  
+  const categories = categorizeVariables(env);
+  
+  Object.entries(categories).forEach(([category, variables]) =&gt; {
+    template += `# ${category.toUpperCase()}\n`;
+    variables.forEach(({ key, description, example }) =&gt; {
+      if (description) {
+        template += `# ${description}\n`;
+      }
+      template += `${key}=${example || &#039;your-value-here&#039;}\n\n`;
+    });
+  });
+  
+  return template;
+}
+
+function categorizeVariables(env: Record&lt;string, string&gt;) {
+  const categories: Record&lt;string, Array&lt;{
+    key: string;
+    description?: string;
+    example?: string;
+  }&gt;&gt; = {
+    database: [],
+    authentication: [],
+    external_apis: [],
+    configuration: [],
+  };
+  
+  Object.keys(env).forEach(key =&gt; {
+    if (key.includes(&#039;DATABASE&#039;) || key.includes(&#039;DB_&#039;)) {
+      categories.database.push({ key, description: getDatabaseDescription(key) });
+    } else if (key.includes(&#039;AUTH&#039;) || key.includes(&#039;SECRET&#039;)) {
+      categories.authentication.push({ key, description: getAuthDescription(key) });
+    } else if (key.includes(&#039;API_KEY&#039;) || key.includes(&#039;_TOKEN&#039;)) {
+      categories.external_apis.push({ key, description: getApiDescription(key) });
+    } else {
+      categories.configuration.push({ key, description: getConfigDescription(key) });
+    }
+  });
+  
+  return categories;
+}
+
+function getDatabaseDescription(key: string): string {
+  if (key === &#039;DATABASE_URL&#039;) return &#039;Database connection string&#039;;
+  if (key === &#039;DB_HOST&#039;) return &#039;Database host&#039;;
+  if (key === &#039;DB_PORT&#039;) return &#039;Database port&#039;;
+  if (key === &#039;DB_NAME&#039;) return &#039;Database name&#039;;
+  return &#039;Database configuration&#039;;
+}
+
+function getAuthDescription(key: string): string {
+  if (key === &#039;NEXTAUTH_SECRET&#039;) return &#039;NextAuth.js secret key&#039;;
+  if (key === &#039;NEXTAUTH_URL&#039;) return &#039;NextAuth.js canonical URL&#039;;
+  if (key === &#039;JWT_SECRET&#039;) return &#039;JWT secret key&#039;;
+  return &#039;Authentication configuration&#039;;
+}
+
+function getApiDescription(key: string): string {
+  return `API key for ${key.toLowerCase().replace(/_/g, &#039; &#039;)}`;
+}
+
+function getConfigDescription(key: string): string {
+  return `Configuration for ${key.toLowerCase().replace(/_/g, &#039; &#039;)}`;
+}
+```
+
+### 3. Security and Validation
+```bash
+#!/bin/bash
+# Security checks for environment variables
+
+security_check() {
+  echo &quot;🔐 Running security checks on environment variables...&quot;
+  
+  local issues=0
+  
+  # Check for common security issues
+  for file in .env.local .env.development .env.staging .env.production; do
+    if [ ! -f &quot;$file&quot; ]; then
+      continue
+    fi
+    
+    echo &quot;🔍 Checking $file...&quot;
+    
+    # Check for weak secrets
+    while IFS=&#039;=&#039; read -r key value; do
+      if [[ -z &quot;$key&quot; || &quot;$key&quot; =~ ^#.* ]]; then
+        continue
+      fi
+      
+      # Remove quotes
+      value=$(echo &quot;$value&quot; | sed &#039;s/^&quot;\(.*\)&quot;$/\1/&#039; | sed &quot;s/^&#039;\(.*\)&#039;$/\1/&quot;)
+      
+      # Check for placeholder values
+      if [[ &quot;$value&quot; == *&quot;your-&quot;* || &quot;$value&quot; == *&quot;change-me&quot;* || &quot;$value&quot; == *&quot;replace-me&quot;* ]]; then
+        echo &quot;⚠️  Placeholder value in $key&quot;
+        ((issues++))
+      fi
+      
+      # Check for short secrets
+      if [[ &quot;$key&quot; =~ (SECRET|PRIVATE|KEY|TOKEN) ]]; then
+        if [ ${#value} -lt 16 ]; then
+          echo &quot;⚠️  $key appears to be too short for a secret (${#value} characters)&quot;
+          ((issues++))
+        fi
+      fi
+      
+      # Check for hardcoded URLs in production
+      if [[ &quot;$file&quot; == *&quot;production&quot;* &amp;&amp; &quot;$value&quot; =~ localhost ]]; then
+        echo &quot;⚠️  $key contains localhost in production environment&quot;
+        ((issues++))
+      fi
+      
+    done &lt; &quot;$file&quot;
+  done
+  
+  # Check if .env files are in .gitignore
+  if [ -f .gitignore ]; then
+    if ! grep -q &quot;.env.local&quot; .gitignore; then
+      echo &quot;⚠️  .env.local not in .gitignore&quot;
+      ((issues++))
+    fi
+    if ! grep -q &quot;.env.production&quot; .gitignore; then
+      echo &quot;⚠️  .env.production not in .gitignore&quot;
+      ((issues++))
+    fi
+  else
+    echo &quot;⚠️  No .gitignore file found&quot;
+    ((issues++))
+  fi
+  
+  echo &quot;&quot;
+  if [ $issues -eq 0 ]; then
+    echo &quot;✅ No security issues found&quot;
+  else
+    echo &quot;❌ Found $issues security issues&quot;
+    exit 1
+  fi
+}
+
+security_check
+```
+
+## Automation and Integration
+
+### 1. GitHub Actions Integration
+```yaml
+# .github/workflows/env-sync.yml
+name: Environment Sync
+
+on:
+  push:
+    branches: [main, develop]
+    paths: [&#039;.env.example&#039;, &#039;.env.*&#039;]
+  
+  workflow_dispatch:
+    inputs:
+      action:
+        description: &#039;Sync action&#039;
+        required: true
+        default: &#039;validate&#039;
+        type: choice
+        options:
+        - validate
+        - pull
+        - push
+
+jobs:
+  env-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Vercel CLI
+        run: npm i -g vercel@latest
+      
+      - name: Link to Vercel
+        run: vercel link --token=${{ secrets.VERCEL_TOKEN }} --yes
+      
+      - name: Validate Environment
+        if: github.event.inputs.action == &#039;validate&#039; || github.event.inputs.action == &#039;&#039;
+        run: |
+          # Run environment validation
+          node scripts/validate-env.js
+      
+      - name: Pull Environment
+        if: github.event.inputs.action == &#039;pull&#039;
+        run: |
+          vercel env pull .env.ci --token=${{ secrets.VERCEL_TOKEN }}
+          # Validate pulled environment
+          node scripts/validate-env.js .env.ci
+      
+      - name: Push Environment
+        if: github.event.inputs.action == &#039;push&#039;
+        run: |
+          # Push environment variables to Vercel
+          node scripts/push-env.js --token=${{ secrets.VERCEL_TOKEN }}
+```
+
+### 2. Development Workflow Integration
+```bash
+#!/bin/bash
+# Pre-commit hook for environment validation
+
+echo &quot;🔍 Validating environment variables...&quot;
+
+# Check if environment files are properly configured
+if [ -f .env.local ]; then
+  echo &quot;✅ .env.local exists&quot;
+else
+  echo &quot;⚠️  .env.local not found&quot;
+  if [ -f .env.example ]; then
+    echo &quot;💡 Copy .env.example to .env.local and configure your variables&quot;
+  fi
+fi
+
+# Validate environment structure
+node scripts/validate-env.js
+
+if [ $? -ne 0 ]; then
+  echo &quot;❌ Environment validation failed&quot;
+  exit 1
+fi
+
+echo &quot;✅ Environment validation passed&quot;
+```
+
+## Comprehensive Sync Operations
+
+Implement complete environment synchronization workflow with validation, backup, security checks, and automation integration for seamless development and deployment processes.
+
+&lt;function_calls&gt;
+&lt;invoke name=&quot;TodoWrite&quot;&gt;
+&lt;parameter name=&quot;todos&quot;&gt;[{&quot;content&quot;: &quot;Analyze hook system and context monitoring capabilities&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Design context threshold detection mechanism&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create hook script for automatic compact + clear sequence&quot;, &quot;status&quot;: &quot;pending&quot;}, {&quot;content&quot;: &quot;Configure hook in settings.json with proper event triggers&quot;, &quot;status&quot;: &quot;pending&quot;}, {&quot;content&quot;: &quot;Test hook execution and threshold detection&quot;, &quot;status&quot;: &quot;pending&quot;}, {&quot;content&quot;: &quot;Add markdown copy button to Supabase blog post&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Write Claude Code + Next.js and Vercel Integration article&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create Next.js Architecture Expert agent&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create Vercel Deployment Specialist agent&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create React Performance Optimizer agent&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create Next.js app scaffolding command&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create Vercel deployment optimization command&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create component generator command&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create API route tester command&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create bundle analyzer command&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create middleware creator command&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create edge function generator command&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create performance audit command&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create environment sync command&quot;, &quot;status&quot;: &quot;completed&quot;}, {&quot;content&quot;: &quot;Create migration helper command&quot;, &quot;status&quot;: &quot;in_progress&quot;}]</code>
       </div>
     </div>
 

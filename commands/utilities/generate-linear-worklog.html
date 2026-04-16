@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,129 @@
     <p class="desc">No description available.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/generate-linear-worklog</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/generate-linear-worklog</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd"># Generate Linear Work Log
+
+You are tasked with generating a technical work log comment for a Linear issue based on recent git commits.
+
+## Instructions
+
+1. **Check Linear MCP Availability**
+   - Verify that Linear MCP tools are available (mcp__linear__* functions)
+   - If Linear MCP is not installed, inform the user to install it and provide installation instructions
+   - Do not proceed with work log generation if Linear MCP is unavailable
+
+2. **Check for Existing Work Log**
+   - Use Linear MCP to get existing comments on the issue
+   - Look for comments with today&#039;s date in the format &quot;## Work Completed [TODAY&#039;S DATE]&quot;
+   - If found, note the existing content to append/update rather than duplicate
+
+2. **Extract Git Information**
+   - Get the current branch name
+   - Get recent commits on the current branch (last 10 commits)
+   - Get commits that are on the current branch but not on main branch
+   - For each relevant commit, get detailed information including file changes and line counts
+   - Focus on commits since the last work log update (if any exists)
+
+3. **Generate Work Log Content**
+   - Use dry, technical language without adjectives or emojis
+   - Focus on factual implementation details
+   - Structure the log with date, branch, and commit information
+   - Include quantitative metrics (file counts, line counts) where relevant
+   - Avoid subjective commentary or promotional language
+
+4. **Handle Existing Work Log**
+   - If no work log exists for today: Create new comment
+   - If work log exists for today: Replace the existing comment with updated content including all today&#039;s work
+   - Ensure chronological order of commits
+   - Include both previous and new work completed today
+
+5. **Format Structure**
+   ```
+   ## Work Completed [TODAY&#039;S DATE]
+
+   ### Branch: [current-branch-name]
+
+   **Commit [short-hash]: [Commit Title]**
+   - [Technical detail 1]
+   - [Technical detail 2]
+   - [Line count] lines of code across [file count] files
+
+   [Additional commits in chronological order]
+
+   ### [Status Section]
+   - [Current infrastructure/testing status]
+   - [What is now available/ready]
+   ```
+
+6. **Post to Linear**
+   - Use the Linear MCP integration to create or update the comment
+   - Post the formatted work log to the specified Linear issue
+   - If updating, replace the entire existing work log comment
+   - Confirm successful posting
+
+## Git Commands to Use
+- `git branch --show-current` - Get current branch
+- `git log --oneline -10` - Get recent commits
+- `git log main..HEAD --oneline` - Get branch-specific commits
+- `git show --stat [commit-hash]` - Get detailed commit info
+- `git log --since=&quot;[today&#039;s date]&quot; --pretty=format:&quot;%h %ad %s&quot; --date=short` - Get today&#039;s commits
+
+## Content Guidelines
+- Include commit hashes and descriptive titles
+- Provide specific technical implementations
+- Include file counts and line counts for significant changes
+- Maintain consistent formatting
+- Focus on technical accomplishments
+- Include current status summary
+- No emojis or special characters
+
+## Error Handling
+- Check if Linear MCP client is available before proceeding
+- If Linear MCP is not available, display installation instructions:
+  ```
+  Linear MCP client is not installed. To install it:
+  
+  1. Install the Linear MCP server:
+     npm install -g @modelcontextprotocol/server-linear
+  
+  2. Add Linear MCP to your Claude configuration:
+     Add the following to your Claude MCP settings:
+     {
+       &quot;mcpServers&quot;: {
+         &quot;linear&quot;: {
+           &quot;command&quot;: &quot;npx&quot;,
+           &quot;args&quot;: [&quot;@modelcontextprotocol/server-linear&quot;],
+           &quot;env&quot;: {
+             &quot;LINEAR_API_KEY&quot;: &quot;your_linear_api_key_here&quot;
+           }
+         }
+       }
+     }
+  
+  3. Restart Claude Code
+  4. Get your Linear API key from: https://linear.app/settings/api
+  ```
+- Validate that the Linear ticket ID exists
+- Handle cases where no recent commits are found
+- Provide clear error messages for git operation failures
+- Confirm successful comment posting
+
+## Example Usage
+When invoked with `/generate-linear-worklog BLA2-2`, the command should:
+1. Analyze git commits on the current branch
+2. Generate a structured work log
+3. Post the comment to Linear issue BLA2-2
+4. Confirm successful posting</code>
       </div>
     </div>
 

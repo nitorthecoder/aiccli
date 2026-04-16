@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,474 @@
     <p class="desc">"Constraint-based metabolic modeling (COBRA). FBA, FVA, gene knockouts, flux sampling, SBML models, for systems biology and metabolic engineering analysis."</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/cobrapy</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/cobrapy</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: cobrapy
+description: &quot;Constraint-based metabolic modeling (COBRA). FBA, FVA, gene knockouts, flux sampling, SBML models, for systems biology and metabolic engineering analysis.&quot;
+---
+
+# COBRApy - Constraint-Based Reconstruction and Analysis
+
+## Overview
+
+COBRApy is a Python library for constraint-based reconstruction and analysis (COBRA) of metabolic models, essential for systems biology research. Work with genome-scale metabolic models, perform computational simulations of cellular metabolism, conduct metabolic engineering analyses, and predict phenotypic behaviors.
+
+## Core Capabilities
+
+COBRApy provides comprehensive tools organized into several key areas:
+
+### 1. Model Management
+
+Load existing models from repositories or files:
+```python
+from cobra.io import load_model
+
+# Load bundled test models
+model = load_model(&quot;textbook&quot;)  # E. coli core model
+model = load_model(&quot;ecoli&quot;)     # Full E. coli model
+model = load_model(&quot;salmonella&quot;)
+
+# Load from files
+from cobra.io import read_sbml_model, load_json_model, load_yaml_model
+model = read_sbml_model(&quot;path/to/model.xml&quot;)
+model = load_json_model(&quot;path/to/model.json&quot;)
+model = load_yaml_model(&quot;path/to/model.yml&quot;)
+```
+
+Save models in various formats:
+```python
+from cobra.io import write_sbml_model, save_json_model, save_yaml_model
+write_sbml_model(model, &quot;output.xml&quot;)  # Preferred format
+save_json_model(model, &quot;output.json&quot;)  # For Escher compatibility
+save_yaml_model(model, &quot;output.yml&quot;)   # Human-readable
+```
+
+### 2. Model Structure and Components
+
+Access and inspect model components:
+```python
+# Access components
+model.reactions      # DictList of all reactions
+model.metabolites    # DictList of all metabolites
+model.genes          # DictList of all genes
+
+# Get specific items by ID or index
+reaction = model.reactions.get_by_id(&quot;PFK&quot;)
+metabolite = model.metabolites[0]
+
+# Inspect properties
+print(reaction.reaction)        # Stoichiometric equation
+print(reaction.bounds)          # Flux constraints
+print(reaction.gene_reaction_rule)  # GPR logic
+print(metabolite.formula)       # Chemical formula
+print(metabolite.compartment)   # Cellular location
+```
+
+### 3. Flux Balance Analysis (FBA)
+
+Perform standard FBA simulation:
+```python
+# Basic optimization
+solution = model.optimize()
+print(f&quot;Objective value: {solution.objective_value}&quot;)
+print(f&quot;Status: {solution.status}&quot;)
+
+# Access fluxes
+print(solution.fluxes[&quot;PFK&quot;])
+print(solution.fluxes.head())
+
+# Fast optimization (objective value only)
+objective_value = model.slim_optimize()
+
+# Change objective
+model.objective = &quot;ATPM&quot;
+solution = model.optimize()
+```
+
+Parsimonious FBA (minimize total flux):
+```python
+from cobra.flux_analysis import pfba
+solution = pfba(model)
+```
+
+Geometric FBA (find central solution):
+```python
+from cobra.flux_analysis import geometric_fba
+solution = geometric_fba(model)
+```
+
+### 4. Flux Variability Analysis (FVA)
+
+Determine flux ranges for all reactions:
+```python
+from cobra.flux_analysis import flux_variability_analysis
+
+# Standard FVA
+fva_result = flux_variability_analysis(model)
+
+# FVA at 90% optimality
+fva_result = flux_variability_analysis(model, fraction_of_optimum=0.9)
+
+# Loopless FVA (eliminates thermodynamically infeasible loops)
+fva_result = flux_variability_analysis(model, loopless=True)
+
+# FVA for specific reactions
+fva_result = flux_variability_analysis(
+    model,
+    reaction_list=[&quot;PFK&quot;, &quot;FBA&quot;, &quot;PGI&quot;]
+)
+```
+
+### 5. Gene and Reaction Deletion Studies
+
+Perform knockout analyses:
+```python
+from cobra.flux_analysis import (
+    single_gene_deletion,
+    single_reaction_deletion,
+    double_gene_deletion,
+    double_reaction_deletion
+)
+
+# Single deletions
+gene_results = single_gene_deletion(model)
+reaction_results = single_reaction_deletion(model)
+
+# Double deletions (uses multiprocessing)
+double_gene_results = double_gene_deletion(
+    model,
+    processes=4  # Number of CPU cores
+)
+
+# Manual knockout using context manager
+with model:
+    model.genes.get_by_id(&quot;b0008&quot;).knock_out()
+    solution = model.optimize()
+    print(f&quot;Growth after knockout: {solution.objective_value}&quot;)
+# Model automatically reverts after context exit
+```
+
+### 6. Growth Media and Minimal Media
+
+Manage growth medium:
+```python
+# View current medium
+print(model.medium)
+
+# Modify medium (must reassign entire dict)
+medium = model.medium
+medium[&quot;EX_glc__D_e&quot;] = 10.0  # Set glucose uptake
+medium[&quot;EX_o2_e&quot;] = 0.0       # Anaerobic conditions
+model.medium = medium
+
+# Calculate minimal media
+from cobra.medium import minimal_medium
+
+# Minimize total import flux
+min_medium = minimal_medium(model, minimize_components=False)
+
+# Minimize number of components (uses MILP, slower)
+min_medium = minimal_medium(
+    model,
+    minimize_components=True,
+    open_exchanges=True
+)
+```
+
+### 7. Flux Sampling
+
+Sample the feasible flux space:
+```python
+from cobra.sampling import sample
+
+# Sample using OptGP (default, supports parallel processing)
+samples = sample(model, n=1000, method=&quot;optgp&quot;, processes=4)
+
+# Sample using ACHR
+samples = sample(model, n=1000, method=&quot;achr&quot;)
+
+# Validate samples
+from cobra.sampling import OptGPSampler
+sampler = OptGPSampler(model, processes=4)
+sampler.sample(1000)
+validation = sampler.validate(sampler.samples)
+print(validation.value_counts())  # Should be all &#039;v&#039; for valid
+```
+
+### 8. Production Envelopes
+
+Calculate phenotype phase planes:
+```python
+from cobra.flux_analysis import production_envelope
+
+# Standard production envelope
+envelope = production_envelope(
+    model,
+    reactions=[&quot;EX_glc__D_e&quot;, &quot;EX_o2_e&quot;],
+    objective=&quot;EX_ac_e&quot;  # Acetate production
+)
+
+# With carbon yield
+envelope = production_envelope(
+    model,
+    reactions=[&quot;EX_glc__D_e&quot;, &quot;EX_o2_e&quot;],
+    carbon_sources=&quot;EX_glc__D_e&quot;
+)
+
+# Visualize (use matplotlib or pandas plotting)
+import matplotlib.pyplot as plt
+envelope.plot(x=&quot;EX_glc__D_e&quot;, y=&quot;EX_o2_e&quot;, kind=&quot;scatter&quot;)
+plt.show()
+```
+
+### 9. Gapfilling
+
+Add reactions to make models feasible:
+```python
+from cobra.flux_analysis import gapfill
+
+# Prepare universal model with candidate reactions
+universal = load_model(&quot;universal&quot;)
+
+# Perform gapfilling
+with model:
+    # Remove reactions to create gaps for demonstration
+    model.remove_reactions([model.reactions.PGI])
+
+    # Find reactions needed
+    solution = gapfill(model, universal)
+    print(f&quot;Reactions to add: {solution}&quot;)
+```
+
+### 10. Model Building
+
+Build models from scratch:
+```python
+from cobra import Model, Reaction, Metabolite
+
+# Create model
+model = Model(&quot;my_model&quot;)
+
+# Create metabolites
+atp_c = Metabolite(&quot;atp_c&quot;, formula=&quot;C10H12N5O13P3&quot;,
+                   name=&quot;ATP&quot;, compartment=&quot;c&quot;)
+adp_c = Metabolite(&quot;adp_c&quot;, formula=&quot;C10H12N5O10P2&quot;,
+                   name=&quot;ADP&quot;, compartment=&quot;c&quot;)
+pi_c = Metabolite(&quot;pi_c&quot;, formula=&quot;HO4P&quot;,
+                  name=&quot;Phosphate&quot;, compartment=&quot;c&quot;)
+
+# Create reaction
+reaction = Reaction(&quot;ATPASE&quot;)
+reaction.name = &quot;ATP hydrolysis&quot;
+reaction.subsystem = &quot;Energy&quot;
+reaction.lower_bound = 0.0
+reaction.upper_bound = 1000.0
+
+# Add metabolites with stoichiometry
+reaction.add_metabolites({
+    atp_c: -1.0,
+    adp_c: 1.0,
+    pi_c: 1.0
+})
+
+# Add gene-reaction rule
+reaction.gene_reaction_rule = &quot;(gene1 and gene2) or gene3&quot;
+
+# Add to model
+model.add_reactions([reaction])
+
+# Add boundary reactions
+model.add_boundary(atp_c, type=&quot;exchange&quot;)
+model.add_boundary(adp_c, type=&quot;demand&quot;)
+
+# Set objective
+model.objective = &quot;ATPASE&quot;
+```
+
+## Common Workflows
+
+### Workflow 1: Load Model and Predict Growth
+
+```python
+from cobra.io import load_model
+
+# Load model
+model = load_model(&quot;ecoli&quot;)
+
+# Run FBA
+solution = model.optimize()
+print(f&quot;Growth rate: {solution.objective_value:.3f} /h&quot;)
+
+# Show active pathways
+print(solution.fluxes[solution.fluxes.abs() &gt; 1e-6])
+```
+
+### Workflow 2: Gene Knockout Screen
+
+```python
+from cobra.io import load_model
+from cobra.flux_analysis import single_gene_deletion
+
+# Load model
+model = load_model(&quot;ecoli&quot;)
+
+# Perform single gene deletions
+results = single_gene_deletion(model)
+
+# Find essential genes (growth &lt; threshold)
+essential_genes = results[results[&quot;growth&quot;] &lt; 0.01]
+print(f&quot;Found {len(essential_genes)} essential genes&quot;)
+
+# Find genes with minimal impact
+neutral_genes = results[results[&quot;growth&quot;] &gt; 0.9 * solution.objective_value]
+```
+
+### Workflow 3: Media Optimization
+
+```python
+from cobra.io import load_model
+from cobra.medium import minimal_medium
+
+# Load model
+model = load_model(&quot;ecoli&quot;)
+
+# Calculate minimal medium for 50% of max growth
+target_growth = model.slim_optimize() * 0.5
+min_medium = minimal_medium(
+    model,
+    target_growth,
+    minimize_components=True
+)
+
+print(f&quot;Minimal medium components: {len(min_medium)}&quot;)
+print(min_medium)
+```
+
+### Workflow 4: Flux Uncertainty Analysis
+
+```python
+from cobra.io import load_model
+from cobra.flux_analysis import flux_variability_analysis
+from cobra.sampling import sample
+
+# Load model
+model = load_model(&quot;ecoli&quot;)
+
+# First check flux ranges at optimality
+fva = flux_variability_analysis(model, fraction_of_optimum=1.0)
+
+# For reactions with large ranges, sample to understand distribution
+samples = sample(model, n=1000)
+
+# Analyze specific reaction
+reaction_id = &quot;PFK&quot;
+import matplotlib.pyplot as plt
+samples[reaction_id].hist(bins=50)
+plt.xlabel(f&quot;Flux through {reaction_id}&quot;)
+plt.ylabel(&quot;Frequency&quot;)
+plt.show()
+```
+
+### Workflow 5: Context Manager for Temporary Changes
+
+Use context managers to make temporary modifications:
+```python
+# Model remains unchanged outside context
+with model:
+    # Temporarily change objective
+    model.objective = &quot;ATPM&quot;
+
+    # Temporarily modify bounds
+    model.reactions.EX_glc__D_e.lower_bound = -5.0
+
+    # Temporarily knock out genes
+    model.genes.b0008.knock_out()
+
+    # Optimize with changes
+    solution = model.optimize()
+    print(f&quot;Modified growth: {solution.objective_value}&quot;)
+
+# All changes automatically reverted
+solution = model.optimize()
+print(f&quot;Original growth: {solution.objective_value}&quot;)
+```
+
+## Key Concepts
+
+### DictList Objects
+Models use `DictList` objects for reactions, metabolites, and genes - behaving like both lists and dictionaries:
+```python
+# Access by index
+first_reaction = model.reactions[0]
+
+# Access by ID
+pfk = model.reactions.get_by_id(&quot;PFK&quot;)
+
+# Query methods
+atp_reactions = model.reactions.query(&quot;atp&quot;)
+```
+
+### Flux Constraints
+Reaction bounds define feasible flux ranges:
+- **Irreversible**: `lower_bound = 0, upper_bound &gt; 0`
+- **Reversible**: `lower_bound &lt; 0, upper_bound &gt; 0`
+- Set both bounds simultaneously with `.bounds` to avoid inconsistencies
+
+### Gene-Reaction Rules (GPR)
+Boolean logic linking genes to reactions:
+```python
+# AND logic (both required)
+reaction.gene_reaction_rule = &quot;gene1 and gene2&quot;
+
+# OR logic (either sufficient)
+reaction.gene_reaction_rule = &quot;gene1 or gene2&quot;
+
+# Complex logic
+reaction.gene_reaction_rule = &quot;(gene1 and gene2) or (gene3 and gene4)&quot;
+```
+
+### Exchange Reactions
+Special reactions representing metabolite import/export:
+- Named with prefix `EX_` by convention
+- Positive flux = secretion, negative flux = uptake
+- Managed through `model.medium` dictionary
+
+## Best Practices
+
+1. **Use context managers** for temporary modifications to avoid state management issues
+2. **Validate models** before analysis using `model.slim_optimize()` to ensure feasibility
+3. **Check solution status** after optimization - `optimal` indicates successful solve
+4. **Use loopless FVA** when thermodynamic feasibility matters
+5. **Set fraction_of_optimum** appropriately in FVA to explore suboptimal space
+6. **Parallelize** computationally expensive operations (sampling, double deletions)
+7. **Prefer SBML format** for model exchange and long-term storage
+8. **Use slim_optimize()** when only objective value needed for performance
+9. **Validate flux samples** to ensure numerical stability
+
+## Troubleshooting
+
+**Infeasible solutions**: Check medium constraints, reaction bounds, and model consistency
+**Slow optimization**: Try different solvers (GLPK, CPLEX, Gurobi) via `model.solver`
+**Unbounded solutions**: Verify exchange reactions have appropriate upper bounds
+**Import errors**: Ensure correct file format and valid SBML identifiers
+
+## References
+
+For detailed workflows and API patterns, refer to:
+- `references/workflows.md` - Comprehensive step-by-step workflow examples
+- `references/api_quick_reference.md` - Common function signatures and patterns
+
+Official documentation: https://cobrapy.readthedocs.io/en/latest/
+</code>
       </div>
     </div>
 

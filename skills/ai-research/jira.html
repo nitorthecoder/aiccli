@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,212 @@
     <p class="desc">Use when the user mentions Jira issues (e.g., "PROJ-123"), asks about tickets, wants to create/view/update issues, check sprint status, or manage their Jira workflow. Triggers on keywords like "jira", "issue", "ticket", "sprint", "backlog", or issue key patterns.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/jira</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/jira</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: jira
+description: Use when the user mentions Jira issues (e.g., &quot;PROJ-123&quot;), asks about tickets, wants to create/view/update issues, check sprint status, or manage their Jira workflow. Triggers on keywords like &quot;jira&quot;, &quot;issue&quot;, &quot;ticket&quot;, &quot;sprint&quot;, &quot;backlog&quot;, or issue key patterns.
+---
+
+# Jira
+
+Natural language interaction with Jira. Supports multiple backends.
+
+## Backend Detection
+
+**Run this check first** to determine which backend to use:
+
+```
+1. Check if jira CLI is available:
+   → Run: which jira
+   → If found: USE CLI BACKEND
+
+2. If no CLI, check for Atlassian MCP:
+   → Look for mcp__atlassian__* tools
+   → If available: USE MCP BACKEND
+
+3. If neither available:
+   → GUIDE USER TO SETUP
+```
+
+| Backend | When to Use | Reference |
+|---------|-------------|-----------|
+| **CLI** | `jira` command available | `references/commands.md` |
+| **MCP** | Atlassian MCP tools available | `references/mcp.md` |
+| **None** | Neither available | Guide to install CLI |
+
+---
+
+## Quick Reference (CLI)
+
+&gt; Skip this section if using MCP backend.
+
+| Intent | Command |
+|--------|---------|
+| View issue | `jira issue view ISSUE-KEY` |
+| List my issues | `jira issue list -a$(jira me)` |
+| My in-progress | `jira issue list -a$(jira me) -s&quot;In Progress&quot;` |
+| Create issue | `jira issue create -tType -s&quot;Summary&quot; -b&quot;Description&quot;` |
+| Move/transition | `jira issue move ISSUE-KEY &quot;State&quot;` |
+| Assign to me | `jira issue assign ISSUE-KEY $(jira me)` |
+| Unassign | `jira issue assign ISSUE-KEY x` |
+| Add comment | `jira issue comment add ISSUE-KEY -b&quot;Comment text&quot;` |
+| Open in browser | `jira open ISSUE-KEY` |
+| Current sprint | `jira sprint list --state active` |
+| Who am I | `jira me` |
+
+---
+
+## Quick Reference (MCP)
+
+&gt; Skip this section if using CLI backend.
+
+| Intent | MCP Tool |
+|--------|----------|
+| Search issues | `mcp__atlassian__searchJiraIssuesUsingJql` |
+| View issue | `mcp__atlassian__getJiraIssue` |
+| Create issue | `mcp__atlassian__createJiraIssue` |
+| Update issue | `mcp__atlassian__editJiraIssue` |
+| Get transitions | `mcp__atlassian__getTransitionsForJiraIssue` |
+| Transition | `mcp__atlassian__transitionJiraIssue` |
+| Add comment | `mcp__atlassian__addCommentToJiraIssue` |
+| User lookup | `mcp__atlassian__lookupJiraAccountId` |
+| List projects | `mcp__atlassian__getVisibleJiraProjects` |
+
+See `references/mcp.md` for full MCP patterns.
+
+---
+
+## Triggers
+
+- &quot;create a jira ticket&quot;
+- &quot;show me PROJ-123&quot;
+- &quot;list my tickets&quot;
+- &quot;move ticket to done&quot;
+- &quot;what&#039;s in the current sprint&quot;
+
+---
+
+## Issue Key Detection
+
+Issue keys follow the pattern: `[A-Z]+-[0-9]+` (e.g., PROJ-123, ABC-1).
+
+When a user mentions an issue key in conversation:
+- **CLI:** `jira issue view KEY` or `jira open KEY`
+- **MCP:** `mcp__atlassian__jira_get_issue` with the key
+
+---
+
+## Workflow
+
+**Creating tickets:**
+1. Research context if user references code/tickets/PRs
+2. Draft ticket content
+3. Review with user
+4. Create using appropriate backend
+
+**Updating tickets:**
+1. Fetch issue details first
+2. Check status (careful with in-progress tickets)
+3. Show current vs proposed changes
+4. Get approval before updating
+5. Add comment explaining changes
+
+---
+
+## Before Any Operation
+
+Ask yourself:
+
+1. **What&#039;s the current state?** — Always fetch the issue first. Don&#039;t assume status, assignee, or fields are what user thinks they are.
+
+2. **Who else is affected?** — Check watchers, linked issues, parent epics. A &quot;simple edit&quot; might notify 10 people.
+
+3. **Is this reversible?** — Transitions may have one-way gates. Some workflows require intermediate states. Description edits have no undo.
+
+4. **Do I have the right identifiers?** — Issue keys, transition IDs, account IDs. Display names don&#039;t work for assignment (MCP).
+
+---
+
+## NEVER
+
+- **NEVER transition without fetching current status** — Workflows may require intermediate states. &quot;To Do&quot; → &quot;Done&quot; might fail silently if &quot;In Progress&quot; is required first.
+
+- **NEVER assign using display name (MCP)** — Only account IDs work. Always call `lookupJiraAccountId` first, or assignment silently fails.
+
+- **NEVER edit description without showing original** — Jira has no undo. User must see what they&#039;re replacing.
+
+- **NEVER use `--no-input` without all required fields (CLI)** — Fails silently with cryptic errors. Check project&#039;s required fields first.
+
+- **NEVER assume transition names are universal** — &quot;Done&quot;, &quot;Closed&quot;, &quot;Complete&quot; vary by project. Always get available transitions first.
+
+- **NEVER bulk-modify without explicit approval** — Each ticket change notifies watchers. 10 edits = 10 notification storms.
+
+---
+
+## Safety
+
+- Always show the command/tool call before running it
+- Always get approval before modifying tickets
+- Preserve original information when editing
+- Verify updates after applying
+- Always surface authentication issues clearly so the user can resolve them
+
+---
+
+## No Backend Available
+
+If neither CLI nor MCP is available, guide the user:
+
+```
+To use Jira, you need one of:
+
+1. **jira CLI** (recommended):
+   https://github.com/ankitpokhrel/jira-cli
+
+   Install: brew install ankitpokhrel/jira-cli/jira-cli
+   Setup:   jira init
+
+2. **Atlassian MCP**:
+   Configure in your MCP settings with Atlassian credentials.
+```
+
+---
+
+## Deep Dive
+
+**LOAD reference when:**
+- Creating issues with complex fields or multi-line content
+- Building JQL queries beyond simple filters
+- Troubleshooting errors or authentication issues
+- Working with transitions, linking, or sprints
+
+**Do NOT load reference for:**
+- Simple view/list operations (Quick Reference above is sufficient)
+- Basic status checks (`jira issue view KEY`)
+- Opening issues in browser
+
+| Task | Load Reference? |
+|------|-----------------|
+| View single issue | No |
+| List my tickets | No |
+| Create with description | **Yes** — CLI needs `/tmp` pattern |
+| Transition issue | **Yes** — need transition ID workflow |
+| JQL search | **Yes** — for complex queries |
+| Link issues | **Yes** — MCP limitation, need script |
+
+References:
+- CLI patterns: `references/commands.md`
+- MCP patterns: `references/mcp.md`
+</code>
       </div>
     </div>
 

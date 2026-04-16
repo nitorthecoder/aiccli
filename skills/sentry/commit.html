@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,148 @@
     <p class="desc">Create commit messages following Sentry conventions. Use when committing code changes, writing commit messages, or formatting git history. Follows conventional commits with Sentry-specific issue references.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/commit</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/commit</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: commit
+description: Create commit messages following Sentry conventions. Use when committing code changes, writing commit messages, or formatting git history. Follows conventional commits with Sentry-specific issue references.
+---
+
+# Sentry Commit Messages
+
+Follow these conventions when creating commits for Sentry projects.
+
+## Format
+
+```
+&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt;
+
+&lt;body&gt;
+
+&lt;footer&gt;
+```
+
+The header is required. Scope is optional. All lines must stay under 100 characters.
+
+## Commit Types
+
+| Type | Purpose |
+|------|---------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `ref` | Refactoring (no behavior change) |
+| `perf` | Performance improvement |
+| `docs` | Documentation only |
+| `test` | Test additions or corrections |
+| `build` | Build system or dependencies |
+| `ci` | CI configuration |
+| `chore` | Maintenance tasks |
+| `style` | Code formatting (no logic change) |
+| `meta` | Repository metadata |
+| `license` | License changes |
+
+## Subject Line Rules
+
+- Use imperative, present tense: &quot;Add feature&quot; not &quot;Added feature&quot;
+- Capitalize the first letter
+- No period at the end
+- Maximum 70 characters
+
+## Body Guidelines
+
+- Explain **what** and **why**, not how
+- Use imperative mood and present tense
+- Include motivation for the change
+- Contrast with previous behavior when relevant
+
+## Footer: Issue References
+
+Reference issues in the footer using these patterns:
+
+```
+Fixes GH-1234
+Fixes #1234
+Fixes SENTRY-1234
+Refs LINEAR-ABC-123
+```
+
+- `Fixes` closes the issue when merged
+- `Refs` links without closing
+
+## Examples
+
+### Simple fix
+
+```
+fix(api): Handle null response in user endpoint
+
+The user API could return null for deleted accounts, causing a crash
+in the dashboard. Add null check before accessing user properties.
+
+Fixes SENTRY-5678
+```
+
+### Feature with scope
+
+```
+feat(alerts): Add Slack thread replies for alert updates
+
+When an alert is updated or resolved, post a reply to the original
+Slack thread instead of creating a new message. This keeps related
+notifications grouped together.
+
+Refs GH-1234
+```
+
+### Refactor
+
+```
+ref: Extract common validation logic to shared module
+
+Move duplicate validation code from three endpoints into a shared
+validator class. No behavior change.
+```
+
+### Breaking change
+
+```
+feat(api)!: Remove deprecated v1 endpoints
+
+Remove all v1 API endpoints that were deprecated in version 23.1.
+Clients should migrate to v2 endpoints.
+
+BREAKING CHANGE: v1 endpoints no longer available
+Fixes SENTRY-9999
+```
+
+## Revert Format
+
+```
+revert: feat(api): Add new endpoint
+
+This reverts commit abc123def456.
+
+Reason: Caused performance regression in production.
+```
+
+## Principles
+
+- Each commit should be a single, stable change
+- Commits should be independently reviewable
+- The repository should be in a working state after each commit
+
+## References
+
+- [Sentry Commit Messages](https://develop.sentry.dev/engineering-practices/commit-messages/)
+</code>
       </div>
     </div>
 

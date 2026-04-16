@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,76 @@
     <p class="desc">Check current worktree status, branch, and assigned task</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install commands/worktree-check</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install commands/worktree-check</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+allowed-tools: Bash(git:*), Bash(cat:*), Bash(pwd:*), Bash(ls:*)
+description: Check current worktree status, branch, and assigned task
+---
+
+# Worktree Status Check
+
+Verify the current worktree environment and show task details.
+
+## Instructions
+
+You are inside a worktree (or the main repo). Gather and display the current status clearly.
+
+### Step 1: Detect Worktree
+
+1. Get the current directory: `pwd`
+2. List all worktrees: `git worktree list`
+3. Determine if the current directory is a worktree (not the main working tree). The main working tree is listed first in `git worktree list` output — if the current path matches the first entry, this is the main repo, not a worktree.
+
+If this is **not** a worktree, inform the user:
+&gt; You&#039;re in the main repository, not a worktree. Use `/worktree-init` to create worktrees.
+
+Then list any existing worktrees and exit.
+
+### Step 2: Show Branch Info
+
+1. Get current branch: `git branch --show-current`
+2. Verify it follows the `claude/*`, `claude-daniel/*`, or `review/*` naming convention
+3. Show how many commits ahead of origin/main: `git rev-list --count origin/main..HEAD`
+
+### Step 3: Read Task
+
+1. Check if `.worktree-task.md` exists in the worktree root
+2. If it exists, read and display its contents
+3. If it doesn&#039;t exist, note that no task file was found (may have been created manually)
+
+### Step 4: Show Working Status
+
+Run and display:
+1. `git status --short` — show modified, staged, and untracked files
+2. `git diff --stat` — show a summary of unstaged changes
+
+### Step 5: Display Summary
+
+Present a clean summary:
+
+```
+Worktree Status
+──────────────────────────────────
+Branch:    claude/&lt;name&gt;
+Task:      &lt;task description from .worktree-task.md&gt;
+Commits:   &lt;N&gt; ahead of main
+Modified:  &lt;N&gt; files
+Staged:    &lt;N&gt; files
+Untracked: &lt;N&gt; files
+──────────────────────────────────
+```
+
+If there are changes ready to deliver, suggest: &quot;Run `/worktree-deliver` when you&#039;re ready to commit, push, and create a PR.&quot;
+</code>
       </div>
     </div>
 

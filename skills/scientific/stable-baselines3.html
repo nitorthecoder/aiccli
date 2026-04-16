@@ -33,20 +33,15 @@
     .desc{font-size:18px;color:#444;margin-bottom:32px;line-height:1.7}
     .section{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px;margin-bottom:24px}
     .section h2{font-size:20px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e5e5e5}
-    .install-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
-    .install-box p{color:#888;font-size:13px;margin-bottom:8px}
-    .install-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
+    .copy-box{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px}
+    .copy-box p{color:#888;font-size:13px;margin-bottom:8px}
+    .copy-box code{display:block;color:#4ade80;font-family:'JetBrains Mono',monospace;font-size:14px;word-break:break-all}
     .copy-btn{float:right;padding:8px 16px;background:#fff;color:#1a1a1a;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500}
     .copy-btn:hover{background:#f5f5f5}
     pre{background:#f8f8f8;border:1px solid #e5e5e5;border-radius:12px;padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
-    .how-to{background:#fff;border:1px solid #e5e5e5;border-radius:16px;padding:28px}
-    .how-to h2{font-size:20px;font-weight:600;margin-bottom:16px}
-    .how-to ol{margin:16px 0;padding-left:24px}
-    .how-to li{margin-bottom:12px;color:#444}
-    .how-to code{background:#f5f5f5;padding:2px 6px;border-radius:4px;font-size:13px}
     .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
     .tag{padding:6px 12px;background:#f5f5f5;border-radius:20px;font-size:12px;color:#666}
-    @media(max-width:768px){.header{flex-direction:column}.install-box code{font-size:12px}}
+    @media(max-width:768px){.header{flex-direction:column}.copy-box code{font-size:12px}}
   </style>
 </head>
 <body>
@@ -83,18 +78,310 @@
     <p class="desc">Use this skill for reinforcement learning tasks including training RL agents (PPO, SAC, DQN, TD3, DDPG, A2C, etc.), creating custom Gym environments, implementing callbacks for monitoring and control, using vectorized environments for parallel training, and integrating with deep RL workflows. This skill should be used when users request RL algorithm implementation, agent training, environment design, or RL experimentation.</p>
 
     <div class="section">
-      <h2>How to Use</h2>
-      <div class="how-to">
-        <ol>
-          <li><strong>Install via CLI:</strong> Run <code>npx aiccli install skills/stable-baselines3</code> in your terminal</li>
-          <li><strong>Manual install:</strong> Copy the configuration below and add it to your project's config</li>
-        </ol>
-        
-        <div class="install-box">
-          <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
-          <p>Installation Command:</p>
-          <code id="install-cmd">npx aiccli install skills/stable-baselines3</code>
-        </div>
+      <h2>How to Install</h2>
+      <ol style="margin:16px 0;padding-left:24px;color:#444">
+        <li style="margin-bottom:12px"><strong>Copy the config</strong> - Click the "Copy Config" button below</li>
+        <li style="margin-bottom:12px"><strong>Add to your project</strong> - Paste the code into the appropriate config file</li>
+        <li style="margin-bottom:12px"><strong>Done!</strong> - The component is now available in your AI</li>
+      </ol>
+      
+      <div class="copy-box">
+        <button class="copy-btn" onclick="copyConfig()">Copy Config</button>
+        <p>Configuration (click to copy):</p>
+        <code id="install-cmd">---
+name: stable-baselines3
+description: Use this skill for reinforcement learning tasks including training RL agents (PPO, SAC, DQN, TD3, DDPG, A2C, etc.), creating custom Gym environments, implementing callbacks for monitoring and control, using vectorized environments for parallel training, and integrating with deep RL workflows. This skill should be used when users request RL algorithm implementation, agent training, environment design, or RL experimentation.
+---
+
+# Stable Baselines3
+
+## Overview
+
+Stable Baselines3 (SB3) is a PyTorch-based library providing reliable implementations of reinforcement learning algorithms. This skill provides comprehensive guidance for training RL agents, creating custom environments, implementing callbacks, and optimizing training workflows using SB3&#039;s unified API.
+
+## Core Capabilities
+
+### 1. Training RL Agents
+
+**Basic Training Pattern:**
+
+```python
+import gymnasium as gym
+from stable_baselines3 import PPO
+
+# Create environment
+env = gym.make(&quot;CartPole-v1&quot;)
+
+# Initialize agent
+model = PPO(&quot;MlpPolicy&quot;, env, verbose=1)
+
+# Train the agent
+model.learn(total_timesteps=10000)
+
+# Save the model
+model.save(&quot;ppo_cartpole&quot;)
+
+# Load the model (without prior instantiation)
+model = PPO.load(&quot;ppo_cartpole&quot;, env=env)
+```
+
+**Important Notes:**
+- `total_timesteps` is a lower bound; actual training may exceed this due to batch collection
+- Use `model.load()` as a static method, not on an existing instance
+- The replay buffer is NOT saved with the model to save space
+
+**Algorithm Selection:**
+Use `references/algorithms.md` for detailed algorithm characteristics and selection guidance. Quick reference:
+- **PPO/A2C**: General-purpose, supports all action space types, good for multiprocessing
+- **SAC/TD3**: Continuous control, off-policy, sample-efficient
+- **DQN**: Discrete actions, off-policy
+- **HER**: Goal-conditioned tasks
+
+See `scripts/train_rl_agent.py` for a complete training template with best practices.
+
+### 2. Custom Environments
+
+**Requirements:**
+Custom environments must inherit from `gymnasium.Env` and implement:
+- `__init__()`: Define action_space and observation_space
+- `reset(seed, options)`: Return initial observation and info dict
+- `step(action)`: Return observation, reward, terminated, truncated, info
+- `render()`: Visualization (optional)
+- `close()`: Cleanup resources
+
+**Key Constraints:**
+- Image observations must be `np.uint8` in range [0, 255]
+- Use channel-first format when possible (channels, height, width)
+- SB3 normalizes images automatically by dividing by 255
+- Set `normalize_images=False` in policy_kwargs if pre-normalized
+- SB3 does NOT support `Discrete` or `MultiDiscrete` spaces with `start!=0`
+
+**Validation:**
+```python
+from stable_baselines3.common.env_checker import check_env
+
+check_env(env, warn=True)
+```
+
+See `scripts/custom_env_template.py` for a complete custom environment template and `references/custom_environments.md` for comprehensive guidance.
+
+### 3. Vectorized Environments
+
+**Purpose:**
+Vectorized environments run multiple environment instances in parallel, accelerating training and enabling certain wrappers (frame-stacking, normalization).
+
+**Types:**
+- **DummyVecEnv**: Sequential execution on current process (for lightweight environments)
+- **SubprocVecEnv**: Parallel execution across processes (for compute-heavy environments)
+
+**Quick Setup:**
+```python
+from stable_baselines3.common.env_util import make_vec_env
+
+# Create 4 parallel environments
+env = make_vec_env(&quot;CartPole-v1&quot;, n_envs=4, vec_env_cls=SubprocVecEnv)
+
+model = PPO(&quot;MlpPolicy&quot;, env, verbose=1)
+model.learn(total_timesteps=25000)
+```
+
+**Off-Policy Optimization:**
+When using multiple environments with off-policy algorithms (SAC, TD3, DQN), set `gradient_steps=-1` to perform one gradient update per environment step, balancing wall-clock time and sample efficiency.
+
+**API Differences:**
+- `reset()` returns only observations (info available in `vec_env.reset_infos`)
+- `step()` returns 4-tuple: `(obs, rewards, dones, infos)` not 5-tuple
+- Environments auto-reset after episodes
+- Terminal observations available via `infos[env_idx][&quot;terminal_observation&quot;]`
+
+See `references/vectorized_envs.md` for detailed information on wrappers and advanced usage.
+
+### 4. Callbacks for Monitoring and Control
+
+**Purpose:**
+Callbacks enable monitoring metrics, saving checkpoints, implementing early stopping, and custom training logic without modifying core algorithms.
+
+**Common Callbacks:**
+- **EvalCallback**: Evaluate periodically and save best model
+- **CheckpointCallback**: Save model checkpoints at intervals
+- **StopTrainingOnRewardThreshold**: Stop when target reward reached
+- **ProgressBarCallback**: Display training progress with timing
+
+**Custom Callback Structure:**
+```python
+from stable_baselines3.common.callbacks import BaseCallback
+
+class CustomCallback(BaseCallback):
+    def _on_training_start(self):
+        # Called before first rollout
+        pass
+
+    def _on_step(self):
+        # Called after each environment step
+        # Return False to stop training
+        return True
+
+    def _on_rollout_end(self):
+        # Called at end of rollout
+        pass
+```
+
+**Available Attributes:**
+- `self.model`: The RL algorithm instance
+- `self.num_timesteps`: Total environment steps
+- `self.training_env`: The training environment
+
+**Chaining Callbacks:**
+```python
+from stable_baselines3.common.callbacks import CallbackList
+
+callback = CallbackList([eval_callback, checkpoint_callback, custom_callback])
+model.learn(total_timesteps=10000, callback=callback)
+```
+
+See `references/callbacks.md` for comprehensive callback documentation.
+
+### 5. Model Persistence and Inspection
+
+**Saving and Loading:**
+```python
+# Save model
+model.save(&quot;model_name&quot;)
+
+# Save normalization statistics (if using VecNormalize)
+vec_env.save(&quot;vec_normalize.pkl&quot;)
+
+# Load model
+model = PPO.load(&quot;model_name&quot;, env=env)
+
+# Load normalization statistics
+vec_env = VecNormalize.load(&quot;vec_normalize.pkl&quot;, vec_env)
+```
+
+**Parameter Access:**
+```python
+# Get parameters
+params = model.get_parameters()
+
+# Set parameters
+model.set_parameters(params)
+
+# Access PyTorch state dict
+state_dict = model.policy.state_dict()
+```
+
+### 6. Evaluation and Recording
+
+**Evaluation:**
+```python
+from stable_baselines3.common.evaluation import evaluate_policy
+
+mean_reward, std_reward = evaluate_policy(
+    model,
+    env,
+    n_eval_episodes=10,
+    deterministic=True
+)
+```
+
+**Video Recording:**
+```python
+from stable_baselines3.common.vec_env import VecVideoRecorder
+
+# Wrap environment with video recorder
+env = VecVideoRecorder(
+    env,
+    &quot;videos/&quot;,
+    record_video_trigger=lambda x: x % 2000 == 0,
+    video_length=200
+)
+```
+
+See `scripts/evaluate_agent.py` for a complete evaluation and recording template.
+
+### 7. Advanced Features
+
+**Learning Rate Schedules:**
+```python
+def linear_schedule(initial_value):
+    def func(progress_remaining):
+        # progress_remaining goes from 1 to 0
+        return progress_remaining * initial_value
+    return func
+
+model = PPO(&quot;MlpPolicy&quot;, env, learning_rate=linear_schedule(0.001))
+```
+
+**Multi-Input Policies (Dict Observations):**
+```python
+model = PPO(&quot;MultiInputPolicy&quot;, env, verbose=1)
+```
+Use when observations are dictionaries (e.g., combining images with sensor data).
+
+**Hindsight Experience Replay:**
+```python
+from stable_baselines3 import SAC, HerReplayBuffer
+
+model = SAC(
+    &quot;MultiInputPolicy&quot;,
+    env,
+    replay_buffer_class=HerReplayBuffer,
+    replay_buffer_kwargs=dict(
+        n_sampled_goal=4,
+        goal_selection_strategy=&quot;future&quot;,
+    ),
+)
+```
+
+**TensorBoard Integration:**
+```python
+model = PPO(&quot;MlpPolicy&quot;, env, tensorboard_log=&quot;./tensorboard/&quot;)
+model.learn(total_timesteps=10000)
+```
+
+## Workflow Guidance
+
+**Starting a New RL Project:**
+
+1. **Define the problem**: Identify observation space, action space, and reward structure
+2. **Choose algorithm**: Use `references/algorithms.md` for selection guidance
+3. **Create/adapt environment**: Use `scripts/custom_env_template.py` if needed
+4. **Validate environment**: Always run `check_env()` before training
+5. **Set up training**: Use `scripts/train_rl_agent.py` as starting template
+6. **Add monitoring**: Implement callbacks for evaluation and checkpointing
+7. **Optimize performance**: Consider vectorized environments for speed
+8. **Evaluate and iterate**: Use `scripts/evaluate_agent.py` for assessment
+
+**Common Issues:**
+
+- **Memory errors**: Reduce `buffer_size` for off-policy algorithms or use fewer parallel environments
+- **Slow training**: Consider SubprocVecEnv for parallel environments
+- **Unstable training**: Try different algorithms, tune hyperparameters, or check reward scaling
+- **Import errors**: Ensure `stable_baselines3` is installed: `uv pip install stable-baselines3[extra]`
+
+## Resources
+
+### scripts/
+- `train_rl_agent.py`: Complete training script template with best practices
+- `evaluate_agent.py`: Agent evaluation and video recording template
+- `custom_env_template.py`: Custom Gym environment template
+
+### references/
+- `algorithms.md`: Detailed algorithm comparison and selection guide
+- `custom_environments.md`: Comprehensive custom environment creation guide
+- `callbacks.md`: Complete callback system reference
+- `vectorized_envs.md`: Vectorized environment usage and wrappers
+
+## Installation
+
+```bash
+# Basic installation
+uv pip install stable-baselines3
+
+# With extra dependencies (Tensorboard, etc.)
+uv pip install stable-baselines3[extra]
+```
+</code>
       </div>
     </div>
 
