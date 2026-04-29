@@ -1,4 +1,4 @@
 // Update this to your domain
 window.SITE_CONFIG = {
-  domain: 'https://YOUR-DOMAIN-HERE.com'
+  domain: 'https://nitorthecoder.github.io/aiccli'
 };
